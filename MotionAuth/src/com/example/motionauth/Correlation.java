@@ -154,17 +154,17 @@ public class Correlation
 								{
 									// thresholdにLOOSEが渡されていて，相関係数がそれ以上であると判定された場合
 									// 相関係数が0.8とかであれば，ズレを修正する必要なしと判断する
-									if ((R_accel[0][0] > 0.8 && R_accel[1][0] > 0.8) || (R_accel[1][0] > 0.8 && R_accel[2][0] > 0.8) || (R_accel[0][0] > 0.8 && R_accel[2][0] > 0.8))
+									if ((R_accel[0][0] > 0.7 && R_accel[1][0] > 0.7) || (R_accel[1][0] > 0.7 && R_accel[2][0] > 0.7) || (R_accel[0][0] > 0.7 && R_accel[2][0] > 0.7))
 									{
-										if ((R_accel[0][1] > 0.8 && R_accel[1][1] > 0.8) || (R_accel[1][1] > 0.8 && R_accel[2][1] > 0.8) || (R_accel[0][1] > 0.8 && R_accel[2][1] > 0.8))
+										if ((R_accel[0][1] > 0.7 && R_accel[1][1] > 0.7) || (R_accel[1][1] > 0.7 && R_accel[2][1] > 0.7) || (R_accel[0][1] > 0.7 && R_accel[2][1] > 0.7))
 										{
-											if ((R_accel[0][2] > 0.8 && R_accel[1][2] > 0.8) || (R_accel[1][2] > 0.8 && R_accel[2][2] > 0.8) || (R_accel[0][2] > 0.8 && R_accel[2][2] > 0.8))
+											if ((R_accel[0][2] > 0.7 && R_accel[1][2] > 0.7) || (R_accel[1][2] > 0.7 && R_accel[2][2] > 0.7) || (R_accel[0][2] > 0.7 && R_accel[2][2] > 0.7))
 											{
-												if ((R_gyro[0][0] > 0.8 && R_gyro[1][0] > 0.8) || (R_gyro[1][0] > 0.8 && R_gyro[2][0] > 0.8) || (R_gyro[0][0] > 0.8 && R_gyro[2][0] > 0.8))
+												if ((R_gyro[0][0] > 0.7 && R_gyro[1][0] > 0.7) || (R_gyro[1][0] > 0.7 && R_gyro[2][0] > 0.7) || (R_gyro[0][0] > 0.7 && R_gyro[2][0] > 0.7))
 												{
-													if ((R_gyro[0][1] > 0.8 && R_gyro[1][1] > 0.8) || (R_gyro[1][1] > 0.8 && R_gyro[2][1] > 0.8) || (R_gyro[0][1] > 0.8 && R_gyro[2][1] > 0.8))
+													if ((R_gyro[0][1] > 0.7 && R_gyro[1][1] > 0.7) || (R_gyro[1][1] > 0.7 && R_gyro[2][1] > 0.7) || (R_gyro[0][1] > 0.7 && R_gyro[2][1] > 0.7))
 													{
-														if ((R_gyro[0][2] > 0.8 && R_gyro[1][2] > 0.8) || (R_gyro[1][2] > 0.8 && R_gyro[2][2] > 0.8) || (R_gyro[0][2] > 0.8 && R_gyro[2][2] > 0.8))
+														if ((R_gyro[0][2] > 0.7 && R_gyro[1][2] > 0.7) || (R_gyro[1][2] > 0.7 && R_gyro[2][2] > 0.7) || (R_gyro[0][2] > 0.7 && R_gyro[2][2] > 0.7))
 														{
 															return Enum.MEASURE.PERFECT;
 														}

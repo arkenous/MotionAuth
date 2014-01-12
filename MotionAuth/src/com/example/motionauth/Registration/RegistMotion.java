@@ -374,7 +374,7 @@ public class RegistMotion extends Activity implements SensorEventListener
 				Log.d(TAG, "soukan");
 				// 相関係数の計算
 
-				// Calculate of average A
+				//region Calculate of Average A
 				float[][] sample_accel = new float[3][3];
 
 				float[][] sample_gyro = new float[3][3];
@@ -400,8 +400,9 @@ public class RegistMotion extends Activity implements SensorEventListener
 								sample_gyro[i][j] /= 99;
 							}
 					}
+				//endregion
 
-				// Calculate of average B
+				//region Calculate of Average B
 				float ave_accel[] = new float[3];
 				float ave_gyro[] = new float[3];
 
@@ -419,8 +420,9 @@ public class RegistMotion extends Activity implements SensorEventListener
 						ave_accel[i] /= 99;
 						ave_gyro[i] /= 99;
 					}
+				//endregion
 
-				// Calculate of Sxx
+				//region Calculate of Sxx
 				float Sxx_accel[][] = new float[3][3];
 				float Sxx_gyro[][] = new float[3][3];
 
@@ -435,8 +437,9 @@ public class RegistMotion extends Activity implements SensorEventListener
 									}
 							}
 					}
+				//endregion
 
-				// Calculate of Syy
+				//region Calculate of Syy
 				float Syy_accel[] = new float[3];
 
 				float Syy_gyro[] = new float[3];
@@ -449,8 +452,9 @@ public class RegistMotion extends Activity implements SensorEventListener
 								Syy_gyro[j] += Math.pow((aveMoveAverageAngle[j][i] - ave_gyro[j]), 2);
 							}
 					}
+				//endregion
 
-				// Calculate of Sxy
+				//region Calculate of Sxy
 				float[][] Sxy_accel = new float[3][3];
 				float[][] Sxy_gyro = new float[3][3];
 
@@ -465,8 +469,9 @@ public class RegistMotion extends Activity implements SensorEventListener
 									}
 							}
 					}
+				//endregion
 
-				// Calculate of R
+				//region Calculate of R
 				double[][] R_accel = new double[3][3];
 				double[][] R_gyro = new double[3][3];
 
@@ -478,6 +483,7 @@ public class RegistMotion extends Activity implements SensorEventListener
 								R_gyro[i][j] = Sxy_gyro[i][j] / Math.sqrt(Sxx_gyro[i][j] * Syy_gyro[j]);
 							}
 					}
+				//endregion
 
 				Toast.makeText(RegistMotion.this, "a", Toast.LENGTH_LONG).show();
 				if (!WriteData.writeRData("RegistSRdata", "R_accel", RegistNameInput.name, R_accel, RegistMotion.this))
@@ -489,8 +495,8 @@ public class RegistMotion extends Activity implements SensorEventListener
 						Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_SHORT).show();
 					}
 
+				//region 相関係数の判定
 				// 相関係数が一定以上なら保存する（ユーザ名のテキストファイルに書き出す）
-
 				if ((R_accel[0][0] > STRICT && R_accel[1][0] > STRICT) || (R_accel[1][0] > STRICT && R_accel[2][0] > STRICT) || (R_accel[0][0] > STRICT && R_accel[2][0] > STRICT))
 					{
 						if ((R_accel[0][1] > STRICT && R_accel[1][1] > STRICT) || (R_accel[1][1] > STRICT && R_accel[2][1] > STRICT) || (R_accel[0][1] > STRICT && R_accel[2][1] > STRICT))
@@ -539,7 +545,7 @@ public class RegistMotion extends Activity implements SensorEventListener
 						Toast.makeText(this, "モーション登録に失敗しました", Toast.LENGTH_SHORT).show();
 						Log.d(TAG, "失敗");
 					}
-
+				//endregion
 			}
 
 

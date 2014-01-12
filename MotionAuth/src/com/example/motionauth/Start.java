@@ -15,6 +15,10 @@ import android.os.Message;
 import android.os.Handler;
 
 
+/**
+ * アプリを起動した際に最初に表示されるアクティビティ
+ * モード選択を行う
+ */
 public class Start extends Activity
 	{
 		private Handler handler;

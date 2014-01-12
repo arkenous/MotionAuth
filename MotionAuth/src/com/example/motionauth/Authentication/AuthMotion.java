@@ -23,6 +23,9 @@ import com.example.motionauth.R;
 
 import java.io.*;
 
+/**
+ * ユーザ認証を行う
+ */
 public class AuthMotion extends Activity implements SensorEventListener
 	{
 		private SensorManager mSensorManager;
@@ -234,8 +237,8 @@ public class AuthMotion extends Activity implements SensorEventListener
 			{
 				// 相関係数の計算
 
-				// Calculate of average A
-				// ユーザが入力したデータ
+				//region Calculate of Average A
+
 				float[] sample_accel = new float[3];
 
 				float[] sample_gyro = new float[3];
@@ -256,8 +259,9 @@ public class AuthMotion extends Activity implements SensorEventListener
 
 						sample_gyro[i] /= 99;
 					}
+				//endregion
 
-				// Calculate of average B
+				//region Calculate of Average B
 				float ave_accel[] = new float[3];
 
 				float ave_gyro[] = new float[3];
@@ -380,8 +384,9 @@ public class AuthMotion extends Activity implements SensorEventListener
 						ave_accel[i] /= 99;
 						ave_gyro[i] /= 99;
 					}
+				//endregion
 
-				// Calculate of Sxx
+				//region Calculate of Sxx
 				float Sxx_accel[] = new float[3];
 
 				float Sxx_gyro[] = new float[3];
@@ -395,8 +400,9 @@ public class AuthMotion extends Activity implements SensorEventListener
 								Sxx_gyro[i] += Math.pow((moveAverageAngle[i][j] - sample_gyro[i]), 2);
 							}
 					}
+				//endregion
 
-				// Calculate of Syy
+				//region Calculate of Syy
 				float Syy_accel[] = new float[3];
 
 				float Syy_gyro[] = new float[3];
@@ -410,8 +416,9 @@ public class AuthMotion extends Activity implements SensorEventListener
 								Syy_gyro[i] += Math.pow((registed_ave_angle[i][j] - ave_gyro[i]), 2);
 							}
 					}
+				//endregion
 
-				// Calculate of Sxy
+				//region Calculate of Sxy
 				float Sxy_accel[] = new float[3];
 
 				float Sxy_gyro[] = new float[3];
@@ -424,8 +431,9 @@ public class AuthMotion extends Activity implements SensorEventListener
 								Sxy_gyro[i] += (moveAverageAngle[i][j] - sample_gyro[i]) * (registed_ave_angle[i][j] - ave_gyro[i]);
 							}
 					}
+				//endregion
 
-				// Calculate of R
+				//region Calculate of R
 				double R_accel[] = new double[3];
 
 				double R_gyro[] = new double[3];
@@ -436,8 +444,10 @@ public class AuthMotion extends Activity implements SensorEventListener
 
 						R_gyro[i] = Sxy_gyro[i] / Math.sqrt(Sxx_gyro[i] * Syy_gyro[i]);
 					}
+				//endregion
 
-				// 相関係数が一定以上あるなら認証成功
+				//region 相関の判定
+				//相関係数が一定以上あるなら認証成功
 				if (R_accel[0] > 0.5)
 					{
 						if (R_accel[1] > 0.5)
@@ -495,6 +505,7 @@ public class AuthMotion extends Activity implements SensorEventListener
 						Toast.makeText(this, "認証失敗", Toast.LENGTH_LONG).show();
 						Toast.makeText(this, "距離X軸: " + R_accel[0], Toast.LENGTH_SHORT).show();
 					}
+				//endregion
 			}
 
 

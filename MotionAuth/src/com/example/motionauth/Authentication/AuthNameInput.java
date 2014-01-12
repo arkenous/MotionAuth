@@ -21,6 +21,9 @@ import android.widget.Toast;
 import com.example.motionauth.R;
 
 
+/**
+ * 認証するユーザ名を入力させる
+ */
 public class AuthNameInput extends Activity
 	{
 		public static String name;
@@ -38,6 +41,9 @@ public class AuthNameInput extends Activity
 			}
 
 
+		/**
+		 * ユーザ名を入力させる
+		 */
 		private void nameInput()
 			{
 				final EditText nameInput = (EditText) findViewById(R.id.nameInputEditText);

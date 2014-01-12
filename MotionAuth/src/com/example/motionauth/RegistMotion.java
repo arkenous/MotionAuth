@@ -28,635 +28,632 @@ import java.io.*;
  * モーションを新規登録する
  */
 public class RegistMotion extends Activity implements SensorEventListener
-{
-	private SensorManager mSensorManager;
-	private Sensor mAccelerometerSensor;
-	private Sensor mGyroscopeSensor;
-
-	// モーションの生データ
-	private float vAccelo[];
-	private float vGyro[];
-
-	private boolean btnStatus = false;
-
-	private static final int TIMEOUT_MESSAGE = 1;
-	private static final int INTERVAL = 30;
-
-	// 相関の閾値
-	private static final double LOOSE = 0.4;
-	private static final double STRICT = 0.6;
-
-	// データ取得カウント用
-	private int accelCount = 0;
-	private int gyroCount = 0;
-	private int getCount = 0;
-
-	// 配列を多重リストに変える？
-
-	private float accelo_tmp[][][] = new float[3][3][100];
-
-	private float gyro_tmp[][][] = new float[3][3][100];
-
-	private double accelo[][][] = new double[3][3][100];
-
-	private double gyro[][][] = new double[3][3][100];
-
-	// 修正済みデータ格納用変数を宣言する
-	private double newDistance[][][] = new double[3][3][100];
-	private double newAngle[][][] = new double[3][3][100];
-	private double newAveDistance[][] = new double[3][100];
-	private double newAveAngle[][] = new double[3][100];
-	private double newAveDistanceTmp[][] = new double[3][100];
-	private double newAveAngleTmp[][] = new double[3][100];
-
-
-	TextView secondTv;
-	TextView countSecondTv;
-	Button getMotionBtn;
-
-	private static final String TAG = "MotionTest";
-
-
-	private double outputData = 0.0;
-	private int count = 0;
-
-	// 移動平均後のデータを格納する配列
-	private double moveAverageDistance[][][] = new double[3][3][100];
-	private double moveAverageAngle[][][] = new double[3][3][100];
-
-	private double aveMoveAverageDistance[][] = new double[3][100];
-	private double aveMoveAverageAngle[][] = new double[3][100];
-
-
-	@Override
-	protected void onCreate (Bundle savedInstanceState)
 	{
-		super.onCreate (savedInstanceState);
-		setContentView (R.layout.activity_regist_motion);
+		private SensorManager mSensorManager;
+		private Sensor mAccelerometerSensor;
+		private Sensor mGyroscopeSensor;
 
-		registMotion ();
-	}
+		// モーションの生データ
+		private float vAccelo[];
+		private float vGyro[];
+
+		private boolean btnStatus = false;
+
+		private static final int TIMEOUT_MESSAGE = 1;
+		private static final int INTERVAL = 30;
+
+		// 相関の閾値
+		private static final double LOOSE = 0.4;
+		private static final double STRICT = 0.6;
+
+		// データ取得カウント用
+		private int accelCount = 0;
+		private int gyroCount = 0;
+		private int getCount = 0;
+
+		// 配列を多重リストに変える？
+
+		private float accelo_tmp[][][] = new float[3][3][100];
+
+		private float gyro_tmp[][][] = new float[3][3][100];
+
+		private double accelo[][][] = new double[3][3][100];
+
+		private double gyro[][][] = new double[3][3][100];
+
+		// 修正済みデータ格納用変数を宣言する
+		private double newDistance[][][] = new double[3][3][100];
+		private double newAngle[][][] = new double[3][3][100];
+		private double newAveDistance[][] = new double[3][100];
+		private double newAveAngle[][] = new double[3][100];
+		private double newAveDistanceTmp[][] = new double[3][100];
+		private double newAveAngleTmp[][] = new double[3][100];
 
 
-	/**
-	 * モーション登録画面にイベントリスナ等を設定する
-	 */
-	private void registMotion ()
-	{
-		mSensorManager = (SensorManager) getSystemService (Context.SENSOR_SERVICE);
-		mAccelerometerSensor = mSensorManager.getDefaultSensor (Sensor.TYPE_ACCELEROMETER);
-		mGyroscopeSensor = mSensorManager.getDefaultSensor (Sensor.TYPE_GYROSCOPE);
+		TextView secondTv;
+		TextView countSecondTv;
+		Button getMotionBtn;
 
-		TextView nameTv = (TextView) findViewById (R.id.textView2);
-		secondTv = (TextView) findViewById (R.id.secondTextView);
-		countSecondTv = (TextView) findViewById (R.id.textView4);
-		getMotionBtn = (Button) findViewById (R.id.button1);
-
-		nameTv.setText (RegistNameInput.name + "さん読んでね！");
-
-		getMotionBtn.setOnClickListener (new OnClickListener ()
-		{
-			public void onClick (View v)
-			{
-				if (btnStatus == false)
-				{
-					btnStatus = true;
-					getMotionBtn.setText ("取得中");
-					countSecondTv.setText ("秒");
-					timeHandler.sendEmptyMessage (TIMEOUT_MESSAGE);
-				}
-				else
-				{
-				}
-			}
-		});
-	}
+		private static final String TAG = "MotionTest";
 
 
-	@Override
-	public void onSensorChanged (SensorEvent event)
-	{
-		if (event.sensor.getType () == Sensor.TYPE_ACCELEROMETER)
-		{
-			vAccelo = event.values.clone ();
-		}
-		if (event.sensor.getType () == Sensor.TYPE_GYROSCOPE)
-		{
-			vGyro = event.values.clone ();
-		}
-	}
+		private double outputData = 0.0;
+		private int count = 0;
 
-	Handler timeHandler = new Handler ()
-	{
+		// 移動平均後のデータを格納する配列
+		private double moveAverageDistance[][][] = new double[3][3][100];
+		private double moveAverageAngle[][][] = new double[3][3][100];
+
+		private double aveMoveAverageDistance[][] = new double[3][100];
+		private double aveMoveAverageAngle[][] = new double[3][100];
+
+
 		@Override
-		public void dispatchMessage (Message msg)
-		{
-			Log.d (TAG, "dispatchMessageIn");
-
-			if (msg.what == TIMEOUT_MESSAGE && btnStatus == true)
+		protected void onCreate(Bundle savedInstanceState)
 			{
-				Log.d (TAG, "ifIn");
-				if (accelCount < 100 && gyroCount < 100 && getCount >= 0 && getCount < 3)
+				super.onCreate(savedInstanceState);
+				setContentView(R.layout.activity_regist_motion);
+
+				registMotion();
+			}
+
+
+		/**
+		 * モーション登録画面にイベントリスナ等を設定する
+		 */
+		private void registMotion()
+			{
+				mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+				mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+				mGyroscopeSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+
+				TextView nameTv = (TextView) findViewById(R.id.textView2);
+				secondTv = (TextView) findViewById(R.id.secondTextView);
+				countSecondTv = (TextView) findViewById(R.id.textView4);
+				getMotionBtn = (Button) findViewById(R.id.button1);
+
+				nameTv.setText(RegistNameInput.name + "さん読んでね！");
+
+				getMotionBtn.setOnClickListener(new OnClickListener()
 				{
-					// 取得した値を，0.03秒ごとに配列に入れる
-					for (int i = 0; i < 3; i++)
+					public void onClick(View v)
+						{
+							if (btnStatus == false)
+								{
+									btnStatus = true;
+									getMotionBtn.setText("取得中");
+									countSecondTv.setText("秒");
+									timeHandler.sendEmptyMessage(TIMEOUT_MESSAGE);
+								}
+							else
+								{
+								}
+						}
+				});
+			}
+
+
+		@Override
+		public void onSensorChanged(SensorEvent event)
+			{
+				if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
 					{
-						accelo_tmp[getCount][i][accelCount] = vAccelo[i];
+						vAccelo = event.values.clone();
 					}
-
-					for (int i = 0; i < 3; i++)
+				if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE)
 					{
-						gyro_tmp[getCount][i][gyroCount] = vGyro[i];
+						vGyro = event.values.clone();
 					}
+			}
 
-					Log.d (TAG, "a");
-
-					accelCount++;
-					gyroCount++;
-
-					if (accelCount == 1)
-					{
-						secondTv.setText ("3");
-					}
-
-					if (accelCount == 33)
-					{
-						secondTv.setText ("2");
-					}
-					if (accelCount == 66)
-					{
-						secondTv.setText ("1");
-					}
-
-					timeHandler.sendEmptyMessageDelayed (TIMEOUT_MESSAGE, INTERVAL);
-				}
-				else if (accelCount >= 100 && gyroCount >= 100 && getCount >= 0 && getCount < 4)
+		Handler timeHandler = new Handler()
+		{
+			@Override
+			public void dispatchMessage(Message msg)
 				{
-					// 取得完了
-					btnStatus = false;
-					getCount++;
-					countSecondTv.setText ("回");
-					getMotionBtn.setText ("モーションデータ取得");
+					Log.d(TAG, "dispatchMessageIn");
 
-					accelCount = 0;
-					gyroCount = 0;
-
-					if (getCount == 1)
-					{
-						secondTv.setText ("2");
-					}
-					if (getCount == 2)
-					{
-						secondTv.setText ("1");
-					}
-
-					if (getCount == 3)
-					{
-						// 全データ取得完了（3回分の加速度，ジャイロを取得完了）
-						secondTv.setText ("0");
-
-						// 生データをアウトプット
-						if (!WriteData.writeFloatThreeArrayData ("RegistRawData", "rawAccelo", RegistNameInput.name, accelo_tmp, RegistMotion.this))
+					if (msg.what == TIMEOUT_MESSAGE && btnStatus == true)
 						{
-						Toast.makeText (RegistMotion.this, "Error", Toast.LENGTH_SHORT).show ();
-						}
-						if (!WriteData.writeFloatThreeArrayData ("RegistRawData", "rawGyro", RegistNameInput.name, gyro_tmp, RegistMotion.this))
-						{
-						Toast.makeText (RegistMotion.this, "Error", Toast.LENGTH_SHORT).show ();
-						}
+							Log.d(TAG, "ifIn");
+							if (accelCount < 100 && gyroCount < 100 && getCount >= 0 && getCount < 3)
+								{
+									// 取得した値を，0.03秒ごとに配列に入れる
+									for (int i = 0; i < 3; i++)
+										{
+											accelo_tmp[getCount][i][accelCount] = vAccelo[i];
+										}
 
-						 calc ();
-						 soukan ();
-					}
+									for (int i = 0; i < 3; i++)
+										{
+											gyro_tmp[getCount][i][gyroCount] = vGyro[i];
+										}
+
+									Log.d(TAG, "a");
+
+									accelCount++;
+									gyroCount++;
+
+									if (accelCount == 1)
+										{
+											secondTv.setText("3");
+										}
+
+									if (accelCount == 33)
+										{
+											secondTv.setText("2");
+										}
+									if (accelCount == 66)
+										{
+											secondTv.setText("1");
+										}
+
+									timeHandler.sendEmptyMessageDelayed(TIMEOUT_MESSAGE, INTERVAL);
+								}
+							else if (accelCount >= 100 && gyroCount >= 100 && getCount >= 0 && getCount < 4)
+								{
+									// 取得完了
+									btnStatus = false;
+									getCount++;
+									countSecondTv.setText("回");
+									getMotionBtn.setText("モーションデータ取得");
+
+									accelCount = 0;
+									gyroCount = 0;
+
+									if (getCount == 1)
+										{
+											secondTv.setText("2");
+										}
+									if (getCount == 2)
+										{
+											secondTv.setText("1");
+										}
+
+									if (getCount == 3)
+										{
+											// 全データ取得完了（3回分の加速度，ジャイロを取得完了）
+											secondTv.setText("0");
+
+											// 生データをアウトプット
+											if (!WriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accelo_tmp, RegistMotion.this))
+												{
+													Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_SHORT).show();
+												}
+											if (!WriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyro_tmp, RegistMotion.this))
+												{
+													Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_SHORT).show();
+												}
+
+											calc();
+											soukan();
+										}
+								}
+							else
+								{
+									Log.d(TAG, "elseIn");
+									super.dispatchMessage(msg);
+								}
+						}
 				}
+		};
+
+
+		/**
+		 * データ加工，計算処理を行う
+		 */
+		private void calc()
+			{
+				Log.d(TAG, "calc");
+
+				// データ加工，計算処理
+				// データの桁揃え
+
+				for (int i = 0; i < 3; i++)
+					{
+						for (int j = 0; j < 3; j++)
+							{
+								// 原データの桁揃え
+								for (int k = 0; k < 100; k++)
+									{
+										// データのフォーマット
+										accelo[i][j][k] = Formatter.floatToDoubleFormatter(accelo_tmp[i][j][k]);
+										gyro[i][j][k] = Formatter.floatToDoubleFormatter(gyro_tmp[i][j][k]);
+									}
+
+								// 移動平均ローパス
+								for (int k = 0; k < 100; k++)
+									{
+										double tmp = lowpass(accelo[i][j][k]);
+										tmp = (tmp * 0.03 * 0.03) / 2 * 1000;
+										moveAverageDistance[i][j][k] = Formatter.doubleToDoubleFormatter(tmp);
+									}
+								for (int k = 0; k < 100; k++)
+									{
+										double tmp = lowpass(gyro[i][j][k]);
+										tmp = (tmp * 0.03 * 0.03) / 2 * 1000;
+										moveAverageAngle[i][j][k] = Formatter.doubleToDoubleFormatter(tmp);
+									}
+							}
+					}
+
+				if (!WriteData.writeDoubleThreeArrayData("FormatRawData", "rawAccelo", RegistNameInput.name, accelo, RegistMotion.this))
+					{
+						Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_SHORT).show();
+					}
+				if (!WriteData.writeDoubleThreeArrayData("FormatRawData", "rawGyro", RegistNameInput.name, gyro, RegistMotion.this))
+					{
+						Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_SHORT).show();
+					}
+
+
+				// measureCorrelation用の平均値データを作成
+				for (int i = 0; i < 3; i++)
+					{
+						for (int j = 0; j < 100; j++)
+							{
+								aveMoveAverageDistance[i][j] = (moveAverageDistance[0][i][j] + moveAverageDistance[1][i][j] + moveAverageDistance[2][i][j]) / 3;
+								aveMoveAverageAngle[i][j] = (moveAverageAngle[0][i][j] + moveAverageAngle[1][i][j] + moveAverageAngle[2][i][j]) / 3;
+							}
+					}
+
+				//TODO 同一モーション確認時，導出された相関係数が一定以上であれば，ズレ修正をスキップするようにする
+
+				// 同一のモーションデータであることを確認する
+				Enum.MEASURE measure = Correlation.measureCorrelation(this, moveAverageDistance, moveAverageAngle, aveMoveAverageDistance, aveMoveAverageAngle, LOOSE);
+				if (Enum.MEASURE.INCORRECT == measure)
+					{
+						// 相関係数が0.4以下
+						Toast.makeText(RegistMotion.this, "同一モーションですか？", Toast.LENGTH_SHORT).show();
+						return;
+					}
+				else if (Enum.MEASURE.CORRECT == measure)
+					{
+						// 相関係数が0.4よりも高く，0.8以下の場合
+						// ズレ修正を行う
+						moveAverageDistance = CorrectDeviation.correctDeviation(moveAverageDistance, this);
+						moveAverageAngle = CorrectDeviation.correctDeviation(moveAverageAngle, this);
+					}
+				else if (Enum.MEASURE.PERFECT == measure)
+					{
+						// 相関係数が0.8よりも高い場合
+						// ズレ修正を行わず，スキップする
+					}
 				else
-				{
-					Log.d (TAG, "elseIn");
-					super.dispatchMessage (msg);
-				}
-			}
-		}
-	};
+					{
+						// なにかがおかしい
+						Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_LONG).show();
+					}
 
 
-	/**
-	 * データ加工，計算処理を行う
-	 */
-	private void calc ()
-	{
-		Log.d (TAG, "calc");
-
-		// データ加工，計算処理
-		// データの桁揃え
-
-		for (int i = 0; i < 3; i++)
-		{
-			for (int j = 0; j < 3; j++)
-			{
-				// 原データの桁揃え
-				for (int k = 0; k < 100; k++)
-				{
-					// データのフォーマット
-					accelo[i][j][k] = Formatter.floatToDoubleFormatter (accelo_tmp[i][j][k]);
-					gyro[i][j][k] = Formatter.floatToDoubleFormatter (gyro_tmp[i][j][k]);
-				}
-
-				// 移動平均ローパス
-				for (int k = 0; k < 100; k++)
-				{
-					double tmp = lowpass (accelo[i][j][k]);
-					tmp = (tmp * 0.03 * 0.03) / 2 * 1000;
-					moveAverageDistance[i][j][k] = Formatter.doubleToDoubleFormatter (tmp);
-				}
-				for (int k = 0; k < 100; k++)
-				{
-					double tmp = lowpass (gyro[i][j][k]);
-					tmp = (tmp * 0.03 * 0.03) / 2 * 1000;
-					moveAverageAngle[i][j][k] = Formatter.doubleToDoubleFormatter (tmp);
-				}
-			}
-		}
-
-		if (!WriteData.writeDoubleThreeArrayData("FormatRawData", "rawAccelo", RegistNameInput.name, accelo, RegistMotion.this))
-		{
-			Toast.makeText (RegistMotion.this, "Error", Toast.LENGTH_SHORT).show ();
-		}
-		if (!WriteData.writeDoubleThreeArrayData("FormatRawData", "rawGyro", RegistNameInput.name, gyro, RegistMotion.this))
-		{
-			Toast.makeText (RegistMotion.this, "Error", Toast.LENGTH_SHORT).show ();
-		}
-
-
-
-		// measureCorrelation用の平均値データを作成
-		for (int i = 0; i < 3; i++)
-		{
-			for (int j = 0; j < 100; j++)
-			{
-				aveMoveAverageDistance[i][j] = (moveAverageDistance[0][i][j] + moveAverageDistance[1][i][j] + moveAverageDistance[2][i][j]) / 3;
-				aveMoveAverageAngle[i][j] = (moveAverageAngle[0][i][j] + moveAverageAngle[1][i][j] + moveAverageAngle[2][i][j]) / 3;
-			}
-		}
-
-		//TODO 同一モーション確認時，導出された相関係数が一定以上であれば，ズレ修正をスキップするようにする
-
-		// 同一のモーションデータであることを確認する
-		Enum.MEASURE measure = Correlation.measureCorrelation (this, moveAverageDistance, moveAverageAngle, aveMoveAverageDistance, aveMoveAverageAngle, LOOSE);
-		if (Enum.MEASURE.INCORRECT == measure)
-		{
-			// 相関係数が0.4以下
-			Toast.makeText (RegistMotion.this, "同一モーションですか？", Toast.LENGTH_SHORT).show();
-			return;
-		}
-		else if (Enum.MEASURE.CORRECT == measure)
-		{
-			// 相関係数が0.4よりも高く，0.8以下の場合
-			// ズレ修正を行う
-			moveAverageDistance = CorrectDeviation.correctDeviation (moveAverageDistance, this);
-			moveAverageAngle = CorrectDeviation.correctDeviation (moveAverageAngle, this);
-		}
-		else if (Enum.MEASURE.PERFECT == measure)
-		{
-			// 相関係数が0.8よりも高い場合
-			// ズレ修正を行わず，スキップする
-		}
-		else
-		{
-			// なにかがおかしい
-			Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_LONG).show();
-		}
-
-
-
-
-		// ズレ修正後の平均値データを出す
-		for (int i = 0; i < 3; i++)
-		{
-			for (int j = 0; j < 100; j++)
-			{
+				// ズレ修正後の平均値データを出す
+				for (int i = 0; i < 3; i++)
+					{
+						for (int j = 0; j < 100; j++)
+							{
 //				double tmp = (moveAverageDistance[0][i][j] + moveAverageDistance[1][i][j] + moveAverageDistance[2][i][j]) / 3;
 //				aveMoveAverageDistance[i][j] = Formatter.doubleToDoubleFormatter (tmp);
-				aveMoveAverageDistance[i][j] = (moveAverageDistance[0][i][j] + moveAverageDistance[1][i][j] + moveAverageDistance[2][i][j]) / 3;
+								aveMoveAverageDistance[i][j] = (moveAverageDistance[0][i][j] + moveAverageDistance[1][i][j] + moveAverageDistance[2][i][j]) / 3;
 
 //				tmp = (moveAverageAngle[0][i][j] + moveAverageAngle[1][i][j] + moveAverageAngle[2][i][j]) / 3;
 //				aveMoveAverageAngle[i][j] = Formatter.doubleToDoubleFormatter (tmp);
-				aveMoveAverageAngle[i][j] = (moveAverageAngle[0][i][j] + moveAverageAngle[1][i][j] + moveAverageAngle[2][i][j]) / 3;
+								aveMoveAverageAngle[i][j] = (moveAverageAngle[0][i][j] + moveAverageAngle[1][i][j] + moveAverageAngle[2][i][j]) / 3;
+							}
+					}
 			}
-		}
-	}
 
 
-	/**
-	 * 移動量平均ローパスフィルタ
-	 *
-	 * @param data ローパスをかけるdouble型のデータ
-	 * @return ローパスをかけ終わったdouble型のデータ
-	 */
-	private double lowpass (double data)
-	{
-		Log.d (TAG, "lowpass");
-
-		if (count == 100)
-		{
-			outputData = 0.0;
-			count = 0;
-		}
-
-		outputData = outputData * 0.9 + data * 0.1;
-
-		count++;
-		return outputData;
-	}
-
-
-	/**
-	 * 相関係数を導出し，ユーザが入力した3回のモーションの類似性を確認する
-	 */
-	private void soukan ()
-	{
-		Log.d (TAG, "soukan");
-		// 相関係数の計算
-
-		// Calculate of average A
-		float[][] sample_accel = new float[3][3];
-
-		float[][] sample_gyro = new float[3][3];
-
-		// iは1回目，2回目，3回目
-		for (int i = 0; i < 3; i++)
-		{
-			for (int k = 0; k < 3; k++)
+		/**
+		 * 移動量平均ローパスフィルタ
+		 *
+		 * @param data ローパスをかけるdouble型のデータ
+		 * @return ローパスをかけ終わったdouble型のデータ
+		 */
+		private double lowpass(double data)
 			{
-				for (int j = 0; j < 100; j++)
-				{
-					sample_accel[i][k] += moveAverageDistance[i][k][j];
-					sample_gyro[i][k] += moveAverageAngle[i][k][j];
-				}
-			}
-		}
+				Log.d(TAG, "lowpass");
 
-		for (int i = 0; i < 3; i++)
-		{
-			for (int j = 0; j < 3; j++)
-			{
-				sample_accel[i][j] /= 99;
-				sample_gyro[i][j] /= 99;
-			}
-		}
-
-		// Calculate of average B
-		float ave_accel[] = new float[3];
-		float ave_gyro[] = new float[3];
-
-		for (int j = 0; j < 3; j++)
-		{
-			for (int i = 0; i < 100; i++)
-			{
-				ave_accel[j] += aveMoveAverageDistance[j][i];
-				ave_gyro[j] += aveMoveAverageAngle[j][i];
-			}
-		}
-
-		for (int i = 0; i < 3; i++)
-		{
-			ave_accel[i] /= 99;
-			ave_gyro[i] /= 99;
-		}
-
-		// Calculate of Sxx
-		float Sxx_accel[][] = new float[3][3];
-		float Sxx_gyro[][] = new float[3][3];
-
-		for (int i = 0; i < 3; i++)
-		{
-			for (int k = 0; k < 3; k++)
-			{
-				for (int j = 0; j < 100; j++)
-				{
-					Sxx_accel[i][k] += Math.pow ((moveAverageDistance[i][k][j] - sample_accel[i][k]), 2);
-					Sxx_gyro[i][k] += Math.pow ((moveAverageAngle[i][k][j] - sample_gyro[i][k]), 2);
-				}
-			}
-		}
-
-		// Calculate of Syy
-		float Syy_accel[] = new float[3];
-
-		float Syy_gyro[] = new float[3];
-
-		for (int j = 0; j < 3; j++)
-		{
-			for (int i = 0; i < 100; i++)
-			{
-				Syy_accel[j] += Math.pow ((aveMoveAverageDistance[j][i] - ave_accel[j]), 2);
-				Syy_gyro[j] += Math.pow ((aveMoveAverageAngle[j][i] - ave_gyro[j]), 2);
-			}
-		}
-
-		// Calculate of Sxy
-		float[][] Sxy_accel = new float[3][3];
-		float[][] Sxy_gyro = new float[3][3];
-
-		for (int i = 0; i < 3; i++)
-		{
-			for (int k = 0; k < 3; k++)
-			{
-				for (int j = 0; j < 100; j++)
-				{
-					Sxy_accel[i][k] += (moveAverageDistance[i][k][j] - sample_accel[i][k]) * (aveMoveAverageDistance[k][j] - ave_accel[k]);
-					Sxy_gyro[i][k] += (moveAverageAngle[i][k][j] - sample_gyro[i][k]) * (aveMoveAverageAngle[k][j] - ave_gyro[k]);
-				}
-			}
-		}
-
-		// Calculate of R
-		double[][] R_accel = new double[3][3];
-		double[][] R_gyro = new double[3][3];
-
-		for (int i = 0; i < 3; i++)
-		{
-			for (int j = 0; j < 3; j++)
-			{
-				R_accel[i][j] = Sxy_accel[i][j] / Math.sqrt (Sxx_accel[i][j] * Syy_accel[j]);
-				R_gyro[i][j] = Sxy_gyro[i][j] / Math.sqrt (Sxx_gyro[i][j] * Syy_gyro[j]);
-			}
-		}
-
-		Toast.makeText(RegistMotion.this, "a", Toast.LENGTH_LONG).show();
-			if (!WriteData.writeRData("RegistSRdata", "R_accel", RegistNameInput.name, R_accel, RegistMotion.this))
-		{
-			Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_SHORT).show();
-		}
-		if (!WriteData.writeRData("RegistSRdata", "R_gyro", RegistNameInput.name, R_gyro, RegistMotion.this))
-		{
-			Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_SHORT).show();
-		}
-
-		// 相関係数が一定以上なら保存する（ユーザ名のテキストファイルに書き出す）
-
-		if ((R_accel[0][0] > STRICT && R_accel[1][0] > STRICT) || (R_accel[1][0] > STRICT && R_accel[2][0] > STRICT) || (R_accel[0][0] > STRICT && R_accel[2][0] > STRICT))
-		{
-			if ((R_accel[0][1] > STRICT && R_accel[1][1] > STRICT) || (R_accel[1][1] > STRICT && R_accel[2][1] > STRICT) || (R_accel[0][1] > STRICT && R_accel[2][1] > STRICT))
-			{
-				if ((R_accel[0][2] > STRICT && R_accel[1][2] > STRICT) || (R_accel[1][2] > STRICT && R_accel[2][2] > STRICT) || (R_accel[0][2] > STRICT && R_accel[2][2] > STRICT))
-				{
-					if ((R_gyro[0][0] > STRICT && R_gyro[1][0] > STRICT) || (R_gyro[1][0] > STRICT && R_gyro[2][0] > STRICT) || (R_gyro[0][0] > STRICT || R_gyro[2][0] > STRICT))
+				if (count == 100)
 					{
-						if ((R_gyro[0][1] > STRICT && R_gyro[1][1] > STRICT) || (R_gyro[1][1] > STRICT && R_gyro[2][1] > STRICT) || (R_gyro[0][1] > STRICT || R_gyro[2][1] > STRICT))
-						{
-							if ((R_gyro[0][2] > STRICT && R_gyro[1][2] > STRICT) || (R_gyro[1][2] > STRICT && R_gyro[2][2] > STRICT) || (R_gyro[0][2] > STRICT && R_gyro[2][2] > STRICT))
-							{
-								getMotionBtn.setText("認証登録中");
-								Toast.makeText (this, "モーションを登録中です", Toast.LENGTH_SHORT).show ();
+						outputData = 0.0;
+						count = 0;
+					}
 
-								// 3回のモーションの平均値をファイルに書き出す
-								writeData();
-							}
-							else
+				outputData = outputData * 0.9 + data * 0.1;
+
+				count++;
+				return outputData;
+			}
+
+
+		/**
+		 * 相関係数を導出し，ユーザが入力した3回のモーションの類似性を確認する
+		 */
+		private void soukan()
+			{
+				Log.d(TAG, "soukan");
+				// 相関係数の計算
+
+				// Calculate of average A
+				float[][] sample_accel = new float[3][3];
+
+				float[][] sample_gyro = new float[3][3];
+
+				// iは1回目，2回目，3回目
+				for (int i = 0; i < 3; i++)
+					{
+						for (int k = 0; k < 3; k++)
 							{
-								Toast.makeText (this, "モーション登録に失敗しました", Toast.LENGTH_SHORT).show ();
+								for (int j = 0; j < 100; j++)
+									{
+										sample_accel[i][k] += moveAverageDistance[i][k][j];
+										sample_gyro[i][k] += moveAverageAngle[i][k][j];
+									}
 							}
-						}
+					}
+
+				for (int i = 0; i < 3; i++)
+					{
+						for (int j = 0; j < 3; j++)
+							{
+								sample_accel[i][j] /= 99;
+								sample_gyro[i][j] /= 99;
+							}
+					}
+
+				// Calculate of average B
+				float ave_accel[] = new float[3];
+				float ave_gyro[] = new float[3];
+
+				for (int j = 0; j < 3; j++)
+					{
+						for (int i = 0; i < 100; i++)
+							{
+								ave_accel[j] += aveMoveAverageDistance[j][i];
+								ave_gyro[j] += aveMoveAverageAngle[j][i];
+							}
+					}
+
+				for (int i = 0; i < 3; i++)
+					{
+						ave_accel[i] /= 99;
+						ave_gyro[i] /= 99;
+					}
+
+				// Calculate of Sxx
+				float Sxx_accel[][] = new float[3][3];
+				float Sxx_gyro[][] = new float[3][3];
+
+				for (int i = 0; i < 3; i++)
+					{
+						for (int k = 0; k < 3; k++)
+							{
+								for (int j = 0; j < 100; j++)
+									{
+										Sxx_accel[i][k] += Math.pow((moveAverageDistance[i][k][j] - sample_accel[i][k]), 2);
+										Sxx_gyro[i][k] += Math.pow((moveAverageAngle[i][k][j] - sample_gyro[i][k]), 2);
+									}
+							}
+					}
+
+				// Calculate of Syy
+				float Syy_accel[] = new float[3];
+
+				float Syy_gyro[] = new float[3];
+
+				for (int j = 0; j < 3; j++)
+					{
+						for (int i = 0; i < 100; i++)
+							{
+								Syy_accel[j] += Math.pow((aveMoveAverageDistance[j][i] - ave_accel[j]), 2);
+								Syy_gyro[j] += Math.pow((aveMoveAverageAngle[j][i] - ave_gyro[j]), 2);
+							}
+					}
+
+				// Calculate of Sxy
+				float[][] Sxy_accel = new float[3][3];
+				float[][] Sxy_gyro = new float[3][3];
+
+				for (int i = 0; i < 3; i++)
+					{
+						for (int k = 0; k < 3; k++)
+							{
+								for (int j = 0; j < 100; j++)
+									{
+										Sxy_accel[i][k] += (moveAverageDistance[i][k][j] - sample_accel[i][k]) * (aveMoveAverageDistance[k][j] - ave_accel[k]);
+										Sxy_gyro[i][k] += (moveAverageAngle[i][k][j] - sample_gyro[i][k]) * (aveMoveAverageAngle[k][j] - ave_gyro[k]);
+									}
+							}
+					}
+
+				// Calculate of R
+				double[][] R_accel = new double[3][3];
+				double[][] R_gyro = new double[3][3];
+
+				for (int i = 0; i < 3; i++)
+					{
+						for (int j = 0; j < 3; j++)
+							{
+								R_accel[i][j] = Sxy_accel[i][j] / Math.sqrt(Sxx_accel[i][j] * Syy_accel[j]);
+								R_gyro[i][j] = Sxy_gyro[i][j] / Math.sqrt(Sxx_gyro[i][j] * Syy_gyro[j]);
+							}
+					}
+
+				Toast.makeText(RegistMotion.this, "a", Toast.LENGTH_LONG).show();
+				if (!WriteData.writeRData("RegistSRdata", "R_accel", RegistNameInput.name, R_accel, RegistMotion.this))
+					{
+						Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_SHORT).show();
+					}
+				if (!WriteData.writeRData("RegistSRdata", "R_gyro", RegistNameInput.name, R_gyro, RegistMotion.this))
+					{
+						Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_SHORT).show();
+					}
+
+				// 相関係数が一定以上なら保存する（ユーザ名のテキストファイルに書き出す）
+
+				if ((R_accel[0][0] > STRICT && R_accel[1][0] > STRICT) || (R_accel[1][0] > STRICT && R_accel[2][0] > STRICT) || (R_accel[0][0] > STRICT && R_accel[2][0] > STRICT))
+					{
+						if ((R_accel[0][1] > STRICT && R_accel[1][1] > STRICT) || (R_accel[1][1] > STRICT && R_accel[2][1] > STRICT) || (R_accel[0][1] > STRICT && R_accel[2][1] > STRICT))
+							{
+								if ((R_accel[0][2] > STRICT && R_accel[1][2] > STRICT) || (R_accel[1][2] > STRICT && R_accel[2][2] > STRICT) || (R_accel[0][2] > STRICT && R_accel[2][2] > STRICT))
+									{
+										if ((R_gyro[0][0] > STRICT && R_gyro[1][0] > STRICT) || (R_gyro[1][0] > STRICT && R_gyro[2][0] > STRICT) || (R_gyro[0][0] > STRICT || R_gyro[2][0] > STRICT))
+											{
+												if ((R_gyro[0][1] > STRICT && R_gyro[1][1] > STRICT) || (R_gyro[1][1] > STRICT && R_gyro[2][1] > STRICT) || (R_gyro[0][1] > STRICT || R_gyro[2][1] > STRICT))
+													{
+														if ((R_gyro[0][2] > STRICT && R_gyro[1][2] > STRICT) || (R_gyro[1][2] > STRICT && R_gyro[2][2] > STRICT) || (R_gyro[0][2] > STRICT && R_gyro[2][2] > STRICT))
+															{
+																getMotionBtn.setText("認証登録中");
+																Toast.makeText(this, "モーションを登録中です", Toast.LENGTH_SHORT).show();
+
+																// 3回のモーションの平均値をファイルに書き出す
+																writeData();
+															}
+														else
+															{
+																Toast.makeText(this, "モーション登録に失敗しました", Toast.LENGTH_SHORT).show();
+															}
+													}
+												else
+													{
+														Toast.makeText(this, "モーション登録に失敗しました", Toast.LENGTH_SHORT).show();
+													}
+											}
+										else
+											{
+												Toast.makeText(this, "モーション登録に失敗しました", Toast.LENGTH_SHORT).show();
+											}
+									}
+								else
+									{
+										Toast.makeText(this, "モーション登録に失敗しました", Toast.LENGTH_SHORT).show();
+									}
+							}
 						else
-						{
-							Toast.makeText (this, "モーション登録に失敗しました", Toast.LENGTH_SHORT).show ();
-						}
+							{
+								Toast.makeText(this, "モーション登録に失敗しました", Toast.LENGTH_SHORT).show();
+							}
 					}
-					else
-					{
-						Toast.makeText (this, "モーション登録に失敗しました", Toast.LENGTH_SHORT).show ();
-					}
-				}
 				else
-				{
-					Toast.makeText (this, "モーション登録に失敗しました", Toast.LENGTH_SHORT).show ();
-				}
+					{
+						Toast.makeText(this, "モーション登録に失敗しました", Toast.LENGTH_SHORT).show();
+						Log.d(TAG, "失敗");
+					}
+
 			}
-			else
+
+
+		/**
+		 * モーションデータの平均値をSDカードの指定したディレクトリの出力するメソッド
+		 */
+		private void writeData()
 			{
-				Toast.makeText (this, "モーション登録に失敗しました", Toast.LENGTH_SHORT).show ();
+				try
+					{
+						String filePath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + RegistNameInput.name;
+						File file = new File(filePath);
+						file.getParentFile().mkdir();
+						FileOutputStream fos;
+
+						fos = new FileOutputStream(file, false);
+						OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+						BufferedWriter bw = new BufferedWriter(osw);
+
+						for (int i = 0; i < 100; i++)
+							{
+								bw.write("ave_distance_x@" + aveMoveAverageDistance[0][i] + "\n");
+								bw.flush();
+							}
+
+						for (int i = 0; i < 100; i++)
+							{
+								bw.write("ave_distance_y@" + aveMoveAverageDistance[1][i] + "\n");
+								bw.flush();
+							}
+
+						for (int i = 0; i < 100; i++)
+							{
+								bw.write("ave_distance_z@" + aveMoveAverageDistance[2][i] + "\n");
+								bw.flush();
+							}
+
+						for (int i = 0; i < 100; i++)
+							{
+								bw.write("ave_angle_x@" + aveMoveAverageAngle[0][i] + "\n");
+								bw.flush();
+							}
+
+						for (int i = 0; i < 100; i++)
+							{
+								bw.write("ave_angle_y@" + aveMoveAverageAngle[1][i] + "\n");
+								bw.flush();
+							}
+
+						for (int i = 0; i < 100; i++)
+							{
+								bw.write("ave_angle_z@" + aveMoveAverageAngle[2][i] + "\n");
+								bw.flush();
+							}
+
+						bw.close();
+						fos.close();
+
+						Toast.makeText(this, "finish", Toast.LENGTH_LONG).show();
+
+						finishRegist();
+					}
+				catch (IOException e)
+					{
+						Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
+					}
 			}
-		}
-		else
-		{
-			Toast.makeText (this, "モーション登録に失敗しました", Toast.LENGTH_SHORT).show ();
-			Log.d (TAG, "失敗");
-		}
-
-	}
 
 
-	/**
-	 * モーションデータの平均値をSDカードの指定したディレクトリの出力するメソッド
-	 */
-	private void writeData ()
-	{
-		try
-		{
-			String filePath = Environment.getExternalStorageDirectory ().getPath() + File.separator + "MotionAuth" + File.separator + RegistNameInput.name;
-			File file = new File (filePath);
-			file.getParentFile ().mkdir ();
-			FileOutputStream fos;
-
-			fos = new FileOutputStream (file, false);
-			OutputStreamWriter osw = new OutputStreamWriter (fos, "UTF-8");
-			BufferedWriter bw = new BufferedWriter (osw);
-
-			for (int i = 0; i < 100; i++)
+		@Override
+		public void onAccuracyChanged(Sensor sensor, int accuracy)
 			{
-				bw.write ("ave_distance_x@" + aveMoveAverageDistance[0][i] + "\n");
-				bw.flush ();
+
 			}
 
-			for (int i = 0; i < 100; i++)
+
+		@Override
+		protected void onResume()
 			{
-				bw.write ("ave_distance_y@" + aveMoveAverageDistance[1][i] + "\n");
-				bw.flush ();
+				super.onResume();
+
+				mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
+				mSensorManager.registerListener(this, mGyroscopeSensor, SensorManager.SENSOR_DELAY_GAME);
 			}
 
-			for (int i = 0; i < 100; i++)
+
+		@Override
+		protected void onPause()
 			{
-				bw.write ("ave_distance_z@" + aveMoveAverageDistance[2][i] + "\n");
-				bw.flush ();
+				super.onPause();
+
+				mSensorManager.unregisterListener(this);
 			}
 
-			for (int i = 0; i < 100; i++)
+
+		@Override
+		public boolean onCreateOptionsMenu(Menu menu)
 			{
-				bw.write ("ave_angle_x@" + aveMoveAverageAngle[0][i] + "\n");
-				bw.flush ();
+				// Inflate the menu; this adds items to the action bar if it is present.
+				getMenuInflater().inflate(R.menu.regist_motion, menu);
+				return true;
 			}
 
-			for (int i = 0; i < 100; i++)
+
+		/**
+		 * スタート画面に移動するメソッド
+		 */
+		private void finishRegist()
 			{
-				bw.write ("ave_angle_y@" + aveMoveAverageAngle[1][i] + "\n");
-				bw.flush ();
+				Intent intent = new Intent();
+
+				intent.setClassName("com.example.motionauth", "com.example.motionauth.Start");
+
+				startActivityForResult(intent, 0);
+				finish();
 			}
-
-			for (int i = 0; i < 100; i++)
-			{
-				bw.write ("ave_angle_z@" + aveMoveAverageAngle[2][i] + "\n");
-				bw.flush ();
-			}
-
-			bw.close ();
-			fos.close ();
-
-			Toast.makeText (this, "finish", Toast.LENGTH_LONG).show ();
-
-			finishRegist ();
-		}
-		catch (IOException e)
-		{
-			Toast.makeText (this, "Error", Toast.LENGTH_SHORT).show ();
-		}
 	}
-
-
-	@Override
-	public void onAccuracyChanged (Sensor sensor, int accuracy)
-	{
-
-	}
-
-
-	@Override
-	protected void onResume ()
-	{
-		super.onResume ();
-
-		mSensorManager.registerListener (this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
-		mSensorManager.registerListener (this, mGyroscopeSensor, SensorManager.SENSOR_DELAY_GAME);
-	}
-
-
-	@Override
-	protected void onPause ()
-	{
-		super.onPause ();
-
-		mSensorManager.unregisterListener (this);
-	}
-
-
-	@Override
-	public boolean onCreateOptionsMenu (Menu menu)
-	{
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater ().inflate (R.menu.regist_motion, menu);
-		return true;
-	}
-
-
-	/**
-	 * スタート画面に移動するメソッド
-	 */
-	private void finishRegist ()
-	{
-		Intent intent = new Intent ();
-
-		intent.setClassName ("com.example.motionauth", "com.example.motionauth.Start");
-
-		startActivityForResult (intent, 0);
-		finish ();
-	}
-}

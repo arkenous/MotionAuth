@@ -26,27 +26,27 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.motionauth.RegistNameInput"
+            android:name=".Registration.RegistNameInput"
             android:label="@string/title_activity_regist_name_input" >
         </activity>
         <activity
-            android:name="com.example.motionauth.RegistMotion"
+            android:name=".Registration.RegistMotion"
             android:label="@string/title_activity_regist_motion" >
         </activity>
         <activity
-            android:name="com.example.motionauth.AuthNameInput"
+            android:name=".Authentication.AuthNameInput"
             android:label="@string/title_activity_auth_name_input" >
         </activity>
         <activity
-            android:name="com.example.motionauth.AuthMotion"
+            android:name=".Authentication.AuthMotion"
             android:label="@string/title_activity_auth_motion" >
         </activity>
         <activity
-            android:name="com.example.motionauth.RegistrantList"
+            android:name=".ViewDataList.RegistrantList"
             android:label="@string/title_activity_registrant_list" >
         </activity>
         <activity
-            android:name="com.example.motionauth.ViewRegistedData"
+            android:name=".ViewDataList.ViewRegistedData"
             android:label="@string/title_activity_view_registed_data" >
         </activity>
     </application>

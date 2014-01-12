@@ -1,4 +1,4 @@
-package com.example.motionauth;
+package com.example.motionauth.Authentication;
 
 import android.app.Activity;
 import android.content.Context;
@@ -17,6 +17,9 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.example.motionauth.Authentication.AuthNameInput;
+import com.example.motionauth.Formatter;
+import com.example.motionauth.R;
 
 import java.io.*;
 

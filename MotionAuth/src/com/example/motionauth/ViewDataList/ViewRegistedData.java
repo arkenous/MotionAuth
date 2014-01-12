@@ -1,4 +1,4 @@
-package com.example.motionauth;
+package com.example.motionauth.ViewDataList;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import com.example.motionauth.R;
 
 
 /**

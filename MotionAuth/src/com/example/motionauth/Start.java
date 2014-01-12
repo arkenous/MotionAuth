@@ -58,17 +58,17 @@ public class Start extends Activity
 										if (msg.arg1 == POSITIVE)
 											{
 												// 登録者一覧モード
-												moveActivity("com.example.motionauth", "com.example.motionauth.RegistrantList", true);
+												moveActivity("com.example.motionauth", "com.example.motionauth.ViewDataList.RegistrantList", true);
 											}
 										else if (msg.arg1 == NEUTRAL)
 											{
 												// 認証試験モード
-												moveActivity("com.example.motionauth", "com.example.motionauth.AuthNameInput", true);
+												moveActivity("com.example.motionauth", "com.example.motionauth.Authentication.AuthNameInput", true);
 											}
 										else if (msg.arg1 == NEGATIVE)
 											{
 												// 新規登録モード
-												moveActivity("com.example.motionauth", "com.example.motionauth.RegistNameInput", true);
+												moveActivity("com.example.motionauth", "com.example.motionauth.Registration.RegistNameInput", true);
 											}
 									}
 							};

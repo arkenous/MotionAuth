@@ -2,6 +2,7 @@ package com.example.motionauth;
 
 import android.content.Context;
 import android.util.Log;
+import com.example.motionauth.Registration.RegistNameInput;
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 
 public class Lowpass

@@ -1,4 +1,4 @@
-package com.example.motionauth;
+package com.example.motionauth.ViewDataList;
 
 import java.io.File;
 
@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import com.example.motionauth.R;
 
 
 /**
@@ -81,7 +82,7 @@ public class RegistrantList extends Activity
 							item = lv.getItemAtPosition(position).toString();
 
 							// itemを次のアクティビティに送る
-							moveActivity("com.example.motionauth", "com.example.motionauth.ViewRegistedData", false);
+							moveActivity("com.example.motionauth", "com.example.motionauth.ViewDataList.ViewRegistedData", false);
 						}
 
 				});

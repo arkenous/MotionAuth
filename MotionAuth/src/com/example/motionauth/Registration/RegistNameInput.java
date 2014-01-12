@@ -1,4 +1,4 @@
-package com.example.motionauth;
+package com.example.motionauth.Registration;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -15,6 +15,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import com.example.motionauth.R;
 
 
 public class RegistNameInput extends Activity
@@ -93,7 +94,7 @@ public class RegistNameInput extends Activity
 								}
 							else
 								{
-									moveActivity("com.example.motionauth", "com.example.motionauth.RegistMotion", false);
+									moveActivity("com.example.motionauth", "com.example.motionauth.Registration.RegistMotion", false);
 								}
 						}
 				});

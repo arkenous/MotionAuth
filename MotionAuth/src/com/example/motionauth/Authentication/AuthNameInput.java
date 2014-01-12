@@ -1,4 +1,4 @@
-package com.example.motionauth;
+package com.example.motionauth.Authentication;
 
 import java.io.File;
 
@@ -18,6 +18,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import com.example.motionauth.R;
 
 
 public class AuthNameInput extends Activity
@@ -90,7 +91,7 @@ public class AuthNameInput extends Activity
 							// 指定したユーザが存在するかどうかを確認する
 							if (checkFileExists())
 								{
-									moveActivity("com.example.motionauth", "com.example.motionauth.AuthMotion", false);
+									moveActivity("com.example.motionauth", "com.example.motionauth.Authentication.AuthMotion", false);
 								}
 							else
 								{

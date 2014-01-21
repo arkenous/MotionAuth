@@ -201,6 +201,7 @@ public class RegistMotion extends Activity implements SensorEventListener
 									accelCount = 0;
 									gyroCount = 0;
 
+									// TODO 画面に番号を表示するのではなく，音声で出力させる
 									if (getCount == 1)
 										{
 											secondTv.setText("2");
@@ -297,7 +298,6 @@ public class RegistMotion extends Activity implements SensorEventListener
 							}
 					}
 
-				//TODO 同一モーション確認時，導出された相関係数が一定以上であれば，ズレ修正をスキップするようにする
 
 				// 同一のモーションデータであることを確認する
 				Enum.MEASURE measure = Correlation.measureCorrelation(this, moveAverageDistance, moveAverageAngle, aveMoveAverageDistance, aveMoveAverageAngle, LOOSE);

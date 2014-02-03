@@ -344,7 +344,7 @@ public class RegistMotion extends Activity implements SensorEventListener
 
 
 		/**
-		 * 移動量平均ローパスフィルタ
+		 * 移動平均ローパスフィルタ
 		 *
 		 * @param data ローパスをかけるdouble型のデータ
 		 * @return ローパスをかけ終わったdouble型のデータ

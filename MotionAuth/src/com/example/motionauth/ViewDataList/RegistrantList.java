@@ -76,7 +76,7 @@ public class RegistrantList extends Activity
 					}
 				catch (NullPointerException e)
 					{
-						back("com.example.motionauth", "com.example.motionauth.Start", true);
+						moveActivity("com.example.motionauth", "com.example.motionauth.Start", true);
 						finish();
 					}
 
@@ -151,21 +151,10 @@ public class RegistrantList extends Activity
 
 				intent.setClassName(pkgName, actName);
 
-				intent.putExtra("item", item);
-
-				if (flg == true)
+				if (actName.equals("com.example.motionauth.ViewRegistedData"))
 					{
-						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+						intent.putExtra("item", item);
 					}
-
-				startActivityForResult(intent, 0);
-			}
-
-
-		private void back(String pkgName, String actName, boolean flg)
-			{
-				Intent intent = new Intent();
-				intent.setClassName(pkgName, actName);
 
 				if (flg == true)
 					{

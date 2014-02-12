@@ -23,9 +23,11 @@ import com.example.motionauth.R;
 
 /**
  * 認証するユーザ名を入力させる
+ * @author Kensuke Kousaka
  */
 public class AuthNameInput extends Activity
 	{
+		// ユーザが入力した文字列（名前）を格納する
 		public static String name;
 		private Context current;
 

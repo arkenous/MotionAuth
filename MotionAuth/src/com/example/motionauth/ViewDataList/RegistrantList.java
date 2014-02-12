@@ -64,11 +64,20 @@ public class RegistrantList extends Activity
 
 				ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
 
-				// アイテム追加
-				for (int i = 0; i < fileNameStr.length; i++)
+				try
 					{
-						Log.d(TAG, "fileNameStr.length = " + fileNameStr.length);
-						adapter.add(fileNameStr[i]);
+
+						// アイテム追加
+						for (int i = 0; i < fileNameStr.length; i++)
+							{
+								Log.d(TAG, "fileNameStr.length = " + fileNameStr.length);
+								adapter.add(fileNameStr[i]);
+							}
+					}
+				catch (NullPointerException e)
+					{
+						back("com.example.motionauth", "com.example.motionauth.Start", true);
+						finish();
 					}
 
 				Log.d(TAG, "d");
@@ -100,23 +109,32 @@ public class RegistrantList extends Activity
 		 */
 		private String[] getRegistrantName()
 			{
-				// 専用ディレクトリを指定
-				String dirPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth";
-				File dir = new File(dirPath);
-
-				// 指定されたディレクトリのファイル名（ディレクトリ名）を取得
-				final File[] files = dir.listFiles();
-				final String[] str_items;
-				str_items = new String[files.length];
-				for (int i = 0; i < files.length; i++)
+				try
 					{
-						File file = files[i];
-						str_items[i] = file.getName();
+
+						// 専用ディレクトリを指定
+						String dirPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth";
+						File dir = new File(dirPath);
+
+						// 指定されたディレクトリのファイル名（ディレクトリ名）を取得
+						final File[] files = dir.listFiles();
+						final String[] str_items;
+						str_items = new String[files.length];
+						for (int i = 0; i < files.length; i++)
+							{
+								File file = files[i];
+								str_items[i] = file.getName();
+							}
+
+						Log.d(TAG, "b");
+
+						return str_items;
+
 					}
-
-				Log.d(TAG, "b");
-
-				return str_items;
+				catch (NullPointerException e)
+					{
+						return null;
+					}
 			}
 
 
@@ -134,6 +152,20 @@ public class RegistrantList extends Activity
 				intent.setClassName(pkgName, actName);
 
 				intent.putExtra("item", item);
+
+				if (flg == true)
+					{
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+					}
+
+				startActivityForResult(intent, 0);
+			}
+
+
+		private void back(String pkgName, String actName, boolean flg)
+			{
+				Intent intent = new Intent();
+				intent.setClassName(pkgName, actName);
 
 				if (flg == true)
 					{

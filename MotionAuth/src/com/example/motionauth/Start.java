@@ -1,3 +1,4 @@
+
 package com.example.motionauth;
 
 import android.os.Bundle;
@@ -7,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnKeyListener;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -18,6 +18,8 @@ import android.os.Handler;
 /**
  * アプリを起動した際に最初に表示されるアクティビティ
  * モード選択を行う
+ *
+ * @author Kensuke Kousaka
  */
 public class Start extends Activity
 	{
@@ -101,6 +103,7 @@ public class Start extends Activity
 									// アラート画面に特定のキー動作をかませる
 									if (keyCode == KeyEvent.KEYCODE_BACK)
 										{
+											// Backキーが押された場合
 											// ダイアログを閉じて，アクティビティを閉じる
 											dialog.dismiss();
 											finish();
@@ -111,6 +114,7 @@ public class Start extends Activity
 								}
 						});
 
+						// ダイアログ外をタッチしてもダイアログが閉じないようにする
 						alert.setCancelable(false);
 
 						alert.setTitle(title);
@@ -152,6 +156,7 @@ public class Start extends Activity
 									// アラート画面に特定のキー動作をかませる
 									if (keyCode == KeyEvent.KEYCODE_BACK)
 										{
+											// Backキーを押した場合
 											// ダイアログを閉じて，アクティビティを閉じる
 											dialog.dismiss();
 											finish();
@@ -162,6 +167,7 @@ public class Start extends Activity
 								}
 						});
 
+						// ダイアログ外をタッチしてもダイアログを閉じないようにする
 						alert.setCancelable(false);
 
 						alert.setTitle(title);
@@ -227,14 +233,4 @@ public class Start extends Activity
 
 				startActivityForResult(intent, 0);
 			}
-
-
-		@Override
-		public boolean onCreateOptionsMenu(Menu menu)
-			{
-				// Inflate the menu; this adds items to the action bar if it is present.
-				getMenuInflater().inflate(R.menu.start, menu);
-				return true;
-			}
-
 	}

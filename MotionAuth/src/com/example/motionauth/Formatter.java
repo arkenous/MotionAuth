@@ -5,6 +5,7 @@ import java.util.Locale;
 
 /**
  * データの桁揃えを行う．対応データはfloat及びdouble．返り値はdouble型．
+ * @author Kensuke Kousaka
  */
 public class Formatter
 	{

@@ -10,6 +10,7 @@ import android.content.DialogInterface.OnKeyListener;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.Button;
 import android.os.Message;
 import android.os.Handler;
@@ -37,6 +38,9 @@ public class Start extends Activity
 		protected void onCreate(Bundle savedInstanceState)
 			{
 				super.onCreate(savedInstanceState);
+
+				// タイトルバーの非表示
+				requestWindowFeature(Window.FEATURE_NO_TITLE);
 				setContentView(R.layout.activity_start);
 
 				chooseMode();

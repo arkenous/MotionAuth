@@ -17,7 +17,6 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.example.motionauth.Authentication.AuthNameInput;
 import com.example.motionauth.Formatter;
 import com.example.motionauth.R;
 
@@ -25,6 +24,7 @@ import java.io.*;
 
 /**
  * ユーザ認証を行う
+ * @author Kensuke Kousaka
  */
 public class AuthMotion extends Activity implements SensorEventListener
 	{
@@ -32,37 +32,39 @@ public class AuthMotion extends Activity implements SensorEventListener
 		private Sensor mAccelerometerSensor;
 		private Sensor mGyroscopeSensor;
 
-		private static final int TIMEOUT_MESSAGE = 1;
-		private static final int INTERVAL = 30;
-
-		TextView secondTv;
-		TextView countSecondTv;
-		Button getMotionBtn;
-
-		private boolean btnStatus = false;
-
+		// モーションの生データ
 		private float vAccelo[];
 		private float vGyro[];
 
+		private boolean btnStatus = false;
+
+		private static final int TIMEOUT_MESSAGE = 1;
+
+		// データを取得する間隔
+		private static final int INTERVAL = 30;
+
+		// データ取得カウント用
 		private int accelCount = 0;
 		private int gyroCount = 0;
 		private int getCount = 0;
 
 		private float accelo_tmp[][] = new float[3][100];
-
 		private float gyro_tmp[][] = new float[3][100];
 
 		private double accelo[][] = new double[3][100];
-
 		private double gyro[][] = new double[3][100];
 
-		// 移動平均ローパス用変数
+		// 移動平均の際に用いる
 		private double outputData = 0.0;
 		private int count = 0;
 
-		// 移動量平均後のデータを格納する配列
+		// 移動平均後のデータを格納する配列
 		private double moveAverageDistance[][] = new double[3][100];
 		private double moveAverageAngle[][] = new double[3][100];
+
+		TextView secondTv;
+		TextView countSecondTv;
+		Button getMotionBtn;
 
 
 		@Override
@@ -75,8 +77,12 @@ public class AuthMotion extends Activity implements SensorEventListener
 			}
 
 
+		/**
+		 * 認証画面にイベントリスナ等を設定する
+		 */
 		private void authMotion()
 			{
+				// センササービス，各種センサを取得する
 				mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 				mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 				mGyroscopeSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
@@ -261,6 +267,7 @@ public class AuthMotion extends Activity implements SensorEventListener
 					}
 				//endregion
 
+
 				//region Calculate of Average B
 				float ave_accel[] = new float[3];
 
@@ -386,6 +393,7 @@ public class AuthMotion extends Activity implements SensorEventListener
 					}
 				//endregion
 
+
 				//region Calculate of Sxx
 				float Sxx_accel[] = new float[3];
 
@@ -401,6 +409,7 @@ public class AuthMotion extends Activity implements SensorEventListener
 							}
 					}
 				//endregion
+
 
 				//region Calculate of Syy
 				float Syy_accel[] = new float[3];
@@ -418,6 +427,7 @@ public class AuthMotion extends Activity implements SensorEventListener
 					}
 				//endregion
 
+
 				//region Calculate of Sxy
 				float Sxy_accel[] = new float[3];
 
@@ -433,6 +443,7 @@ public class AuthMotion extends Activity implements SensorEventListener
 					}
 				//endregion
 
+
 				//region Calculate of R
 				double R_accel[] = new double[3];
 
@@ -445,6 +456,7 @@ public class AuthMotion extends Activity implements SensorEventListener
 						R_gyro[i] = Sxy_gyro[i] / Math.sqrt(Sxx_gyro[i] * Syy_gyro[i]);
 					}
 				//endregion
+
 
 				//region 相関の判定
 				//相関係数が一定以上あるなら認証成功
@@ -461,12 +473,6 @@ public class AuthMotion extends Activity implements SensorEventListener
 														if (R_gyro[2] > 0.5)
 															{
 																Toast.makeText(this, "認証成功", Toast.LENGTH_LONG).show();
-																Toast.makeText(this, "距離X軸: " + R_accel[0], Toast.LENGTH_SHORT).show();
-																Toast.makeText(this, "距離Y軸: " + R_accel[1], Toast.LENGTH_SHORT).show();
-																Toast.makeText(this, "距離Z軸: " + R_accel[2], Toast.LENGTH_SHORT).show();
-																Toast.makeText(this, "角度X軸: " + R_gyro[0], Toast.LENGTH_SHORT).show();
-																Toast.makeText(this, "角度Y軸: " + R_gyro[1], Toast.LENGTH_SHORT).show();
-																Toast.makeText(this, "角度Z軸: " + R_gyro[2], Toast.LENGTH_SHORT).show();
 
 																moveActivity("com.example.motionauth", "com.example.motionauth.Start", true);
 															}

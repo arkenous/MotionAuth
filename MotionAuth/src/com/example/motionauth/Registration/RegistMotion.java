@@ -62,10 +62,6 @@ public class RegistMotion extends Activity implements SensorEventListener
 		private double accelo[][][] = new double[3][3][100];
 		private double gyro[][][] = new double[3][3][100];
 
-		TextView secondTv;
-		TextView countSecondTv;
-		Button getMotionBtn;
-
 
 		// 移動平均の際に用いる
 		private double outputData = 0.0;
@@ -77,6 +73,10 @@ public class RegistMotion extends Activity implements SensorEventListener
 
 		private double aveMoveAverageDistance[][] = new double[3][100];
 		private double aveMoveAverageAngle[][] = new double[3][100];
+
+		TextView secondTv;
+		TextView countSecondTv;
+		Button getMotionBtn;
 
 
 		@Override
@@ -161,8 +161,6 @@ public class RegistMotion extends Activity implements SensorEventListener
 										{
 											gyro_tmp[getCount][i][gyroCount] = vGyro[i];
 										}
-
-									Log.d(TAG, "a");
 
 									accelCount++;
 									gyroCount++;
@@ -487,8 +485,6 @@ public class RegistMotion extends Activity implements SensorEventListener
 				//endregion
 
 
-
-				Toast.makeText(RegistMotion.this, "a", Toast.LENGTH_LONG).show();
 				if (!WriteData.writeRData("RegistSRdata", "R_accel", RegistNameInput.name, R_accel, RegistMotion.this))
 					{
 						Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_SHORT).show();

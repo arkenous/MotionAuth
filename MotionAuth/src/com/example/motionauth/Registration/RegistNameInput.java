@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
@@ -18,8 +17,13 @@ import android.widget.Toast;
 import com.example.motionauth.R;
 
 
+/**
+ * ユーザに名前を入力させる
+ * @author Kensuke Kousaka
+ */
 public class RegistNameInput extends Activity
 	{
+		// ユーザが入力した文字列（名前）を格納する
 		public static String name;
 
 
@@ -98,15 +102,6 @@ public class RegistNameInput extends Activity
 								}
 						}
 				});
-			}
-
-
-		@Override
-		public boolean onCreateOptionsMenu(Menu menu)
-			{
-				// Inflate the menu; this adds items to the action bar if it is present.
-				getMenuInflater().inflate(R.menu.regist_name_input, menu);
-				return true;
 			}
 
 

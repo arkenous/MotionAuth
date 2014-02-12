@@ -10,6 +10,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,6 +32,9 @@ public class RegistNameInput extends Activity
 		protected void onCreate(Bundle savedInstanceState)
 			{
 				super.onCreate(savedInstanceState);
+
+				// タイトルバーの非表示
+				requestWindowFeature(Window.FEATURE_NO_TITLE);
 				setContentView(R.layout.activity_regist_name_input);
 
 				nameInput();
@@ -47,21 +51,21 @@ public class RegistNameInput extends Activity
 				nameInput.addTextChangedListener(new TextWatcher()
 				{
 					// 変更前
-					public void beforeTextChanged(CharSequence s, int start, int count, int after)
+					public void beforeTextChanged (CharSequence s, int start, int count, int after)
 						{
 
 						}
 
 
 					// 変更直前
-					public void onTextChanged(CharSequence s, int start, int before, int count)
+					public void onTextChanged (CharSequence s, int start, int before, int count)
 						{
 
 						}
 
 
 					// 変更後
-					public void afterTextChanged(Editable s)
+					public void afterTextChanged (Editable s)
 						{
 							// ユーザの入力した名前をnameに格納
 							name = nameInput.getText().toString();

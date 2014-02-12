@@ -1,7 +1,8 @@
 package com.example.motionauth.Utility;
 
 /**
- * Created by kousaka on 2013/12/18.
+ * 列挙型．相関周りの判定の際に使用
+ * @author Kensuke Kousaka
  */
 public class Enum
 	{

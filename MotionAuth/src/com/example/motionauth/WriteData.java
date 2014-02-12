@@ -10,8 +10,21 @@ import android.os.Environment;
 import android.widget.Toast;
 
 
+/**
+ * データをSDカードに書き込む
+ * @author Kensuke Kousaka
+ */
 public class WriteData
 	{
+		/**
+		 * Float型の三次元配列データをアウトプットする．保存先は，SDカードディレクトリ/folderName/userName/fileName+回数+次元
+		 * @param folderName 保存するフォルダ名
+		 * @param fileName   保存するファイル名
+		 * @param userName   保存するユーザ名
+		 * @param data       保存するfloat型の3次元配列データ
+		 * @param context    実行するアクティビティのコンテキスト
+		 * @return           保存に成功したらtrue，失敗したらfalseを返す
+		 */
 		public static boolean writeFloatThreeArrayData(String folderName, String fileName, String userName, float[][][] data, Context context)
 			{
 				// SDカードのマウント確認
@@ -473,6 +486,4 @@ public class WriteData
 					}
 				return true;
 			}
-
-
 	}

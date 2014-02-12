@@ -3,24 +3,20 @@ package com.example.motionauth;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import android.content.Context;
-import android.util.Log;
-import android.widget.Toast;
 
-
+/**
+ * データの時間的なズレを修正する
+ * @author Kensuke Kousaka
+ */
 public class CorrectDeviation
 	{
-		private static String TAG = "CorrectDeviation";
-
-
 		/**
 		 * 取得回数ごとのデータのズレを時間的なズレを修正する
 		 *
 		 * @param data    修正するdouble型の3次元配列データ
-		 * @param context 呼び出し元のcontext
 		 * @return newData ズレ修正後のdouble型の3次元配列データ
 		 */
-		public static double[][][] correctDeviation(double[][][] data, Context context)
+		public static double[][][] correctDeviation(double[][][] data)
 			{
 				double[][][] newData = new double[3][3][100];
 

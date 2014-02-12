@@ -5,6 +5,11 @@ import android.util.Log;
 import com.example.motionauth.Registration.RegistNameInput;
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 
+/**
+ * フーリエ変換を用いたローパスフィルタ
+ * フーリエ変換にはjtransformsライブラリを使用
+ * @see <a href="https://sites.google.com/site/piotrwendykier/software/jtransforms">https://sites.google.com/site/piotrwendykier/software/jtransforms</a>
+ */
 public class Lowpass
 	{
 		public static void LowpassFilter(double[] data, Context context)
@@ -14,6 +19,7 @@ public class Lowpass
 				Log.d("FFT", "a");
 
 				// フーリエ変換（FFT）の実行
+				// 時間領域のデータを周波数領域のデータに変換する
 				fft.realForward(data);
 
 				Log.d("FFT", "b");
@@ -35,6 +41,8 @@ public class Lowpass
 
 				WriteData.writeSingleArrayData("FFT", "afterFFT", RegistNameInput.name, data, context);
 
+				// 逆フーリエ変換の実行
+				// 周波数領域のデータを時間領域のデータに変換する
 				fft.realInverse(data, true);
 
 				WriteData.writeSingleArrayData("FFT", "afteraccelo0X", RegistNameInput.name, data, context);

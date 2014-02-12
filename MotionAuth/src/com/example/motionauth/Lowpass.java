@@ -9,6 +9,7 @@ import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
  * フーリエ変換を用いたローパスフィルタ
  * フーリエ変換にはjtransformsライブラリを使用
  * @see <a href="https://sites.google.com/site/piotrwendykier/software/jtransforms">https://sites.google.com/site/piotrwendykier/software/jtransforms</a>
+ * @author Kensuke Kousaka
  */
 public class Lowpass
 	{

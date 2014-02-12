@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,6 +37,9 @@ public class AuthNameInput extends Activity
 		protected void onCreate(Bundle savedInstanceState)
 			{
 				super.onCreate(savedInstanceState);
+
+				// タイトルバーの非表示
+				requestWindowFeature(Window.FEATURE_NO_TITLE);
 				setContentView(R.layout.activity_auth_name_input);
 				current = this;
 

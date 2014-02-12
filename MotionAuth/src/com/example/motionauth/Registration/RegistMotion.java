@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -83,6 +84,9 @@ public class RegistMotion extends Activity implements SensorEventListener
 		protected void onCreate(Bundle savedInstanceState)
 			{
 				super.onCreate(savedInstanceState);
+
+				// タイトルバーの非表示
+				requestWindowFeature(Window.FEATURE_NO_TITLE);
 				setContentView(R.layout.activity_regist_motion);
 
 				registMotion();
@@ -303,8 +307,8 @@ public class RegistMotion extends Activity implements SensorEventListener
 					{
 						// 相関係数が0.4よりも高く，0.8以下の場合
 						// ズレ修正を行う
-						moveAverageDistance = CorrectDeviation.correctDeviation(moveAverageDistance, this);
-						moveAverageAngle = CorrectDeviation.correctDeviation(moveAverageAngle, this);
+						moveAverageDistance = CorrectDeviation.correctDeviation(moveAverageDistance);
+						moveAverageAngle = CorrectDeviation.correctDeviation(moveAverageAngle);
 					}
 				else if (Enum.MEASURE.PERFECT == measure)
 					{

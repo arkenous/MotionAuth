@@ -15,6 +15,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.example.motionauth.R;
@@ -34,6 +35,9 @@ public class ViewRegistedData extends Activity
 		protected void onCreate(Bundle savedInstanceState)
 			{
 				super.onCreate(savedInstanceState);
+
+				// タイトルバーの非表示
+				requestWindowFeature(Window.FEATURE_NO_TITLE);
 				setContentView(R.layout.activity_view_registed_data);
 
 				viewRegistedData();

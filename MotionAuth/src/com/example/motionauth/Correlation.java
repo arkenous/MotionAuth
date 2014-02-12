@@ -6,10 +6,14 @@ import com.example.motionauth.Registration.RegistNameInput;
 import com.example.motionauth.Utility.Enum;
 
 
+/**
+ * 相関を求める
+ * @author Kensuke Kousaka
+ */
 public class Correlation
 	{
 		/**
-		 * 相関係数を求め，同一のモーションであるかどうかを確認する
+		 * 相関を求め，同一のモーションであるかどうかを確認する
 		 *
 		 * @param context      呼び出し元のcontext
 		 * @param distance     double型の3次元配列距離データ
@@ -17,7 +21,7 @@ public class Correlation
 		 * @param ave_distance double型の二次元配列距離データ
 		 * @param ave_angle    double型の二次元配列角度データ
 		 * @param threshold    int型の閾値
-		 * @return 同一モーションであればtrueが，そうでなければfalseが返される
+		 * @return Enum.javaで定義した値が返る
 		 */
 		public static Enum.MEASURE measureCorrelation(Context context, double[][][] distance, double[][][] angle, double[][] ave_distance, double[][] ave_angle, double threshold)
 			{

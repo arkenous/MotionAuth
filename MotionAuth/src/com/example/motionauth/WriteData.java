@@ -23,7 +23,6 @@ public class WriteData
 		 * @param userName   保存するユーザ名
 		 * @param data       保存するfloat型の3次元配列データ
 		 * @param context    実行するアクティビティのコンテキスト
-		 * @return           保存に成功したらtrue，失敗したらfalseを返す
 		 */
 		public void writeFloatThreeArrayData(String folderName, String fileName, String userName, float[][][] data, Context context)
 			{
@@ -114,7 +113,6 @@ public class WriteData
 		 * @param userName   保存するユーザ名
 		 * @param data       保存するdouble型の３次元配列データ
 		 * @param context    実行するアクティビティのコンテキスト
-		 * @return 保存に成功したらtrue，失敗したらfalseを返す
 		 */
 		public void writeDoubleThreeArrayData(String folderName, String fileName, String userName, double[][][] data, Context context)
 			{
@@ -300,7 +298,6 @@ public class WriteData
 		 * @param userName   保存するユーザ名
 		 * @param data       保存するdouble型の２次元配列データ
 		 * @param context    実行するアクティビティのコンテキスト
-		 * @return 保存に成功したらtrue，失敗したらfalseを返す
 		 */
 		public void writeRData(String folderName, String fileName, String userName, double[][] data, Context context)
 			{

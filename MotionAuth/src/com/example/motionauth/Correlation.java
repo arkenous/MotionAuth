@@ -12,6 +12,7 @@ import com.example.motionauth.Utility.Enum;
  */
 public class Correlation
 	{
+		private WriteData mWriteData = new WriteData();
 		/**
 		 * 相関を求め，同一のモーションであるかどうかを確認する
 		 *
@@ -23,7 +24,7 @@ public class Correlation
 		 * @param threshold    int型の閾値
 		 * @return Enum.javaで定義した値が返る
 		 */
-		public static Enum.MEASURE measureCorrelation(Context context, double[][][] distance, double[][][] angle, double[][] ave_distance, double[][] ave_angle, double threshold)
+		public Enum.MEASURE measureCorrelation(Context context, double[][][] distance, double[][][] angle, double[][] ave_distance, double[][] ave_angle, double threshold)
 			{
 				// 相関係数の計算
 
@@ -131,14 +132,8 @@ public class Correlation
 							}
 					}
 
-				if (!WriteData.writeRData("RegistLRdata", "R_accel", RegistNameInput.name, R_accel, context))
-					{
-						Toast.makeText(context, "Error", Toast.LENGTH_LONG).show();
-					}
-				if (!WriteData.writeRData("RegistLRdata", "R_gyro", RegistNameInput.name, R_gyro, context))
-					{
-						Toast.makeText(context, "Error", Toast.LENGTH_LONG).show();
-					}
+				mWriteData.writeRData("RegistLRdata", "R_accel", RegistNameInput.name, R_accel, context);
+				mWriteData.writeRData("RegistLRdata", "R_gyro", RegistNameInput.name, R_gyro, context);
 
 				if ((R_accel[0][0] > threshold && R_accel[1][0] > threshold) || (R_accel[1][0] > threshold && R_accel[2][0] > threshold) || (R_accel[0][0] > threshold && R_accel[2][0] > threshold))
 					{

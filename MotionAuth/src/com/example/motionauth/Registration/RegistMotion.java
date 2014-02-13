@@ -81,6 +81,7 @@ public class RegistMotion extends Activity implements SensorEventListener
 
 
 		private WriteData mWriteData = new WriteData();
+		private Correlation mCorrelation = new Correlation();
 
 
 		@Override
@@ -290,7 +291,8 @@ public class RegistMotion extends Activity implements SensorEventListener
 
 
 				//region 同一のモーションであるかの確認をし，必要に応じてズレ修正を行う
-				Enum.MEASURE measure = Correlation.measureCorrelation(this, moveAverageDistance, moveAverageAngle, aveMoveAverageDistance, aveMoveAverageAngle, LOOSE);
+				Enum.MEASURE measure = mCorrelation.measureCorrelation(this, moveAverageDistance, moveAverageAngle, aveMoveAverageDistance, aveMoveAverageAngle, LOOSE);
+
 				if (Enum.MEASURE.INCORRECT == measure)
 					{
 						// 相関係数が0.4以下

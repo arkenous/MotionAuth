@@ -80,6 +80,9 @@ public class RegistMotion extends Activity implements SensorEventListener
 		Button getMotionBtn;
 
 
+		private WriteData mWriteData = new WriteData();
+
+
 		@Override
 		protected void onCreate(Bundle savedInstanceState)
 			{
@@ -213,15 +216,8 @@ public class RegistMotion extends Activity implements SensorEventListener
 											secondTv.setText("0");
 
 											// 生データをアウトプット
-											// TODO Toastメッセージ表示もWriteDataに任せるようにする
-											if (!WriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accelo_tmp, RegistMotion.this))
-												{
-													Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_SHORT).show();
-												}
-											if (!WriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyro_tmp, RegistMotion.this))
-												{
-													Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_SHORT).show();
-												}
+											mWriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accelo_tmp, RegistMotion.this);
+											mWriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyro_tmp, RegistMotion.this);
 
 											calc();
 
@@ -279,16 +275,8 @@ public class RegistMotion extends Activity implements SensorEventListener
 							}
 					}
 
-				// TODO Toastメッセージ表示もWriteDataに任せるようにする
-				if (!WriteData.writeDoubleThreeArrayData("FormatRawData", "rawAccelo", RegistNameInput.name, accelo, RegistMotion.this))
-					{
-						Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_SHORT).show();
-					}
-				if (!WriteData.writeDoubleThreeArrayData("FormatRawData", "rawGyro", RegistNameInput.name, gyro, RegistMotion.this))
-					{
-						Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_SHORT).show();
-					}
-
+				mWriteData.writeDoubleThreeArrayData("FormatRawData", "rawAccelo", RegistNameInput.name, accelo, RegistMotion.this);
+				mWriteData.writeDoubleThreeArrayData("FormatRawData", "rawGyro", RegistNameInput.name, gyro, RegistMotion.this);
 
 				// measureCorrelation用の平均値データを作成
 				for (int i = 0; i < 3; i++)

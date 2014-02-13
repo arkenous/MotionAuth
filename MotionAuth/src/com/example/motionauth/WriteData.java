@@ -25,7 +25,7 @@ public class WriteData
 		 * @param context    実行するアクティビティのコンテキスト
 		 * @return           保存に成功したらtrue，失敗したらfalseを返す
 		 */
-		public static boolean writeFloatThreeArrayData(String folderName, String fileName, String userName, float[][][] data, Context context)
+		public void writeFloatThreeArrayData(String folderName, String fileName, String userName, float[][][] data, Context context)
 			{
 				// SDカードのマウント確認
 				String status = Environment.getExternalStorageState();
@@ -33,7 +33,6 @@ public class WriteData
 					{
 						// マウントされていない場合
 						Toast.makeText(context, "SDカードがマウントされていません", Toast.LENGTH_SHORT).show();
-						return false;
 					}
 
 				// SDカードのフォルダパスの取得
@@ -42,8 +41,6 @@ public class WriteData
 				// SDカードにフォルダを作成
 				String FOLDER_PATH = SD_PATH + File.separator + folderName + File.separator + userName;
 
-				Toast.makeText(context, "FolderPath = " + FOLDER_PATH, Toast.LENGTH_SHORT).show();
-
 				File file = new File(FOLDER_PATH);
 
 				try
@@ -51,13 +48,11 @@ public class WriteData
 						if (!file.exists())
 							{
 								// フォルダがない場合
-								Toast.makeText(context, "folderNotExists", Toast.LENGTH_SHORT).show();
 								file.mkdirs();
 							}
 						else
 							{
 								// フォルダがある場合
-								Toast.makeText(context, "folderExists", Toast.LENGTH_SHORT).show();
 							}
 					}
 				catch (Exception e)
@@ -65,7 +60,6 @@ public class WriteData
 						Toast.makeText(context, "makeFolderException", Toast.LENGTH_SHORT).show();
 						Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
 						e.printStackTrace();
-						return false;
 					}
 
 				try
@@ -108,10 +102,7 @@ public class WriteData
 				catch (Exception e)
 					{
 						Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
-						Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
-						return false;
 					}
-				return true;
 			}
 
 
@@ -125,7 +116,7 @@ public class WriteData
 		 * @param context    実行するアクティビティのコンテキスト
 		 * @return 保存に成功したらtrue，失敗したらfalseを返す
 		 */
-		public static boolean writeDoubleThreeArrayData(String folderName, String fileName, String userName, double[][][] data, Context context)
+		public void writeDoubleThreeArrayData(String folderName, String fileName, String userName, double[][][] data, Context context)
 			{
 				// SDカードのマウント確認
 				String status = Environment.getExternalStorageState();
@@ -133,7 +124,6 @@ public class WriteData
 					{
 						// マウントされていない場合
 						Toast.makeText(context, "SDカードがマウントされていません", Toast.LENGTH_SHORT).show();
-						return false;
 					}
 
 				// SDカードのフォルダパスの取得
@@ -142,8 +132,6 @@ public class WriteData
 				// SDカードにフォルダを作成
 				String FOLDER_PATH = SD_PATH + File.separator + folderName + File.separator + userName;
 
-				Toast.makeText(context, "FolderPath = " + FOLDER_PATH, Toast.LENGTH_SHORT).show();
-
 				File file = new File(FOLDER_PATH);
 
 				try
@@ -151,21 +139,16 @@ public class WriteData
 						if (!file.exists())
 							{
 								// フォルダがない場合
-								Toast.makeText(context, "folderNotExists", Toast.LENGTH_SHORT).show();
 								file.mkdirs();
 							}
 						else
 							{
 								// フォルダがある場合
-								Toast.makeText(context, "folderExists", Toast.LENGTH_SHORT).show();
 							}
 					}
 				catch (Exception e)
 					{
 						Toast.makeText(context, "makeFolderException", Toast.LENGTH_SHORT).show();
-						Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
-						e.printStackTrace();
-						return false;
 					}
 
 				try
@@ -208,10 +191,7 @@ public class WriteData
 				catch (Exception e)
 					{
 						Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
-						Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
-						return false;
 					}
-				return true;
 			}
 
 

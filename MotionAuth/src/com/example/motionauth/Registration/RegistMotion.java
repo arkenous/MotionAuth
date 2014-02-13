@@ -483,15 +483,8 @@ public class RegistMotion extends Activity implements SensorEventListener
 				//endregion
 
 
-				// TODO Toastメッセージ表示もWriteDataに任せるようにする
-				if (!WriteData.writeRData("RegistSRdata", "R_accel", RegistNameInput.name, R_accel, RegistMotion.this))
-					{
-						Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_SHORT).show();
-					}
-				if (!WriteData.writeRData("RegistSRdata", "R_gyro", RegistNameInput.name, R_gyro, RegistMotion.this))
-					{
-						Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_SHORT).show();
-					}
+				mWriteData.writeRData("RegistSRdata", "R_accel", RegistNameInput.name, R_accel, RegistMotion.this);
+				mWriteData.writeRData("RegistSRdata", "R_gyro", RegistNameInput.name, R_gyro, RegistMotion.this);
 
 				//region 相関係数の判定
 				// 相関係数が一定以上なら保存する（ユーザ名のテキストファイルに書き出す）

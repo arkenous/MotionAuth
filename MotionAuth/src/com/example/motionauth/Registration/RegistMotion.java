@@ -559,6 +559,7 @@ public class RegistMotion extends Activity implements SensorEventListener
 						OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
 						BufferedWriter bw = new BufferedWriter(osw);
 
+						// TODO "@"を他の記号で代用できないか調べる
 						for (int i = 0; i < 100; i++)
 							{
 								bw.write("ave_distance_x@" + aveMoveAverageDistance[0][i] + "\n");

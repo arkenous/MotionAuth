@@ -245,7 +245,6 @@ public class RegistMotion extends Activity implements SensorEventListener
 
 				// データ加工，計算処理
 				// データの桁揃え
-
 				for (int i = 0; i < 3; i++)
 					{
 						for (int j = 0; j < 3; j++)
@@ -258,7 +257,13 @@ public class RegistMotion extends Activity implements SensorEventListener
 										accelo[i][j][k] = Formatter.floatToDoubleFormatter(accelo_tmp[i][j][k]);
 										gyro[i][j][k] = Formatter.floatToDoubleFormatter(gyro_tmp[i][j][k]);
 									}
+							}
+					}
 
+				for (int i = 0; i < 3; i++)
+					{
+						for (int j = 0; j < 3; j++)
+							{
 								// 移動平均ローパス
 								// TODO 別クラスに分離できるか検討
 								for (int k = 0; k < 100; k++)

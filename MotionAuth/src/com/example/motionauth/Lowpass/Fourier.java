@@ -1,8 +1,9 @@
-package com.example.motionauth;
+package com.example.motionauth.Lowpass;
 
 import android.content.Context;
 import android.util.Log;
 import com.example.motionauth.Registration.RegistNameInput;
+import com.example.motionauth.WriteData;
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 
 /**
@@ -11,9 +12,9 @@ import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
  * @see <a href="https://sites.google.com/site/piotrwendykier/software/jtransforms">https://sites.google.com/site/piotrwendykier/software/jtransforms</a>
  * @author Kensuke Kousaka
  */
-public class Lowpass
+public class Fourier
 	{
-		public static void LowpassFilter(double[] data, Context context)
+		public void LowpassFilter(double[] data, Context context)
 			{
 				DoubleFFT_1D fft = new DoubleFFT_1D(data.length);
 

@@ -213,6 +213,7 @@ public class RegistMotion extends Activity implements SensorEventListener
 											secondTv.setText("0");
 
 											// 生データをアウトプット
+											// TODO Toastメッセージ表示もWriteDataに任せるようにする
 											if (!WriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accelo_tmp, RegistMotion.this))
 												{
 													Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_SHORT).show();
@@ -223,6 +224,8 @@ public class RegistMotion extends Activity implements SensorEventListener
 												}
 
 											calc();
+
+											// TODO Correlationに渡して処理し，返り値を利用する
 											soukan();
 										}
 								}
@@ -251,6 +254,7 @@ public class RegistMotion extends Activity implements SensorEventListener
 						for (int j = 0; j < 3; j++)
 							{
 								// 原データの桁揃え
+								// Formatterに配列ごと渡して処理する（ここでfor文を使わないようにする）
 								for (int k = 0; k < 100; k++)
 									{
 										// データのフォーマット
@@ -259,6 +263,7 @@ public class RegistMotion extends Activity implements SensorEventListener
 									}
 
 								// 移動平均ローパス
+								// TODO 別クラスに分離できるか検討
 								for (int k = 0; k < 100; k++)
 									{
 										double tmp = lowpass(accelo[i][j][k]);
@@ -274,6 +279,7 @@ public class RegistMotion extends Activity implements SensorEventListener
 							}
 					}
 
+				// TODO Toastメッセージ表示もWriteDataに任せるようにする
 				if (!WriteData.writeDoubleThreeArrayData("FormatRawData", "rawAccelo", RegistNameInput.name, accelo, RegistMotion.this))
 					{
 						Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_SHORT).show();
@@ -489,6 +495,7 @@ public class RegistMotion extends Activity implements SensorEventListener
 				//endregion
 
 
+				// TODO Toastメッセージ表示もWriteDataに任せるようにする
 				if (!WriteData.writeRData("RegistSRdata", "R_accel", RegistNameInput.name, R_accel, RegistMotion.this))
 					{
 						Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_SHORT).show();
@@ -555,6 +562,7 @@ public class RegistMotion extends Activity implements SensorEventListener
 		/**
 		 * モーションデータの平均値をSDカードの指定したディレクトリの出力するメソッド
 		 */
+		// TODO WriteDataに任せる（ここに書かない）
 		private void writeData()
 			{
 				try

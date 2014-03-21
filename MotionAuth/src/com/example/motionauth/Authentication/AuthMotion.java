@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.motionauth.Formatter;
+import com.example.motionauth.Lowpass.MovingAverage;
 import com.example.motionauth.R;
 
 import java.io.*;
@@ -33,6 +34,8 @@ public class AuthMotion extends Activity implements SensorEventListener
         private SensorManager mSensorManager;
         private Sensor mAccelerometerSensor;
         private Sensor mGyroscopeSensor;
+
+        private MovingAverage mMovingAverage = new MovingAverage();
 
         // モーションの生データ
         private float vAccel[];
@@ -200,16 +203,23 @@ public class AuthMotion extends Activity implements SensorEventListener
                                 gyro[i][j] = Formatter.floatToDoubleFormatter(gyro_tmp[i][j]);
                             }
 
+                        accel = mMovingAverage.LowpassFilter(accel);
+
                         // 移動平均ローパス
                         for (int j = 0; j < 100; j++)
                             {
-                                double tmp = lowpass(accel[i][j]);
+//                                double tmp = lowpass(accel[i][j]);
+                                double tmp = accel[i][j];
                                 tmp = (tmp * 0.03 * 0.03) / 2 * 1000;
                                 moveAverageDistance[i][j] = Formatter.doubleToDoubleFormatter(tmp);
                             }
+
+                        gyro = mMovingAverage.LowpassFilter(gyro);
+
                         for (int j = 0; j < 100; j++)
                             {
-                                double tmp = lowpass(gyro[i][j]);
+//                                double tmp = lowpass(gyro[i][j]);
+                                double tmp = gyro[i][j];
                                 tmp = (tmp * 0.03 * 0.03) / 2 * 1000;
                                 moveAverageAngle[i][j] = Formatter.doubleToDoubleFormatter(tmp);
                             }
@@ -225,19 +235,19 @@ public class AuthMotion extends Activity implements SensorEventListener
          * @param data ローパスをかけるdouble型のデータ
          * @return ローパスをかけ終わったdouble型のデータ
          */
-        private double lowpass (double data)
-            {
-                if (count == 100)
-                    {
-                        outputData = 0.0;
-                        count = 0;
-                    }
-
-                outputData = outputData * 0.9 + data * 0.1;
-
-                count++;
-                return outputData;
-            }
+//        private double lowpass (double data)
+//            {
+//                if (count == 100)
+//                    {
+//                        outputData = 0.0;
+//                        count = 0;
+//                    }
+//
+//                outputData = outputData * 0.9 + data * 0.1;
+//
+//                count++;
+//                return outputData;
+//            }
 
 
         private void soukan ()

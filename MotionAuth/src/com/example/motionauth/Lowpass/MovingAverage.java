@@ -36,4 +36,24 @@ public class MovingAverage
                     }
                 return data;
             }
+
+        public double[][] LowpassFilter (double[][] data)
+            {
+                double outputData = 0.0;
+
+                for (int i = 0; i < 3; i++)
+                    {
+                        for (int j = 0; j < 100; j++)
+                            {
+                                outputData = outputData * 0.9 + data[i][j] * 0.1;
+                                data[i][j] = outputData;
+
+                                if (j == 99)
+                                    {
+                                        outputData = 0.0;
+                                    }
+                            }
+                    }
+                return data;
+            }
     }

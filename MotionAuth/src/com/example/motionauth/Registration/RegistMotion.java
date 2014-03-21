@@ -39,7 +39,7 @@ public class RegistMotion extends Activity implements SensorEventListener
         private Sensor mGyroscopeSensor;
 
         // モーションの生データ
-        private float vAccelo[];
+        private float vAccel[];
         private float vGyro[];
 
         private boolean btnStatus = false;
@@ -58,10 +58,10 @@ public class RegistMotion extends Activity implements SensorEventListener
         private int gyroCount = 0;
         private int getCount = 0;
 
-        private float accelo_tmp[][][] = new float[3][3][100];
+        private float accel_tmp[][][] = new float[3][3][100];
         private float gyro_tmp[][][] = new float[3][3][100];
 
-        private double accelo[][][] = new double[3][3][100];
+        private double accel[][][] = new double[3][3][100];
         private double gyro[][][] = new double[3][3][100];
 
 
@@ -76,9 +76,9 @@ public class RegistMotion extends Activity implements SensorEventListener
         private double aveMoveAverageDistance[][] = new double[3][100];
         private double aveMoveAverageAngle[][] = new double[3][100];
 
-        TextView secondTv;
-        TextView countSecondTv;
-        Button getMotionBtn;
+        private TextView secondTv;
+        private TextView countSecondTv;
+        private Button getMotionBtn;
 
 
         private WriteData mWriteData = new WriteData();
@@ -119,15 +119,12 @@ public class RegistMotion extends Activity implements SensorEventListener
                 {
                     public void onClick (View v)
                         {
-                            if (btnStatus == false)
+                            if (!btnStatus)
                                 {
                                     btnStatus = true;
                                     getMotionBtn.setText("取得中");
                                     countSecondTv.setText("秒");
                                     timeHandler.sendEmptyMessage(TIMEOUT_MESSAGE);
-                                }
-                            else
-                                {
                                 }
                         }
                 });
@@ -139,7 +136,7 @@ public class RegistMotion extends Activity implements SensorEventListener
             {
                 if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
                     {
-                        vAccelo = event.values.clone();
+                        vAccel = event.values.clone();
                     }
                 if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE)
                     {
@@ -148,14 +145,14 @@ public class RegistMotion extends Activity implements SensorEventListener
             }
 
 
-        Handler timeHandler = new Handler()
+        private Handler timeHandler = new Handler()
         {
             @Override
             public void dispatchMessage (Message msg)
                 {
                     Log.d(TAG, "dispatchMessageIn");
 
-                    if (msg.what == TIMEOUT_MESSAGE && btnStatus == true)
+                    if (msg.what == TIMEOUT_MESSAGE && btnStatus)
                         {
                             Log.d(TAG, "ifIn");
                             if (accelCount < 100 && gyroCount < 100 && getCount >= 0 && getCount < 3)
@@ -163,7 +160,7 @@ public class RegistMotion extends Activity implements SensorEventListener
                                     // 取得した値を，0.03秒ごとに配列に入れる
                                     for (int i = 0; i < 3; i++)
                                         {
-                                            accelo_tmp[getCount][i][accelCount] = vAccelo[i];
+                                            accel_tmp[getCount][i][accelCount] = vAccel[i];
                                         }
 
                                     for (int i = 0; i < 3; i++)
@@ -218,7 +215,7 @@ public class RegistMotion extends Activity implements SensorEventListener
                                             secondTv.setText("0");
 
                                             // 生データをアウトプット
-                                            mWriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accelo_tmp, RegistMotion.this);
+                                            mWriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accel_tmp, RegistMotion.this);
                                             mWriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyro_tmp, RegistMotion.this);
 
                                             calc();
@@ -255,7 +252,7 @@ public class RegistMotion extends Activity implements SensorEventListener
                                 for (int k = 0; k < 100; k++)
                                     {
                                         // データのフォーマット
-                                        accelo[i][j][k] = Formatter.floatToDoubleFormatter(accelo_tmp[i][j][k]);
+                                        accel[i][j][k] = Formatter.floatToDoubleFormatter(accel_tmp[i][j][k]);
                                         gyro[i][j][k] = Formatter.floatToDoubleFormatter(gyro_tmp[i][j][k]);
                                     }
                             }
@@ -269,7 +266,7 @@ public class RegistMotion extends Activity implements SensorEventListener
                                 // TODO 別クラスに分離できるか検討
                                 for (int k = 0; k < 100; k++)
                                     {
-                                        double tmp = lowpass(accelo[i][j][k]);
+                                        double tmp = lowpass(accel[i][j][k]);
                                         tmp = (tmp * 0.03 * 0.03) / 2 * 1000;
                                         moveAverageDistance[i][j][k] = Formatter.doubleToDoubleFormatter(tmp);
                                     }
@@ -282,7 +279,7 @@ public class RegistMotion extends Activity implements SensorEventListener
                             }
                     }
 
-                mWriteData.writeDoubleThreeArrayData("FormatRawData", "rawAccelo", RegistNameInput.name, accelo, RegistMotion.this);
+                mWriteData.writeDoubleThreeArrayData("FormatRawData", "rawAccelo", RegistNameInput.name, accel, RegistMotion.this);
                 mWriteData.writeDoubleThreeArrayData("FormatRawData", "rawGyro", RegistNameInput.name, gyro, RegistMotion.this);
 
                 // measureCorrelation用の平均値データを作成
@@ -311,11 +308,6 @@ public class RegistMotion extends Activity implements SensorEventListener
                         // ズレ修正を行う
                         moveAverageDistance = CorrectDeviation.correctDeviation(moveAverageDistance);
                         moveAverageAngle = CorrectDeviation.correctDeviation(moveAverageAngle);
-                    }
-                else if (Enum.MEASURE.PERFECT == measure)
-                    {
-                        // 相関係数が0.8よりも高い場合
-                        // ズレ修正を行わず，スキップする
                     }
                 else
                     {

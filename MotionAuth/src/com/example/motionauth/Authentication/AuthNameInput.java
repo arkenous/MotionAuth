@@ -124,14 +124,8 @@ public class AuthNameInput extends Activity
             {
                 String folderPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + name;
                 File file = new File(folderPath);
-                if (file.exists())
-                    {
-                        return true;
-                    }
-                else
-                    {
-                        return false;
-                    }
+
+                return file.exists();
             }
 
 
@@ -148,7 +142,7 @@ public class AuthNameInput extends Activity
 
                 intent.setClassName(pkgName, actName);
 
-                if (flg == true)
+                if (flg)
                     {
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     }

@@ -35,7 +35,7 @@ public class AuthMotion extends Activity implements SensorEventListener
         private Sensor mGyroscopeSensor;
 
         // モーションの生データ
-        private float vAccelo[];
+        private float vAccel[];
         private float vGyro[];
 
         private boolean btnStatus = false;
@@ -50,10 +50,10 @@ public class AuthMotion extends Activity implements SensorEventListener
         private int gyroCount = 0;
         private int getCount = 0;
 
-        private float accelo_tmp[][] = new float[3][100];
+        private float accel_tmp[][] = new float[3][100];
         private float gyro_tmp[][] = new float[3][100];
 
-        private double accelo[][] = new double[3][100];
+        private double accel[][] = new double[3][100];
         private double gyro[][] = new double[3][100];
 
         // 移動平均の際に用いる
@@ -103,16 +103,12 @@ public class AuthMotion extends Activity implements SensorEventListener
                 {
                     public void onClick (View v)
                         {
-                            if (btnStatus == false)
+                            if (!btnStatus)
                                 {
                                     btnStatus = true;
                                     getMotionBtn.setText("取得中");
                                     countSecondTv.setText("秒");
                                     timeHandler.sendEmptyMessage(TIMEOUT_MESSAGE);
-                                }
-                            else
-                                {
-
                                 }
                         }
                 });
@@ -124,7 +120,7 @@ public class AuthMotion extends Activity implements SensorEventListener
             {
                 if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
                     {
-                        vAccelo = event.values.clone();
+                        vAccel = event.values.clone();
                     }
                 if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE)
                     {
@@ -137,14 +133,14 @@ public class AuthMotion extends Activity implements SensorEventListener
             @Override
             public void dispatchMessage (Message msg)
                 {
-                    if (msg.what == TIMEOUT_MESSAGE && btnStatus == true)
+                    if (msg.what == TIMEOUT_MESSAGE && btnStatus)
                         {
                             if (accelCount < 100 && gyroCount < 100 && getCount >= 0 && getCount < 3)
                                 {
                                     // 取得した値を，0.03秒ごとに配列に入れる
                                     for (int i = 0; i < 3; i++)
                                         {
-                                            accelo_tmp[i][accelCount] = vAccelo[i];
+                                            accel_tmp[i][accelCount] = vAccel[i];
                                         }
 
                                     for (int i = 0; i < 3; i++)
@@ -200,14 +196,14 @@ public class AuthMotion extends Activity implements SensorEventListener
                         // 原データの桁揃え
                         for (int j = 0; j < 100; j++)
                             {
-                                accelo[i][j] = Formatter.floatToDoubleFormatter(accelo_tmp[i][j]);
+                                accel[i][j] = Formatter.floatToDoubleFormatter(accel_tmp[i][j]);
                                 gyro[i][j] = Formatter.floatToDoubleFormatter(gyro_tmp[i][j]);
                             }
 
                         // 移動平均ローパス
                         for (int j = 0; j < 100; j++)
                             {
-                                double tmp = lowpass(accelo[i][j]);
+                                double tmp = lowpass(accel[i][j]);
                                 tmp = (tmp * 0.03 * 0.03) / 2 * 1000;
                                 moveAverageDistance[i][j] = Formatter.doubleToDoubleFormatter(tmp);
                             }
@@ -559,7 +555,7 @@ public class AuthMotion extends Activity implements SensorEventListener
 
                 intent.setClassName(pkgName, actName);
 
-                if (flg == true)
+                if (flg)
                     {
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     }

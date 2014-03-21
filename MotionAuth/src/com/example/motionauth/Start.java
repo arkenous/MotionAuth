@@ -43,18 +43,18 @@ public class Start extends Activity
                 requestWindowFeature(Window.FEATURE_NO_TITLE);
                 setContentView(R.layout.activity_start);
 
-                chooseMode();
+                selectMode();
             }
 
 
         /**
          * モード選択
          */
-        private void chooseMode ()
+        private void selectMode ()
             {
-                Button startbtn = (Button) findViewById(R.id.start);
+                Button startBtn = (Button) findViewById(R.id.start);
 
-                startbtn.setOnClickListener(new OnClickListener()
+                startBtn.setOnClickListener(new OnClickListener()
                 {
                     @Override
                     public void onClick (View v)
@@ -230,7 +230,7 @@ public class Start extends Activity
 
                 intent.setClassName(pkgName, actName);
 
-                if (flg == true)
+                if (flg)
                     {
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     }

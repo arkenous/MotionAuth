@@ -70,6 +70,7 @@ public class RegistNameInput extends Activity
                         {
                             // ユーザの入力した名前をnameに格納
                             name = nameInput.getText().toString();
+
                         }
                 });
 
@@ -97,7 +98,7 @@ public class RegistNameInput extends Activity
                     public void onClick (View v)
                         {
                             // nameが入力されているかの確認
-                            if (nameInput.getText().toString().isEmpty())
+                            if (name.isEmpty())
                                 {
                                     Toast.makeText(RegistNameInput.this, "名前が入力されていません", Toast.LENGTH_LONG).show();
                                 }
@@ -123,7 +124,7 @@ public class RegistNameInput extends Activity
 
                 intent.setClassName(pkgName, actName);
 
-                if (flg == true)
+                if (flg)
                     {
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     }

@@ -111,7 +111,6 @@ public class RegistrantList extends Activity
             {
                 try
                     {
-
                         // 専用ディレクトリを指定
                         String dirPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth";
                         File dir = new File(dirPath);
@@ -156,7 +155,7 @@ public class RegistrantList extends Activity
                         intent.putExtra("item", item);
                     }
 
-                if (flg == true)
+                if (flg)
                     {
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     }
@@ -172,5 +171,4 @@ public class RegistrantList extends Activity
                 getMenuInflater().inflate(R.menu.registrant_list, menu);
                 return true;
             }
-
     }

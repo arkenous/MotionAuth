@@ -198,9 +198,9 @@ public class AuthMotion extends Activity implements SensorEventListener
                                 gyro[i][j] = Formatter.floatToDoubleFormatter(gyro_tmp[i][j]);
                             }
 
+                        // 移動平均ローパス
                         accel = mMovingAverage.LowpassFilter(accel);
 
-                        // 移動平均ローパス
                         for (int j = 0; j < 100; j++)
                             {
                                 double tmp = accel[i][j];
@@ -357,7 +357,7 @@ public class AuthMotion extends Activity implements SensorEventListener
                     }
                 catch (IOException e)
                     {
-
+                        e.printStackTrace();
                     }
 
                 for (int i = 0; i < 3; i++)

@@ -51,10 +51,6 @@ public class WriteData
                                 // フォルダがない場合
                                 file.mkdirs();
                             }
-                        else
-                            {
-                                // フォルダがある場合
-                            }
                     }
                 catch (Exception e)
                     {
@@ -140,10 +136,6 @@ public class WriteData
                             {
                                 // フォルダがない場合
                                 file.mkdirs();
-                            }
-                        else
-                            {
-                                // フォルダがある場合
                             }
                     }
                 catch (Exception e)

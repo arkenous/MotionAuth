@@ -20,9 +20,8 @@ public class Formatter
             {
                 String afterFormat = String.format(Locale.getDefault(), "%.2f", tmp);
 
-                Double doubleValue = Double.valueOf(afterFormat);
+                return Double.valueOf(afterFormat);
 
-                return doubleValue;
             }
 
 
@@ -36,8 +35,6 @@ public class Formatter
             {
                 String afterFormat = String.format(Locale.getDefault(), "%.2f", tmp);
 
-                Double doubleValue = Double.valueOf(afterFormat);
-
-                return doubleValue;
+                return Double.valueOf(afterFormat);
             }
     }

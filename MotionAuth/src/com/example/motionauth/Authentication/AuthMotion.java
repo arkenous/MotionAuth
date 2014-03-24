@@ -299,7 +299,7 @@ public class AuthMotion extends Activity implements SensorEventListener
                         BufferedReader br = new BufferedReader(isr);
 
                         String beforeSplitData;
-                        String[] afterSplitData = new String[2];
+                        String[] afterSplitData;
 
                         while ((beforeSplitData = br.readLine()) != null)
                             {

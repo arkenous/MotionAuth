@@ -68,10 +68,6 @@ public class RegistMotion extends Activity implements SensorEventListener
         private double gyro[][][] = new double[3][3][100];
 
 
-        // 移動平均の際に用いる
-        private double outputData = 0.0;
-        private int count = 0;
-
         // 移動平均後のデータを格納する配列
         private double moveAverageDistance[][][] = new double[3][3][100];
         private double moveAverageAngle[][][] = new double[3][3][100];
@@ -272,7 +268,6 @@ public class RegistMotion extends Activity implements SensorEventListener
 
                                 for (int k = 0; k < 100; k++)
                                     {
-//                                        double tmp = lowpass(accel[i][j][k]);
                                         double tmp = accel[i][j][k];
                                         tmp = (tmp * 0.03 * 0.03) / 2 * 1000;
                                         moveAverageDistance[i][j][k] = Formatter.doubleToDoubleFormatter(tmp);
@@ -282,7 +277,6 @@ public class RegistMotion extends Activity implements SensorEventListener
 
                                 for (int k = 0; k < 100; k++)
                                     {
-//                                        double tmp = lowpass(gyro[i][j][k]);
                                         double tmp = gyro[i][j][k];
                                         tmp = (tmp * 0.03 * 0.03) / 2 * 1000;
                                         moveAverageAngle[i][j][k] = Formatter.doubleToDoubleFormatter(tmp);
@@ -339,29 +333,6 @@ public class RegistMotion extends Activity implements SensorEventListener
                             }
                     }
             }
-
-
-        /**
-         * 移動量平均ローパスフィルタ
-         *
-         * @param data ローパスをかけるdouble型のデータ
-         * @return ローパスをかけ終わったdouble型のデータ
-         */
-//        private double lowpass (double data)
-//            {
-//                Log.d(TAG, "lowpass");
-//
-//                if (count == 100)
-//                    {
-//                        outputData = 0.0;
-//                        count = 0;
-//                    }
-//
-//                outputData = outputData * 0.9 + data * 0.1;
-//
-//                count++;
-//                return outputData;
-//            }
 
 
         /**

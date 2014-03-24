@@ -59,10 +59,6 @@ public class AuthMotion extends Activity implements SensorEventListener
         private double accel[][] = new double[3][100];
         private double gyro[][] = new double[3][100];
 
-        // 移動平均の際に用いる
-        private double outputData = 0.0;
-        private int count = 0;
-
         // 移動平均後のデータを格納する配列
         private double moveAverageDistance[][] = new double[3][100];
         private double moveAverageAngle[][] = new double[3][100];
@@ -208,7 +204,6 @@ public class AuthMotion extends Activity implements SensorEventListener
                         // 移動平均ローパス
                         for (int j = 0; j < 100; j++)
                             {
-//                                double tmp = lowpass(accel[i][j]);
                                 double tmp = accel[i][j];
                                 tmp = (tmp * 0.03 * 0.03) / 2 * 1000;
                                 moveAverageDistance[i][j] = Formatter.doubleToDoubleFormatter(tmp);
@@ -218,7 +213,6 @@ public class AuthMotion extends Activity implements SensorEventListener
 
                         for (int j = 0; j < 100; j++)
                             {
-//                                double tmp = lowpass(gyro[i][j]);
                                 double tmp = gyro[i][j];
                                 tmp = (tmp * 0.03 * 0.03) / 2 * 1000;
                                 moveAverageAngle[i][j] = Formatter.doubleToDoubleFormatter(tmp);
@@ -227,27 +221,6 @@ public class AuthMotion extends Activity implements SensorEventListener
 
 
             }
-
-
-        /**
-         * 移動量平均ローパスフィルタ
-         *
-         * @param data ローパスをかけるdouble型のデータ
-         * @return ローパスをかけ終わったdouble型のデータ
-         */
-//        private double lowpass (double data)
-//            {
-//                if (count == 100)
-//                    {
-//                        outputData = 0.0;
-//                        count = 0;
-//                    }
-//
-//                outputData = outputData * 0.9 + data * 0.1;
-//
-//                count++;
-//                return outputData;
-//            }
 
 
         private void soukan ()
@@ -581,5 +554,4 @@ public class AuthMotion extends Activity implements SensorEventListener
                 getMenuInflater().inflate(R.menu.auth_motion, menu);
                 return true;
             }
-
     }

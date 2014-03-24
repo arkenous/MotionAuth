@@ -51,7 +51,6 @@ public class AuthMotion extends Activity implements SensorEventListener
         // データ取得カウント用
         private int accelCount = 0;
         private int gyroCount = 0;
-        private int getCount = 0;
 
         private float accel_tmp[][] = new float[3][100];
         private float gyro_tmp[][] = new float[3][100];
@@ -134,7 +133,7 @@ public class AuthMotion extends Activity implements SensorEventListener
                 {
                     if (msg.what == TIMEOUT_MESSAGE && btnStatus)
                         {
-                            if (accelCount < 100 && gyroCount < 100 && getCount >= 0 && getCount < 3)
+                            if (accelCount < 100 && gyroCount < 100)
                                 {
                                     // 取得した値を，0.03秒ごとに配列に入れる
                                     for (int i = 0; i < 3; i++)

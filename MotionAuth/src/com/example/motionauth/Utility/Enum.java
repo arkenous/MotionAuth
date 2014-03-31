@@ -5,10 +5,12 @@ package com.example.motionauth.Utility;
  *
  * @author Kensuke Kousaka
  */
-public class Enum
-    {
-        public static enum MEASURE
-            {
-                INCORRECT, CORRECT, PERFECT
-            }
+public class Enum {
+    public static enum MEASURE {
+        BAD, INCORRECT, CORRECT, PERFECT
     }
+
+    public static final double LOOSE = 0.4;
+    public static final double NORMAL = 0.6;
+    public static final double STRICT = 0.8;
+}

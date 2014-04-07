@@ -14,6 +14,8 @@ import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
  * @see <a href="https://sites.google.com/site/piotrwendykier/software/jtransforms">https://sites.google.com/site/piotrwendykier/software/jtransforms</a>
  */
 public class Fourier {
+    private WriteData mWriteData = new WriteData();
+
     public void LowpassFilter (double[] data, Context context) {
         DoubleFFT_1D fft = new DoubleFFT_1D(data.length);
 
@@ -28,7 +30,7 @@ public class Fourier {
         // dataの偶数要素は実数成分，奇数要素は虚数成分
 
         // フーリエ変換後の値をアウトプット
-        WriteData.writeSingleArrayData("FFT", "beforeFFT", RegistNameInput.name, data, context);
+        mWriteData.writeDoubleOneArrayData("FFT", "beforeFFT", RegistNameInput.name, data, context);
 
         for (int i = 0; i < 100; i = i + 2) {
             if (data[i] > 10 || data[i] < -10) {
@@ -38,12 +40,12 @@ public class Fourier {
         }
         Log.d("FFT", "c");
 
-        WriteData.writeSingleArrayData("FFT", "afterFFT", RegistNameInput.name, data, context);
+        mWriteData.writeDoubleOneArrayData("FFT", "afterFFT", RegistNameInput.name, data, context);
 
         // 逆フーリエ変換の実行
         // 周波数領域のデータを時間領域のデータに変換する
         fft.realInverse(data, true);
 
-        WriteData.writeSingleArrayData("FFT", "afteraccelo0X", RegistNameInput.name, data, context);
+        mWriteData.writeDoubleOneArrayData("FFT", "afteraccelo0X", RegistNameInput.name, data, context);
     }
 }

@@ -224,21 +224,6 @@ public class RegistMotion extends Activity implements SensorEventListener {
         accel = mFormatter.floatToDoubleFormatter(accel_tmp);
         gyro = mFormatter.floatToDoubleFormatter(gyro_tmp);
 
-//                for (int i = 0; i < 3; i++)
-//                    {
-//                        for (int j = 0; j < 3; j++)
-//                            {
-//                                // 原データの桁揃え
-//                                // Formatterに配列ごと渡して処理する（ここでfor文を使わないようにする）
-//                                for (int k = 0; k < 100; k++)
-//                                    {
-//                                        // データのフォーマット
-//                                        accel[i][j][k] = Formatter.floatToDoubleFormatter(accel_tmp[i][j][k]);
-//                                        gyro[i][j][k] = Formatter.floatToDoubleFormatter(gyro_tmp[i][j][k]);
-//                                    }
-//                            }
-//                    }
-
         accel = mMovingAverage.LowpassFilter(accel);
         gyro = mMovingAverage.LowpassFilter(gyro);
 
@@ -247,32 +232,6 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
         moveAverageDistance = mFormatter.doubleToDoubleFormatter(moveAverageDistance);
         moveAverageAngle = mFormatter.doubleToDoubleFormatter(moveAverageAngle);
-
-//                for (int i = 0; i < 3; i++)
-//                    {
-//                        for (int j = 0; j < 3; j++)
-//                            {
-//                                // 移動平均ローパス
-//
-//                                accel = mMovingAverage.LowpassFilter(accel);
-//
-//                                for (int k = 0; k < 100; k++)
-//                                    {
-//                                        double tmp = accel[i][j][k];
-//                                        tmp = (tmp * 0.03 * 0.03) / 2 * 1000;
-//                                        moveAverageDistance[i][j][k] = Formatter.doubleToDoubleFormatter(tmp);
-//                                    }
-//
-//                                gyro = mMovingAverage.LowpassFilter(gyro);
-//
-//                                for (int k = 0; k < 100; k++)
-//                                    {
-//                                        double tmp = gyro[i][j][k];
-//                                        tmp = (tmp * 0.03 * 0.03) / 2 * 1000;
-//                                        moveAverageAngle[i][j][k] = Formatter.doubleToDoubleFormatter(tmp);
-//                                    }
-//                            }
-//                    }
 
         mWriteData.writeDoubleThreeArrayData("FormatRawData", "rawAccelo", RegistNameInput.name, accel, RegistMotion.this);
         mWriteData.writeDoubleThreeArrayData("FormatRawData", "rawGyro", RegistNameInput.name, gyro, RegistMotion.this);
@@ -323,149 +282,16 @@ public class RegistMotion extends Activity implements SensorEventListener {
      */
     private void soukan () {
         Log.d(TAG, "soukan");
-        // 相関係数の計算
 
-        //region Calculate of Average A
-        float[][] sample_accel = new float[3][3];
+        Enum.MEASURE measure = mCorrelation.measureCorrelation(this, moveAverageDistance, moveAverageAngle, aveMoveAverageDistance, aveMoveAverageAngle);
 
-        float[][] sample_gyro = new float[3][3];
+        if (measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT) {
+            getMotionBtn.setText("認証登録中");
+            Toast.makeText(this, "モーションを登録中です", Toast.LENGTH_SHORT).show();
 
-        // iは1回目，2回目，3回目
-        for (int i = 0; i < 3; i++) {
-            for (int k = 0; k < 3; k++) {
-                for (int j = 0; j < 100; j++) {
-                    sample_accel[i][k] += moveAverageDistance[i][k][j];
-                    sample_gyro[i][k] += moveAverageAngle[i][k][j];
-                }
-            }
+            // 3回のモーションの平均値をファイルに書き出す
+            writeData();
         }
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                sample_accel[i][j] /= 99;
-                sample_gyro[i][j] /= 99;
-            }
-        }
-        //endregion
-
-
-        //region Calculate of Average B
-        float ave_accel[] = new float[3];
-        float ave_gyro[] = new float[3];
-
-        for (int j = 0; j < 3; j++) {
-            for (int i = 0; i < 100; i++) {
-                ave_accel[j] += aveMoveAverageDistance[j][i];
-                ave_gyro[j] += aveMoveAverageAngle[j][i];
-            }
-        }
-
-        for (int i = 0; i < 3; i++) {
-            ave_accel[i] /= 99;
-            ave_gyro[i] /= 99;
-        }
-        //endregion
-
-
-        //region Calculate of Sxx
-        float Sxx_accel[][] = new float[3][3];
-        float Sxx_gyro[][] = new float[3][3];
-
-        for (int i = 0; i < 3; i++) {
-            for (int k = 0; k < 3; k++) {
-                for (int j = 0; j < 100; j++) {
-                    Sxx_accel[i][k] += Math.pow((moveAverageDistance[i][k][j] - sample_accel[i][k]), 2);
-                    Sxx_gyro[i][k] += Math.pow((moveAverageAngle[i][k][j] - sample_gyro[i][k]), 2);
-                }
-            }
-        }
-        //endregion
-
-
-        //region Calculate of Syy
-        float Syy_accel[] = new float[3];
-
-        float Syy_gyro[] = new float[3];
-
-        for (int j = 0; j < 3; j++) {
-            for (int i = 0; i < 100; i++) {
-                Syy_accel[j] += Math.pow((aveMoveAverageDistance[j][i] - ave_accel[j]), 2);
-                Syy_gyro[j] += Math.pow((aveMoveAverageAngle[j][i] - ave_gyro[j]), 2);
-            }
-        }
-        //endregion
-
-
-        //region Calculate of Sxy
-        float[][] Sxy_accel = new float[3][3];
-        float[][] Sxy_gyro = new float[3][3];
-
-        for (int i = 0; i < 3; i++) {
-            for (int k = 0; k < 3; k++) {
-                for (int j = 0; j < 100; j++) {
-                    Sxy_accel[i][k] += (moveAverageDistance[i][k][j] - sample_accel[i][k]) * (aveMoveAverageDistance[k][j] - ave_accel[k]);
-                    Sxy_gyro[i][k] += (moveAverageAngle[i][k][j] - sample_gyro[i][k]) * (aveMoveAverageAngle[k][j] - ave_gyro[k]);
-                }
-            }
-        }
-        //endregion
-
-
-        //region Calculate of R
-        double[][] R_accel = new double[3][3];
-        double[][] R_gyro = new double[3][3];
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                R_accel[i][j] = Sxy_accel[i][j] / Math.sqrt(Sxx_accel[i][j] * Syy_accel[j]);
-                R_gyro[i][j] = Sxy_gyro[i][j] / Math.sqrt(Sxx_gyro[i][j] * Syy_gyro[j]);
-            }
-        }
-        //endregion
-
-
-        mWriteData.writeRData("RegistSRdata", "R_accel", RegistNameInput.name, R_accel, RegistMotion.this);
-        mWriteData.writeRData("RegistSRdata", "R_gyro", RegistNameInput.name, R_gyro, RegistMotion.this);
-
-        //region 相関係数の判定
-        // 相関係数が一定以上なら保存する（ユーザ名のテキストファイルに書き出す）
-        if ((R_accel[0][0] > Enum.STRICT && R_accel[1][0] > Enum.STRICT) || (R_accel[1][0] > Enum.STRICT && R_accel[2][0] > Enum.STRICT) || (R_accel[0][0] > Enum.STRICT && R_accel[2][0] > Enum.STRICT)) {
-            if ((R_accel[0][1] > Enum.STRICT && R_accel[1][1] > Enum.STRICT) || (R_accel[1][1] > Enum.STRICT && R_accel[2][1] > Enum.STRICT) || (R_accel[0][1] > Enum.STRICT && R_accel[2][1] > Enum.STRICT)) {
-                if ((R_accel[0][2] > Enum.STRICT && R_accel[1][2] > Enum.STRICT) || (R_accel[1][2] > Enum.STRICT && R_accel[2][2] > Enum.STRICT) || (R_accel[0][2] > Enum.STRICT && R_accel[2][2] > Enum.STRICT)) {
-                    if ((R_gyro[0][0] > Enum.STRICT && R_gyro[1][0] > Enum.STRICT) || (R_gyro[1][0] > Enum.STRICT && R_gyro[2][0] > Enum.STRICT) || (R_gyro[0][0] > Enum.STRICT || R_gyro[2][0] > Enum.STRICT)) {
-                        if ((R_gyro[0][1] > Enum.STRICT && R_gyro[1][1] > Enum.STRICT) || (R_gyro[1][1] > Enum.STRICT && R_gyro[2][1] > Enum.STRICT) || (R_gyro[0][1] > Enum.STRICT || R_gyro[2][1] > Enum.STRICT)) {
-                            if ((R_gyro[0][2] > Enum.STRICT && R_gyro[1][2] > Enum.STRICT) || (R_gyro[1][2] > Enum.STRICT && R_gyro[2][2] > Enum.STRICT) || (R_gyro[0][2] > Enum.STRICT && R_gyro[2][2] > Enum.STRICT)) {
-                                getMotionBtn.setText("認証登録中");
-                                Toast.makeText(this, "モーションを登録中です", Toast.LENGTH_SHORT).show();
-
-                                // 3回のモーションの平均値をファイルに書き出す
-                                writeData();
-                            }
-                            else {
-                                Toast.makeText(this, "モーション登録に失敗しました", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                        else {
-                            Toast.makeText(this, "モーション登録に失敗しました", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    else {
-                        Toast.makeText(this, "モーション登録に失敗しました", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                else {
-                    Toast.makeText(this, "モーション登録に失敗しました", Toast.LENGTH_SHORT).show();
-                }
-            }
-            else {
-                Toast.makeText(this, "モーション登録に失敗しました", Toast.LENGTH_SHORT).show();
-            }
-        }
-        else {
-            Toast.makeText(this, "モーション登録に失敗しました", Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "失敗");
-        }
-        //endregion
     }
 
 

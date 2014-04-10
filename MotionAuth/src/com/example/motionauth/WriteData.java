@@ -61,13 +61,13 @@ public class WriteData {
                 // X,Y,Zループ
                 for (int j = 0; j < 3; j++) {
                     if (j == 0) {
-                        dimension = "x";
+                        dimension = "X";
                     }
                     else if (j == 1) {
-                        dimension = "y";
+                        dimension = "Y";
                     }
                     else if (j == 2) {
-                        dimension = "z";
+                        dimension = "Z";
                     }
 
                     FileOutputStream fos = new FileOutputStream(file, false);

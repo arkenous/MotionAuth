@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 /**
  * データをSDカードに書き込む
+ * //TODO ファイル書き込みを追記モードにする
  *
  * @author Kensuke Kousaka
  */

@@ -54,10 +54,6 @@ public class RegistMotion extends Activity implements SensorEventListener {
     // データを取得する間隔
     private static final int INTERVAL = 30;
 
-    // 相関の閾値
-//        private static final double LOOSE = 0.4;
-//        private static final double STRICT = 0.6;
-
     // データ取得カウント用
     private int accelCount = 0;
     private int gyroCount = 0;
@@ -117,7 +113,12 @@ public class RegistMotion extends Activity implements SensorEventListener {
         getMotionBtn.setOnClickListener(new OnClickListener() {
             public void onClick (View v) {
                 if (!btnStatus) {
+                    // TODO ボタンを押したら，statusをdisableにして押せないようにする
                     btnStatus = true;
+
+                    // ボタンをクリックできないようにする
+                    v.setClickable(false);
+
                     getMotionBtn.setText("取得中");
                     countSecondTv.setText("秒");
                     timeHandler.sendEmptyMessage(TIMEOUT_MESSAGE);
@@ -183,22 +184,41 @@ public class RegistMotion extends Activity implements SensorEventListener {
                     gyroCount = 0;
 
                     // TODO 画面に番号を表示するのではなく，音声で出力させる
+                    // TODO 取り終わったら，ボタンのstatusをenableにして押せるようにする
                     if (getCount == 1) {
                         secondTv.setText("2");
+
+                        // ボタンを押せるようにする
+                        getMotionBtn.setClickable(true);
                     }
                     if (getCount == 2) {
                         secondTv.setText("1");
+
+                        // ボタンを押せるようにする
+                        getMotionBtn.setClickable(true);
                     }
 
                     if (getCount == 3) {
                         // 全データ取得完了（3回分の加速度，ジャイロを取得完了）
+                        // TODO ボタンのstatusをdisableにして押せないようにする
+                        if (getMotionBtn.isClickable()){
+                            getMotionBtn.setClickable(false);
+                        }
                         secondTv.setText("0");
 
                         // 生データをアウトプット
                         mWriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accel_tmp, RegistMotion.this);
                         mWriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyro_tmp, RegistMotion.this);
 
-                        calc();
+                        if (!calc()){
+                            // もう一度モーションを取り直す処理
+                            // TODO ボタンのstatusをenableにして押せるようにする
+                            getMotionBtn.setClickable(true);
+                            // TODO データ取得関係の変数を初期化
+                            accelCount = 0;
+                            gyroCount = 0;
+                            getCount = 0;
+                        };
 
                         // TODO Correlationに渡して処理し，返り値を利用する
                         soukan();
@@ -216,7 +236,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
     /**
      * データ加工，計算処理を行う
      */
-    private void calc () {
+    private boolean calc () {
         Log.d(TAG, "calc");
 
         // データ加工，計算処理
@@ -251,7 +271,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
         if (Enum.MEASURE.BAD == measure) {
             // 相関係数が0.4以下
             Toast.makeText(RegistMotion.this, "同一モーションですか？", Toast.LENGTH_SHORT).show();
-            return;
+            return false;
         }
         else if (Enum.MEASURE.INCORRECT == measure || Enum.MEASURE.CORRECT == measure) {
             // 相関係数が0.4よりも高く，0.8以下の場合
@@ -262,6 +282,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
         else {
             // なにかがおかしい
             Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_LONG).show();
+            return false;
         }
         //endregion
 
@@ -274,6 +295,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
                 aveMoveAverageAngle[i][j] = (moveAverageAngle[0][i][j] + moveAverageAngle[1][i][j] + moveAverageAngle[2][i][j]) / 3;
             }
         }
+
+        return true;
     }
 
 

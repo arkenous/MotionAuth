@@ -71,7 +71,8 @@ public class WriteData {
                         dimension = "z";
                     }
 
-                    FileOutputStream fos = new FileOutputStream(file, false);
+                    // ファイルを追記モードで書き込む
+                    FileOutputStream fos = new FileOutputStream(file, true);
                     OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
                     BufferedWriter bw = new BufferedWriter(osw);
 
@@ -129,7 +130,8 @@ public class WriteData {
         }
 
         try {
-            FileOutputStream fos = new FileOutputStream(file, false);
+            // ファイルを追記モードで書き込む
+            FileOutputStream fos = new FileOutputStream(file, true);
             OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
             BufferedWriter bw = new BufferedWriter(osw);
 
@@ -152,7 +154,7 @@ public class WriteData {
      * Double型の２次元配列データをアウトプットする． 保存先は，SDカードディレクトリ/folderName/userName/fileName+次元
      *
      * @param folderName 保存するフォルダ名
-     * @param dataName   保存するファイル名
+     * @param dataName   保存するデータ名
      * @param userName   保存するユーザ名
      * @param data       保存するdouble型の２次元配列データ
      * @param context    実行するアクティビティのコンテキスト
@@ -203,7 +205,8 @@ public class WriteData {
                     dimension = "z";
                 }
 
-                FileOutputStream fos = new FileOutputStream(file, false);
+                // ファイルを追記モードで書き込む
+                FileOutputStream fos = new FileOutputStream(file, true);
                 OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
                 BufferedWriter bw = new BufferedWriter(osw);
 
@@ -226,7 +229,7 @@ public class WriteData {
      * Double型の三次元配列データをアウトプットする． 保存先は，SDカードディレクトリ/folderName/userName/fileName+回数+次元
      *
      * @param folderName 保存するフォルダ名
-     * @param dataName   保存するファイル名
+     * @param dataName   保存するデータ名
      * @param userName   保存するユーザ名
      * @param data       保存するdouble型の３次元配列データ
      * @param context    実行するアクティビティのコンテキスト
@@ -273,7 +276,8 @@ public class WriteData {
                         dimension = "z";
                     }
 
-                    FileOutputStream fos = new FileOutputStream(file, false);
+                    // ファイルを追記モードで書き込む
+                    FileOutputStream fos = new FileOutputStream(file, true);
                     OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
                     BufferedWriter bw = new BufferedWriter(osw);
 
@@ -294,7 +298,7 @@ public class WriteData {
      * Double型の２次元配列データをアウトプットする． 保存先は，SDカードディレクトリ/folderName/userName/fileName+次元
      *
      * @param folderName 保存するフォルダ名
-     * @param dataName   保存するファイル名
+     * @param dataName   保存するデータ名
      * @param userName   保存するユーザ名
      * @param data       保存するdouble型の２次元配列データ
      * @param context    実行するアクティビティのコンテキスト
@@ -342,7 +346,8 @@ public class WriteData {
                         dimension = "z";
                     }
 
-                    FileOutputStream fos = new FileOutputStream(file, false);
+                    // ファイルを追記モードで書き込む
+                    FileOutputStream fos = new FileOutputStream(file, true);
                     OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
                     BufferedWriter bw = new BufferedWriter(osw);
 

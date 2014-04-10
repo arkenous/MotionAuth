@@ -291,7 +291,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
             // 3回のモーションの平均値をファイルに書き出す
 //            writeData();
-            mWriteData.writeDoubleTwoArrayData("MotionAuth", )
+            mWriteData.writeDoubleTwoArrayData("MotionAuth", "ave_distance", RegistNameInput.name, aveMoveAverageDistance, this);
+            mWriteData.writeDoubleTwoArrayData("MotionAuth", "ave_angle", RegistNameInput.name, aveMoveAverageAngle, this);
         }
     }
 

@@ -91,7 +91,7 @@ public class WriteData {
      * Double型の1次元配列データをアウトプットする． 保存先は，SDカードディレクトリ/folderName/userName/fileName
      *
      * @param folderName 保存するフォルダ名
-     * @param dataName   保存するファイル名
+     * @param dataName   保存するデータ名
      * @param userName   保存するユーザ名
      * @param data       保存するdouble型の1次元配列データ
      * @param context    実行するアクティビティのコンテキスト

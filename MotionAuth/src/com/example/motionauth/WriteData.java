@@ -61,13 +61,13 @@ public class WriteData {
                 // X,Y,Zループ
                 for (int j = 0; j < 3; j++) {
                     if (j == 0) {
-                        dimension = "X";
+                        dimension = "x";
                     }
                     else if (j == 1) {
-                        dimension = "Y";
+                        dimension = "y";
                     }
                     else if (j == 2) {
-                        dimension = "Z";
+                        dimension = "z";
                     }
 
                     FileOutputStream fos = new FileOutputStream(file, false);
@@ -193,13 +193,13 @@ public class WriteData {
             // X,Y,Zループ
             for (int i = 0; i < 3; i++) {
                 if (i == 0) {
-                    dimension = "X";
+                    dimension = "x";
                 }
                 else if (i == 1) {
-                    dimension = "Y";
+                    dimension = "y";
                 }
                 else if (i == 2) {
-                    dimension = "Z";
+                    dimension = "z";
                 }
 
                 FileOutputStream fos = new FileOutputStream(file, false);
@@ -263,13 +263,13 @@ public class WriteData {
                 // X,Y,Zループ
                 for (int j = 0; j < 3; j++) {
                     if (j == 0) {
-                        dimension = "X";
+                        dimension = "x";
                     }
                     else if (j == 1) {
-                        dimension = "Y";
+                        dimension = "y";
                     }
                     else if (j == 2) {
-                        dimension = "Z";
+                        dimension = "z";
                     }
 
                     FileOutputStream fos = new FileOutputStream(file, false);
@@ -332,13 +332,13 @@ public class WriteData {
                 // X,Y,Zループ
                 for (int j = 0; j < 3; j++) {
                     if (j == 0) {
-                        dimension = "X";
+                        dimension = "x";
                     }
                     else if (j == 1) {
-                        dimension = "Y";
+                        dimension = "y";
                     }
                     else if (j == 2) {
-                        dimension = "Z";
+                        dimension = "z";
                     }
 
                     FileOutputStream fos = new FileOutputStream(file, false);

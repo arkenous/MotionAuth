@@ -12,30 +12,44 @@ public class Formatter {
     /**
      * float型の数値データを小数点以下2桁に揃え，doubleに変換する
      *
-     * @param tmp float型の数値データ
+     * @param inputVal float型の数値データ
      * @return 小数点以下2桁に揃え，double型に変換した数値データ
      */
-    public static double floatToDoubleFormatter (float tmp) {
-        String afterFormat = String.format(Locale.getDefault(), "%.2f", tmp);
+    public static double floatToDoubleFormatter (float inputVal) {
+        double returnVal;
 
-        return Double.valueOf(afterFormat);
+        String afterFormat = String.format(Locale.getDefault(), "%.2f", inputVal);
 
+        returnVal = Double.valueOf(afterFormat);
+
+        return returnVal;
     }
 
 
     /**
-     * double型の数値データを小数点以下2桁に揃える
-     *
-     * @param tmp double型の数値データ
-     * @return 小数点以下2桁に揃えたdouble型数値データ
+     * float型の２次元数値データを小数点以下２桁に揃え，doubleに変換する
+     * @param inputVal float型の２次元配列データ
+     * @return 小数点以下２桁に揃え，double型に変換した２次元数値データ
      */
-    public static double doubleToDoubleFormatter (double tmp) {
-        String afterFormat = String.format(Locale.getDefault(), "%.2f", tmp);
+    public double[][] floatToDoubleFormatter (float[][] inputVal) {
+        double[][] returnVal = {};
 
-        return Double.valueOf(afterFormat);
+        for (int i = 0; i < inputVal.length; i++) {
+            for (int j = 0; j < inputVal[i].length; j++) {
+                String format = String.format(Locale.getDefault(), "%.2f", inputVal[i][j]);
+                returnVal[i][j] = Double.valueOf(format);
+            }
+        }
+
+        return returnVal;
     }
 
 
+    /**
+     * float型の３次元数値データを小数点以下２桁に揃え，doubleに変換する
+     * @param inputVal float型の3次元配列データ
+     * @return 小数点以下２桁に揃え，double型に変換した３次元数値データ
+     */
     public double[][][] floatToDoubleFormatter (float[][][] inputVal) {
         double[][][] returnVal = {};
 
@@ -52,6 +66,42 @@ public class Formatter {
     }
 
 
+    /**
+     * double型の数値データを小数点以下2桁に揃える
+     *
+     * @param inputVal double型の数値データ
+     * @return 小数点以下2桁に揃えたdouble型数値データ
+     */
+    public static double doubleToDoubleFormatter (double inputVal) {
+        double returnVal;
+
+        String afterFormat = String.format(Locale.getDefault(), "%.2f", inputVal);
+
+        returnVal = Double.valueOf(afterFormat);
+
+        return returnVal;
+    }
+
+
+    public double[][] doubleToDoubleFormatter (double[][] inputVal) {
+        double[][] returnVal = {};
+
+        for (int i = 0; i < inputVal.length; i++) {
+            for (int j = 0; j < inputVal[i].length; j++) {
+                String format = String.format(Locale.getDefault(), "%.2f", inputVal[i][j]);
+                returnVal[i][j] = Double.valueOf(format);
+            }
+        }
+
+        return returnVal;
+    }
+
+
+    /**
+     * double型の３次元数値データを小数点以下２桁に揃える
+     * @param inputVal double型の３次元配列データ
+     * @return 小数点以下２桁に揃えたdouble型３次元数値データ
+     */
     public double[][][] doubleToDoubleFormatter (double[][][] inputVal) {
         double[][][] returnVal = {};
 

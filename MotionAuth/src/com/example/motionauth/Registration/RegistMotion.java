@@ -201,7 +201,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
                     if (getCount == 3) {
                         // 全データ取得完了（3回分の加速度，ジャイロを取得完了）
                         // TODO ボタンのstatusをdisableにして押せないようにする
-                        if (getMotionBtn.isClickable()){
+                        if (getMotionBtn.isClickable()) {
                             getMotionBtn.setClickable(false);
                         }
                         secondTv.setText("0");
@@ -210,7 +210,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
                         mWriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accel_tmp, RegistMotion.this);
                         mWriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyro_tmp, RegistMotion.this);
 
-                        if (!calc()){
+                        if (!calc() || !soukan()) {
                             // もう一度モーションを取り直す処理
                             // TODO ボタンのstatusをenableにして押せるようにする
                             getMotionBtn.setClickable(true);
@@ -218,10 +218,15 @@ public class RegistMotion extends Activity implements SensorEventListener {
                             accelCount = 0;
                             gyroCount = 0;
                             getCount = 0;
-                        };
+                        }
+                        else {
+                            getMotionBtn.setText("認証登録中");
+                            Toast.makeText(RegistMotion.this, "モーションを登録中です", Toast.LENGTH_SHORT).show();
 
-                        // TODO Correlationに渡して処理し，返り値を利用する
-                        soukan();
+                            // 3回のモーションの平均値をファイルに書き出す
+                            mWriteData.writeDoubleTwoArrayData("MotionAuth", "ave_distance", RegistNameInput.name, aveMoveAverageDistance, RegistMotion.this);
+                            mWriteData.writeDoubleTwoArrayData("MotionAuth", "ave_angle", RegistNameInput.name, aveMoveAverageAngle, RegistMotion.this);
+                        }
                     }
                 }
                 else {
@@ -253,8 +258,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
         moveAverageDistance = mFormatter.doubleToDoubleFormatter(moveAverageDistance);
         moveAverageAngle = mFormatter.doubleToDoubleFormatter(moveAverageAngle);
 
-        mWriteData.writeDoubleThreeArrayData("FormatRawData", "rawAccelo", RegistNameInput.name, accel, RegistMotion.this);
-        mWriteData.writeDoubleThreeArrayData("FormatRawData", "rawGyro", RegistNameInput.name, gyro, RegistMotion.this);
+        mWriteData.writeDoubleThreeArrayData("FormatRawData", "formatAccelo", RegistNameInput.name, accel, RegistMotion.this);
+        mWriteData.writeDoubleThreeArrayData("FormatRawData", "formatGyro", RegistNameInput.name, gyro, RegistMotion.this);
 
         // measureCorrelation用の平均値データを作成
         for (int i = 0; i < 3; i++) {
@@ -303,20 +308,22 @@ public class RegistMotion extends Activity implements SensorEventListener {
     /**
      * 相関係数を導出し，ユーザが入力した3回のモーションの類似性を確認する
      */
-    private void soukan () {
+    private boolean soukan () {
         Log.d(TAG, "soukan");
 
         Enum.MEASURE measure = mCorrelation.measureCorrelation(this, moveAverageDistance, moveAverageAngle, aveMoveAverageDistance, aveMoveAverageAngle);
 
         if (measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT) {
-            getMotionBtn.setText("認証登録中");
-            Toast.makeText(this, "モーションを登録中です", Toast.LENGTH_SHORT).show();
-
-            // 3回のモーションの平均値をファイルに書き出す
-//            writeData();
-            mWriteData.writeDoubleTwoArrayData("MotionAuth", "ave_distance", RegistNameInput.name, aveMoveAverageDistance, this);
-            mWriteData.writeDoubleTwoArrayData("MotionAuth", "ave_angle", RegistNameInput.name, aveMoveAverageAngle, this);
+            return true;
+//            getMotionBtn.setText("認証登録中");
+//            Toast.makeText(this, "モーションを登録中です", Toast.LENGTH_SHORT).show();
+//
+//            // 3回のモーションの平均値をファイルに書き出す
+////            writeData();
+//            mWriteData.writeDoubleTwoArrayData("MotionAuth", "ave_distance", RegistNameInput.name, aveMoveAverageDistance, this);
+//            mWriteData.writeDoubleTwoArrayData("MotionAuth", "ave_angle", RegistNameInput.name, aveMoveAverageAngle, this);
         }
+        return false;
     }
 
 

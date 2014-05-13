@@ -1,6 +1,7 @@
 package com.example.motionauth;
 
 import android.content.Context;
+import android.widget.Toast;
 import com.example.motionauth.Registration.RegistNameInput;
 import com.example.motionauth.Utility.Enum;
 
@@ -237,5 +238,124 @@ public class Correlation {
         else {
             return Enum.MEASURE.BAD;
         }
+    }
+
+
+    public Enum.MEASURE measureCorrelation (Context context, double[][] distance, double[][] angle, double[][] ave_distance, double[][] ave_angle) {
+        //region Calculate of Average A
+        float[] sample_accel = new float[3];
+        float[] sample_gyro = new float[3];
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 100; j++) {
+                sample_accel[i] += distance[i][j];
+                sample_gyro[i] += angle[i][j];
+            }
+        }
+
+        for (int i = 0; i < 3; i++) {
+            sample_accel[i] /= 99;
+            sample_gyro[i] /= 99;
+        }
+        //endregion
+
+        //region Calculate of Average B
+        float ave_accel[] = new float[3];
+        float ave_gyro[] = new float[3];
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 100; j++) {
+                ave_accel[i] += ave_distance[i][j];
+                ave_gyro[i] += ave_angle[i][j];
+            }
+        }
+
+        for (int i = 0; i < 3; i++) {
+            ave_accel[i] /= 99;
+            ave_gyro[i] /= 99;
+        }
+        //endregion
+
+        //region Calculate of Sxx
+        float Sxx_accel[] = new float[3];
+        float Sxx_gyro[] = new float[3];
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 100; j++) {
+                Sxx_accel[i] += Math.pow((distance[i][j] - sample_accel[i]), 2);
+                Sxx_gyro[i] += Math.pow((angle[i][j] - sample_gyro[i]), 2);
+            }
+        }
+        //endregion
+
+        //region Calculate of Syy
+        float Syy_accel[] = new float[3];
+        float Syy_gyro[] = new float[3];
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 100; j++) {
+                Syy_accel[i] += Math.pow((ave_distance[i][j] - ave_accel[i]), 2);
+                Syy_gyro[i] += Math.pow((ave_angle[i][j] - ave_gyro[i]), 2);
+            }
+        }
+        //endregion
+
+        //region Calculate of Sxy
+        float Sxy_accel[] = new float[3];
+        float Sxy_gyro[] = new float[3];
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 100; j++) {
+                Sxy_accel[i] += (distance[i][j] - sample_accel[i]) * (ave_distance[i][j] - ave_accel[i]);
+                Sxy_gyro[i] += (angle[i][j] - sample_gyro[i]) * (ave_angle[i][j] - ave_gyro[i]);
+            }
+        }
+        //endregion
+
+        //region Calculate of R
+        double R_accel[] = new double[3];
+        double R_gyro[] = new double[3];
+
+        for (int i = 0; i < 3; i++) {
+            R_accel[i] = Sxy_accel[i] / Math.sqrt(Sxx_accel[i] * Syy_accel[i]);
+            R_gyro[i] = Sxy_gyro[i] / Math.sqrt(Sxx_gyro[i] * Syy_gyro[i]);
+        }
+        //endregion
+
+        //region 相関の判定
+        //相関係数が一定以上あるなら認証成功
+        if (R_accel[0] > 0.5) {
+            if (R_accel[1] > 0.5) {
+                if (R_accel[2] > 0.5) {
+                    if (R_gyro[0] > 0.5) {
+                        if (R_gyro[1] > 0.5) {
+                            if (R_gyro[2] > 0.5) {
+                                return Enum.MEASURE.CORRECT;
+                            }
+                            else {
+                                return Enum.MEASURE.INCORRECT;
+                            }
+                        }
+                        else {
+                            return Enum.MEASURE.INCORRECT;
+                        }
+                    }
+                    else {
+                        return Enum.MEASURE.INCORRECT;
+                    }
+                }
+                else {
+                    return Enum.MEASURE.INCORRECT;
+                }
+            }
+            else {
+                return Enum.MEASURE.INCORRECT;
+            }
+        }
+        else {
+            return Enum.MEASURE.INCORRECT;
+        }
+        //endregion
+
     }
 }

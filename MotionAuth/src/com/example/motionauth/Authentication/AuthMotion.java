@@ -18,6 +18,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.example.motionauth.Calc;
 import com.example.motionauth.Formatter;
 import com.example.motionauth.Lowpass.MovingAverage;
 import com.example.motionauth.R;
@@ -35,6 +36,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
     private Sensor mGyroscopeSensor;
 
     private MovingAverage mMovingAverage = new MovingAverage();
+    private Formatter mFormatter = new Formatter();
+    private Calc mCalc = new Calc();
 
     // モーションの生データ
     private float vAccel[];
@@ -60,6 +63,10 @@ public class AuthMotion extends Activity implements SensorEventListener {
     // 移動平均後のデータを格納する配列
     private double moveAverageDistance[][] = new double[3][100];
     private double moveAverageAngle[][] = new double[3][100];
+
+    // RegistMotionにて登録された平均データ
+    private float registed_ave_distance[][] = new float[3][100];
+    private float registed_ave_angle[][] = new float[3][100];
 
     TextView secondTv;
     TextView countSecondTv;
@@ -152,7 +159,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     getMotionBtn.setText("モーションデータ取得完了");
 
                     calc();
-
+                    readRegistedData();
                     soukan();
                 }
             }
@@ -168,29 +175,105 @@ public class AuthMotion extends Activity implements SensorEventListener {
      */
     //TODO データのズレを，登録された平均値データと比較して修正する
     private void calc () {
-        for (int i = 0; i < 3; i++) {
-            // 原データの桁揃え
-            for (int j = 0; j < 100; j++) {
-                accel[i][j] = Formatter.floatToDoubleFormatter(accel_tmp[i][j]);
-                gyro[i][j] = Formatter.floatToDoubleFormatter(gyro_tmp[i][j]);
+        // 原データの桁揃え
+        accel = mFormatter.floatToDoubleFormatter(accel_tmp);
+        gyro = mFormatter.floatToDoubleFormatter(gyro_tmp);
+
+        // 移動平均ローパス
+        accel = mMovingAverage.LowpassFilter(accel);
+        gyro = mMovingAverage.LowpassFilter(gyro);
+
+        moveAverageDistance = mCalc.accelToDistance(accel, 0.03);
+        moveAverageAngle = mCalc.gyroToAngle(gyro, 0.03);
+
+        moveAverageDistance = mFormatter.doubleToDoubleFormatter(moveAverageDistance);
+        moveAverageAngle = mFormatter.doubleToDoubleFormatter(moveAverageAngle);
+    }
+
+
+    private void readRegistedData() {
+        int readCount = 0;
+
+        try {
+            String filePath = Environment.getExternalStorageDirectory() + File.separator + "MotionAuth" + File.separator + AuthNameInput.name;
+            File file = new File(filePath);
+            FileInputStream fis = new FileInputStream(file);
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
+
+            String beforeSplitData;
+            String[] afterSplitData;
+
+            while ((beforeSplitData = br.readLine()) != null) {
+                afterSplitData = beforeSplitData.split("@");
+
+                if (afterSplitData[0].equals("ave_distance_x")) {
+                    registed_ave_distance[0][readCount] = Float.valueOf(afterSplitData[1]);
+                    if (readCount == 99) {
+                        readCount = 0;
+                    }
+                    else {
+                        readCount++;
+                    }
+                }
+
+                if (afterSplitData[0].equals("ave_distance_y")) {
+                    registed_ave_distance[1][readCount] = Float.valueOf(afterSplitData[1]);
+                    if (readCount == 99) {
+                        readCount = 0;
+                    }
+                    else {
+                        readCount++;
+                    }
+                }
+
+                if (afterSplitData[0].equals("ave_distance_z")) {
+                    registed_ave_distance[2][readCount] = Float.valueOf(afterSplitData[1]);
+                    if (readCount == 99) {
+                        readCount = 0;
+                    }
+                    else {
+                        readCount++;
+                    }
+                }
+
+                if (afterSplitData[0].equals("ave_angle_x")) {
+                    registed_ave_angle[0][readCount] = Float.valueOf(afterSplitData[1]);
+                    if (readCount == 99) {
+                        readCount = 0;
+                    }
+                    else {
+                        readCount++;
+                    }
+                }
+
+                if (afterSplitData[0].equals("ave_angle_y")) {
+                    registed_ave_angle[1][readCount] = Float.valueOf(afterSplitData[1]);
+                    if (readCount == 99) {
+                        readCount = 0;
+                    }
+                    else {
+                        readCount++;
+                    }
+                }
+
+                if (afterSplitData[0].equals("ave_angle_z")) {
+                    registed_ave_angle[2][readCount] = Float.valueOf(afterSplitData[1]);
+                    if (readCount == 99) {
+                        readCount = 0;
+                    }
+                    else {
+                        readCount++;
+                    }
+                }
             }
 
-            // 移動平均ローパス
-            accel = mMovingAverage.LowpassFilter(accel);
-
-            for (int j = 0; j < 100; j++) {
-                double tmp = accel[i][j];
-                tmp = (tmp * 0.03 * 0.03) / 2 * 1000;
-                moveAverageDistance[i][j] = Formatter.doubleToDoubleFormatter(tmp);
-            }
-
-            gyro = mMovingAverage.LowpassFilter(gyro);
-
-            for (int j = 0; j < 100; j++) {
-                double tmp = gyro[i][j];
-                tmp = (tmp * 0.03 * 0.03) / 2 * 1000;
-                moveAverageAngle[i][j] = Formatter.doubleToDoubleFormatter(tmp);
-            }
+            br.close();
+            isr.close();
+            fis.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
         }
 
 
@@ -224,91 +307,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
 
         //region Calculate of Average B
         float ave_accel[] = new float[3];
-
         float ave_gyro[] = new float[3];
 
-        float registed_ave_distance[][] = new float[3][100];
-
-        float registed_ave_angle[][] = new float[3][100];
-
-        int readCount = 0;
-
-        try {
-            String filePath = Environment.getExternalStorageDirectory() + File.separator + "MotionAuth" + File.separator + AuthNameInput.name;
-            File file = new File(filePath);
-            FileInputStream fis = new FileInputStream(file);
-            InputStreamReader isr = new InputStreamReader(fis);
-            BufferedReader br = new BufferedReader(isr);
-
-            String beforeSplitData;
-            String[] afterSplitData;
-
-            while ((beforeSplitData = br.readLine()) != null) {
-                afterSplitData = beforeSplitData.split("@");
-
-                if (afterSplitData[0].equals("ave_distance_x")) {
-                    registed_ave_distance[0][readCount] = Float.valueOf(afterSplitData[1]);
-                    if (readCount == 99) {
-                        readCount = 0;
-                    }
-                    else {
-                        readCount++;
-                    }
-                }
-                if (afterSplitData[0].equals("ave_distance_y")) {
-                    registed_ave_distance[1][readCount] = Float.valueOf(afterSplitData[1]);
-                    if (readCount == 99) {
-                        readCount = 0;
-                    }
-                    else {
-                        readCount++;
-                    }
-                }
-                if (afterSplitData[0].equals("ave_distance_z")) {
-                    registed_ave_distance[2][readCount] = Float.valueOf(afterSplitData[1]);
-                    if (readCount == 99) {
-                        readCount = 0;
-                    }
-                    else {
-                        readCount++;
-                    }
-                }
-                if (afterSplitData[0].equals("ave_angle_x")) {
-                    registed_ave_angle[0][readCount] = Float.valueOf(afterSplitData[1]);
-                    if (readCount == 99) {
-                        readCount = 0;
-                    }
-                    else {
-                        readCount++;
-                    }
-                }
-                if (afterSplitData[0].equals("ave_angle_y")) {
-                    registed_ave_angle[1][readCount] = Float.valueOf(afterSplitData[1]);
-                    if (readCount == 99) {
-                        readCount = 0;
-                    }
-                    else {
-                        readCount++;
-                    }
-                }
-                if (afterSplitData[0].equals("ave_angle_z")) {
-                    registed_ave_angle[2][readCount] = Float.valueOf(afterSplitData[1]);
-                    if (readCount == 99) {
-                        readCount = 0;
-                    }
-                    else {
-                        readCount++;
-                    }
-                }
-            }
-
-            br.close();
-            isr.close();
-            fis.close();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 100; j++) {
@@ -341,13 +341,11 @@ public class AuthMotion extends Activity implements SensorEventListener {
 
         //region Calculate of Syy
         float Syy_accel[] = new float[3];
-
         float Syy_gyro[] = new float[3];
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 100; j++) {
                 Syy_accel[i] += Math.pow((registed_ave_distance[i][j] - ave_accel[i]), 2);
-
                 Syy_gyro[i] += Math.pow((registed_ave_angle[i][j] - ave_gyro[i]), 2);
             }
         }
@@ -356,7 +354,6 @@ public class AuthMotion extends Activity implements SensorEventListener {
 
         //region Calculate of Sxy
         float Sxy_accel[] = new float[3];
-
         float Sxy_gyro[] = new float[3];
 
         for (int i = 0; i < 3; i++) {
@@ -370,12 +367,10 @@ public class AuthMotion extends Activity implements SensorEventListener {
 
         //region Calculate of R
         double R_accel[] = new double[3];
-
         double R_gyro[] = new double[3];
 
         for (int i = 0; i < 3; i++) {
             R_accel[i] = Sxy_accel[i] / Math.sqrt(Sxx_accel[i] * Syy_accel[i]);
-
             R_gyro[i] = Sxy_gyro[i] / Math.sqrt(Sxx_gyro[i] * Syy_gyro[i]);
         }
         //endregion

@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
 import android.content.Intent;
-import android.util.Log;
 import android.view.Menu;
 import android.view.Window;
 import android.widget.ArrayAdapter;
@@ -74,12 +73,10 @@ public class ViewRegistedData extends Activity {
     private ArrayList<String> readData () {
         ArrayList<String> dataList = new ArrayList<String>();
 
-        Log.d(TAG, "readData");
         String filePath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + "MotionAuth" + File.separator + item;
         File file = new File(filePath);
 
         try {
-            Log.d(TAG, "tryIn");
             FileInputStream fis = new FileInputStream(file);
             InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
             BufferedReader br = new BufferedReader(isr);

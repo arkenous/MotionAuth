@@ -58,9 +58,9 @@ public class WriteData {
             // 1ファイルでave_distance_y_1@みたいな感じでやる
             String dimension = null;
 
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < data.length; i++) {
                 // X,Y,Zループ
-                for (int j = 0; j < 3; j++) {
+                for (int j = 0; j < data[i].length; j++) {
                     if (j == 0) {
                         dimension = "x";
                     }
@@ -80,7 +80,7 @@ public class WriteData {
                     OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
                     BufferedWriter bw = new BufferedWriter(osw);
 
-                    for (int k = 0; k < 100; k++) {
+                    for (int k = 0; k < data[i][j].length; k++) {
                         bw.write(dataName + "_" + dimension + "_" + String.valueOf(i + 1) + "@" + data[i][j][k] + "\n");
                     }
                     bw.close();
@@ -143,7 +143,7 @@ public class WriteData {
             OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
             BufferedWriter bw = new BufferedWriter(osw);
 
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < data.length; i++) {
                 bw.write(dataName + "@" + data[i] + "\n");
             }
             bw.close();
@@ -202,7 +202,7 @@ public class WriteData {
             String dimension = null;
 
             // X,Y,Zループ
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < data.length; i++) {
                 if (i == 0) {
                     dimension = "x";
                 }
@@ -222,7 +222,7 @@ public class WriteData {
                 OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
                 BufferedWriter bw = new BufferedWriter(osw);
 
-                for (int j = 0; j < 100; j++) {
+                for (int j = 0; j < data[i].length; j++) {
                     bw.write(dataName + "_" + dimension + "@" + data[i][j] + "\n");
                 }
                 bw.close();
@@ -275,10 +275,9 @@ public class WriteData {
         try {
             String dimension = null;
 
-            Log.e("Output", "a");
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < data.length; i++) {
                 // X,Y,Zループ
-                for (int j = 0; j < 3; j++) {
+                for (int j = 0; j < data[i].length; j++) {
                     if (j == 0) {
                         dimension = "x";
                     }
@@ -295,23 +294,16 @@ public class WriteData {
 
                     // ファイルを追記モードで書き込む
                     FileOutputStream fos = new FileOutputStream(file, false);
-                    Log.e("Output", "a-1");
                     OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
-                    Log.e("Output", "a-2");
                     BufferedWriter bw = new BufferedWriter(osw);
-                    Log.e("Output", "a-3");
-
-                    Log.e("Output", "b");
 
                     for (int k = 0; k < data[0][0].length; k++) {
                         //bw.write(dataName + "_" + dimension + "_" + String.valueOf(i + 1) + "@" + data[i][j][k] + "\n");
                         bw.write(data[i][j][k] + "\n");
-                        Log.e("Output", "c | " + k);
                         bw.flush();
                     }
                     bw.close();
                     fos.close();
-                    Log.e("Output", "d");
                 }
             }
         }
@@ -359,10 +351,10 @@ public class WriteData {
         try {
             String dimension = null;
 
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < data.length; i++) {
 
                 // X,Y,Zループ
-                for (int j = 0; j < 3; j++) {
+                for (int j = 0; j < data[i].length; j++) {
                     if (j == 0) {
                         dimension = "x";
                     }

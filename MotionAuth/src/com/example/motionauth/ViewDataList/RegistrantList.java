@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
 import android.content.Intent;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
@@ -39,8 +38,6 @@ public class RegistrantList extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_registrant_list);
 
-        Log.d(TAG, "+++ onCreate +++");
-
         registrantList();
     }
 
@@ -50,12 +47,8 @@ public class RegistrantList extends Activity {
      * ユーザ名が選択されたら，そのユーザ名をViewRegistedDataに送る
      */
     private void registrantList () {
-        Log.d(TAG, "registrantList");
-
         // 登録されているユーザ名のリストを作成する
         fileNameStr = getRegistrantName();
-
-        Log.d(TAG, "c");
 
         final ListView lv = (ListView) findViewById(R.id.listView1);
 
@@ -65,7 +58,6 @@ public class RegistrantList extends Activity {
 
             // アイテム追加
             for (int i = 0; i < fileNameStr.length; i++) {
-                Log.d(TAG, "fileNameStr.length = " + fileNameStr.length);
                 adapter.add(fileNameStr[i]);
             }
         }
@@ -73,8 +65,6 @@ public class RegistrantList extends Activity {
             moveActivity("com.example.motionauth", "com.example.motionauth.Start", true);
             finish();
         }
-
-        Log.d(TAG, "d");
 
         // リストビューにアダプタを設定
         lv.setAdapter(adapter);
@@ -113,8 +103,6 @@ public class RegistrantList extends Activity {
                 File file = files[i];
                 str_items[i] = file.getName();
             }
-
-            Log.d(TAG, "b");
 
             return str_items;
 

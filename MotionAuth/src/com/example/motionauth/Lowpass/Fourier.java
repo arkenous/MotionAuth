@@ -1,13 +1,9 @@
 package com.example.motionauth.Lowpass;
 
 import android.content.Context;
-import android.util.Log;
 import com.example.motionauth.Registration.RegistNameInput;
 import com.example.motionauth.WriteData;
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
-import edu.emory.mathcs.jtransforms.fft.DoubleFFT_3D;
-
-import java.util.Arrays;
 
 /**
  * フーリエ変換を用いたローパスフィルタ

@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -145,10 +144,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
     private Handler timeHandler = new Handler() {
         @Override
         public void dispatchMessage (Message msg) {
-            Log.d(TAG, "dispatchMessageIn");
-
             if (msg.what == TIMEOUT_MESSAGE && btnStatus) {
-                Log.d(TAG, "ifIn");
                 if (accelCount < 100 && gyroCount < 100 && getCount >= 0 && getCount < 3) {
                     // 取得した値を，0.03秒ごとに配列に入れる
                     for (int i = 0; i < 3; i++) {
@@ -240,7 +236,6 @@ public class RegistMotion extends Activity implements SensorEventListener {
                     }
                 }
                 else {
-                    Log.d(TAG, "elseIn");
                     super.dispatchMessage(msg);
                 }
             }
@@ -252,8 +247,6 @@ public class RegistMotion extends Activity implements SensorEventListener {
      * データ加工，計算処理を行う
      */
     private boolean calc () {
-        Log.d(TAG, "calc");
-
         // データ加工，計算処理
         // データの桁揃え
         accel = mFormatter.floatToDoubleFormatter(accel_tmp);
@@ -343,8 +336,6 @@ public class RegistMotion extends Activity implements SensorEventListener {
      * 相関係数を導出し，ユーザが入力した3回のモーションの類似性を確認する
      */
     private boolean soukan () {
-        Log.d(TAG, "soukan");
-
         Enum.MEASURE measure = mCorrelation.measureCorrelation(this, moveAverageDistance, moveAverageAngle, aveMoveAverageDistance, aveMoveAverageAngle);
 
         if (measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT) {

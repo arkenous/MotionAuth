@@ -107,7 +107,7 @@ public class AuthNameInput extends Activity {
      * @return 登録したことがあるユーザであればtrue，登録したことがなければfalse
      */
     private boolean checkFileExists () {
-        String folderPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + name;
+        String folderPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + "MotionAuth" + File.separator + name;
         File file = new File(folderPath);
 
         return file.exists();

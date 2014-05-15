@@ -367,7 +367,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
     // TODO WriteDataに任せる（ここに書かない）
     private void writeData () {
         try {
-            String filePath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + RegistNameInput.name;
+            String filePath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + "MotionAuth" + File.separator + RegistNameInput.name;
             File file = new File(filePath);
             file.getParentFile().mkdir();
             FileOutputStream fos;

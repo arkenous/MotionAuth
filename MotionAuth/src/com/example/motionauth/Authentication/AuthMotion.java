@@ -195,7 +195,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
         int readCount = 0;
 
         try {
-            String filePath = Environment.getExternalStorageDirectory() + File.separator + "MotionAuth" + File.separator + AuthNameInput.name;
+            String filePath = Environment.getExternalStorageDirectory() + File.separator + "MotionAuth" + File.separator + "MotionAuth" + File.separator + AuthNameInput.name;
             File file = new File(filePath);
             FileInputStream fis = new FileInputStream(file);
             InputStreamReader isr = new InputStreamReader(fis);

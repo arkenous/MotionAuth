@@ -38,7 +38,7 @@ public class WriteData {
         String SD_PATH = Environment.getExternalStorageDirectory().getPath();
 
         // SDカードにフォルダを作成
-        String FOLDER_PATH = SD_PATH + File.separator + folderName + File.separator + userName;
+        String FOLDER_PATH = SD_PATH + File.separator + "MotionAuth" + File.separator + folderName + File.separator + userName;
 
         File file = new File(FOLDER_PATH);
 
@@ -116,7 +116,7 @@ public class WriteData {
         String SD_PATH = Environment.getExternalStorageDirectory().getPath();
 
         // SDカードにフォルダを作成
-        String FOLDER_PATH = SD_PATH + File.separator + folderName + File.separator + userName;
+        String FOLDER_PATH = SD_PATH + File.separator + "MotionAuth" + File.separator + folderName + File.separator + userName;
 
         File file = new File(FOLDER_PATH);
 
@@ -181,7 +181,7 @@ public class WriteData {
         String SD_PATH = Environment.getExternalStorageDirectory().getPath();
 
         // SDカードにフォルダを作成
-        String FOLDER_PATH = SD_PATH + File.separator + folderName + File.separator + userName;
+        String FOLDER_PATH = SD_PATH + File.separator + "MotionAuth" + File.separator + folderName + File.separator + userName;
 
         File file = new File(FOLDER_PATH);
 
@@ -258,7 +258,7 @@ public class WriteData {
         String SD_PATH = Environment.getExternalStorageDirectory().getPath();
 
         // SDカードにフォルダを作成
-        String FOLDER_PATH = SD_PATH + File.separator + folderName + File.separator + userName;
+        String FOLDER_PATH = SD_PATH + File.separator + "MotionAuth" + File.separator + folderName + File.separator + userName;
 
         File file = new File(FOLDER_PATH);
 
@@ -342,7 +342,7 @@ public class WriteData {
         String SD_PATH = Environment.getExternalStorageDirectory().getPath();
 
         // SDカードにフォルダを作成
-        String FOLDER_PATH = SD_PATH + File.separator + folderName + File.separator + userName;
+        String FOLDER_PATH = SD_PATH + File.separator + "MotionAuth" + File.separator + folderName + File.separator + userName;
 
         File file = new File(FOLDER_PATH);
 

@@ -75,7 +75,7 @@ public class ViewRegistedData extends Activity {
         ArrayList<String> dataList = new ArrayList<String>();
 
         Log.d(TAG, "readData");
-        String filePath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + item;
+        String filePath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + "MotionAuth" + File.separator + item;
         File file = new File(filePath);
 
         try {

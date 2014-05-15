@@ -102,7 +102,7 @@ public class RegistrantList extends Activity {
     private String[] getRegistrantName () {
         try {
             // 専用ディレクトリを指定
-            String dirPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth";
+            String dirPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + "MotionAuth";
             File dir = new File(dirPath);
 
             // 指定されたディレクトリのファイル名（ディレクトリ名）を取得

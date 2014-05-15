@@ -13,7 +13,6 @@ import android.widget.Toast;
 
 /**
  * データをSDカードに書き込む
- * //TODO ファイル書き込みを追記モードにする
  *
  * @author Kensuke Kousaka
  */
@@ -135,6 +134,10 @@ public class WriteData {
         }
 
         try {
+            // ファイルパス
+            String filePath = FOLDER_PATH + File.separator + dataName;
+            file = new File(filePath);
+
             // ファイルを追記モードで書き込む
             FileOutputStream fos = new FileOutputStream(file, true);
             OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
@@ -209,6 +212,10 @@ public class WriteData {
                 else if (i == 2) {
                     dimension = "z";
                 }
+
+                // ファイルパス
+                String filePath = FOLDER_PATH + File.separator + dataName + String.valueOf(i) + dimension;
+                file = new File(filePath);
 
                 // ファイルを追記モードで書き込む
                 FileOutputStream fos = new FileOutputStream(file, true);
@@ -365,6 +372,10 @@ public class WriteData {
                     else if (j == 2) {
                         dimension = "z";
                     }
+
+                    // ファイルパス
+                    String filePath = FOLDER_PATH + File.separator + dataName + String.valueOf(i) + dimension;
+                    file = new File(filePath);
 
                     // ファイルを追記モードで書き込む
                     FileOutputStream fos = new FileOutputStream(file, true);

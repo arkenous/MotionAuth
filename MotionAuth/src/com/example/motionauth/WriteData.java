@@ -7,6 +7,7 @@ import java.io.OutputStreamWriter;
 
 import android.content.Context;
 import android.os.Environment;
+import android.util.Log;
 import android.widget.Toast;
 
 
@@ -70,6 +71,10 @@ public class WriteData {
                     else if (j == 2) {
                         dimension = "z";
                     }
+
+                    // ファイルパス
+                    String filePath = FOLDER_PATH + File.separator + dataName + String.valueOf(i) + dimension;
+                    file = new File(filePath);
 
                     // ファイルを追記モードで書き込む
                     FileOutputStream fos = new FileOutputStream(file, true);
@@ -263,6 +268,7 @@ public class WriteData {
         try {
             String dimension = null;
 
+            Log.e("Output", "a");
             for (int i = 0; i < 3; i++) {
                 // X,Y,Zループ
                 for (int j = 0; j < 3; j++) {
@@ -276,20 +282,34 @@ public class WriteData {
                         dimension = "z";
                     }
 
-                    // ファイルを追記モードで書き込む
-                    FileOutputStream fos = new FileOutputStream(file, true);
-                    OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
-                    BufferedWriter bw = new BufferedWriter(osw);
+                    // ファイルパス
+                    String filePath = FOLDER_PATH + File.separator + dataName + String.valueOf(i) + dimension;
+                    file = new File(filePath);
 
-                    for (int k = 0; k < 100; k++) {
-                        bw.write(dataName + "_" + dimension + "_" + String.valueOf(i + 1) + "@" + data[i][j][k] + "\n");
+                    // ファイルを追記モードで書き込む
+                    FileOutputStream fos = new FileOutputStream(file, false);
+                    Log.e("Output", "a-1");
+                    OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+                    Log.e("Output", "a-2");
+                    BufferedWriter bw = new BufferedWriter(osw);
+                    Log.e("Output", "a-3");
+
+                    Log.e("Output", "b");
+
+                    for (int k = 0; k < data[0][0].length; k++) {
+                        //bw.write(dataName + "_" + dimension + "_" + String.valueOf(i + 1) + "@" + data[i][j][k] + "\n");
+                        bw.write(data[i][j][k] + "\n");
+                        Log.e("Output", "c | " + k);
+                        bw.flush();
                     }
                     bw.close();
+                    fos.close();
+                    Log.e("Output", "d");
                 }
             }
         }
         catch (Exception e) {
-            Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "ErrorWhileWriting", Toast.LENGTH_SHORT).show();
         }
     }
 

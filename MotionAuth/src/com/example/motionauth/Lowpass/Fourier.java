@@ -5,6 +5,9 @@ import android.util.Log;
 import com.example.motionauth.Registration.RegistNameInput;
 import com.example.motionauth.WriteData;
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
+import edu.emory.mathcs.jtransforms.fft.DoubleFFT_3D;
+
+import java.util.Arrays;
 
 /**
  * フーリエ変換を用いたローパスフィルタ
@@ -16,36 +19,86 @@ import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 public class Fourier {
     private WriteData mWriteData = new WriteData();
 
-    public void LowpassFilter (double[] data, Context context) {
-        DoubleFFT_1D fft = new DoubleFFT_1D(data.length);
+    /**
+     * 3次元入力データに対し，フーリエ変換を用いてローパスフィルタリングを行ってデータの平滑化を行う
+     * @param data データ平滑化を行うdouble型3次元配列データ
+     * @param name アウトプット用，データ種別
+     * @param context Toast表示用
+     */
+    public void LowpassFilter (double[][][] data, String name, Context context) {
+        DoubleFFT_1D realfft = new DoubleFFT_1D(data[0][0].length);
 
-        Log.d("FFT", "a");
+//        mWriteData.writeDoubleThreeArrayData("BeforeFFT", name, RegistNameInput.name, data, context);
 
-        // フーリエ変換（FFT）の実行
-        // 時間領域のデータを周波数領域のデータに変換する
-        fft.realForward(data);
-
-        Log.d("FFT", "b");
-
-        // dataの偶数要素は実数成分，奇数要素は虚数成分
-
-        // フーリエ変換後の値をアウトプット
-        mWriteData.writeDoubleOneArrayData("FFT", "beforeFFT", RegistNameInput.name, data, context);
-
-        for (int i = 0; i < 100; i = i + 2) {
-            if (data[i] > 10 || data[i] < -10) {
-                data[i] = 0;
-                data[i + 1] = 0;
+        // フーリエ変換（ForwardDFT）の実行
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[i].length; j++) {
+                realfft.realForward(data[i][j]);
             }
         }
-        Log.d("FFT", "c");
 
-        mWriteData.writeDoubleOneArrayData("FFT", "afterFFT", RegistNameInput.name, data, context);
+        // 実数部，虚数部それぞれを入れる配列
+        double[][][] real = new double[data.length][data[0].length][data[0][0].length];
+        double[][][] imaginary = new double[data.length][data[0].length][data[0][0].length];
 
-        // 逆フーリエ変換の実行
-        // 周波数領域のデータを時間領域のデータに変換する
-        fft.realInverse(data, true);
+        int countReal = 0;
+        int countImaginary = 0;
 
-        mWriteData.writeDoubleOneArrayData("FFT", "afteraccelo0X", RegistNameInput.name, data, context);
+        // 実数部と虚数部に分解
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[i].length; j++) {
+                for (int k = 0; k < data[i][j].length; k++) {
+                    if (k % 2 == 0) {
+                        real[i][j][countReal] = data[i][j][k];
+                        countReal++;
+                        if (countReal == 99) {
+                            countReal = 0;
+                        }
+                    } else {
+                        imaginary[i][j][countImaginary] = data[i][j][k];
+                        countImaginary++;
+                        if (countImaginary == 99) {
+                            countImaginary = 0;
+                        }
+                    }
+                }
+            }
+        }
+
+        mWriteData.writeDoubleThreeArrayData("ResultFFT", "rFFT" + name, RegistNameInput.name, real, context);
+        mWriteData.writeDoubleThreeArrayData("ResultFFT", "iFFT" + name, RegistNameInput.name, imaginary, context);
+
+        // パワースペクトルを求めるために，実数部（k），虚数部（k + 1）それぞれを2乗して加算し，平方根を取り，絶対値を求める
+        double[][][] power = new double[data.length][data[0].length][data[0][0].length / 2];
+
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[0].length; j++) {
+                for (int k = 0; k < data[0][0].length / 2; k++) {
+                    power[i][j][k] = Math.sqrt(Math.pow(real[i][j][k], 2) + Math.pow(imaginary[i][j][k], 2));
+                }
+            }
+        }
+
+        mWriteData.writeDoubleThreeArrayData("ResultFFT", "powerFFT" + name, RegistNameInput.name, power, context);
+
+        // ローパスフィルタ処理
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[i].length; j++) {
+                for (int k = 0; k < data[i][j].length; k++) {
+                    if (k > 30) {
+                        data[i][j][k] = 0;
+                    }
+                }
+            }
+        }
+
+        // 逆フーリエ変換（InverseDFT）
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[i].length; j++) {
+                realfft.realInverse(data[i][j], true);
+            }
+        }
+
+        mWriteData.writeDoubleThreeArrayData("AfterFFT", name, RegistNameInput.name, data, context);
     }
 }

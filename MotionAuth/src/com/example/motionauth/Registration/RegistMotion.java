@@ -20,10 +20,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.motionauth.*;
+import com.example.motionauth.Lowpass.Fourier;
 import com.example.motionauth.Lowpass.MovingAverage;
 import com.example.motionauth.Utility.Enum;
 
 import java.io.*;
+import java.util.Arrays;
 
 
 /**
@@ -35,6 +37,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
     private static final String TAG = RegistMotion.class.getSimpleName();
 
     private MovingAverage mMovingAverage = new MovingAverage();
+    private Fourier mFourier = new Fourier();
     private Formatter mFormatter = new Formatter();
     private Calc mCalc = new Calc();
     private Enum mEnum = new Enum();
@@ -113,7 +116,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
         getMotionBtn.setOnClickListener(new OnClickListener() {
             public void onClick (View v) {
                 if (!btnStatus) {
-                    // TODO ボタンを押したら，statusをdisableにして押せないようにする
+                    // ボタンを押したら，statusをdisableにして押せないようにする
                     btnStatus = true;
 
                     // ボタンをクリックできないようにする
@@ -184,7 +187,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
                     gyroCount = 0;
 
                     // TODO 画面に番号を表示するのではなく，音声で出力させる
-                    // TODO 取り終わったら，ボタンのstatusをenableにして押せるようにする
+                    // 取り終わったら，ボタンのstatusをenableにして押せるようにする
                     if (getCount == 1) {
                         secondTv.setText("2");
 
@@ -200,7 +203,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
                     if (getCount == 3) {
                         // 全データ取得完了（3回分の加速度，ジャイロを取得完了）
-                        // TODO ボタンのstatusをdisableにして押せないようにする
+                        // ボタンのstatusをdisableにして押せないようにする
                         if (getMotionBtn.isClickable()) {
                             getMotionBtn.setClickable(false);
                         }
@@ -210,11 +213,15 @@ public class RegistMotion extends Activity implements SensorEventListener {
                         mWriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accel_tmp, RegistMotion.this);
                         mWriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyro_tmp, RegistMotion.this);
 
+// 実験用にコメントアウト
+                        // 実験用
+                        calc();
+/*
                         if (!calc() || !soukan()) {
                             // もう一度モーションを取り直す処理
-                            // TODO ボタンのstatusをenableにして押せるようにする
+                            // ボタンのstatusをenableにして押せるようにする
                             getMotionBtn.setClickable(true);
-                            // TODO データ取得関係の変数を初期化
+                            // データ取得関係の変数を初期化
                             accelCount = 0;
                             gyroCount = 0;
                             getCount = 0;
@@ -227,6 +234,9 @@ public class RegistMotion extends Activity implements SensorEventListener {
                             mWriteData.writeDoubleTwoArrayData("MotionAuth", "ave_distance", RegistNameInput.name, aveMoveAverageDistance, RegistMotion.this);
                             mWriteData.writeDoubleTwoArrayData("MotionAuth", "ave_angle", RegistNameInput.name, aveMoveAverageAngle, RegistMotion.this);
                         }
+*/
+// コメントアウト終わり
+
                     }
                 }
                 else {
@@ -249,9 +259,32 @@ public class RegistMotion extends Activity implements SensorEventListener {
         accel = mFormatter.floatToDoubleFormatter(accel_tmp);
         gyro = mFormatter.floatToDoubleFormatter(gyro_tmp);
 
-        accel = mMovingAverage.LowpassFilter(accel);
-        gyro = mMovingAverage.LowpassFilter(gyro);
+        mWriteData.writeDoubleThreeArrayData("BeforeFFT", "accel", RegistNameInput.name, accel, this);
+        mWriteData.writeDoubleThreeArrayData("BeforeFFT", "gyro", RegistNameInput.name, gyro, this);
 
+        double[][][] forMAaccel = new double[accel.length][accel[0].length][accel[0][0].length];
+        double[][][] forMAgyro = new double[gyro.length][gyro[0].length][gyro[0][0].length];
+
+        for (int i = 0; i < accel.length; i++) {
+            for (int j = 0; j < accel[0].length; j++) {
+                forMAaccel[i][j] = Arrays.copyOf(accel[i][j], accel[i][j].length);
+                forMAgyro[i][j] = Arrays.copyOf(gyro[i][j], gyro[i][j].length);
+            }
+        }
+
+
+        // ローパス処理
+//        accel = mMovingAverage.LowpassFilter(accel);
+        mMovingAverage.LowpassFilter(forMAaccel, "accel", this);
+//        gyro = mMovingAverage.LowpassFilter(gyro);
+        mMovingAverage.LowpassFilter(forMAgyro, "gyro", this);
+
+        // 現状は，FFTにより得られた諸データをアウトプットするだけ
+        mFourier.LowpassFilter(accel, "accel", this);
+        mFourier.LowpassFilter(gyro, "gyro", this);
+
+// 実験用にコメントアウト
+/*
         moveAverageDistance = mCalc.accelToDistance(accel, 0.03);
         moveAverageAngle = mCalc.gyroToAngle(gyro, 0.03);
 
@@ -300,7 +333,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
                 aveMoveAverageAngle[i][j] = (moveAverageAngle[0][i][j] + moveAverageAngle[1][i][j] + moveAverageAngle[2][i][j]) / 3;
             }
         }
-
+*/
+// コメントアウト終わり
         return true;
     }
 

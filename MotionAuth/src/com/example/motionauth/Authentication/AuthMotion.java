@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.example.motionauth.Calc;
 import com.example.motionauth.Formatter;
+import com.example.motionauth.Lowpass.Fourier;
 import com.example.motionauth.Lowpass.MovingAverage;
 import com.example.motionauth.R;
 
@@ -36,6 +37,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
     private Sensor mGyroscopeSensor;
 
     private MovingAverage mMovingAverage = new MovingAverage();
+    private Fourier mFourier = new Fourier();
     private Formatter mFormatter = new Formatter();
     private Calc mCalc = new Calc();
 
@@ -104,7 +106,12 @@ public class AuthMotion extends Activity implements SensorEventListener {
         getMotionBtn.setOnClickListener(new OnClickListener() {
             public void onClick (View v) {
                 if (!btnStatus) {
+                    // ボタンを押したら，statusをfalseにして押せないようにする
                     btnStatus = true;
+
+                    // ボタンをクリックできないようにする
+                    v.setClickable(false);
+
                     getMotionBtn.setText("取得中");
                     countSecondTv.setText("秒");
                     timeHandler.sendEmptyMessage(TIMEOUT_MESSAGE);
@@ -179,9 +186,9 @@ public class AuthMotion extends Activity implements SensorEventListener {
         accel = mFormatter.floatToDoubleFormatter(accel_tmp);
         gyro = mFormatter.floatToDoubleFormatter(gyro_tmp);
 
-        // 移動平均ローパス
-        accel = mMovingAverage.LowpassFilter(accel);
-        gyro = mMovingAverage.LowpassFilter(gyro);
+        // フーリエ変換を用いたローパス処理
+        accel = mFourier.retValLowpassFilter(accel, "accel", this);
+        gyro = mFourier.retValLowpassFilter(gyro, "gyro", this);
 
         moveAverageDistance = mCalc.accelToDistance(accel, 0.03);
         moveAverageAngle = mCalc.gyroToAngle(gyro, 0.03);
@@ -292,14 +299,12 @@ public class AuthMotion extends Activity implements SensorEventListener {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 100; j++) {
                 sample_accel[i] += moveAverageDistance[i][j];
-
                 sample_gyro[i] += moveAverageAngle[i][j];
             }
         }
 
         for (int i = 0; i < 3; i++) {
             sample_accel[i] /= 99;
-
             sample_gyro[i] /= 99;
         }
         //endregion
@@ -332,7 +337,6 @@ public class AuthMotion extends Activity implements SensorEventListener {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 100; j++) {
                 Sxx_accel[i] += Math.pow((moveAverageDistance[i][j] - sample_accel[i]), 2);
-
                 Sxx_gyro[i] += Math.pow((moveAverageAngle[i][j] - sample_gyro[i]), 2);
             }
         }

@@ -1,9 +1,12 @@
 package com.example.motionauth.Lowpass;
 
 import android.content.Context;
+import com.example.motionauth.Authentication.AuthNameInput;
 import com.example.motionauth.Registration.RegistNameInput;
 import com.example.motionauth.WriteData;
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
+
+import java.util.Arrays;
 
 /**
  * フーリエ変換を用いたローパスフィルタ
@@ -27,6 +30,10 @@ public class Fourier {
 //        mWriteData.writeDoubleThreeArrayData("BeforeFFT", name, RegistNameInput.name, data, context);
 
         // フーリエ変換（ForwardDFT）の実行
+        // 0~99の計100個のデータがフーリエ変換の結果として出力されるなら，
+        // realForwardでは0~49の分だけ返ってくる
+        // 50~99は0~49の反転のため，捨てている
+        // realForwardFullを使うと全部いけるかもしれないけど，する必要はないかも
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < data[i].length; j++) {
                 realfft.realForward(data[i][j]);
@@ -34,8 +41,8 @@ public class Fourier {
         }
 
         // 実数部，虚数部それぞれを入れる配列
-        double[][][] real = new double[data.length][data[0].length][data[0][0].length];
-        double[][][] imaginary = new double[data.length][data[0].length][data[0][0].length];
+        double[][][] real = new double[data.length][data[0].length][data[0][0].length / 2];
+        double[][][] imaginary = new double[data.length][data[0].length][data[0][0].length / 2];
 
         int countReal = 0;
         int countImaginary = 0;
@@ -77,12 +84,56 @@ public class Fourier {
 
         mWriteData.writeDoubleThreeArrayData("ResultFFT", "powerFFT" + name, RegistNameInput.name, power, context);
 
+        // ローパスの閾値を複数パターン試すために，元データを複数の配列にディープコピーする
+        double[][][] testData1 = new double[data.length][data[0].length][data[0][0].length];
+        double[][][] testData2 = new double[data.length][data[0].length][data[0][0].length];
+        double[][][] testData3 = new double[data.length][data[0].length][data[0][0].length];
+        double[][][] testData4 = new double[data.length][data[0].length][data[0][0].length];
+        double[][][] testData5 = new double[data.length][data[0].length][data[0][0].length];
+        double[][][] testData6 = new double[data.length][data[0].length][data[0][0].length];
+        double[][][] testData7 = new double[data.length][data[0].length][data[0][0].length];
+        double[][][] testData8 = new double[data.length][data[0].length][data[0][0].length];
+
+        for(int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[i].length; j++) {
+                testData1[i][j] = Arrays.copyOf(data[i][j], data[i][j].length);
+                testData2[i][j] = Arrays.copyOf(data[i][j], data[i][j].length);
+                testData3[i][j] = Arrays.copyOf(data[i][j], data[i][j].length);
+                testData4[i][j] = Arrays.copyOf(data[i][j], data[i][j].length);
+                testData5[i][j] = Arrays.copyOf(data[i][j], data[i][j].length);
+                testData6[i][j] = Arrays.copyOf(data[i][j], data[i][j].length);
+                testData7[i][j] = Arrays.copyOf(data[i][j], data[i][j].length);
+                testData8[i][j] = Arrays.copyOf(data[i][j], data[i][j].length);
+            }
+        }
+
         // ローパスフィルタ処理
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < data[i].length; j++) {
                 for (int k = 0; k < data[i][j].length; k++) {
-                    if (k > 30) {
-                        data[i][j][k] = 0;
+                    if (k > 10) {
+                        testData1[i][j][k] = 0;
+                    }
+                    else if (k > 20) {
+                        testData2[i][j][k] = 0;
+                    }
+                    else if (k > 30) {
+                        testData3[i][j][k] = 0;
+                    }
+                    else if (k > 40) {
+                        testData4[i][j][k] = 0;
+                    }
+                    else if (k > 50) {
+                        testData5[i][j][k] = 0;
+                    }
+                    else if (k > 60) {
+                        testData6[i][j][k] = 0;
+                    }
+                    else if (k > 70) {
+                        testData7[i][j][k] = 0;
+                    }
+                    else if (k > 80) {
+                        testData8[i][j][k] = 0;
                     }
                 }
             }
@@ -91,11 +142,28 @@ public class Fourier {
         // 逆フーリエ変換（InverseDFT）
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < data[i].length; j++) {
-                realfft.realInverse(data[i][j], true);
+//                realfft.realInverse(data[i][j], true);
+
+                realfft.realInverse(testData1[i][j], true);
+                realfft.realInverse(testData2[i][j], true);
+                realfft.realInverse(testData3[i][j], true);
+                realfft.realInverse(testData4[i][j], true);
+                realfft.realInverse(testData5[i][j], true);
+                realfft.realInverse(testData6[i][j], true);
+                realfft.realInverse(testData7[i][j], true);
+                realfft.realInverse(testData8[i][j], true);
             }
         }
 
-        mWriteData.writeDoubleThreeArrayData("AfterFFT", name, RegistNameInput.name, data, context);
+//        mWriteData.writeDoubleThreeArrayData("AfterFFT", name, RegistNameInput.name, data, context);
+        mWriteData.writeDoubleThreeArrayData("AfterFFT", name + "testData1", RegistNameInput.name, testData1, context);
+        mWriteData.writeDoubleThreeArrayData("AfterFFT", name + "testData2", RegistNameInput.name, testData2, context);
+        mWriteData.writeDoubleThreeArrayData("AfterFFT", name + "testData3", RegistNameInput.name, testData3, context);
+        mWriteData.writeDoubleThreeArrayData("AfterFFT", name + "testData4", RegistNameInput.name, testData4, context);
+        mWriteData.writeDoubleThreeArrayData("AfterFFT", name + "testData5", RegistNameInput.name, testData5, context);
+        mWriteData.writeDoubleThreeArrayData("AfterFFT", name + "testData6", RegistNameInput.name, testData6, context);
+        mWriteData.writeDoubleThreeArrayData("AfterFFT", name + "testData7", RegistNameInput.name, testData7, context);
+        mWriteData.writeDoubleThreeArrayData("AfterFFT", name + "testData8", RegistNameInput.name, testData8, context);
     }
 
 
@@ -173,6 +241,76 @@ public class Fourier {
         }
 
         mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName, RegistNameInput.name, data, context);
+
+        return data;
+    }
+
+
+    public double[][] retValLowpassFilter (double[][] data, String dataName, Context context) {
+        DoubleFFT_1D realfft = new DoubleFFT_1D(data[0].length);
+
+        // フーリエ変換（ForwardDFT）の実行
+        for (int i = 0; i < data.length; i++) {
+            realfft.realForward(data[i]);
+        }
+
+        // 実数部，虚数部それぞれを入れる配列
+        double[][] real = new double[data.length][data[0].length];
+        double[][] imaginary = new double[data.length][data[0].length];
+
+        int countReal = 0;
+        int countImaginary = 0;
+
+        // 実数部と虚数部に分解
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[i].length; j++) {
+                if (j % 2 == 0) {
+                    real[i][countReal] = data[i][j];
+                    countReal++;
+                    if (countReal == 99) {
+                        countReal = 0;
+                    }
+                }
+                else {
+                    imaginary[i][countImaginary] = data[i][j];
+                    countImaginary++;
+                    if (countImaginary == 99) {
+                        countImaginary = 0;
+                    }
+                }
+
+            }
+        }
+
+        mWriteData.writeDoubleTwoArrayData("ResultFFT", "rFFT" + dataName, AuthNameInput.name, real, context);
+        mWriteData.writeDoubleTwoArrayData("ResultFFT", "iFFT" + dataName, AuthNameInput.name, imaginary, context);
+
+        // パワースペクトルを求めるために，実数部（k），虚数部（k + 1）それぞれを二乗して加算し，平方根を取り，絶対値を求める
+        double[][] power = new double[data.length][data[0].length / 2];
+
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[i].length / 2; j++) {
+                power[i][j] = Math.sqrt(Math.pow(real[i][j], 2) + Math.pow(imaginary[i][j], 2));
+            }
+        }
+
+        mWriteData.writeDoubleTwoArrayData("ResultFFT", "powerFFT" + dataName, AuthNameInput.name, power, context);
+
+        // ローパスフィルタ処理
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[i].length; j++) {
+                if (j > 30) {
+                    data[i][j] = 0;
+                }
+            }
+        }
+
+        // 逆フーリエ変換（InverseDFT）
+        for (int i = 0; i < data.length; i++) {
+            realfft.realInverse(data[i], true);
+        }
+
+        mWriteData.writeDoubleTwoArrayData("AfterFFT", dataName, AuthNameInput.name, data, context);
 
         return data;
     }

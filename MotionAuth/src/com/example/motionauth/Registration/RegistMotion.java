@@ -8,7 +8,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.view.Menu;
@@ -23,7 +22,6 @@ import com.example.motionauth.Lowpass.Fourier;
 import com.example.motionauth.Lowpass.MovingAverage;
 import com.example.motionauth.Utility.Enum;
 
-import java.io.*;
 import java.util.Arrays;
 
 
@@ -39,7 +37,6 @@ public class RegistMotion extends Activity implements SensorEventListener {
     private Fourier mFourier = new Fourier();
     private Formatter mFormatter = new Formatter();
     private Calc mCalc = new Calc();
-    private Enum mEnum = new Enum();
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometerSensor;
@@ -115,7 +112,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
         getMotionBtn.setOnClickListener(new OnClickListener() {
             public void onClick (View v) {
                 if (!btnStatus) {
-                    // ボタンを押したら，statusをdisableにして押せないようにする
+                    // ボタンを押したら，statusをfalseにして押せないようにする
                     btnStatus = true;
 
                     // ボタンをクリックできないようにする
@@ -182,7 +179,6 @@ public class RegistMotion extends Activity implements SensorEventListener {
                     accelCount = 0;
                     gyroCount = 0;
 
-                    // TODO 画面に番号を表示するのではなく，音声で出力させる
                     // 取り終わったら，ボタンのstatusをenableにして押せるようにする
                     if (getCount == 1) {
                         secondTv.setText("2");
@@ -209,10 +205,6 @@ public class RegistMotion extends Activity implements SensorEventListener {
                         mWriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accel_tmp, RegistMotion.this);
                         mWriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyro_tmp, RegistMotion.this);
 
-// 実験用にコメントアウト
-                        // 実験用
-                        calc();
-/*
                         if (!calc() || !soukan()) {
                             // もう一度モーションを取り直す処理
                             // ボタンのstatusをenableにして押せるようにする
@@ -229,10 +221,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
                             // 3回のモーションの平均値をファイルに書き出す
                             mWriteData.writeDoubleTwoArrayData("MotionAuth", "ave_distance", RegistNameInput.name, aveMoveAverageDistance, RegistMotion.this);
                             mWriteData.writeDoubleTwoArrayData("MotionAuth", "ave_angle", RegistNameInput.name, aveMoveAverageAngle, RegistMotion.this);
+                            finishRegist();
                         }
-*/
-// コメントアウト終わり
-
                     }
                 }
                 else {
@@ -267,17 +257,13 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
 
         // ローパス処理
-//        accel = mMovingAverage.LowpassFilter(accel);
         mMovingAverage.LowpassFilter(forMAaccel, "accel", this);
-//        gyro = mMovingAverage.LowpassFilter(gyro);
         mMovingAverage.LowpassFilter(forMAgyro, "gyro", this);
 
-        // 現状は，FFTにより得られた諸データをアウトプットするだけ
-        mFourier.LowpassFilter(accel, "accel", this);
-        mFourier.LowpassFilter(gyro, "gyro", this);
+        // フーリエ変換によるローパスフィルタ
+        accel = mFourier.retValLowpassFilter(accel, "accel", this);
+        gyro = mFourier.retValLowpassFilter(gyro, "gyro", this);
 
-// 実験用にコメントアウト
-/*
         moveAverageDistance = mCalc.accelToDistance(accel, 0.03);
         moveAverageAngle = mCalc.gyroToAngle(gyro, 0.03);
 
@@ -322,12 +308,9 @@ public class RegistMotion extends Activity implements SensorEventListener {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 100; j++) {
                 aveMoveAverageDistance[i][j] = (moveAverageDistance[0][i][j] + moveAverageDistance[1][i][j] + moveAverageDistance[2][i][j]) / 3;
-
                 aveMoveAverageAngle[i][j] = (moveAverageAngle[0][i][j] + moveAverageAngle[1][i][j] + moveAverageAngle[2][i][j]) / 3;
             }
         }
-*/
-// コメントアウト終わり
         return true;
     }
 
@@ -338,77 +321,10 @@ public class RegistMotion extends Activity implements SensorEventListener {
     private boolean soukan () {
         Enum.MEASURE measure = mCorrelation.measureCorrelation(this, moveAverageDistance, moveAverageAngle, aveMoveAverageDistance, aveMoveAverageAngle);
 
-        if (measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT) {
-            return true;
-//            getMotionBtn.setText("認証登録中");
-//            Toast.makeText(this, "モーションを登録中です", Toast.LENGTH_SHORT).show();
-//
-//            // 3回のモーションの平均値をファイルに書き出す
-////            writeData();
-//            mWriteData.writeDoubleTwoArrayData("MotionAuth", "ave_distance", RegistNameInput.name, aveMoveAverageDistance, this);
-//            mWriteData.writeDoubleTwoArrayData("MotionAuth", "ave_angle", RegistNameInput.name, aveMoveAverageAngle, this);
-        }
-        return false;
+        return measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT;
     }
 
 
-    /**
-     * モーションデータの平均値をSDカードの指定したディレクトリの出力するメソッド
-     */
-    // TODO WriteDataに任せる（ここに書かない）
-    private void writeData () {
-        try {
-            String filePath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + "MotionAuth" + File.separator + RegistNameInput.name;
-            File file = new File(filePath);
-            file.getParentFile().mkdir();
-            FileOutputStream fos;
-
-            fos = new FileOutputStream(file, false);
-            OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
-            BufferedWriter bw = new BufferedWriter(osw);
-
-            // TODO "@"を他の記号で代用できないか調べる
-            for (int i = 0; i < 100; i++) {
-                bw.write("ave_distance_x@" + aveMoveAverageDistance[0][i] + "\n");
-                bw.flush();
-            }
-
-            for (int i = 0; i < 100; i++) {
-                bw.write("ave_distance_y@" + aveMoveAverageDistance[1][i] + "\n");
-                bw.flush();
-            }
-
-            for (int i = 0; i < 100; i++) {
-                bw.write("ave_distance_z@" + aveMoveAverageDistance[2][i] + "\n");
-                bw.flush();
-            }
-
-            for (int i = 0; i < 100; i++) {
-                bw.write("ave_angle_x@" + aveMoveAverageAngle[0][i] + "\n");
-                bw.flush();
-            }
-
-            for (int i = 0; i < 100; i++) {
-                bw.write("ave_angle_y@" + aveMoveAverageAngle[1][i] + "\n");
-                bw.flush();
-            }
-
-            for (int i = 0; i < 100; i++) {
-                bw.write("ave_angle_z@" + aveMoveAverageAngle[2][i] + "\n");
-                bw.flush();
-            }
-
-            bw.close();
-            fos.close();
-
-            Toast.makeText(this, "finish", Toast.LENGTH_LONG).show();
-
-            finishRegist();
-        }
-        catch (IOException e) {
-            Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
-        }
-    }
 
 
     @Override

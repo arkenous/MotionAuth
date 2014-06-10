@@ -216,8 +216,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
                             Toast.makeText(RegistMotion.this, "モーションを登録中です", Toast.LENGTH_SHORT).show();
 
                             // 3回のモーションの平均値をファイルに書き出す
-                            mWriteData.writeDoubleTwoArrayData("MotionAuth", "ave_distance", RegistNameInput.name, averageDistance, RegistMotion.this);
-                            mWriteData.writeDoubleTwoArrayData("MotionAuth", "ave_angle", RegistNameInput.name, averageAngle, RegistMotion.this);
+                            mWriteData.writeRegistedData("MotionAuth", RegistNameInput.name, averageDistance, averageAngle, RegistMotion.this);
                             finishRegist();
                         }
                     }

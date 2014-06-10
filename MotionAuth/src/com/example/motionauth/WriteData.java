@@ -1,14 +1,11 @@
 package com.example.motionauth;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
+
+import java.io.*;
 
 
 /**
@@ -17,6 +14,7 @@ import android.widget.Toast;
  * @author Kensuke Kousaka
  */
 public class WriteData {
+    private static final String TAG = WriteData.class.getSimpleName();
     /**
      * Float型の三次元配列データをアウトプットする．保存先は，SDカードディレクトリ/folderName/userName/fileName+回数+次元
      *
@@ -154,8 +152,6 @@ public class WriteData {
         }
         return true;
     }
-
-
 
 
     /**
@@ -381,6 +377,57 @@ public class WriteData {
         }
         catch (Exception e) {
             Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    public boolean writeRegistedData (String folderName, String userName, double[][] averageDistance, double[][] averageAngle, Context context) {
+        try {
+            Log.d(TAG, "--- writeRegistedData ---");
+            String filePath = Environment.getExternalStorageDirectory() + File.separator + "MotionAuth" + File.separator + folderName + File.separator + userName;
+            File file = new File(filePath);
+            file.getParentFile().mkdirs();
+            FileOutputStream fos;
+
+            fos = new FileOutputStream(file, false);
+            OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+            BufferedWriter bw = new BufferedWriter(osw);
+
+            Log.d(TAG, "*** Preparing is finished ***");
+
+            for (int i = 0; i < 100; i++) {
+                bw.write("ave_distance_x@" + averageDistance[0][i] + "\n");
+                bw.flush();
+            }
+            for (int i = 0; i < 100; i++) {
+                bw.write("ave_distance_y@" + averageDistance[1][i] + "\n");
+                bw.flush();
+            }
+            for (int i = 0; i < 100; i++) {
+                bw.write("ave_distance_z@" + averageDistance[2][i] + "\n");
+                bw.flush();
+            }
+            for (int i = 0; i < 100; i++) {
+                bw.write("ave_angle_x@" + averageAngle[0][i] + "\n");
+                bw.flush();
+            }
+            for (int i = 0; i < 100; i++) {
+                bw.write("ave_angle_y@" + averageAngle[1][i] + "\n");
+                bw.flush();
+            }
+            for (int i = 0; i < 100; i++) {
+                bw.write("ave_angle_z@" + averageAngle[2][i] + "\n");
+                bw.flush();
+            }
+
+            bw.close();
+            fos.close();
+
+            return true;
+        }
+        catch (IOException e) {
+            Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
+            return false;
         }
     }
 }

@@ -1,11 +1,9 @@
 package com.example.motionauth.ViewDataList;
 
-import java.io.File;
-
-import android.os.Bundle;
-import android.os.Environment;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
+import android.os.Environment;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
@@ -14,6 +12,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.example.motionauth.R;
+
+import java.io.File;
 
 
 /**
@@ -125,7 +125,7 @@ public class RegistrantList extends Activity {
 
         intent.setClassName(pkgName, actName);
 
-        if (actName.equals("com.example.motionauth.ViewRegistedData")) {
+        if (actName.equals("com.example.motionauth.ViewDataList.ViewRegistedData")) {
             intent.putExtra("item", item);
         }
 

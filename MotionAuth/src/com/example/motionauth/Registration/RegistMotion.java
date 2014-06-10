@@ -10,6 +10,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,10 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.example.motionauth.*;
 import com.example.motionauth.Lowpass.Fourier;
-import com.example.motionauth.Lowpass.MovingAverage;
 import com.example.motionauth.Utility.Enum;
-
-import java.util.Arrays;
 
 
 /**
@@ -33,7 +31,6 @@ import java.util.Arrays;
 public class RegistMotion extends Activity implements SensorEventListener {
     private static final String TAG = RegistMotion.class.getSimpleName();
 
-    private MovingAverage mMovingAverage = new MovingAverage();
     private Fourier mFourier = new Fourier();
     private Formatter mFormatter = new Formatter();
     private Calc mCalc = new Calc();
@@ -58,19 +55,19 @@ public class RegistMotion extends Activity implements SensorEventListener {
     private int gyroCount = 0;
     private int getCount = 0;
 
-    private float accel_tmp[][][] = new float[3][3][100];
-    private float gyro_tmp[][][] = new float[3][3][100];
+    private float accel_float[][][] = new float[3][3][100];
+    private float gyro_float[][][] = new float[3][3][100];
 
-    private double accel[][][] = new double[3][3][100];
-    private double gyro[][][] = new double[3][3][100];
+    private double accel_double[][][] = new double[3][3][100];
+    private double gyro_double[][][] = new double[3][3][100];
 
 
     // 移動平均後のデータを格納する配列
-    private double moveAverageDistance[][][] = new double[3][3][100];
-    private double moveAverageAngle[][][] = new double[3][3][100];
+    private double distance[][][] = new double[3][3][100];
+    private double angle[][][] = new double[3][3][100];
 
-    private double aveMoveAverageDistance[][] = new double[3][100];
-    private double aveMoveAverageAngle[][] = new double[3][100];
+    private double averageDistance[][] = new double[3][100];
+    private double averageAngle[][] = new double[3][100];
 
     private TextView secondTv;
     private TextView countSecondTv;
@@ -145,11 +142,11 @@ public class RegistMotion extends Activity implements SensorEventListener {
                 if (accelCount < 100 && gyroCount < 100 && getCount >= 0 && getCount < 3) {
                     // 取得した値を，0.03秒ごとに配列に入れる
                     for (int i = 0; i < 3; i++) {
-                        accel_tmp[getCount][i][accelCount] = vAccel[i];
+                        accel_float[getCount][i][accelCount] = vAccel[i];
                     }
 
                     for (int i = 0; i < 3; i++) {
-                        gyro_tmp[getCount][i][gyroCount] = vGyro[i];
+                        gyro_float[getCount][i][gyroCount] = vGyro[i];
                     }
 
                     accelCount++;
@@ -202,8 +199,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
                         secondTv.setText("0");
 
                         // 生データをアウトプット
-                        mWriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accel_tmp, RegistMotion.this);
-                        mWriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyro_tmp, RegistMotion.this);
+                        mWriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accel_float, RegistMotion.this);
+                        mWriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyro_float, RegistMotion.this);
 
                         if (!calc() || !soukan()) {
                             // もう一度モーションを取り直す処理
@@ -219,8 +216,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
                             Toast.makeText(RegistMotion.this, "モーションを登録中です", Toast.LENGTH_SHORT).show();
 
                             // 3回のモーションの平均値をファイルに書き出す
-                            mWriteData.writeDoubleTwoArrayData("MotionAuth", "ave_distance", RegistNameInput.name, aveMoveAverageDistance, RegistMotion.this);
-                            mWriteData.writeDoubleTwoArrayData("MotionAuth", "ave_angle", RegistNameInput.name, aveMoveAverageAngle, RegistMotion.this);
+                            mWriteData.writeDoubleTwoArrayData("MotionAuth", "ave_distance", RegistNameInput.name, averageDistance, RegistMotion.this);
+                            mWriteData.writeDoubleTwoArrayData("MotionAuth", "ave_angle", RegistNameInput.name, averageAngle, RegistMotion.this);
                             finishRegist();
                         }
                     }
@@ -237,53 +234,45 @@ public class RegistMotion extends Activity implements SensorEventListener {
      * データ加工，計算処理を行う
      */
     private boolean calc () {
+        Log.d(TAG, "--- calc ---");
         // データ加工，計算処理
         // データの桁揃え
-        accel = mFormatter.floatToDoubleFormatter(accel_tmp);
-        gyro = mFormatter.floatToDoubleFormatter(gyro_tmp);
+        accel_double = mFormatter.floatToDoubleFormatter(accel_float);
+        gyro_double = mFormatter.floatToDoubleFormatter(gyro_float);
 
-        mWriteData.writeDoubleThreeArrayData("BeforeFFT", "accel", RegistNameInput.name, accel, this);
-        mWriteData.writeDoubleThreeArrayData("BeforeFFT", "gyro", RegistNameInput.name, gyro, this);
-
-        double[][][] forMAaccel = new double[accel.length][accel[0].length][accel[0][0].length];
-        double[][][] forMAgyro = new double[gyro.length][gyro[0].length][gyro[0][0].length];
-
-        for (int i = 0; i < accel.length; i++) {
-            for (int j = 0; j < accel[0].length; j++) {
-                forMAaccel[i][j] = Arrays.copyOf(accel[i][j], accel[i][j].length);
-                forMAgyro[i][j] = Arrays.copyOf(gyro[i][j], gyro[i][j].length);
-            }
-        }
-
-
-        // ローパス処理
-        mMovingAverage.LowpassFilter(forMAaccel, "accel", this);
-        mMovingAverage.LowpassFilter(forMAgyro, "gyro", this);
+        mWriteData.writeDoubleThreeArrayData("BeforeFFT", "accel", RegistNameInput.name, accel_double, this);
+        mWriteData.writeDoubleThreeArrayData("BeforeFFT", "gyro", RegistNameInput.name, gyro_double, this);
 
         // フーリエ変換によるローパスフィルタ
-        accel = mFourier.retValLowpassFilter(accel, "accel", this);
-        gyro = mFourier.retValLowpassFilter(gyro, "gyro", this);
+        accel_double = mFourier.retValLowpassFilter(accel_double, "accel", this);
+        gyro_double = mFourier.retValLowpassFilter(gyro_double, "gyro", this);
 
-        moveAverageDistance = mCalc.accelToDistance(accel, 0.03);
-        moveAverageAngle = mCalc.gyroToAngle(gyro, 0.03);
+        Log.d(TAG, "*** finishFourier ***");
 
-        moveAverageDistance = mFormatter.doubleToDoubleFormatter(moveAverageDistance);
-        moveAverageAngle = mFormatter.doubleToDoubleFormatter(moveAverageAngle);
+        distance = mCalc.accelToDistance(accel_double, 0.03);
+        angle = mCalc.gyroToAngle(gyro_double, 0.03);
 
-        mWriteData.writeDoubleThreeArrayData("FormatRawData", "formatAccelo", RegistNameInput.name, accel, RegistMotion.this);
-        mWriteData.writeDoubleThreeArrayData("FormatRawData", "formatGyro", RegistNameInput.name, gyro, RegistMotion.this);
+        distance = mFormatter.doubleToDoubleFormatter(distance);
+        angle = mFormatter.doubleToDoubleFormatter(angle);
+
+        mWriteData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatDistance", RegistNameInput.name, distance, RegistMotion.this);
+        mWriteData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatAngle", RegistNameInput.name, angle, RegistMotion.this);
+
+        Log.d(TAG, "*** afterWriteData ***");
 
         // measureCorrelation用の平均値データを作成
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 100; j++) {
-                aveMoveAverageDistance[i][j] = (moveAverageDistance[0][i][j] + moveAverageDistance[1][i][j] + moveAverageDistance[2][i][j]) / 3;
-                aveMoveAverageAngle[i][j] = (moveAverageAngle[0][i][j] + moveAverageAngle[1][i][j] + moveAverageAngle[2][i][j]) / 3;
+                averageDistance[i][j] = (distance[0][i][j] + distance[1][i][j] + distance[2][i][j]) / 3;
+                averageAngle[i][j] = (angle[0][i][j] + angle[1][i][j] + angle[2][i][j]) / 3;
             }
         }
 
-
         //region 同一のモーションであるかの確認をし，必要に応じてズレ修正を行う
-        Enum.MEASURE measure = mCorrelation.measureCorrelation(this, moveAverageDistance, moveAverageAngle, aveMoveAverageDistance, aveMoveAverageAngle);
+        Enum.MEASURE measure = mCorrelation.measureCorrelation(this, distance, angle, averageDistance, averageAngle);
+
+        Log.d(TAG, "*** afterMeasureCorrelation");
+        Log.d(TAG, "measure = " + String.valueOf(measure));
 
         if (Enum.MEASURE.BAD == measure) {
             // 相関係数が0.4以下
@@ -293,8 +282,11 @@ public class RegistMotion extends Activity implements SensorEventListener {
         else if (Enum.MEASURE.INCORRECT == measure || Enum.MEASURE.CORRECT == measure) {
             // 相関係数が0.4よりも高く，0.8以下の場合
             // ズレ修正を行う
-            moveAverageDistance = CorrectDeviation.correctDeviation(moveAverageDistance);
-            moveAverageAngle = CorrectDeviation.correctDeviation(moveAverageAngle);
+            distance = CorrectDeviation.correctDeviation(distance);
+            angle = CorrectDeviation.correctDeviation(angle);
+        }
+        else if (Enum.MEASURE.PERFECT == measure) {
+
         }
         else {
             // なにかがおかしい
@@ -307,10 +299,12 @@ public class RegistMotion extends Activity implements SensorEventListener {
         // ズレ修正後の平均値データを出す
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 100; j++) {
-                aveMoveAverageDistance[i][j] = (moveAverageDistance[0][i][j] + moveAverageDistance[1][i][j] + moveAverageDistance[2][i][j]) / 3;
-                aveMoveAverageAngle[i][j] = (moveAverageAngle[0][i][j] + moveAverageAngle[1][i][j] + moveAverageAngle[2][i][j]) / 3;
+                averageDistance[i][j] = (distance[0][i][j] + distance[1][i][j] + distance[2][i][j]) / 3;
+                averageAngle[i][j] = (angle[0][i][j] + angle[1][i][j] + angle[2][i][j]) / 3;
             }
         }
+
+        Log.d(TAG, "*** return ***");
         return true;
     }
 
@@ -319,7 +313,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
      * 相関係数を導出し，ユーザが入力した3回のモーションの類似性を確認する
      */
     private boolean soukan () {
-        Enum.MEASURE measure = mCorrelation.measureCorrelation(this, moveAverageDistance, moveAverageAngle, aveMoveAverageDistance, aveMoveAverageAngle);
+        Log.d(TAG, "--- soukan ---");
+        Enum.MEASURE measure = mCorrelation.measureCorrelation(this, distance, angle, averageDistance, averageAngle);
 
         return measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT;
     }
@@ -362,6 +357,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
      * スタート画面に移動するメソッド
      */
     private void finishRegist () {
+        Log.d(TAG, "--- finishRegist ---");
         Intent intent = new Intent();
 
         intent.setClassName("com.example.motionauth", "com.example.motionauth.Start");

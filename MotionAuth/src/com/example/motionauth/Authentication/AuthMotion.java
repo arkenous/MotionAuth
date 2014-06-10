@@ -19,10 +19,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.motionauth.Calc;
+import com.example.motionauth.Correlation;
 import com.example.motionauth.Formatter;
 import com.example.motionauth.Lowpass.Fourier;
-import com.example.motionauth.Lowpass.MovingAverage;
 import com.example.motionauth.R;
+import com.example.motionauth.Utility.Enum;
 
 import java.io.*;
 
@@ -36,10 +37,10 @@ public class AuthMotion extends Activity implements SensorEventListener {
     private Sensor mAccelerometerSensor;
     private Sensor mGyroscopeSensor;
 
-    private MovingAverage mMovingAverage = new MovingAverage();
     private Fourier mFourier = new Fourier();
     private Formatter mFormatter = new Formatter();
     private Calc mCalc = new Calc();
+    private Correlation mCorrelation = new Correlation();
 
     // モーションの生データ
     private float vAccel[];
@@ -63,12 +64,12 @@ public class AuthMotion extends Activity implements SensorEventListener {
     private double gyro[][] = new double[3][100];
 
     // 移動平均後のデータを格納する配列
-    private double moveAverageDistance[][] = new double[3][100];
-    private double moveAverageAngle[][] = new double[3][100];
+    private double distance[][] = new double[3][100];
+    private double angle[][] = new double[3][100];
 
     // RegistMotionにて登録された平均データ
-    private float registed_ave_distance[][] = new float[3][100];
-    private float registed_ave_angle[][] = new float[3][100];
+    private double registed_ave_distance[][] = new double[3][100];
+    private double registed_ave_angle[][] = new double[3][100];
 
     TextView secondTv;
     TextView countSecondTv;
@@ -165,9 +166,15 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     btnStatus = false;
                     getMotionBtn.setText("モーションデータ取得完了");
 
-                    calc();
                     readRegistedData();
-                    soukan();
+                    calc();
+
+                    if (!soukan()) {
+                        Toast.makeText(AuthMotion.this, "認証失敗です", Toast.LENGTH_SHORT).show();
+                    }
+
+                    Toast.makeText(AuthMotion.this, "認証成功です", Toast.LENGTH_SHORT).show();
+                    moveActivity("com.example.motionauth", "com.example.motionauth.Start", true);
                 }
             }
             else {
@@ -190,11 +197,11 @@ public class AuthMotion extends Activity implements SensorEventListener {
         accel = mFourier.retValLowpassFilter(accel, "accel", this);
         gyro = mFourier.retValLowpassFilter(gyro, "gyro", this);
 
-        moveAverageDistance = mCalc.accelToDistance(accel, 0.03);
-        moveAverageAngle = mCalc.gyroToAngle(gyro, 0.03);
+        distance = mCalc.accelToDistance(accel, 0.03);
+        angle = mCalc.gyroToAngle(gyro, 0.03);
 
-        moveAverageDistance = mFormatter.doubleToDoubleFormatter(moveAverageDistance);
-        moveAverageAngle = mFormatter.doubleToDoubleFormatter(moveAverageAngle);
+        distance = mFormatter.doubleToDoubleFormatter(distance);
+        angle = mFormatter.doubleToDoubleFormatter(angle);
     }
 
 
@@ -287,141 +294,10 @@ public class AuthMotion extends Activity implements SensorEventListener {
     }
 
 
-    private void soukan () {
-        // 相関係数の計算
+    private boolean soukan () {
+        Enum.MEASURE measure = mCorrelation.measureCorrelation(this, distance, angle, registed_ave_distance, registed_ave_angle);
 
-        //region Calculate of Average A
-
-        float[] sample_accel = new float[3];
-
-        float[] sample_gyro = new float[3];
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 100; j++) {
-                sample_accel[i] += moveAverageDistance[i][j];
-                sample_gyro[i] += moveAverageAngle[i][j];
-            }
-        }
-
-        for (int i = 0; i < 3; i++) {
-            sample_accel[i] /= 99;
-            sample_gyro[i] /= 99;
-        }
-        //endregion
-
-
-        //region Calculate of Average B
-        float ave_accel[] = new float[3];
-        float ave_gyro[] = new float[3];
-
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 100; j++) {
-                ave_accel[i] += registed_ave_distance[i][j];
-                ave_gyro[i] += registed_ave_angle[i][j];
-            }
-        }
-
-        for (int i = 0; i < 3; i++) {
-            ave_accel[i] /= 99;
-            ave_gyro[i] /= 99;
-        }
-        //endregion
-
-
-        //region Calculate of Sxx
-        float Sxx_accel[] = new float[3];
-
-        float Sxx_gyro[] = new float[3];
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 100; j++) {
-                Sxx_accel[i] += Math.pow((moveAverageDistance[i][j] - sample_accel[i]), 2);
-                Sxx_gyro[i] += Math.pow((moveAverageAngle[i][j] - sample_gyro[i]), 2);
-            }
-        }
-        //endregion
-
-
-        //region Calculate of Syy
-        float Syy_accel[] = new float[3];
-        float Syy_gyro[] = new float[3];
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 100; j++) {
-                Syy_accel[i] += Math.pow((registed_ave_distance[i][j] - ave_accel[i]), 2);
-                Syy_gyro[i] += Math.pow((registed_ave_angle[i][j] - ave_gyro[i]), 2);
-            }
-        }
-        //endregion
-
-
-        //region Calculate of Sxy
-        float Sxy_accel[] = new float[3];
-        float Sxy_gyro[] = new float[3];
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 100; j++) {
-                Sxy_accel[i] += (moveAverageDistance[i][j] - sample_accel[i]) * (registed_ave_distance[i][j] - ave_accel[i]);
-                Sxy_gyro[i] += (moveAverageAngle[i][j] - sample_gyro[i]) * (registed_ave_angle[i][j] - ave_gyro[i]);
-            }
-        }
-        //endregion
-
-
-        //region Calculate of R
-        double R_accel[] = new double[3];
-        double R_gyro[] = new double[3];
-
-        for (int i = 0; i < 3; i++) {
-            R_accel[i] = Sxy_accel[i] / Math.sqrt(Sxx_accel[i] * Syy_accel[i]);
-            R_gyro[i] = Sxy_gyro[i] / Math.sqrt(Sxx_gyro[i] * Syy_gyro[i]);
-        }
-        //endregion
-
-
-        //region 相関の判定
-        //相関係数が一定以上あるなら認証成功
-        if (R_accel[0] > 0.5) {
-            if (R_accel[1] > 0.5) {
-                if (R_accel[2] > 0.5) {
-                    if (R_gyro[0] > 0.5) {
-                        if (R_gyro[1] > 0.5) {
-                            if (R_gyro[2] > 0.5) {
-                                Toast.makeText(this, "認証成功", Toast.LENGTH_LONG).show();
-
-                                moveActivity("com.example.motionauth", "com.example.motionauth.Start", true);
-                            }
-                            else {
-                                Toast.makeText(this, "認証失敗", Toast.LENGTH_LONG).show();
-                                Toast.makeText(this, "角度Z軸: " + R_gyro[2], Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                        else {
-                            Toast.makeText(this, "認証失敗", Toast.LENGTH_LONG).show();
-                            Toast.makeText(this, "角度Y軸: " + R_gyro[1], Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    else {
-                        Toast.makeText(this, "認証失敗", Toast.LENGTH_LONG).show();
-                        Toast.makeText(this, "角度X軸: " + R_gyro[0], Toast.LENGTH_SHORT).show();
-                    }
-                }
-                else {
-                    Toast.makeText(this, "認証失敗", Toast.LENGTH_LONG).show();
-                    Toast.makeText(this, "距離Z軸: " + R_accel[2], Toast.LENGTH_SHORT).show();
-                }
-            }
-            else {
-                Toast.makeText(this, "認証失敗", Toast.LENGTH_LONG).show();
-                Toast.makeText(this, "距離Y軸: " + R_accel[1], Toast.LENGTH_SHORT).show();
-            }
-        }
-        else {
-            Toast.makeText(this, "認証失敗", Toast.LENGTH_LONG).show();
-            Toast.makeText(this, "距離X軸: " + R_accel[0], Toast.LENGTH_SHORT).show();
-        }
-        //endregion
+        return measure == Enum.MEASURE.CORRECT;
     }
 
 

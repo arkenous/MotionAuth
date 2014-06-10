@@ -9,7 +9,7 @@ public class Calc {
      * @return 変換後の三次元距離データ
      */
     public double[][][] accelToDistance (double[][][] inputVal, double t) {
-        double[][][] returnVal = {};
+        double[][][] returnVal = new double[inputVal.length][inputVal[0].length][inputVal[0][0].length];
 
         for (int i = 0; i < inputVal.length; i++) {
             for (int j = 0; j < inputVal[i].length; j++) {
@@ -31,7 +31,7 @@ public class Calc {
      * @return 変換後の三次元角度データ
      */
     public double[][][] gyroToAngle (double[][][] inputVal, double t) {
-        double[][][] returnVal = {};
+        double[][][] returnVal = new double[inputVal.length][inputVal[0].length][inputVal[0][0].length];
 
         for (int i = 0; i < inputVal.length; i++) {
             for (int j = 0; j < inputVal[i].length; j++) {
@@ -52,7 +52,7 @@ public class Calc {
      * @return 変換後の三次元距離データ
      */
     public double[][] accelToDistance (double[][] inputVal, double t) {
-        double[][] returnVal = {};
+        double[][] returnVal = new double[inputVal.length][inputVal[0].length];
 
         for (int i = 0; i < inputVal.length; i++) {
             for (int j = 0; j < inputVal[i].length; j++) {
@@ -71,7 +71,7 @@ public class Calc {
      * @return 変換後の三次元角度データ
      */
     public double[][] gyroToAngle (double[][] inputVal, double t) {
-        double[][] returnVal = {};
+        double[][] returnVal = new double[inputVal.length][inputVal[0].length];
 
         for (int i = 0; i < inputVal.length; i++) {
             for (int j = 0; j < inputVal[i].length; j++) {

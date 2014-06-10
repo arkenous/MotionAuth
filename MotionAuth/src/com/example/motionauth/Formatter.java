@@ -32,7 +32,7 @@ public class Formatter {
      * @return 小数点以下２桁に揃え，double型に変換した２次元数値データ
      */
     public double[][] floatToDoubleFormatter (float[][] inputVal) {
-        double[][] returnVal = {};
+        double[][] returnVal = new double[inputVal.length][inputVal[0].length];
 
         for (int i = 0; i < inputVal.length; i++) {
             for (int j = 0; j < inputVal[i].length; j++) {
@@ -84,7 +84,7 @@ public class Formatter {
 
 
     public double[][] doubleToDoubleFormatter (double[][] inputVal) {
-        double[][] returnVal = {};
+        double[][] returnVal = new double[inputVal.length][inputVal[0].length];
 
         for (int i = 0; i < inputVal.length; i++) {
             for (int j = 0; j < inputVal[i].length; j++) {
@@ -103,7 +103,7 @@ public class Formatter {
      * @return 小数点以下２桁に揃えたdouble型３次元数値データ
      */
     public double[][][] doubleToDoubleFormatter (double[][][] inputVal) {
-        double[][][] returnVal = {};
+        double[][][] returnVal = new double[inputVal.length][inputVal[0].length][inputVal[0][0].length];
 
         for (int i = 0; i < inputVal.length; i++) {
             for (int j = 0; j < inputVal[i].length; j++) {

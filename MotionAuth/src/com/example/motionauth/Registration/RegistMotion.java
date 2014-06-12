@@ -10,6 +10,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -38,6 +39,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
     private SensorManager mSensorManager;
     private Sensor mAccelerometerSensor;
     private Sensor mGyroscopeSensor;
+
+    private Vibrator mVibrator;
 
     // モーションの生データ
     private float vAccel[];
@@ -99,6 +102,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
         mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mGyroscopeSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
+        mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+
         TextView nameTv = (TextView) findViewById(R.id.textView2);
         secondTv = (TextView) findViewById(R.id.secondTextView);
         countSecondTv = (TextView) findViewById(R.id.textView4);
@@ -154,13 +159,16 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
                     if (accelCount == 1) {
                         secondTv.setText("3");
+                        mVibrator.vibrate(10);
                     }
 
                     if (accelCount == 33) {
                         secondTv.setText("2");
+                        mVibrator.vibrate(10);
                     }
                     if (accelCount == 66) {
                         secondTv.setText("1");
+                        mVibrator.vibrate(10);
                     }
 
                     // INTERVALで指定したミリ秒後に再度timeHandler（これ自身）を呼び出す

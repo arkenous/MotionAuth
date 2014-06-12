@@ -1,7 +1,9 @@
 package com.example.motionauth.Registration;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -159,16 +161,16 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
                     if (accelCount == 1) {
                         secondTv.setText("3");
-                        mVibrator.vibrate(10);
+                        mVibrator.vibrate(50);
                     }
 
                     if (accelCount == 33) {
                         secondTv.setText("2");
-                        mVibrator.vibrate(10);
+                        mVibrator.vibrate(50);
                     }
                     if (accelCount == 66) {
                         secondTv.setText("1");
-                        mVibrator.vibrate(10);
+                        mVibrator.vibrate(50);
                     }
 
                     // INTERVALで指定したミリ秒後に再度timeHandler（これ自身）を呼び出す
@@ -206,26 +208,46 @@ public class RegistMotion extends Activity implements SensorEventListener {
                         }
                         secondTv.setText("0");
 
-                        // 生データをアウトプット
                         mWriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accel_float, RegistMotion.this);
                         mWriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyro_float, RegistMotion.this);
+                        Log.d(TAG, "writeRawData");
+
 
                         if (!calc() || !soukan()) {
                             // もう一度モーションを取り直す処理
                             // ボタンのstatusをenableにして押せるようにする
-                            getMotionBtn.setClickable(true);
-                            // データ取得関係の変数を初期化
-                            accelCount = 0;
-                            gyroCount = 0;
-                            getCount = 0;
+                            AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);
+                            alert.setTitle("登録失敗");
+                            alert.setMessage("登録に失敗しました．やり直して下さい");
+                            alert.setCancelable(false);
+                            alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick (DialogInterface dialog, int which) {
+                                    getMotionBtn.setClickable(true);
+                                    // データ取得関係の変数を初期化
+                                    accelCount = 0;
+                                    gyroCount = 0;
+                                    getCount = 0;
+                                    secondTv.setText("3");
+                                }
+                            });
+                            alert.show();
                         }
                         else {
-                            getMotionBtn.setText("認証登録中");
-                            Toast.makeText(RegistMotion.this, "モーションを登録中です", Toast.LENGTH_SHORT).show();
-
                             // 3回のモーションの平均値をファイルに書き出す
                             mWriteData.writeRegistedData("MotionAuth", RegistNameInput.name, averageDistance, averageAngle, RegistMotion.this);
-                            finishRegist();
+
+                            AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);
+                            alert.setTitle("登録完了");
+                            alert.setMessage("登録が完了しました．\nスタート画面に戻ります．");
+                            alert.setCancelable(false);
+                            alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick (DialogInterface dialog, int which) {
+                                    finishRegist();
+                                }
+                            });
+                            alert.show();
                         }
                     }
                 }
@@ -325,8 +347,6 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
         return measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT;
     }
-
-
 
 
     @Override

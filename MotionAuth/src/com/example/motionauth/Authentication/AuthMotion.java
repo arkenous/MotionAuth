@@ -1,23 +1,21 @@
 package com.example.motionauth.Authentication;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
+import android.os.*;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.example.motionauth.Calc;
 import com.example.motionauth.Correlation;
 import com.example.motionauth.Formatter;
@@ -36,6 +34,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
     private SensorManager mSensorManager;
     private Sensor mAccelerometerSensor;
     private Sensor mGyroscopeSensor;
+
+    private Vibrator mVibrator;
 
     private Fourier mFourier = new Fourier();
     private Formatter mFormatter = new Formatter();
@@ -97,6 +97,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
         mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mGyroscopeSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
+        mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+
         TextView nameTv = (TextView) findViewById(R.id.textView1);
         secondTv = (TextView) findViewById(R.id.secondTextView);
         countSecondTv = (TextView) findViewById(R.id.textView4);
@@ -151,12 +153,15 @@ public class AuthMotion extends Activity implements SensorEventListener {
 
                     if (accelCount == 1) {
                         secondTv.setText("3");
+                        mVibrator.vibrate(50);
                     }
                     if (accelCount == 33) {
                         secondTv.setText("2");
+                        mVibrator.vibrate(50);
                     }
                     if (accelCount == 66) {
                         secondTv.setText("1");
+                        mVibrator.vibrate(50);
                     }
 
                     timeHandler.sendEmptyMessageDelayed(TIMEOUT_MESSAGE, INTERVAL);
@@ -170,11 +175,35 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     calc();
 
                     if (!soukan()) {
-                        Toast.makeText(AuthMotion.this, "認証失敗です", Toast.LENGTH_SHORT).show();
+                        AlertDialog.Builder alert = new AlertDialog.Builder(AuthMotion.this);
+                        alert.setTitle("認証失敗です");
+                        alert.setMessage("認証に失敗しました");
+                        alert.setCancelable(false);
+                        alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick (DialogInterface dialog, int which) {
+                                getMotionBtn.setClickable(true);
+                                // データ取得関係の変数を初期化
+                                accelCount = 0;
+                                gyroCount = 0;
+                                secondTv.setText("3");
+                            }
+                        });
+                        alert.show();
                     }
-
-                    Toast.makeText(AuthMotion.this, "認証成功です", Toast.LENGTH_SHORT).show();
-                    moveActivity("com.example.motionauth", "com.example.motionauth.Start", true);
+                    else {
+                        AlertDialog.Builder alert = new AlertDialog.Builder(AuthMotion.this);
+                        alert.setTitle("認証成功");
+                        alert.setMessage("認証に成功しました．\nスタート画面に戻ります．");
+                        alert.setCancelable(false);
+                        alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick (DialogInterface dialog, int which) {
+                                moveActivity("com.example.motionauth", "com.example.motionauth.Start", true);
+                            }
+                        });
+                        alert.show();
+                    }
                 }
             }
             else {

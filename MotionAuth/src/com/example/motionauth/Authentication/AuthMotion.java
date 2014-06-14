@@ -217,8 +217,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
         double[][] gyro = mFormatter.floatToDoubleFormatter(gyroFloat);
 
         // フーリエ変換を用いたローパス処理
-        accel = mFourier.retValLowpassFilter(accel, "accel", this);
-        gyro = mFourier.retValLowpassFilter(gyro, "gyro", this);
+        accel = mFourier.LowpassFilter(accel, "accel", this);
+        gyro = mFourier.LowpassFilter(gyro, "gyro", this);
 
         distance = mCalc.accelToDistance(accel, 0.03);
         angle = mCalc.gyroToAngle(gyro, 0.03);

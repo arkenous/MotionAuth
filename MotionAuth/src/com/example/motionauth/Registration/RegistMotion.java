@@ -266,8 +266,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
         mWriteData.writeDoubleThreeArrayData("BeforeFFT", "gyro", RegistNameInput.name, gyro_double, this);
 
         // フーリエ変換によるローパスフィルタ
-        accel_double = mFourier.retValLowpassFilter(accel_double, "accel", this);
-        gyro_double = mFourier.retValLowpassFilter(gyro_double, "gyro", this);
+        accel_double = mFourier.LowpassFilter(accel_double, "accel", this);
+        gyro_double = mFourier.LowpassFilter(gyro_double, "gyro", this);
 
         Log.d(TAG, "*** finishFourier ***");
 

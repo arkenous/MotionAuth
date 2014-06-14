@@ -43,8 +43,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
     private Correlation mCorrelation = new Correlation();
 
     // モーションの生データ
-    private float vAccel[];
-    private float vGyro[];
+    private float[] vAccel;
+    private float[] vGyro;
 
     private boolean btnStatus = false;
 
@@ -57,19 +57,16 @@ public class AuthMotion extends Activity implements SensorEventListener {
     private int accelCount = 0;
     private int gyroCount = 0;
 
-    private float accel_tmp[][] = new float[3][100];
-    private float gyro_tmp[][] = new float[3][100];
-
-    private double accel[][] = new double[3][100];
-    private double gyro[][] = new double[3][100];
+    private float[][] accelFloat = new float[3][100];
+    private float[][] gyroFloat = new float[3][100];
 
     // 移動平均後のデータを格納する配列
-    private double distance[][] = new double[3][100];
-    private double angle[][] = new double[3][100];
+    private double[][] distance = new double[3][100];
+    private double[][] angle = new double[3][100];
 
     // RegistMotionにて登録された平均データ
-    private double registed_ave_distance[][] = new double[3][100];
-    private double registed_ave_angle[][] = new double[3][100];
+    private double[][] registed_ave_distance = new double[3][100];
+    private double[][] registed_ave_angle = new double[3][100];
 
     TextView secondTv;
     TextView countSecondTv;
@@ -141,11 +138,11 @@ public class AuthMotion extends Activity implements SensorEventListener {
                 if (accelCount < 100 && gyroCount < 100) {
                     // 取得した値を，0.03秒ごとに配列に入れる
                     for (int i = 0; i < 3; i++) {
-                        accel_tmp[i][accelCount] = vAccel[i];
+                        accelFloat[i][accelCount] = vAccel[i];
                     }
 
                     for (int i = 0; i < 3; i++) {
-                        gyro_tmp[i][gyroCount] = vGyro[i];
+                        gyroFloat[i][gyroCount] = vGyro[i];
                     }
 
                     accelCount++;
@@ -216,8 +213,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
     //TODO データのズレを，登録された平均値データと比較して修正する
     private void calc () {
         // 原データの桁揃え
-        accel = mFormatter.floatToDoubleFormatter(accel_tmp);
-        gyro = mFormatter.floatToDoubleFormatter(gyro_tmp);
+        double[][] accel = mFormatter.floatToDoubleFormatter(accelFloat);
+        double[][] gyro = mFormatter.floatToDoubleFormatter(gyroFloat);
 
         // フーリエ変換を用いたローパス処理
         accel = mFourier.retValLowpassFilter(accel, "accel", this);

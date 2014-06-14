@@ -45,8 +45,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
     private Vibrator mVibrator;
 
     // モーションの生データ
-    private float vAccel[];
-    private float vGyro[];
+    private float[] vAccel;
+    private float[] vGyro;
 
     private boolean btnStatus = false;
 
@@ -60,19 +60,15 @@ public class RegistMotion extends Activity implements SensorEventListener {
     private int gyroCount = 0;
     private int getCount = 0;
 
-    private float accel_float[][][] = new float[3][3][100];
-    private float gyro_float[][][] = new float[3][3][100];
-
-    private double accel_double[][][] = new double[3][3][100];
-    private double gyro_double[][][] = new double[3][3][100];
-
+    private float[][][] accelFloat = new float[3][3][100];
+    private float[][][] gyroFloat = new float[3][3][100];
 
     // 移動平均後のデータを格納する配列
-    private double distance[][][] = new double[3][3][100];
-    private double angle[][][] = new double[3][3][100];
+    private double[][][] distance = new double[3][3][100];
+    private double[][][] angle = new double[3][3][100];
 
-    private double averageDistance[][] = new double[3][100];
-    private double averageAngle[][] = new double[3][100];
+    private double[][] averageDistance = new double[3][100];
+    private double[][] averageAngle = new double[3][100];
 
     private TextView secondTv;
     private TextView countSecondTv;
@@ -149,11 +145,11 @@ public class RegistMotion extends Activity implements SensorEventListener {
                 if (accelCount < 100 && gyroCount < 100 && getCount >= 0 && getCount < 3) {
                     // 取得した値を，0.03秒ごとに配列に入れる
                     for (int i = 0; i < 3; i++) {
-                        accel_float[getCount][i][accelCount] = vAccel[i];
+                        accelFloat[getCount][i][accelCount] = vAccel[i];
                     }
 
                     for (int i = 0; i < 3; i++) {
-                        gyro_float[getCount][i][gyroCount] = vGyro[i];
+                        gyroFloat[getCount][i][gyroCount] = vGyro[i];
                     }
 
                     accelCount++;
@@ -207,8 +203,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
                         }
                         secondTv.setText("0");
 
-                        mWriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accel_float, RegistMotion.this);
-                        mWriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyro_float, RegistMotion.this);
+                        mWriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accelFloat, RegistMotion.this);
+                        mWriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyroFloat, RegistMotion.this);
                         Log.d(TAG, "writeRawData");
 
 
@@ -263,8 +259,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
         Log.d(TAG, "--- calc ---");
         // データ加工，計算処理
         // データの桁揃え
-        accel_double = mFormatter.floatToDoubleFormatter(accel_float);
-        gyro_double = mFormatter.floatToDoubleFormatter(gyro_float);
+        double[][][] accel_double = mFormatter.floatToDoubleFormatter(accelFloat);
+        double[][][] gyro_double = mFormatter.floatToDoubleFormatter(gyroFloat);
 
         mWriteData.writeDoubleThreeArrayData("BeforeFFT", "accel", RegistNameInput.name, accel_double, this);
         mWriteData.writeDoubleThreeArrayData("BeforeFFT", "gyro", RegistNameInput.name, gyro_double, this);
@@ -310,7 +306,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
             distance = CorrectDeviation.correctDeviation(distance);
             angle = CorrectDeviation.correctDeviation(angle);
         } else if (Enum.MEASURE.PERFECT == measure) {
-
+            // PERFECTなら，何もしない
         } else {
             // なにかがおかしい
             Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_LONG).show();

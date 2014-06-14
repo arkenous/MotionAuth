@@ -60,8 +60,7 @@ public class RegistrantList extends Activity {
             for (int i = 0; i < fileNameStr.length; i++) {
                 adapter.add(fileNameStr[i]);
             }
-        }
-        catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             moveActivity("com.example.motionauth", "com.example.motionauth.Start", true);
             finish();
         }
@@ -106,8 +105,7 @@ public class RegistrantList extends Activity {
 
             return str_items;
 
-        }
-        catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             return null;
         }
     }

@@ -47,6 +47,7 @@ public class Calc {
 
     /**
      * 加速度データを距離データに変換する
+     *
      * @param inputVal 変換対象の，三次元加速度データ
      * @param t        時間
      * @return 変換後の三次元距離データ
@@ -66,6 +67,7 @@ public class Calc {
 
     /**
      * 角速度データを角度データに変換する
+     *
      * @param inputVal 変換対象の，三次元角速度データ
      * @param t        時間
      * @return 変換後の三次元角度データ

@@ -28,6 +28,7 @@ public class Formatter {
 
     /**
      * float型の２次元数値データを小数点以下２桁に揃え，doubleに変換する
+     *
      * @param inputVal float型の２次元配列データ
      * @return 小数点以下２桁に揃え，double型に変換した２次元数値データ
      */
@@ -47,6 +48,7 @@ public class Formatter {
 
     /**
      * float型の３次元数値データを小数点以下２桁に揃え，doubleに変換する
+     *
      * @param inputVal float型の3次元配列データ
      * @return 小数点以下２桁に揃え，double型に変換した３次元数値データ
      */
@@ -99,6 +101,7 @@ public class Formatter {
 
     /**
      * double型の３次元数値データを小数点以下２桁に揃える
+     *
      * @param inputVal double型の３次元配列データ
      * @return 小数点以下２桁に揃えたdouble型３次元数値データ
      */

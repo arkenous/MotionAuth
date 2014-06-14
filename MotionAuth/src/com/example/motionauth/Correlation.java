@@ -163,26 +163,21 @@ public class Correlation {
                                                                             else {
                                                                                 return Enum.MEASURE.CORRECT;
                                                                             }
-                                                                        }
-                                                                        else {
+                                                                        } else {
                                                                             return Enum.MEASURE.CORRECT;
                                                                         }
 
-                                                                    }
-                                                                    else {
+                                                                    } else {
                                                                         return Enum.MEASURE.CORRECT;
                                                                     }
 
-                                                                }
-                                                                else {
+                                                                } else {
                                                                     return Enum.MEASURE.CORRECT;
                                                                 }
-                                                            }
-                                                            else {
+                                                            } else {
                                                                 return Enum.MEASURE.CORRECT;
                                                             }
-                                                        }
-                                                        else {
+                                                        } else {
                                                             return Enum.MEASURE.CORRECT;
                                                         }
 
@@ -191,26 +186,21 @@ public class Correlation {
                                                     else {
                                                         return Enum.MEASURE.INCORRECT;
                                                     }
-                                                }
-                                                else {
+                                                } else {
                                                     return Enum.MEASURE.INCORRECT;
                                                 }
 
-                                            }
-                                            else {
+                                            } else {
                                                 return Enum.MEASURE.INCORRECT;
                                             }
 
-                                        }
-                                        else {
+                                        } else {
                                             return Enum.MEASURE.INCORRECT;
                                         }
-                                    }
-                                    else {
+                                    } else {
                                         return Enum.MEASURE.INCORRECT;
                                     }
-                                }
-                                else {
+                                } else {
                                     return Enum.MEASURE.INCORRECT;
                                 }
                             }
@@ -218,24 +208,19 @@ public class Correlation {
                             else {
                                 return Enum.MEASURE.BAD;
                             }
-                        }
-                        else {
+                        } else {
                             return Enum.MEASURE.BAD;
                         }
-                    }
-                    else {
+                    } else {
                         return Enum.MEASURE.BAD;
                     }
-                }
-                else {
+                } else {
                     return Enum.MEASURE.BAD;
                 }
-            }
-            else {
+            } else {
                 return Enum.MEASURE.BAD;
             }
-        }
-        else {
+        } else {
             return Enum.MEASURE.BAD;
         }
     }
@@ -331,28 +316,22 @@ public class Correlation {
                         if (R_gyro[1] > 0.5) {
                             if (R_gyro[2] > 0.5) {
                                 return Enum.MEASURE.CORRECT;
-                            }
-                            else {
+                            } else {
                                 return Enum.MEASURE.INCORRECT;
                             }
-                        }
-                        else {
+                        } else {
                             return Enum.MEASURE.INCORRECT;
                         }
-                    }
-                    else {
+                    } else {
                         return Enum.MEASURE.INCORRECT;
                     }
-                }
-                else {
+                } else {
                     return Enum.MEASURE.INCORRECT;
                 }
-            }
-            else {
+            } else {
                 return Enum.MEASURE.INCORRECT;
             }
-        }
-        else {
+        } else {
             return Enum.MEASURE.INCORRECT;
         }
         //endregion

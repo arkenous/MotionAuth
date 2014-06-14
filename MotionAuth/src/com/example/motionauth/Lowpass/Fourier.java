@@ -20,8 +20,9 @@ public class Fourier {
 
     /**
      * 3次元入力データに対し，フーリエ変換を用いてローパスフィルタリングを行ってデータの平滑化を行う
-     * @param data データ平滑化を行うdouble型3次元配列データ
-     * @param name アウトプット用，データ種別
+     *
+     * @param data    データ平滑化を行うdouble型3次元配列データ
+     * @param name    アウトプット用，データ種別
      * @param context Toast表示用
      */
     public void LowpassFilter (double[][][] data, String name, Context context) {
@@ -94,7 +95,7 @@ public class Fourier {
         double[][][] testData7 = new double[data.length][data[0].length][data[0][0].length];
         double[][][] testData8 = new double[data.length][data[0].length][data[0][0].length];
 
-        for(int i = 0; i < data.length; i++) {
+        for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < data[i].length; j++) {
                 testData1[i][j] = Arrays.copyOf(data[i][j], data[i][j].length);
                 testData2[i][j] = Arrays.copyOf(data[i][j], data[i][j].length);
@@ -113,26 +114,19 @@ public class Fourier {
                 for (int k = 0; k < data[i][j].length; k++) {
                     if (k > 10) {
                         testData1[i][j][k] = 0;
-                    }
-                    else if (k > 20) {
+                    } else if (k > 20) {
                         testData2[i][j][k] = 0;
-                    }
-                    else if (k > 30) {
+                    } else if (k > 30) {
                         testData3[i][j][k] = 0;
-                    }
-                    else if (k > 40) {
+                    } else if (k > 40) {
                         testData4[i][j][k] = 0;
-                    }
-                    else if (k > 50) {
+                    } else if (k > 50) {
                         testData5[i][j][k] = 0;
-                    }
-                    else if (k > 60) {
+                    } else if (k > 60) {
                         testData6[i][j][k] = 0;
-                    }
-                    else if (k > 70) {
+                    } else if (k > 70) {
                         testData7[i][j][k] = 0;
-                    }
-                    else if (k > 80) {
+                    } else if (k > 80) {
                         testData8[i][j][k] = 0;
                     }
                 }
@@ -194,8 +188,7 @@ public class Fourier {
                         if (countReal == 99) {
                             countReal = 0;
                         }
-                    }
-                    else {
+                    } else {
                         imaginary[i][j][countImaginary] = data[i][j][k];
                         countImaginary++;
                         if (countImaginary == 99) {
@@ -270,8 +263,7 @@ public class Fourier {
                     if (countReal == 99) {
                         countReal = 0;
                     }
-                }
-                else {
+                } else {
                     imaginary[i][countImaginary] = data[i][j];
                     countImaginary++;
                     if (countImaginary == 99) {

@@ -92,8 +92,7 @@ public class AuthNameInput extends Activity {
                 // 指定したユーザが存在するかどうかを確認する
                 if (checkFileExists()) {
                     moveActivity("com.example.motionauth", "com.example.motionauth.Authentication.AuthMotion", false);
-                }
-                else {
+                } else {
                     Toast.makeText(current, "ユーザが登録されていません", Toast.LENGTH_LONG).show();
                 }
             }

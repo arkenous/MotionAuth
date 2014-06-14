@@ -61,12 +61,10 @@ public class Start extends Activity {
                         if (msg.arg1 == POSITIVE) {
                             // 登録者一覧モード
                             moveActivity("com.example.motionauth", "com.example.motionauth.ViewDataList.RegistrantList", true);
-                        }
-                        else if (msg.arg1 == NEUTRAL) {
+                        } else if (msg.arg1 == NEUTRAL) {
                             // 認証試験モード
                             moveActivity("com.example.motionauth", "com.example.motionauth.Authentication.AuthNameInput", true);
-                        }
-                        else if (msg.arg1 == NEGATIVE) {
+                        } else if (msg.arg1 == NEGATIVE) {
                             // 新規登録モード
                             moveActivity("com.example.motionauth", "com.example.motionauth.Registration.RegistNameInput", true);
                         }
@@ -130,8 +128,7 @@ public class Start extends Activity {
 
             // ダイアログを表示する
             alert.show();
-        }
-        else if (choiceNum == TRIPLE) {
+        } else if (choiceNum == TRIPLE) {
             AlertDialog.Builder alert = new AlertDialog.Builder(this);
             alert.setOnKeyListener(new OnKeyListener() {
                 public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {

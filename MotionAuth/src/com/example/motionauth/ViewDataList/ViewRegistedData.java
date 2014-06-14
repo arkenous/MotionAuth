@@ -91,14 +91,11 @@ public class ViewRegistedData extends Activity {
             fis.close();
 
             return dataList;
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             return null;
-        }
-        catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e) {
             return null;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             return null;
         }
     }

@@ -175,8 +175,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
                     // INTERVALで指定したミリ秒後に再度timeHandler（これ自身）を呼び出す
                     timeHandler.sendEmptyMessageDelayed(TIMEOUT_MESSAGE, INTERVAL);
-                }
-                else if (accelCount >= 100 && gyroCount >= 100 && getCount >= 0 && getCount < 4) {
+                } else if (accelCount >= 100 && gyroCount >= 100 && getCount >= 0 && getCount < 4) {
                     // 取得完了
                     btnStatus = false;
                     getCount++;
@@ -232,8 +231,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
                                 }
                             });
                             alert.show();
-                        }
-                        else {
+                        } else {
                             // 3回のモーションの平均値をファイルに書き出す
                             mWriteData.writeRegistedData("MotionAuth", RegistNameInput.name, averageDistance, averageAngle, RegistMotion.this);
 
@@ -250,8 +248,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
                             alert.show();
                         }
                     }
-                }
-                else {
+                } else {
                     super.dispatchMessage(msg);
                 }
             }
@@ -307,17 +304,14 @@ public class RegistMotion extends Activity implements SensorEventListener {
             // 相関係数が0.4以下
             Toast.makeText(RegistMotion.this, "同一モーションですか？", Toast.LENGTH_SHORT).show();
             return false;
-        }
-        else if (Enum.MEASURE.INCORRECT == measure || Enum.MEASURE.CORRECT == measure) {
+        } else if (Enum.MEASURE.INCORRECT == measure || Enum.MEASURE.CORRECT == measure) {
             // 相関係数が0.4よりも高く，0.8以下の場合
             // ズレ修正を行う
             distance = CorrectDeviation.correctDeviation(distance);
             angle = CorrectDeviation.correctDeviation(angle);
-        }
-        else if (Enum.MEASURE.PERFECT == measure) {
+        } else if (Enum.MEASURE.PERFECT == measure) {
 
-        }
-        else {
+        } else {
             // なにかがおかしい
             Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_LONG).show();
             return false;

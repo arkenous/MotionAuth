@@ -165,8 +165,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     }
 
                     timeHandler.sendEmptyMessageDelayed(TIMEOUT_MESSAGE, INTERVAL);
-                }
-                else if (accelCount >= 100 && gyroCount >= 100) {
+                } else if (accelCount >= 100 && gyroCount >= 100) {
                     // 取得完了
                     btnStatus = false;
                     getMotionBtn.setText("モーションデータ取得完了");
@@ -190,8 +189,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
                             }
                         });
                         alert.show();
-                    }
-                    else {
+                    } else {
                         AlertDialog.Builder alert = new AlertDialog.Builder(AuthMotion.this);
                         alert.setTitle("認証成功");
                         alert.setMessage("認証に成功しました．\nスタート画面に戻ります．");
@@ -205,8 +203,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
                         alert.show();
                     }
                 }
-            }
-            else {
+            } else {
                 super.dispatchMessage(msg);
             }
         }
@@ -234,7 +231,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
     }
 
 
-    private void readRegistedData() {
+    private void readRegistedData () {
         int readCount = 0;
 
         try {
@@ -254,8 +251,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     registed_ave_distance[0][readCount] = Float.valueOf(afterSplitData[1]);
                     if (readCount == 99) {
                         readCount = 0;
-                    }
-                    else {
+                    } else {
                         readCount++;
                     }
                 }
@@ -264,8 +260,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     registed_ave_distance[1][readCount] = Float.valueOf(afterSplitData[1]);
                     if (readCount == 99) {
                         readCount = 0;
-                    }
-                    else {
+                    } else {
                         readCount++;
                     }
                 }
@@ -274,8 +269,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     registed_ave_distance[2][readCount] = Float.valueOf(afterSplitData[1]);
                     if (readCount == 99) {
                         readCount = 0;
-                    }
-                    else {
+                    } else {
                         readCount++;
                     }
                 }
@@ -284,8 +278,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     registed_ave_angle[0][readCount] = Float.valueOf(afterSplitData[1]);
                     if (readCount == 99) {
                         readCount = 0;
-                    }
-                    else {
+                    } else {
                         readCount++;
                     }
                 }
@@ -294,8 +287,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     registed_ave_angle[1][readCount] = Float.valueOf(afterSplitData[1]);
                     if (readCount == 99) {
                         readCount = 0;
-                    }
-                    else {
+                    } else {
                         readCount++;
                     }
                 }
@@ -304,8 +296,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     registed_ave_angle[2][readCount] = Float.valueOf(afterSplitData[1]);
                     if (readCount == 99) {
                         readCount = 0;
-                    }
-                    else {
+                    } else {
                         readCount++;
                     }
                 }
@@ -314,8 +305,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
             br.close();
             isr.close();
             fis.close();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 

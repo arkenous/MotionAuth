@@ -226,6 +226,16 @@ public class Correlation {
     }
 
 
+    /**
+     * 相関を求め，同一のモーションであるかどうかを確認する
+     *
+     * @param context       呼び出し元のcontext
+     * @param distance      double型の二次元配列距離データ
+     * @param angle         double型の二次元配列角度データ
+     * @param ave_distance  double型の二次元配列距離データ
+     * @param ave_angle     double型の虹連配列角度データ
+     * @return EnumクラスのMEASURE列挙体の値が返る
+     */
     public Enum.MEASURE measureCorrelation (Context context, double[][] distance, double[][] angle, double[][] ave_distance, double[][] ave_angle) {
         //region Calculate of Average A
         float[] sample_accel = new float[3];

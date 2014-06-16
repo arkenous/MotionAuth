@@ -228,6 +228,9 @@ public class AuthMotion extends Activity implements SensorEventListener {
     }
 
 
+    /**
+     * RegistMotionにて登録したモーションの平均値データを読み込む
+     */
     private void readRegistedData () {
         int readCount = 0;
 

@@ -1,6 +1,8 @@
 package com.example.motionauth.ViewDataList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -61,7 +63,17 @@ public class RegistrantList extends Activity {
                 adapter.add(fileNameStr[i]);
             }
         } catch (NullPointerException e) {
-            moveActivity("com.example.motionauth", "com.example.motionauth.Start", true);
+            AlertDialog.Builder alert = new AlertDialog.Builder(RegistrantList.this);
+            alert.setTitle("エラー");
+            alert.setMessage("登録されていないユーザです．\nスタート画面に戻ります．");
+            alert.setCancelable(false);
+            alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick (DialogInterface dialog, int which) {
+                    moveActivity("com.example.motionauth", "com.example.motionauth.Start", true);
+                }
+            });
+            alert.show();
             finish();
         }
 

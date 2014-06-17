@@ -36,6 +36,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
     private Sensor mGyroscopeSensor;
 
     private Vibrator mVibrator;
+    private static final int vibratorDurationTime = 50;
 
     private Fourier mFourier = new Fourier();
     private Formatter mFormatter = new Formatter();
@@ -155,15 +156,15 @@ public class AuthMotion extends Activity implements SensorEventListener {
 
                     if (accelCount == 1) {
                         secondTv.setText("3");
-                        mVibrator.vibrate(50);
+                        mVibrator.vibrate(vibratorDurationTime);
                     }
                     if (accelCount == 33) {
                         secondTv.setText("2");
-                        mVibrator.vibrate(50);
+                        mVibrator.vibrate(vibratorDurationTime);
                     }
                     if (accelCount == 66) {
                         secondTv.setText("1");
-                        mVibrator.vibrate(50);
+                        mVibrator.vibrate(vibratorDurationTime);
                     }
 
                     timeHandler.sendEmptyMessageDelayed(TIMEOUT_MESSAGE, INTERVAL);

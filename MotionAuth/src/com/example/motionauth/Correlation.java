@@ -1,7 +1,6 @@
 package com.example.motionauth;
 
 import android.content.Context;
-import android.widget.Toast;
 import com.example.motionauth.Registration.RegistNameInput;
 import com.example.motionauth.Utility.Enum;
 

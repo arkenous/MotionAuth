@@ -10,7 +10,7 @@ public class Enum {
         BAD, INCORRECT, CORRECT, PERFECT
     }
 
-    public static final double LOOSE = 0.4;
-    public static final double NORMAL = 0.6;
-    public static final double STRICT = 0.8;
+    public final double LOOSE = 0.4;
+    public final double NORMAL = 0.6;
+    public final double STRICT = 0.8;
 }

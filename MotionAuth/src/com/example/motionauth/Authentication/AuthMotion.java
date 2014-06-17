@@ -131,6 +131,11 @@ public class AuthMotion extends Activity implements SensorEventListener {
         }
     }
 
+
+    /**
+     * 一定時間ごとにモーションデータを取得するハンドラ
+     * 計算処理や相関係数計算関数もここから呼び出す
+     */
     Handler timeHandler = new Handler() {
         @Override
         public void dispatchMessage (Message msg) {

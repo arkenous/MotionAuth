@@ -138,6 +138,10 @@ public class RegistMotion extends Activity implements SensorEventListener {
     }
 
 
+    /**
+     * 一定時間ごとにモーションデータを取得し配列に格納するハンドラ
+     * 計算処理や相関係数取得関数の呼び出しもここで行う
+     */
     private Handler timeHandler = new Handler() {
         @Override
         public void dispatchMessage (Message msg) {

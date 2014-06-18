@@ -88,7 +88,7 @@ public class RegistrantList extends Activity {
                 item = lv.getItemAtPosition(position).toString();
 
                 // itemを次のアクティビティに送る
-                moveActivity("com.example.motionauth", "com.example.motionauth.ViewDataList.ViewRegistedData", false);
+                moveActivity("com.example.motionauth", "com.example.motionauth.ViewDataList.ViewRegistedData", true);
             }
 
         });

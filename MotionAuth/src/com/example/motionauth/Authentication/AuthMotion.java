@@ -189,6 +189,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
                                 accelCount = 0;
                                 gyroCount = 0;
                                 secondTv.setText("3");
+                                getMotionBtn.setText("モーションデータ取得");
                             }
                         });
                         alert.show();
@@ -366,6 +367,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
         }
 
         startActivityForResult(intent, 0);
+        finish();
     }
 
 

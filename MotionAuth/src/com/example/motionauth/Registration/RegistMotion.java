@@ -242,6 +242,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
                                     gyroCount = 0;
                                     getCount = 0;
                                     secondTv.setText("3");
+                                    getMotionBtn.setText("モーションデータ取得");
                                 }
                             });
 
@@ -410,6 +411,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
         Intent intent = new Intent();
 
         intent.setClassName("com.example.motionauth", "com.example.motionauth.Start");
+
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
         startActivityForResult(intent, 0);
         finish();

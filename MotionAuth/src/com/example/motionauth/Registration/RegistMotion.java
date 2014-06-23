@@ -24,7 +24,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.example.motionauth.*;
 import com.example.motionauth.Lowpass.Fourier;
+import com.example.motionauth.Processing.Calc;
+import com.example.motionauth.Processing.CorrectDeviation;
+import com.example.motionauth.Processing.Correlation;
+import com.example.motionauth.Processing.Formatter;
 import com.example.motionauth.Utility.Enum;
+import com.example.motionauth.Utility.WriteData;
 
 
 /**

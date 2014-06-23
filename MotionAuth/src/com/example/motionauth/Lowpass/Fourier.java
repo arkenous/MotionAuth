@@ -3,7 +3,7 @@ package com.example.motionauth.Lowpass;
 import android.content.Context;
 import com.example.motionauth.Authentication.AuthNameInput;
 import com.example.motionauth.Registration.RegistNameInput;
-import com.example.motionauth.WriteData;
+import com.example.motionauth.Utility.WriteData;
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 
 import java.util.Arrays;

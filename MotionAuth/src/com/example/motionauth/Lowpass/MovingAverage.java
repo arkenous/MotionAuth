@@ -2,7 +2,7 @@ package com.example.motionauth.Lowpass;
 
 import android.content.Context;
 import com.example.motionauth.Registration.RegistNameInput;
-import com.example.motionauth.WriteData;
+import com.example.motionauth.Utility.WriteData;
 
 /**
  * 移動平均を用いたローパスフィルタ

@@ -1,4 +1,4 @@
-package com.example.motionauth;
+package com.example.motionauth.Utility;
 
 import android.content.Context;
 import android.os.Environment;

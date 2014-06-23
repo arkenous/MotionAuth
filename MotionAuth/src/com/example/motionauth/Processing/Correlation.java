@@ -1,8 +1,9 @@
-package com.example.motionauth;
+package com.example.motionauth.Processing;
 
 import android.content.Context;
 import com.example.motionauth.Registration.RegistNameInput;
 import com.example.motionauth.Utility.Enum;
+import com.example.motionauth.Utility.WriteData;
 
 
 /**

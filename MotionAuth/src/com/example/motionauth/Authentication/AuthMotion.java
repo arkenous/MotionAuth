@@ -16,6 +16,7 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
+import com.example.motionauth.Processing.Amplifier;
 import com.example.motionauth.Processing.Calc;
 import com.example.motionauth.Processing.Correlation;
 import com.example.motionauth.Processing.Formatter;
@@ -42,6 +43,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
     private Formatter mFormatter = new Formatter();
     private Calc mCalc = new Calc();
     private Correlation mCorrelation = new Correlation();
+    private Amplifier mAmplifier = new Amplifier();
 
     // モーションの生データ
     private float[] vAccel;
@@ -68,6 +70,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
     // RegistMotionにて登録された平均データ
     private double[][] registed_ave_distance = new double[3][100];
     private double[][] registed_ave_angle = new double[3][100];
+
+    private boolean isAmplity = false;
 
     TextView secondTv;
     TextView countSecondTv;
@@ -215,27 +219,6 @@ public class AuthMotion extends Activity implements SensorEventListener {
 
 
     /**
-     * データ加工・計算処理を行う
-     */
-    //TODO データのズレを，登録された平均値データと比較して修正する
-    private void calc () {
-        // 原データの桁揃え
-        double[][] accel = mFormatter.floatToDoubleFormatter(accelFloat);
-        double[][] gyro = mFormatter.floatToDoubleFormatter(gyroFloat);
-
-        // フーリエ変換を用いたローパス処理
-        accel = mFourier.LowpassFilter(accel, "accel", this);
-        gyro = mFourier.LowpassFilter(gyro, "gyro", this);
-
-        distance = mCalc.accelToDistance(accel, 0.03);
-        angle = mCalc.gyroToAngle(gyro, 0.03);
-
-        distance = mFormatter.doubleToDoubleFormatter(distance);
-        angle = mFormatter.doubleToDoubleFormatter(angle);
-    }
-
-
-    /**
      * RegistMotionにて登録したモーションの平均値データを読み込む
      */
     private void readRegistedData () {
@@ -249,13 +232,28 @@ public class AuthMotion extends Activity implements SensorEventListener {
             BufferedReader br = new BufferedReader(isr);
 
             String beforeSplitData;
-            String[] afterSplitData;
+            String[] checkAmplify;
 
             while ((beforeSplitData = br.readLine()) != null) {
-                afterSplitData = beforeSplitData.split("@");
+                checkAmplify = beforeSplitData.split(":");
+                if (checkAmplify[1].equals("true")) {
+                    isAmplity = true;
+                }
 
-                if (afterSplitData[0].equals("ave_distance_x")) {
-                    registed_ave_distance[0][readCount] = Float.valueOf(afterSplitData[1]);
+                String checkedData = checkAmplify[0];
+                String[] checkedSplitData = checkedData.split("@");
+                if (checkedSplitData[0].equals("ave_distance_x")) {
+                    registed_ave_distance[0][readCount] = Double.valueOf(checkedSplitData[1]);
+                    if (readCount == 99) {
+                        readCount = 0;
+                    }
+                    else {
+                        readCount++;
+                    }
+                }
+
+                if (checkedSplitData[0].equals("ave_distance_y")) {
+                    registed_ave_distance[1][readCount] = Double.valueOf(checkedSplitData[1]);
                     if (readCount == 99) {
                         readCount = 0;
                     } else {
@@ -263,8 +261,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     }
                 }
 
-                if (afterSplitData[0].equals("ave_distance_y")) {
-                    registed_ave_distance[1][readCount] = Float.valueOf(afterSplitData[1]);
+                if (checkedSplitData[0].equals("ave_distance_z")) {
+                    registed_ave_distance[2][readCount] = Double.valueOf(checkedSplitData[1]);
                     if (readCount == 99) {
                         readCount = 0;
                     } else {
@@ -272,8 +270,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     }
                 }
 
-                if (afterSplitData[0].equals("ave_distance_z")) {
-                    registed_ave_distance[2][readCount] = Float.valueOf(afterSplitData[1]);
+                if (checkedSplitData[0].equals("ave_angle_x")) {
+                    registed_ave_angle[0][readCount] = Double.valueOf(checkedSplitData[1]);
                     if (readCount == 99) {
                         readCount = 0;
                     } else {
@@ -281,8 +279,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     }
                 }
 
-                if (afterSplitData[0].equals("ave_angle_x")) {
-                    registed_ave_angle[0][readCount] = Float.valueOf(afterSplitData[1]);
+                if (checkedSplitData[0].equals("ave_angle_y")) {
+                    registed_ave_angle[1][readCount] = Double.valueOf(checkedSplitData[1]);
                     if (readCount == 99) {
                         readCount = 0;
                     } else {
@@ -290,17 +288,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     }
                 }
 
-                if (afterSplitData[0].equals("ave_angle_y")) {
-                    registed_ave_angle[1][readCount] = Float.valueOf(afterSplitData[1]);
-                    if (readCount == 99) {
-                        readCount = 0;
-                    } else {
-                        readCount++;
-                    }
-                }
-
-                if (afterSplitData[0].equals("ave_angle_z")) {
-                    registed_ave_angle[2][readCount] = Float.valueOf(afterSplitData[1]);
+                if (checkedSplitData[0].equals("ave_angle_z")) {
+                    registed_ave_angle[2][readCount] = Double.valueOf(checkedSplitData[1]);
                     if (readCount == 99) {
                         readCount = 0;
                     } else {
@@ -315,8 +304,31 @@ public class AuthMotion extends Activity implements SensorEventListener {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
 
+    /**
+     * データ加工・計算処理を行う
+     */
+    private void calc () {
+        // 原データの桁揃え
+        double[][] accel = mFormatter.floatToDoubleFormatter(accelFloat);
+        double[][] gyro = mFormatter.floatToDoubleFormatter(gyroFloat);
+
+        if (isAmplity) {
+            accel = mAmplifier.Amplify(accel);
+            gyro = mAmplifier.Amplify(gyro);
+        }
+
+        // フーリエ変換を用いたローパス処理
+        accel = mFourier.LowpassFilter(accel, "accel", this);
+        gyro = mFourier.LowpassFilter(gyro, "gyro", this);
+
+        distance = mCalc.accelToDistance(accel, 0.03);
+        angle = mCalc.gyroToAngle(gyro, 0.03);
+
+        distance = mFormatter.doubleToDoubleFormatter(distance);
+        angle = mFormatter.doubleToDoubleFormatter(angle);
     }
 
 

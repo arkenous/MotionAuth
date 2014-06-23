@@ -1,0 +1,90 @@
+package com.example.motionauth.Processing;
+
+/**
+ * データの値を増幅させる
+ *
+ * @author Kensuke Kousaka
+ */
+public class Amplifier {
+    private static final double CHECK_RANGE_VALUE = 5;
+    private static final double AMPLIFICATION_VALUE = 3;
+
+
+    /**
+     * 全試行回数中，一回でもデータの幅が閾値よりも小さければtrueを返す
+     * @param data チェックするdouble型三次元配列データ
+     * @return 全試行回数中，一回でもデータの幅が閾値よりも小さければtrue，そうでなければfalse
+     */
+    public boolean CheckValueRange(double[][][] data) {
+        double[][] max = {};
+        double[][] min = {};
+        double range = 0;
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[i].length; j++) {
+                for (int k = 0; k < data[i][j].length; k++) {
+                    if (data[i][j][k] > max[i][j]) {
+                        max[i][j] = data[i][j][k];
+                    }
+                    else if (data[i][j][k] < min[i][j]) {
+                        min[i][j] = data[i][j][k];
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < max.length; i++) {
+            for (int j = 0; j < max[i].length; j++) {
+                range = max[i][j] - min[i][j];
+                if (range < CHECK_RANGE_VALUE) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * 与えられたデータをAMPLIFICATION_VALUEで指定した値だけ増幅させる
+     * @param data 増幅させるdouble型三次元配列データ
+     * @return 増幅後のdouble型三次元配列データ
+     */
+    public double[][][] Apmlify(double[][][] data) {
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[i].length; j++) {
+                for (int k = 0; k < data[i][j].length; k++) {
+                    if (data[i][j][k] < 0) {
+                        data[i][j][k] -= AMPLIFICATION_VALUE;
+                    }
+                    else if (data[i][j][k] > 0) {
+                        data[i][j][k] += AMPLIFICATION_VALUE;
+                    }
+                }
+            }
+        }
+
+        return data;
+    }
+
+
+    /**
+     * 与えられたデータをAMPLIFICATION_VALUEで指定した値だけ増幅させる
+     * @param data 増幅させるdouble型二次元配列データ
+     * @return 増幅後のdouble型二次元配列データ
+     */
+    public double[][] Amplify (double[][] data) {
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[i].length; j++) {
+                if (data[i][j] < 0) {
+                    data[i][j] -= AMPLIFICATION_VALUE;
+                }
+                else if (data[i][j] > 0) {
+                    data[i][j] += AMPLIFICATION_VALUE;
+                }
+            }
+        }
+
+        return data;
+    }
+}

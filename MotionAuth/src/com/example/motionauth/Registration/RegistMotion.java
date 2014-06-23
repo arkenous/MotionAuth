@@ -24,10 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.example.motionauth.*;
 import com.example.motionauth.Lowpass.Fourier;
-import com.example.motionauth.Processing.Calc;
-import com.example.motionauth.Processing.CorrectDeviation;
-import com.example.motionauth.Processing.Correlation;
-import com.example.motionauth.Processing.Formatter;
+import com.example.motionauth.Processing.*;
 import com.example.motionauth.Utility.Enum;
 import com.example.motionauth.Utility.WriteData;
 
@@ -43,6 +40,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
     private Fourier mFourier = new Fourier();
     private Formatter mFormatter = new Formatter();
     private Calc mCalc = new Calc();
+    private Amplifier mAmplifier = new Amplifier();
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometerSensor;
@@ -76,6 +74,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
     private double[][] averageDistance = new double[3][100];
     private double[][] averageAngle = new double[3][100];
+
+    private boolean isAmplified = false;
 
     private TextView secondTv;
     private TextView countSecondTv;
@@ -254,7 +254,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
                             alert.show();
                         } else {
                             // 3回のモーションの平均値をファイルに書き出す
-                            mWriteData.writeRegistedData("MotionAuth", RegistNameInput.name, averageDistance, averageAngle, RegistMotion.this);
+                            mWriteData.writeRegistedData("MotionAuth", RegistNameInput.name, averageDistance, averageAngle, isAmplified, RegistMotion.this);
 
                             AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);
                             alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
@@ -302,6 +302,12 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
         mWriteData.writeDoubleThreeArrayData("BeforeFFT", "accel", RegistNameInput.name, accel_double, this);
         mWriteData.writeDoubleThreeArrayData("BeforeFFT", "gyro", RegistNameInput.name, gyro_double, this);
+
+        if (mAmplifier.CheckValueRange(accel_double) || mAmplifier.CheckValueRange(gyro_double)) {
+            accel_double = mAmplifier.Apmlify(accel_double);
+            gyro_double = mAmplifier.Apmlify(gyro_double);
+            isAmplified = true;
+        }
 
         // フーリエ変換によるローパスフィルタ
         accel_double = mFourier.LowpassFilter(accel_double, "accel", this);

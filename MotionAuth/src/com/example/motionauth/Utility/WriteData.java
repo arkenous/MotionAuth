@@ -364,7 +364,7 @@ public class WriteData {
     }
 
 
-    public boolean writeRegistedData (String folderName, String userName, double[][] averageDistance, double[][] averageAngle, Context context) {
+    public boolean writeRegistedData (String folderName, String userName, double[][] averageDistance, double[][] averageAngle, boolean isAmplify, Context context) {
         try {
             Log.d(TAG, "--- writeRegistedData ---");
             String filePath = Environment.getExternalStorageDirectory() + File.separator + "MotionAuth" + File.separator + folderName + File.separator + userName;
@@ -378,29 +378,57 @@ public class WriteData {
 
             Log.d(TAG, "*** Preparing is finished ***");
 
-            for (int i = 0; i < 100; i++) {
-                bw.write("ave_distance_x@" + averageDistance[0][i] + "\n");
-                bw.flush();
+            if (isAmplify) {
+                for (int i = 0; i < 100; i++) {
+                    bw.write("ave_distance_x@" + averageDistance[0][i] + ":" + "true" + "\n");
+                    bw.flush();
+                }
+                for (int i = 0; i < 100; i++) {
+                    bw.write("ave_distance_y@" + averageDistance[1][i] + ":" + "true" + "\n");
+                    bw.flush();
+                }
+                for (int i = 0; i < 100; i++) {
+                    bw.write("ave_distance_z@" + averageDistance[2][i] + ":" + "true" + "\n");
+                    bw.flush();
+                }
+                for (int i = 0; i < 100; i++) {
+                    bw.write("ave_angle_x@" + averageAngle[0][i] + ":" + "true" + "\n");
+                    bw.flush();
+                }
+                for (int i = 0; i < 100; i++) {
+                    bw.write("ave_angle_y@" + averageAngle[1][i] + ":" + "true" + "\n");
+                    bw.flush();
+                }
+                for (int i = 0; i < 100; i++) {
+                    bw.write("ave_angle_z@" + averageAngle[2][i] + ":" + "true" + "\n");
+                    bw.flush();
+                }
             }
-            for (int i = 0; i < 100; i++) {
-                bw.write("ave_distance_y@" + averageDistance[1][i] + "\n");
-                bw.flush();
-            }
-            for (int i = 0; i < 100; i++) {
-                bw.write("ave_distance_z@" + averageDistance[2][i] + "\n");
-                bw.flush();
-            }
-            for (int i = 0; i < 100; i++) {
-                bw.write("ave_angle_x@" + averageAngle[0][i] + "\n");
-                bw.flush();
-            }
-            for (int i = 0; i < 100; i++) {
-                bw.write("ave_angle_y@" + averageAngle[1][i] + "\n");
-                bw.flush();
-            }
-            for (int i = 0; i < 100; i++) {
-                bw.write("ave_angle_z@" + averageAngle[2][i] + "\n");
-                bw.flush();
+            else {
+                for (int i = 0; i < 100; i++) {
+                    bw.write("ave_distance_x@" + averageDistance[0][i] + ":" + "false" + "\n");
+                    bw.flush();
+                }
+                for (int i = 0; i < 100; i++) {
+                    bw.write("ave_distance_y@" + averageDistance[1][i] + ":" + "false" + "\n");
+                    bw.flush();
+                }
+                for (int i = 0; i < 100; i++) {
+                    bw.write("ave_distance_z@" + averageDistance[2][i] + ":" + "false" + "\n");
+                    bw.flush();
+                }
+                for (int i = 0; i < 100; i++) {
+                    bw.write("ave_angle_x@" + averageAngle[0][i] + ":" + "false" + "\n");
+                    bw.flush();
+                }
+                for (int i = 0; i < 100; i++) {
+                    bw.write("ave_angle_y@" + averageAngle[1][i] + ":" + "false" + "\n");
+                    bw.flush();
+                }
+                for (int i = 0; i < 100; i++) {
+                    bw.write("ave_angle_z@" + averageAngle[2][i] + ":" + "false" + "\n");
+                    bw.flush();
+                }
             }
 
             bw.close();

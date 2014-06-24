@@ -304,8 +304,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
         mWriteData.writeDoubleThreeArrayData("BeforeFFT", "gyro", RegistNameInput.name, gyro_double, this);
 
         if (mAmplifier.CheckValueRange(accel_double) || mAmplifier.CheckValueRange(gyro_double)) {
-            accel_double = mAmplifier.Apmlify(accel_double);
-            gyro_double = mAmplifier.Apmlify(gyro_double);
+            accel_double = mAmplifier.Amplify(accel_double);
+            gyro_double = mAmplifier.Amplify(gyro_double);
             isAmplified = true;
         }
 

@@ -50,7 +50,7 @@ public class Amplifier {
      * @param data 増幅させるdouble型三次元配列データ
      * @return 増幅後のdouble型三次元配列データ
      */
-    public double[][][] Apmlify(double[][][] data) {
+    public double[][][] Amplify(double[][][] data) {
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < data[i].length; j++) {
                 for (int k = 0; k < data[i][j].length; k++) {

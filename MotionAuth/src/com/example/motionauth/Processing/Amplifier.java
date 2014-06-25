@@ -16,8 +16,16 @@ public class Amplifier {
      * @return 全試行回数中，一回でもデータの幅が閾値よりも小さければtrue，そうでなければfalse
      */
     public boolean CheckValueRange(double[][][] data) {
-        double[][] max = {};
-        double[][] min = {};
+        double[][] max = new double[data.length][data[0].length];
+        double[][] min = new double[data.length][data[0].length];
+
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[i].length; j++) {
+                max[i][j] = 0;
+                min[i][j] = 0;
+            }
+        }
+
         double range = 0;
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < data[i].length; j++) {

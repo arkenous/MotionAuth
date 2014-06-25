@@ -1,13 +1,17 @@
 package com.example.motionauth.Processing;
 
+import android.util.Log;
+
 /**
  * データの値を増幅させる
  *
  * @author Kensuke Kousaka
  */
 public class Amplifier {
-    private static final double CHECK_RANGE_VALUE = 5;
+    private static final double CHECK_RANGE_VALUE = 3;
     private static final double AMPLIFICATION_VALUE = 2;
+
+    private static final String TAG = Amplifier.class.getSimpleName();
 
 
     /**
@@ -43,6 +47,7 @@ public class Amplifier {
         for (int i = 0; i < max.length; i++) {
             for (int j = 0; j < max[i].length; j++) {
                 range = max[i][j] - min[i][j];
+                Log.e(TAG, "range = " + range);
                 if (range < CHECK_RANGE_VALUE) {
                     return true;
                 }

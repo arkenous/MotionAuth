@@ -341,12 +341,12 @@ public class RegistMotion extends Activity implements SensorEventListener {
             // 相関係数が0.4以下
             Toast.makeText(RegistMotion.this, "同一モーションですか？", Toast.LENGTH_SHORT).show();
             return false;
-        } else if (Enum.MEASURE.INCORRECT == measure || Enum.MEASURE.CORRECT == measure) {
+        } else if (Enum.MEASURE.INCORRECT == measure) {
             // 相関係数が0.4よりも高く，0.8以下の場合
             // ズレ修正を行う
             distance = CorrectDeviation.correctDeviation(distance);
             angle = CorrectDeviation.correctDeviation(angle);
-        } else if (Enum.MEASURE.PERFECT == measure) {
+        } else if (Enum.MEASURE.PERFECT == measure || Enum.MEASURE.CORRECT == measure) {
             // PERFECTなら，何もしない
         } else {
             // なにかがおかしい
@@ -377,6 +377,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
     private boolean soukan () {
         Log.d(TAG, "--- soukan ---");
         Enum.MEASURE measure = mCorrelation.measureCorrelation(this, distance, angle, averageDistance, averageAngle);
+
+        Log.d(TAG, "measure = " + measure);
 
         return measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT;
     }

@@ -321,9 +321,6 @@ public class RegistMotion extends Activity implements SensorEventListener {
         distance = mFormatter.doubleToDoubleFormatter(distance);
         angle = mFormatter.doubleToDoubleFormatter(angle);
 
-        mWriteData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatDistance", RegistNameInput.name, distance, RegistMotion.this);
-        mWriteData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatAngle", RegistNameInput.name, angle, RegistMotion.this);
-
         Log.d(TAG, "*** afterWriteData ***");
 
         // measureCorrelation用の平均値データを作成
@@ -358,6 +355,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
         }
         //endregion
 
+        mWriteData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatDistance", RegistNameInput.name, distance, RegistMotion.this);
+        mWriteData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatAngle", RegistNameInput.name, angle, RegistMotion.this);
 
         // ズレ修正後の平均値データを出す
         for (int i = 0; i < 3; i++) {

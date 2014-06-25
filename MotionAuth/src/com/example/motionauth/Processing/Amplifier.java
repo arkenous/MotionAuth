@@ -7,7 +7,7 @@ package com.example.motionauth.Processing;
  */
 public class Amplifier {
     private static final double CHECK_RANGE_VALUE = 5;
-    private static final double AMPLIFICATION_VALUE = 3;
+    private static final double AMPLIFICATION_VALUE = 2;
 
 
     /**
@@ -62,12 +62,7 @@ public class Amplifier {
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < data[i].length; j++) {
                 for (int k = 0; k < data[i][j].length; k++) {
-                    if (data[i][j][k] < 0) {
-                        data[i][j][k] -= AMPLIFICATION_VALUE;
-                    }
-                    else if (data[i][j][k] > 0) {
-                        data[i][j][k] += AMPLIFICATION_VALUE;
-                    }
+                    data[i][j][k] *= AMPLIFICATION_VALUE;
                 }
             }
         }
@@ -84,12 +79,7 @@ public class Amplifier {
     public double[][] Amplify (double[][] data) {
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < data[i].length; j++) {
-                if (data[i][j] < 0) {
-                    data[i][j] -= AMPLIFICATION_VALUE;
-                }
-                else if (data[i][j] > 0) {
-                    data[i][j] += AMPLIFICATION_VALUE;
-                }
+                data[i][j] *= AMPLIFICATION_VALUE;
             }
         }
 

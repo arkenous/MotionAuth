@@ -42,6 +42,8 @@ public class AuthNameInput extends Activity {
         setContentView(R.layout.activity_auth_name_input);
         current = this;
 
+        name = null;
+
         nameInput();
     }
 

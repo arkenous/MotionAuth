@@ -36,6 +36,8 @@ public class RegistNameInput extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_regist_name_input);
 
+        name = null;
+
         nameInput();
     }
 

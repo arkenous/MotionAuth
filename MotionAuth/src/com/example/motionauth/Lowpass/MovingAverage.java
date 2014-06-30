@@ -1,6 +1,7 @@
 package com.example.motionauth.Lowpass;
 
 import android.content.Context;
+import android.util.Log;
 import com.example.motionauth.Registration.RegistNameInput;
 import com.example.motionauth.Utility.WriteData;
 
@@ -10,6 +11,8 @@ import com.example.motionauth.Utility.WriteData;
  * @author Kensuke Kousaka
  */
 public class MovingAverage {
+    private static final String TAG = MovingAverage.class.getSimpleName();
+
     WriteData mWriteData = new WriteData();
 
     /**
@@ -22,6 +25,8 @@ public class MovingAverage {
     // 実験用にコメントアウト
 //    public double[][][] LowpassFilter (double[][][] data) {
     public void LowpassFilter (double[][][] data, String dataname, Context context) {
+        Log.v(TAG, "--- LowpassFilter ---");
+
         double outputData = 0.0;
 
         for (int i = 0; i < 3; i++) {
@@ -42,6 +47,8 @@ public class MovingAverage {
     }
 
     public double[][] LowpassFilter (double[][] data) {
+        Log.v(TAG, "--- LowpassFilter ---");
+
         double outputData = 0.0;
 
         for (int i = 0; i < 3; i++) {

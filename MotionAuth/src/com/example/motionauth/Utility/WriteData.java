@@ -26,6 +26,8 @@ public class WriteData {
      * @param context    実行するアクティビティのコンテキスト
      */
     public void writeFloatThreeArrayData (String folderName, String dataName, String userName, float[][][] data, Context context) {
+        Log.v(TAG, "--- writeFloatThreeArrayData ---");
+
         // SDカードのマウント確認
         String status = Environment.getExternalStorageState();
         if (!status.equals(Environment.MEDIA_MOUNTED)) {
@@ -99,6 +101,8 @@ public class WriteData {
      * @return 保存に成功したらtrue，失敗したらfalseを返す
      */
     public boolean writeDoubleOneArrayData (String folderName, String dataName, String userName, double[] data, Context context) {
+        Log.v(TAG, "--- writeDoubleOneArrayData ---");
+
         // SDカードのマウント確認
         String status = Environment.getExternalStorageState();
         if (!status.equals(Environment.MEDIA_MOUNTED)) {
@@ -160,6 +164,7 @@ public class WriteData {
      * @return 保存に成功したらtrue，失敗したらfalseを返す
      */
     public boolean writeDoubleTwoArrayData (String folderName, String dataName, String userName, double[][] data, Context context) {
+        Log.v(TAG, "--- writeDoubleTwoArrayData ---");
         // SDカードのマウント確認
         String status = Environment.getExternalStorageState();
         if (!status.equals(Environment.MEDIA_MOUNTED)) {
@@ -234,6 +239,8 @@ public class WriteData {
      * @param context    実行するアクティビティのコンテキスト
      */
     public void writeDoubleThreeArrayData (String folderName, String dataName, String userName, double[][][] data, Context context) {
+        Log.v(TAG, "--- writeDoubleThreeArrayData ---");
+
         // SDカードのマウント確認
         String status = Environment.getExternalStorageState();
         if (!status.equals(Environment.MEDIA_MOUNTED)) {
@@ -306,6 +313,8 @@ public class WriteData {
      * @param context    実行するアクティビティのコンテキスト
      */
     public void writeRData (String folderName, String dataName, String userName, double[][] data, Context context) {
+        Log.v(TAG, "--- writeRData ---");
+
         // SDカードのマウント確認
         String status = Environment.getExternalStorageState();
         if (!status.equals(Environment.MEDIA_MOUNTED)) {
@@ -365,6 +374,8 @@ public class WriteData {
 
 
     public boolean writeRegistedData (String folderName, String userName, double[][] averageDistance, double[][] averageAngle, boolean isAmplify, Context context) {
+        Log.v(TAG, "--- writeRegistedData ---");
+
         try {
             Log.d(TAG, "--- writeRegistedData ---");
             String filePath = Environment.getExternalStorageDirectory() + File.separator + "MotionAuth" + File.separator + folderName + File.separator + userName;

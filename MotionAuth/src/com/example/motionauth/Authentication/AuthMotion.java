@@ -10,17 +10,18 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.*;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
+import com.example.motionauth.Lowpass.Fourier;
 import com.example.motionauth.Processing.Amplifier;
 import com.example.motionauth.Processing.Calc;
 import com.example.motionauth.Processing.Correlation;
 import com.example.motionauth.Processing.Formatter;
-import com.example.motionauth.Lowpass.Fourier;
 import com.example.motionauth.R;
 import com.example.motionauth.Utility.Enum;
 
@@ -32,6 +33,8 @@ import java.io.*;
  * @author Kensuke Kousaka
  */
 public class AuthMotion extends Activity implements SensorEventListener {
+    private static final String TAG = AuthMotion.class.getSimpleName();
+
     private SensorManager mSensorManager;
     private Sensor mAccelerometerSensor;
     private Sensor mGyroscopeSensor;
@@ -82,6 +85,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.v(TAG, "--- onCreate ---");
+
         // タイトルバーの非表示
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_auth_motion);
@@ -94,6 +99,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
      * 認証画面にイベントリスナ等を設定する
      */
     private void authMotion () {
+        Log.v(TAG, "--- authMotion ---");
+
         // センササービス，各種センサを取得する
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -110,6 +117,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
 
         getMotionBtn.setOnClickListener(new OnClickListener() {
             public void onClick (View v) {
+                Log.i(TAG, "Click Get Motion Button");
                 if (!btnStatus) {
                     // ボタンを押したら，statusをfalseにして押せないようにする
                     btnStatus = true;
@@ -128,6 +136,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
 
     @Override
     public void onSensorChanged (SensorEvent event) {
+        Log.v(TAG, "--- onSensorChanged ---");
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             vAccel = event.values.clone();
         }
@@ -144,8 +153,12 @@ public class AuthMotion extends Activity implements SensorEventListener {
     Handler timeHandler = new Handler() {
         @Override
         public void dispatchMessage (Message msg) {
+            Log.v(TAG, "--- dispatchMessage ---");
             if (msg.what == TIMEOUT_MESSAGE && btnStatus) {
+                Log.i(TAG, "TIMEOUT_MESSAGE");
+
                 if (accelCount < 100 && gyroCount < 100) {
+                    Log.i(TAG, "Getting Motion Data");
                     // 取得した値を，0.03秒ごとに配列に入れる
                     for (int i = 0; i < 3; i++) {
                         accelFloat[i][accelCount] = vAccel[i];
@@ -173,6 +186,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
 
                     timeHandler.sendEmptyMessageDelayed(TIMEOUT_MESSAGE, INTERVAL);
                 } else if (accelCount >= 100 && gyroCount >= 100) {
+                    Log.i(TAG, "Complete Getting Motion Data");
                     // 取得完了
                     btnStatus = false;
                     getMotionBtn.setText("モーションデータ取得完了");
@@ -181,6 +195,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     calc();
 
                     if (!soukan()) {
+                        Log.i(TAG, "False Authentication");
                         AlertDialog.Builder alert = new AlertDialog.Builder(AuthMotion.this);
                         alert.setTitle("認証失敗です");
                         alert.setMessage("認証に失敗しました");
@@ -198,6 +213,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
                         });
                         alert.show();
                     } else {
+                        Log.i(TAG, "Success Authentication");
                         AlertDialog.Builder alert = new AlertDialog.Builder(AuthMotion.this);
                         alert.setTitle("認証成功");
                         alert.setMessage("認証に成功しました．\nスタート画面に戻ります．");
@@ -222,6 +238,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
      * RegistMotionにて登録したモーションの平均値データを読み込む
      */
     private void readRegistedData () {
+        Log.v(TAG, "--- readRegistedData ---");
         int readCount = 0;
 
         try {
@@ -311,11 +328,13 @@ public class AuthMotion extends Activity implements SensorEventListener {
      * データ加工・計算処理を行う
      */
     private void calc () {
+        Log.v(TAG, "--- calc ---");
         // 原データの桁揃え
         double[][] accel = mFormatter.floatToDoubleFormatter(accelFloat);
         double[][] gyro = mFormatter.floatToDoubleFormatter(gyroFloat);
 
         if (isAmplity) {
+            Log.i(TAG, "Amplify");
             accel = mAmplifier.Amplify(accel);
             gyro = mAmplifier.Amplify(gyro);
         }
@@ -333,6 +352,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
 
 
     private boolean soukan () {
+        Log.v(TAG, "--- soukan ---");
         Enum.MEASURE measure = mCorrelation.measureCorrelation(this, distance, angle, registed_ave_distance, registed_ave_angle);
 
         return measure == Enum.MEASURE.CORRECT;
@@ -341,6 +361,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
 
     @Override
     public void onAccuracyChanged (Sensor sensor, int accuracy) {
+        Log.v(TAG, "--- onAccuracyChanged ---");
 
     }
 
@@ -348,6 +369,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
     @Override
     protected void onResume () {
         super.onResume();
+        Log.v(TAG, "--- onResume ---");
 
         mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
         mSensorManager.registerListener(this, mGyroscopeSensor, SensorManager.SENSOR_DELAY_GAME);
@@ -357,6 +379,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
     @Override
     protected void onPause () {
         super.onPause();
+        Log.v(TAG, "--- onPause ---");
 
         mSensorManager.unregisterListener(this);
     }
@@ -370,6 +393,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
      * @param flg     戻るキーを押した際にこのアクティビティを表示させるかどうか
      */
     private void moveActivity (String pkgName, String actName, boolean flg) {
+        Log.v(TAG, "--- moveActivity ---");
         Intent intent = new Intent();
 
         intent.setClassName(pkgName, actName);

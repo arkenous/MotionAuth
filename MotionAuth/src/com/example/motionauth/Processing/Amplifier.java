@@ -20,6 +20,8 @@ public class Amplifier {
      * @return 全試行回数中，一回でもデータの幅が閾値よりも小さければtrue，そうでなければfalse
      */
     public boolean CheckValueRange(double[][][] data) {
+        Log.v(TAG, "--- CheckValueRange ---");
+
         double[][] max = new double[data.length][data[0].length];
         double[][] min = new double[data.length][data[0].length];
 
@@ -64,6 +66,8 @@ public class Amplifier {
      * @return 増幅後のdouble型三次元配列データ
      */
     public double[][][] Amplify(double[][][] data) {
+        Log.v(TAG, "--- Amplify ---");
+
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < data[i].length; j++) {
                 for (int k = 0; k < data[i][j].length; k++) {
@@ -82,6 +86,8 @@ public class Amplifier {
      * @return 増幅後のdouble型二次元配列データ
      */
     public double[][] Amplify (double[][] data) {
+        Log.v(TAG, "--- Amplify ---");
+
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < data[i].length; j++) {
                 data[i][j] *= AMPLIFICATION_VALUE;

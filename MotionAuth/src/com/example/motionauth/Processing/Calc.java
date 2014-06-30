@@ -1,6 +1,11 @@
 package com.example.motionauth.Processing;
 
+import android.util.Log;
+
 public class Calc {
+    private static final String TAG = Calc.class.getSimpleName();
+
+
     /**
      * 加速度データを距離データに変換する
      *
@@ -9,6 +14,8 @@ public class Calc {
      * @return 変換後の三次元距離データ
      */
     public double[][][] accelToDistance (double[][][] inputVal, double t) {
+        Log.v(TAG, "--- accelToDistance ---");
+
         double[][][] returnVal = new double[inputVal.length][inputVal[0].length][inputVal[0][0].length];
 
         for (int i = 0; i < inputVal.length; i++) {
@@ -31,6 +38,8 @@ public class Calc {
      * @return 変換後の三次元角度データ
      */
     public double[][][] gyroToAngle (double[][][] inputVal, double t) {
+        Log.v(TAG, "--- gyroToAngle ---");
+
         double[][][] returnVal = new double[inputVal.length][inputVal[0].length][inputVal[0][0].length];
 
         for (int i = 0; i < inputVal.length; i++) {
@@ -53,6 +62,8 @@ public class Calc {
      * @return 変換後の三次元距離データ
      */
     public double[][] accelToDistance (double[][] inputVal, double t) {
+        Log.v(TAG, "--- accelToDistance ---");
+
         double[][] returnVal = new double[inputVal.length][inputVal[0].length];
 
         for (int i = 0; i < inputVal.length; i++) {
@@ -73,6 +84,8 @@ public class Calc {
      * @return 変換後の三次元角度データ
      */
     public double[][] gyroToAngle (double[][] inputVal, double t) {
+        Log.v(TAG, "--- gyroToAngle ---");
+
         double[][] returnVal = new double[inputVal.length][inputVal[0].length];
 
         for (int i = 0; i < inputVal.length; i++) {

@@ -90,6 +90,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.v(TAG, "--- onCreate ---");
+
         // タイトルバーの非表示
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_regist_motion);
@@ -102,6 +104,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
      * モーション登録画面にイベントリスナ等を設定する
      */
     private void registMotion () {
+        Log.v(TAG, "--- registMotion ---");
+
         // センササービス，各種センサを取得する
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -118,6 +122,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
         getMotionBtn.setOnClickListener(new OnClickListener() {
             public void onClick (View v) {
+                Log.i(TAG, "Click Get Motion Button");
                 if (!btnStatus) {
                     // ボタンを押したら，statusをfalseにして押せないようにする
                     btnStatus = true;
@@ -136,6 +141,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
     @Override
     public void onSensorChanged (SensorEvent event) {
+        Log.i(TAG, "--- onSensorChanged ---");
+
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             vAccel = event.values.clone();
         }
@@ -152,6 +159,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
     private Handler timeHandler = new Handler() {
         @Override
         public void dispatchMessage (Message msg) {
+            Log.i(TAG, "--- dispatchMessage ---");
+
             if (msg.what == TIMEOUT_MESSAGE && btnStatus) {
                 if (accelCount < 100 && gyroCount < 100 && getCount >= 0 && getCount < 3) {
                     // 取得した値を，0.03秒ごとに配列に入れる
@@ -294,7 +303,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
      * データ加工，計算処理を行う
      */
     private boolean calc () {
-        Log.d(TAG, "--- calc ---");
+        Log.v(TAG, "--- calc ---");
         // データ加工，計算処理
         // データの桁揃え
         double[][][] accel_double = mFormatter.floatToDoubleFormatter(accelFloat);
@@ -375,7 +384,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
      * 相関係数を導出し，ユーザが入力した3回のモーションの類似性を確認する
      */
     private boolean soukan () {
-        Log.d(TAG, "--- soukan ---");
+        Log.v(TAG, "--- soukan ---");
         Enum.MEASURE measure = mCorrelation.measureCorrelation(this, distance, angle, averageDistance, averageAngle);
 
         Log.d(TAG, "measure = " + measure);
@@ -386,13 +395,15 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
     @Override
     public void onAccuracyChanged (Sensor sensor, int accuracy) {
-
+        Log.v(TAG, "--- onAccuracyChanged ---");
     }
 
 
     @Override
     protected void onResume () {
         super.onResume();
+
+        Log.v(TAG, "--- onResume ---");
 
         mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
         mSensorManager.registerListener(this, mGyroscopeSensor, SensorManager.SENSOR_DELAY_GAME);
@@ -402,6 +413,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
     @Override
     protected void onPause () {
         super.onPause();
+
+        Log.v(TAG, "--- onPause ---");
 
         mSensorManager.unregisterListener(this);
     }
@@ -419,7 +432,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
      * スタート画面に移動するメソッド
      */
     private void finishRegist () {
-        Log.d(TAG, "--- finishRegist ---");
+        Log.v(TAG, "--- finishRegist ---");
         Intent intent = new Intent();
 
         intent.setClassName("com.example.motionauth", "com.example.motionauth.Start");

@@ -1,5 +1,7 @@
 package com.example.motionauth.Processing;
 
+import android.util.Log;
+
 import java.util.Locale;
 
 
@@ -9,6 +11,9 @@ import java.util.Locale;
  * @author Kensuke Kousaka
  */
 public class Formatter {
+    private static final String TAG = Formatter.class.getSimpleName();
+
+
     /**
      * float型の数値データを小数点以下2桁に揃え，doubleに変換する
      *
@@ -16,6 +21,8 @@ public class Formatter {
      * @return 小数点以下2桁に揃え，double型に変換した数値データ
      */
     public static double floatToDoubleFormatter (float inputVal) {
+        Log.v(TAG, "--- floatToDoubleFormatter ---");
+
         double returnVal;
 
         String afterFormat = String.format(Locale.getDefault(), "%.2f", inputVal);
@@ -33,6 +40,8 @@ public class Formatter {
      * @return 小数点以下２桁に揃え，double型に変換した２次元数値データ
      */
     public double[][] floatToDoubleFormatter (float[][] inputVal) {
+        Log.v(TAG, "--- floatToDoubleFormatter ---");
+
         double[][] returnVal = new double[inputVal.length][inputVal[0].length];
 
         for (int i = 0; i < inputVal.length; i++) {
@@ -53,6 +62,8 @@ public class Formatter {
      * @return 小数点以下２桁に揃え，double型に変換した３次元数値データ
      */
     public double[][][] floatToDoubleFormatter (float[][][] inputVal) {
+        Log.v(TAG, "--- floatToDoubleFormatter ---");
+
         double[][][] returnVal = new double[inputVal.length][inputVal[0].length][inputVal[0][0].length];
 
         for (int i = 0; i < inputVal.length; i++) {
@@ -75,6 +86,8 @@ public class Formatter {
      * @return 小数点以下2桁に揃えたdouble型数値データ
      */
     public static double doubleToDoubleFormatter (double inputVal) {
+        Log.v(TAG, "--- doubleToDoubleFormatter ---");
+
         double returnVal;
 
         String afterFormat = String.format(Locale.getDefault(), "%.2f", inputVal);
@@ -91,6 +104,8 @@ public class Formatter {
      * @return 小数点以下二桁に揃えたdouble型二次元数値データ
      */
     public double[][] doubleToDoubleFormatter (double[][] inputVal) {
+        Log.v(TAG, "--- doubleToDoubleFormatter ---");
+
         double[][] returnVal = new double[inputVal.length][inputVal[0].length];
 
         for (int i = 0; i < inputVal.length; i++) {
@@ -111,6 +126,8 @@ public class Formatter {
      * @return 小数点以下２桁に揃えたdouble型３次元数値データ
      */
     public double[][][] doubleToDoubleFormatter (double[][][] inputVal) {
+        Log.v(TAG, "--- doubleToDoubleFormatter ---");
+
         double[][][] returnVal = new double[inputVal.length][inputVal[0].length][inputVal[0][0].length];
 
         for (int i = 0; i < inputVal.length; i++) {

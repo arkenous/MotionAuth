@@ -1,5 +1,7 @@
 package com.example.motionauth.Processing;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -10,6 +12,9 @@ import java.util.Collections;
  * @author Kensuke Kousaka
  */
 public class CorrectDeviation {
+    private static final String TAG = CorrectDeviation.class.getSimpleName();
+
+
     /**
      * 取得回数ごとのデータのズレを時間的なズレを修正する
      *
@@ -17,6 +22,8 @@ public class CorrectDeviation {
      * @return newData ズレ修正後のdouble型の3次元配列データ
      */
     public static double[][][] correctDeviation (double[][][] data) {
+        Log.v(TAG, "--- correctDeviation ---");
+
         double[][][] newData = new double[3][3][100];
 
         // 試行回ごとの最大値の出ている時間を抽出

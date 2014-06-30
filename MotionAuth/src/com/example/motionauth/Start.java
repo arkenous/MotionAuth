@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnKeyListener;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,6 +24,7 @@ import android.os.Handler;
  * @author Kensuke Kousaka
  */
 public class Start extends Activity {
+    private static final String TAG = Start.class.getSimpleName();
     private Handler handler;
 
     private final static int POSITIVE = 1;
@@ -37,6 +39,8 @@ public class Start extends Activity {
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.v(TAG, "--- onCreate ---");
+
         // タイトルバーの非表示
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_start);
@@ -49,22 +53,29 @@ public class Start extends Activity {
      * モード選択
      */
     private void selectMode () {
+        Log.v(TAG, "--- selectMode ---");
+
         Button startBtn = (Button) findViewById(R.id.start);
 
         startBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick (View v) {
+                Log.i(TAG, "Click Start Button");
+
                 String[] btnMsg = {"登録者一覧モード", "認証試験モード", "新規登録モード"};
                 alertDialog(TRIPLE, btnMsg, "モード選択", "モードを選択してください");
                 handler = new Handler() {
                     public void handleMessage (Message msg) {
                         if (msg.arg1 == POSITIVE) {
+                            Log.i(TAG, "POSITIVE");
                             // 登録者一覧モード
                             moveActivity("com.example.motionauth", "com.example.motionauth.ViewDataList.RegistrantList", true);
                         } else if (msg.arg1 == NEUTRAL) {
+                            Log.i(TAG, "NEUTRAL");
                             // 認証試験モード
                             moveActivity("com.example.motionauth", "com.example.motionauth.Authentication.AuthNameInput", true);
                         } else if (msg.arg1 == NEGATIVE) {
+                            Log.i(TAG, "NEGATIVE");
                             // 新規登録モード
                             moveActivity("com.example.motionauth", "com.example.motionauth.Registration.RegistNameInput", true);
                         }
@@ -84,7 +95,11 @@ public class Start extends Activity {
      * @param msg       ダイアログの説明
      */
     private void alertDialog (int choiceNum, String[] btnMsg, String title, String msg) {
+        Log.v(TAG, "--- alertDialog ---");
+
         if (choiceNum == DOUBLE) {
+            Log.i(TAG, "DOUBLE");
+
             AlertDialog.Builder alert = new AlertDialog.Builder(this);
             alert.setOnKeyListener(new OnKeyListener() {
                 public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {
@@ -129,6 +144,8 @@ public class Start extends Activity {
             // ダイアログを表示する
             alert.show();
         } else if (choiceNum == TRIPLE) {
+            Log.i(TAG, "TRIPLE");
+
             AlertDialog.Builder alert = new AlertDialog.Builder(this);
             alert.setOnKeyListener(new OnKeyListener() {
                 public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {
@@ -193,6 +210,8 @@ public class Start extends Activity {
      * @param flg     戻るキーを押した際にこのアクティビティを表示させるかどうか
      */
     private void moveActivity (String pkgName, String actName, boolean flg) {
+        Log.v(TAG, "--- moveActivity ---");
+
         Intent intent = new Intent();
 
         intent.setClassName(pkgName, actName);

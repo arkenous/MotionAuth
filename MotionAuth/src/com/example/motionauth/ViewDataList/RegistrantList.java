@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
@@ -23,18 +24,20 @@ import java.io.File;
  * ユーザ名が選択されたら，そのユーザのデータをViewRegistedDataアクティビティにて表示する
  */
 public class RegistrantList extends Activity {
+    private static final String TAG = RegistrantList.class.getSimpleName();
+
     // ファイル名を格納するためのリスト
     // List<String> fileName = null;
     String[] fileNameStr = null;
 
     String item;
 
-    private static final String TAG = "RegistrantList";
-
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.v(TAG, "--- onCreate ---");
 
         // タイトルバーの非表示
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -49,6 +52,8 @@ public class RegistrantList extends Activity {
      * ユーザ名が選択されたら，そのユーザ名をViewRegistedDataに送る
      */
     private void registrantList () {
+        Log.v(TAG, "--- registrantList ---");
+
         // 登録されているユーザ名のリストを作成する
         fileNameStr = getRegistrantName();
 
@@ -84,6 +89,8 @@ public class RegistrantList extends Activity {
         lv.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick (AdapterView<?> parent, View v, int position, long id) {
+                Log.i(TAG, "Click Item");
+
                 // クリックされたアイテムを取得
                 item = lv.getItemAtPosition(position).toString();
 
@@ -101,6 +108,8 @@ public class RegistrantList extends Activity {
      * @return 作成されたString配列型のリスト
      */
     private String[] getRegistrantName () {
+        Log.v(TAG, "--- getRegistrantName ---");
+
         try {
             // 専用ディレクトリを指定
             String dirPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + "MotionAuth";
@@ -131,6 +140,8 @@ public class RegistrantList extends Activity {
      * @param flg     戻るキーを押した際にこのアクティビティを表示させるかどうか
      */
     private void moveActivity (String pkgName, String actName, boolean flg) {
+        Log.v(TAG, "--- moveActivity ---");
+
         Intent intent = new Intent();
 
         intent.setClassName(pkgName, actName);

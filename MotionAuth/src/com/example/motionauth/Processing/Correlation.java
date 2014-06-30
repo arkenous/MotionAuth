@@ -1,6 +1,7 @@
 package com.example.motionauth.Processing;
 
 import android.content.Context;
+import android.util.Log;
 import com.example.motionauth.Registration.RegistNameInput;
 import com.example.motionauth.Utility.Enum;
 import com.example.motionauth.Utility.WriteData;
@@ -12,6 +13,7 @@ import com.example.motionauth.Utility.WriteData;
  * @author Kensuke Kousaka
  */
 public class Correlation {
+    private static final String TAG = Correlation.class.getSimpleName();
     private WriteData mWriteData = new WriteData();
     private Enum mEnum = new Enum();
 
@@ -26,6 +28,8 @@ public class Correlation {
      * @return EnumクラスのMEASURE列挙体の値が返る
      */
     public Enum.MEASURE measureCorrelation (Context context, double[][][] distance, double[][][] angle, double[][] ave_distance, double[][] ave_angle) {
+        Log.v(TAG, "--- measureCorrelation ---");
+
         // 相関係数の計算
 
         // Calculate of Average A
@@ -237,6 +241,8 @@ public class Correlation {
      * @return EnumクラスのMEASURE列挙体の値が返る
      */
     public Enum.MEASURE measureCorrelation (Context context, double[][] distance, double[][] angle, double[][] ave_distance, double[][] ave_angle) {
+        Log.v(TAG, "--- measureCorrelation ---");
+
         //region Calculate of Average A
         float[] sample_accel = new float[3];
         float[] sample_gyro = new float[3];

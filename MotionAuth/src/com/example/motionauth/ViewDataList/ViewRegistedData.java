@@ -1,23 +1,18 @@
 package com.example.motionauth.ViewDataList;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-
-import android.os.Bundle;
-import android.os.Environment;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.Menu;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.example.motionauth.R;
+
+import java.io.*;
+import java.util.ArrayList;
 
 
 /**
@@ -26,12 +21,14 @@ import com.example.motionauth.R;
 public class ViewRegistedData extends Activity {
     String item = null;
 
-    private static final String TAG = "ViewRegistedData";
+    private static final String TAG = ViewRegistedData.class.getSimpleName();
 
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.v(TAG, "--- onCreate ---");
 
         // タイトルバーの非表示
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -45,6 +42,8 @@ public class ViewRegistedData extends Activity {
      * ユーザのデータをリスト表示する
      */
     private void viewRegistedData () {
+        Log.v(TAG, "--- viewRegistedData ---");
+
         // RegistrantListから渡されたユーザ名を受け取る
         Intent intent = getIntent();
         item = intent.getStringExtra("item");
@@ -71,6 +70,7 @@ public class ViewRegistedData extends Activity {
      * @return 取得したデータ
      */
     private ArrayList<String> readData () {
+        Log.v(TAG, "--- readData ---");
         ArrayList<String> dataList = new ArrayList<String>();
 
         String filePath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + "MotionAuth" + File.separator + item;

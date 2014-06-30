@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
@@ -28,6 +29,7 @@ import java.io.File;
  * @author Kensuke Kousaka
  */
 public class AuthNameInput extends Activity {
+    private static final String TAG = AuthNameInput.class.getSimpleName();
     // ユーザが入力した文字列（名前）を格納する
     public static String name;
     private Context current;
@@ -36,6 +38,8 @@ public class AuthNameInput extends Activity {
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.v(TAG, "--- onCreate ---");
 
         // タイトルバーの非表示
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -52,6 +56,7 @@ public class AuthNameInput extends Activity {
      * ユーザ名を入力させる
      */
     private void nameInput () {
+        Log.v(TAG, "--- nameInput ---");
         final EditText nameInput = (EditText) findViewById(R.id.nameInputEditText);
 
         nameInput.addTextChangedListener(new TextWatcher() {
@@ -69,7 +74,9 @@ public class AuthNameInput extends Activity {
 
             // 変更後
             public void afterTextChanged (Editable s) {
-                name = nameInput.getText().toString();
+                if (nameInput.getText() != null) {
+                    name = nameInput.getText().toString();
+                }
             }
         });
 
@@ -77,6 +84,7 @@ public class AuthNameInput extends Activity {
         nameInput.setOnKeyListener(new OnKeyListener() {
             public boolean onKey (View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                    Log.i(TAG, "Push Enter Key");
                     InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
@@ -91,10 +99,14 @@ public class AuthNameInput extends Activity {
 
         ok.setOnClickListener(new OnClickListener() {
             public void onClick (View v) {
+                Log.i(TAG, "Click OK Button");
+
                 // 指定したユーザが存在するかどうかを確認する
                 if (checkFileExists()) {
+                    Log.i(TAG, "User is Existed");
                     moveActivity("com.example.motionauth", "com.example.motionauth.Authentication.AuthMotion", true);
                 } else {
+                    Log.i(TAG, "User is not Existed");
                     Toast.makeText(current, "ユーザが登録されていません", Toast.LENGTH_LONG).show();
                 }
             }
@@ -108,6 +120,7 @@ public class AuthNameInput extends Activity {
      * @return 登録したことがあるユーザであればtrue，登録したことがなければfalse
      */
     private boolean checkFileExists () {
+        Log.v(TAG, "--- checkFileExists ---");
         String folderPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + "MotionAuth" + File.separator + name;
         File file = new File(folderPath);
 
@@ -123,6 +136,7 @@ public class AuthNameInput extends Activity {
      * @param flg     戻るキーを押した際にこのアクティビティを表示させるかどうか
      */
     private void moveActivity (String pkgName, String actName, boolean flg) {
+        Log.v(TAG, "--- moveActivity ---");
         Intent intent = new Intent();
 
         intent.setClassName(pkgName, actName);

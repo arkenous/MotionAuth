@@ -131,7 +131,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     // ボタンをクリックできないようにする
                     v.setClickable(false);
 
-                    getMotionBtn.setText("取得中");
+                    getMotionBtn.setText("インターバル中");
                     countSecondTv.setText("秒");
                     timeHandler.sendEmptyMessage(PREPARATION);
                 }
@@ -181,6 +181,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     secondTv.setText("START");
                     mVibrator.vibrate(VIBRATOR_LONG);
                     timeHandler.sendEmptyMessage(GET_MOTION);
+                    getMotionBtn.setText("取得中");
                 }
 
                 prepareCount++;
@@ -221,7 +222,7 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     Log.i(TAG, "Complete Getting Motion Data");
                     // 取得完了
                     btnStatus = false;
-                    getMotionBtn.setText("モーションデータ取得完了");
+                    getMotionBtn.setText("認証処理中");
 
                     prepareCount = 0;
 

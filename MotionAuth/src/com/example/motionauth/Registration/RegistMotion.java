@@ -39,7 +39,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
     private static final int VIBRATOR_SHORT  = 40;
     private static final int VIBRATOR_NORMAL = 50;
-    private static final int VIBRATOR_LONG   = 60;
+    private static final int VIBRATOR_LONG   = 80;
 
     private static final int PREPARATION = 1;
     private static final int GET_MOTION  = 2;
@@ -134,7 +134,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
                     // ボタンをクリックできないようにする
                     v.setClickable(false);
 
-                    getMotionBtn.setText("取得中");
+                    getMotionBtn.setText("インターバル中");
                     countSecondTv.setText("秒");
                     timeHandler.sendEmptyMessage(PREPARATION);
                 }
@@ -145,8 +145,6 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
     @Override
     public void onSensorChanged (SensorEvent event) {
-        Log.i(TAG, "--- onSensorChanged ---");
-
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             vAccel = event.values.clone();
         }
@@ -186,6 +184,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
                     secondTv.setText("START");
                     mVibrator.vibrate(VIBRATOR_LONG);
                     timeHandler.sendEmptyMessage(GET_MOTION);
+                    getMotionBtn.setText("取得中");
                 }
 
                 prepareCount++;
@@ -254,6 +253,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
                             getMotionBtn.setClickable(false);
                         }
                         secondTv.setText("0");
+                        getMotionBtn.setText("データ処理中");
 
                         mWriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accelFloat, RegistMotion.this);
                         mWriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyroFloat, RegistMotion.this);

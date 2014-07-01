@@ -41,7 +41,7 @@ public class RegistNameInput extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_regist_name_input);
 
-        name = null;
+        name = "";
 
         nameInput();
     }
@@ -71,7 +71,9 @@ public class RegistNameInput extends Activity {
             // 変更後
             public void afterTextChanged (Editable s) {
                 // ユーザの入力した名前をnameに格納
-                name = nameInput.getText().toString();
+                if (nameInput.getText() != null) {
+                    name = nameInput.getText().toString();
+                }
 
             }
         });
@@ -96,7 +98,7 @@ public class RegistNameInput extends Activity {
             public void onClick (View v) {
                 Log.i(TAG, "Click OK Button");
                 // nameが入力されているかの確認
-                if (name.isEmpty()) {
+                if (name.length() == 0) {
                     Toast.makeText(RegistNameInput.this, "名前が入力されていません", Toast.LENGTH_LONG).show();
                 }
                 else {

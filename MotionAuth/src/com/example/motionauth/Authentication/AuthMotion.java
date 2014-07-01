@@ -35,55 +35,56 @@ import java.io.*;
 public class AuthMotion extends Activity implements SensorEventListener {
     private static final String TAG = AuthMotion.class.getSimpleName();
 
+    private static final int VIBRATOR_SHORT  = 40;
+    private static final int VIBRATOR_NORMAL = 50;
+    private static final int VIBRATOR_LONG   = 60;
+
+    private static final int PREPARATION = 1;
+    private static final int GET_MOTION  = 2;
+
+    private static final int PREPARATION_INTERVAL = 1000;
+    private static final int GET_MOTION_INTERVAL  = 30;
+
     private SensorManager mSensorManager;
-    private Sensor mAccelerometerSensor;
-    private Sensor mGyroscopeSensor;
+    private Sensor        mAccelerometerSensor;
+    private Sensor        mGyroscopeSensor;
 
     private Vibrator mVibrator;
-    private static final int VIBRATOR_SHORT = 40;
-    private static final int VIBRATOR_NORMAL = 50;
-    private static final int VIBRATOR_LONG = 60;
 
-    private Fourier mFourier = new Fourier();
-    private Formatter mFormatter = new Formatter();
-    private Calc mCalc = new Calc();
+    private TextView secondTv;
+    private TextView countSecondTv;
+    private Button   getMotionBtn;
+
+    private Fourier     mFourier     = new Fourier();
+    private Formatter   mFormatter   = new Formatter();
+    private Calc        mCalc        = new Calc();
     private Correlation mCorrelation = new Correlation();
-    private Amplifier mAmplifier = new Amplifier();
+    private Amplifier   mAmplifier   = new Amplifier();
+
+    // データ取得カウント用
+    private int accelCount = 0;
+    private int gyroCount  = 0;
+
+    private int prepareCount = 0;
+
+    private boolean btnStatus = false;
+
+    private boolean isAmplity = false;
 
     // モーションの生データ
     private float[] vAccel;
     private float[] vGyro;
 
-    private boolean btnStatus = false;
-
-    private static final int PREPARATION = 1;
-    private static final int GET_MOTION = 2;
-
-    private static final int PREPARATION_INTERVAL = 1000;
-    private static final int GET_MOTION_INTERVAL = 30;
-
-    // データ取得カウント用
-    private int accelCount = 0;
-    private int gyroCount = 0;
-
-    private int prepareCount = 0;
-
     private float[][] accelFloat = new float[3][100];
-    private float[][] gyroFloat = new float[3][100];
+    private float[][] gyroFloat  = new float[3][100];
 
     // 移動平均後のデータを格納する配列
     private double[][] distance = new double[3][100];
-    private double[][] angle = new double[3][100];
+    private double[][] angle    = new double[3][100];
 
     // RegistMotionにて登録された平均データ
     private double[][] registed_ave_distance = new double[3][100];
-    private double[][] registed_ave_angle = new double[3][100];
-
-    private boolean isAmplity = false;
-
-    TextView secondTv;
-    TextView countSecondTv;
-    Button getMotionBtn;
+    private double[][] registed_ave_angle    = new double[3][100];
 
 
     @Override
@@ -215,7 +216,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     }
 
                     timeHandler.sendEmptyMessageDelayed(GET_MOTION, GET_MOTION_INTERVAL);
-                } else if (accelCount >= 100 && gyroCount >= 100) {
+                }
+                else if (accelCount >= 100 && gyroCount >= 100) {
                     Log.i(TAG, "Complete Getting Motion Data");
                     // 取得完了
                     btnStatus = false;
@@ -244,7 +246,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
                             }
                         });
                         alert.show();
-                    } else {
+                    }
+                    else {
                         Log.i(TAG, "Success Authentication");
                         AlertDialog.Builder alert = new AlertDialog.Builder(AuthMotion.this);
                         alert.setTitle("認証成功");
@@ -259,7 +262,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
                         alert.show();
                     }
                 }
-            } else {
+            }
+            else {
                 super.dispatchMessage(msg);
             }
         }
@@ -305,7 +309,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     registed_ave_distance[1][readCount] = Double.valueOf(checkedSplitData[1]);
                     if (readCount == 99) {
                         readCount = 0;
-                    } else {
+                    }
+                    else {
                         readCount++;
                     }
                 }
@@ -314,7 +319,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     registed_ave_distance[2][readCount] = Double.valueOf(checkedSplitData[1]);
                     if (readCount == 99) {
                         readCount = 0;
-                    } else {
+                    }
+                    else {
                         readCount++;
                     }
                 }
@@ -323,7 +329,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     registed_ave_angle[0][readCount] = Double.valueOf(checkedSplitData[1]);
                     if (readCount == 99) {
                         readCount = 0;
-                    } else {
+                    }
+                    else {
                         readCount++;
                     }
                 }
@@ -332,7 +339,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     registed_ave_angle[1][readCount] = Double.valueOf(checkedSplitData[1]);
                     if (readCount == 99) {
                         readCount = 0;
-                    } else {
+                    }
+                    else {
                         readCount++;
                     }
                 }
@@ -341,7 +349,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
                     registed_ave_angle[2][readCount] = Double.valueOf(checkedSplitData[1]);
                     if (readCount == 99) {
                         readCount = 0;
-                    } else {
+                    }
+                    else {
                         readCount++;
                     }
                 }
@@ -350,7 +359,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
             br.close();
             isr.close();
             fis.close();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
     }

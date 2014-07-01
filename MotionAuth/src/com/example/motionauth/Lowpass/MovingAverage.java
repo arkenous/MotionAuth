@@ -13,7 +13,7 @@ import com.example.motionauth.Utility.WriteData;
 public class MovingAverage {
     private static final String TAG = MovingAverage.class.getSimpleName();
 
-    WriteData mWriteData = new WriteData();
+    private WriteData mWriteData = new WriteData();
 
     /**
      * Double型3次元配列データを受け取り，移動平均を用いて平滑化し，

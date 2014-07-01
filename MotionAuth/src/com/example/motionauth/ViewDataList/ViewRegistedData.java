@@ -19,9 +19,9 @@ import java.util.ArrayList;
  * RegistrantListより渡されたユーザ名を元に，そのユーザのデータを表示する
  */
 public class ViewRegistedData extends Activity {
-    String item = null;
-
     private static final String TAG = ViewRegistedData.class.getSimpleName();
+
+    String item = null;
 
 
     @Override
@@ -91,11 +91,14 @@ public class ViewRegistedData extends Activity {
             fis.close();
 
             return dataList;
-        } catch (FileNotFoundException e) {
+        }
+        catch (FileNotFoundException e) {
             return null;
-        } catch (UnsupportedEncodingException e) {
+        }
+        catch (UnsupportedEncodingException e) {
             return null;
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             return null;
         }
     }

@@ -14,8 +14,9 @@ import com.example.motionauth.Utility.WriteData;
  */
 public class Correlation {
     private static final String TAG = Correlation.class.getSimpleName();
+
     private WriteData mWriteData = new WriteData();
-    private Enum mEnum = new Enum();
+    private Enum      mEnum      = new Enum();
 
     /**
      * 相関を求め，同一のモーションであるかどうかを確認する
@@ -167,21 +168,26 @@ public class Correlation {
                                                                             else {
                                                                                 return Enum.MEASURE.CORRECT;
                                                                             }
-                                                                        } else {
+                                                                        }
+                                                                        else {
                                                                             return Enum.MEASURE.CORRECT;
                                                                         }
 
-                                                                    } else {
+                                                                    }
+                                                                    else {
                                                                         return Enum.MEASURE.CORRECT;
                                                                     }
 
-                                                                } else {
+                                                                }
+                                                                else {
                                                                     return Enum.MEASURE.CORRECT;
                                                                 }
-                                                            } else {
+                                                            }
+                                                            else {
                                                                 return Enum.MEASURE.CORRECT;
                                                             }
-                                                        } else {
+                                                        }
+                                                        else {
                                                             return Enum.MEASURE.CORRECT;
                                                         }
 
@@ -190,21 +196,26 @@ public class Correlation {
                                                     else {
                                                         return Enum.MEASURE.INCORRECT;
                                                     }
-                                                } else {
+                                                }
+                                                else {
                                                     return Enum.MEASURE.INCORRECT;
                                                 }
 
-                                            } else {
+                                            }
+                                            else {
                                                 return Enum.MEASURE.INCORRECT;
                                             }
 
-                                        } else {
+                                        }
+                                        else {
                                             return Enum.MEASURE.INCORRECT;
                                         }
-                                    } else {
+                                    }
+                                    else {
                                         return Enum.MEASURE.INCORRECT;
                                     }
-                                } else {
+                                }
+                                else {
                                     return Enum.MEASURE.INCORRECT;
                                 }
                             }
@@ -212,19 +223,24 @@ public class Correlation {
                             else {
                                 return Enum.MEASURE.BAD;
                             }
-                        } else {
+                        }
+                        else {
                             return Enum.MEASURE.BAD;
                         }
-                    } else {
+                    }
+                    else {
                         return Enum.MEASURE.BAD;
                     }
-                } else {
+                }
+                else {
                     return Enum.MEASURE.BAD;
                 }
-            } else {
+            }
+            else {
                 return Enum.MEASURE.BAD;
             }
-        } else {
+        }
+        else {
             return Enum.MEASURE.BAD;
         }
     }
@@ -233,11 +249,11 @@ public class Correlation {
     /**
      * 相関を求め，同一のモーションであるかどうかを確認する
      *
-     * @param context       呼び出し元のcontext
-     * @param distance      double型の二次元配列距離データ
-     * @param angle         double型の二次元配列角度データ
-     * @param ave_distance  double型の二次元配列距離データ
-     * @param ave_angle     double型の虹連配列角度データ
+     * @param context      呼び出し元のcontext
+     * @param distance     double型の二次元配列距離データ
+     * @param angle        double型の二次元配列角度データ
+     * @param ave_distance double型の二次元配列距離データ
+     * @param ave_angle    double型の虹連配列角度データ
      * @return EnumクラスのMEASURE列挙体の値が返る
      */
     public Enum.MEASURE measureCorrelation (Context context, double[][] distance, double[][] angle, double[][] ave_distance, double[][] ave_angle) {
@@ -332,22 +348,28 @@ public class Correlation {
                         if (R_gyro[1] > 0.5) {
                             if (R_gyro[2] > 0.5) {
                                 return Enum.MEASURE.CORRECT;
-                            } else {
+                            }
+                            else {
                                 return Enum.MEASURE.INCORRECT;
                             }
-                        } else {
+                        }
+                        else {
                             return Enum.MEASURE.INCORRECT;
                         }
-                    } else {
+                    }
+                    else {
                         return Enum.MEASURE.INCORRECT;
                     }
-                } else {
+                }
+                else {
                     return Enum.MEASURE.INCORRECT;
                 }
-            } else {
+            }
+            else {
                 return Enum.MEASURE.INCORRECT;
             }
-        } else {
+        }
+        else {
             return Enum.MEASURE.INCORRECT;
         }
         //endregion

@@ -67,7 +67,8 @@ public class RegistrantList extends Activity {
             for (int i = 0; i < fileNameStr.length; i++) {
                 adapter.add(fileNameStr[i]);
             }
-        } catch (NullPointerException e) {
+        }
+        catch (NullPointerException e) {
             AlertDialog.Builder alert = new AlertDialog.Builder(RegistrantList.this);
             alert.setTitle("エラー");
             alert.setMessage("登録されていないユーザです．\nスタート画面に戻ります．");
@@ -126,7 +127,8 @@ public class RegistrantList extends Activity {
 
             return str_items;
 
-        } catch (NullPointerException e) {
+        }
+        catch (NullPointerException e) {
             return null;
         }
     }

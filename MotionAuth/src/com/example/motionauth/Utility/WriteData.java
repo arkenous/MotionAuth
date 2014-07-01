@@ -48,7 +48,8 @@ public class WriteData {
                 // フォルダがない場合
                 file.mkdirs();
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Toast.makeText(context, "makeFolderException", Toast.LENGTH_SHORT).show();
             Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
             e.printStackTrace();
@@ -63,9 +64,11 @@ public class WriteData {
                 for (int j = 0; j < data[i].length; j++) {
                     if (j == 0) {
                         dimension = "x";
-                    } else if (j == 1) {
+                    }
+                    else if (j == 1) {
                         dimension = "y";
-                    } else if (j == 2) {
+                    }
+                    else if (j == 2) {
                         dimension = "z";
                     }
 
@@ -84,7 +87,8 @@ public class WriteData {
                     bw.close();
                 }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
         }
     }
@@ -124,7 +128,8 @@ public class WriteData {
                 // フォルダがない場合
                 file.mkdirs();
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Toast.makeText(context, "makeFolderException", Toast.LENGTH_SHORT).show();
             Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
             e.printStackTrace();
@@ -145,7 +150,8 @@ public class WriteData {
                 bw.write(dataName + "@" + data[i] + "\n");
             }
             bw.close();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -186,7 +192,8 @@ public class WriteData {
                 // フォルダがない場合
                 file.mkdirs();
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Toast.makeText(context, "makeFolderException", Toast.LENGTH_SHORT).show();
             Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
             e.printStackTrace();
@@ -200,9 +207,11 @@ public class WriteData {
             for (int i = 0; i < data.length; i++) {
                 if (i == 0) {
                     dimension = "x";
-                } else if (i == 1) {
+                }
+                else if (i == 1) {
                     dimension = "y";
-                } else if (i == 2) {
+                }
+                else if (i == 2) {
                     dimension = "z";
                 }
 
@@ -220,7 +229,8 @@ public class WriteData {
                 }
                 bw.close();
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
             Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
             return false;
@@ -261,7 +271,8 @@ public class WriteData {
                 // フォルダがない場合
                 file.mkdirs();
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Toast.makeText(context, "makeFolderException", Toast.LENGTH_SHORT).show();
         }
 
@@ -273,9 +284,11 @@ public class WriteData {
                 for (int j = 0; j < data[i].length; j++) {
                     if (j == 0) {
                         dimension = "x";
-                    } else if (j == 1) {
+                    }
+                    else if (j == 1) {
                         dimension = "y";
-                    } else if (j == 2) {
+                    }
+                    else if (j == 2) {
                         dimension = "z";
                     }
 
@@ -297,7 +310,8 @@ public class WriteData {
                     fos.close();
                 }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Toast.makeText(context, "ErrorWhileWriting", Toast.LENGTH_SHORT).show();
         }
     }
@@ -335,7 +349,8 @@ public class WriteData {
                 // フォルダがない場合
                 file.mkdirs();
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Toast.makeText(context, "makeFolderException", Toast.LENGTH_SHORT).show();
         }
 
@@ -348,9 +363,11 @@ public class WriteData {
                 for (int j = 0; j < data[i].length; j++) {
                     if (j == 0) {
                         dimension = "x";
-                    } else if (j == 1) {
+                    }
+                    else if (j == 1) {
                         dimension = "y";
-                    } else if (j == 2) {
+                    }
+                    else if (j == 2) {
                         dimension = "z";
                     }
 
@@ -367,7 +384,8 @@ public class WriteData {
                     bw.close();
                 }
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
         }
     }
@@ -446,7 +464,8 @@ public class WriteData {
             fos.close();
 
             return true;
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
             return false;
         }

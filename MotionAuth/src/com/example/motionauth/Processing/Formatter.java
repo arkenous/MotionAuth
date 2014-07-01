@@ -100,6 +100,7 @@ public class Formatter {
 
     /**
      * double型の二次元数値データを小数点以下二桁に揃える
+     *
      * @param inputVal double型の二次元配列データ
      * @return 小数点以下二桁に揃えたdouble型二次元数値データ
      */

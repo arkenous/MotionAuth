@@ -8,18 +8,19 @@ import android.util.Log;
  * @author Kensuke Kousaka
  */
 public class Amplifier {
-    private static final double CHECK_RANGE_VALUE = 3;
-    private static final double AMPLIFICATION_VALUE = 2;
-
     private static final String TAG = Amplifier.class.getSimpleName();
+
+    private static final double CHECK_RANGE_VALUE   = 3;
+    private static final double AMPLIFICATION_VALUE = 2;
 
 
     /**
      * 全試行回数中，一回でもデータの幅が閾値よりも小さければtrueを返す
+     *
      * @param data チェックするdouble型三次元配列データ
      * @return 全試行回数中，一回でもデータの幅が閾値よりも小さければtrue，そうでなければfalse
      */
-    public boolean CheckValueRange(double[][][] data) {
+    public boolean CheckValueRange (double[][][] data) {
         Log.v(TAG, "--- CheckValueRange ---");
 
         double[][] max = new double[data.length][data[0].length];
@@ -62,10 +63,11 @@ public class Amplifier {
 
     /**
      * 与えられたデータをAMPLIFICATION_VALUEで指定した値だけ増幅させる
+     *
      * @param data 増幅させるdouble型三次元配列データ
      * @return 増幅後のdouble型三次元配列データ
      */
-    public double[][][] Amplify(double[][][] data) {
+    public double[][][] Amplify (double[][][] data) {
         Log.v(TAG, "--- Amplify ---");
 
         for (int i = 0; i < data.length; i++) {
@@ -82,6 +84,7 @@ public class Amplifier {
 
     /**
      * 与えられたデータをAMPLIFICATION_VALUEで指定した値だけ増幅させる
+     *
      * @param data 増幅させるdouble型二次元配列データ
      * @return 増幅後のdouble型二次元配列データ
      */

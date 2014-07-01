@@ -1,20 +1,20 @@
 
 package com.example.motionauth;
 
-import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.DialogInterface.OnKeyListener;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
-import android.os.Message;
-import android.os.Handler;
 
 
 /**
@@ -25,15 +25,15 @@ import android.os.Handler;
  */
 public class Start extends Activity {
     private static final String TAG = Start.class.getSimpleName();
-    private Handler handler;
 
     private final static int POSITIVE = 1;
-    private final static int NEUTRAL = 2;
+    private final static int NEUTRAL  = 2;
     private final static int NEGATIVE = 3;
 
     private final static int DOUBLE = 2;
     private final static int TRIPLE = 3;
 
+    private Handler handler;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -70,11 +70,13 @@ public class Start extends Activity {
                             Log.i(TAG, "POSITIVE");
                             // 登録者一覧モード
                             moveActivity("com.example.motionauth", "com.example.motionauth.ViewDataList.RegistrantList", true);
-                        } else if (msg.arg1 == NEUTRAL) {
+                        }
+                        else if (msg.arg1 == NEUTRAL) {
                             Log.i(TAG, "NEUTRAL");
                             // 認証試験モード
                             moveActivity("com.example.motionauth", "com.example.motionauth.Authentication.AuthNameInput", true);
-                        } else if (msg.arg1 == NEGATIVE) {
+                        }
+                        else if (msg.arg1 == NEGATIVE) {
                             Log.i(TAG, "NEGATIVE");
                             // 新規登録モード
                             moveActivity("com.example.motionauth", "com.example.motionauth.Registration.RegistNameInput", true);
@@ -143,7 +145,8 @@ public class Start extends Activity {
 
             // ダイアログを表示する
             alert.show();
-        } else if (choiceNum == TRIPLE) {
+        }
+        else if (choiceNum == TRIPLE) {
             Log.i(TAG, "TRIPLE");
 
             AlertDialog.Builder alert = new AlertDialog.Builder(this);

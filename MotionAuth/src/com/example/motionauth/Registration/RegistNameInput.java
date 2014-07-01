@@ -98,7 +98,8 @@ public class RegistNameInput extends Activity {
                 // nameが入力されているかの確認
                 if (name.isEmpty()) {
                     Toast.makeText(RegistNameInput.this, "名前が入力されていません", Toast.LENGTH_LONG).show();
-                } else {
+                }
+                else {
                     moveActivity("com.example.motionauth", "com.example.motionauth.Registration.RegistMotion", true);
                 }
             }

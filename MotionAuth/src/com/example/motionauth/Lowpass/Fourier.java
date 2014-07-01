@@ -24,9 +24,9 @@ public class Fourier {
     /**
      * double型三次元配列の入力データに対し，フーリエ変換を用いてローパスフィルタリングを行ってデータの平滑化を行う
      *
-     * @param data    データ平滑化を行うdouble型三次元配列データ
-     * @param dataName    アウトプット用，データ種別
-     * @param context Toast表示用
+     * @param data     データ平滑化を行うdouble型三次元配列データ
+     * @param dataName アウトプット用，データ種別
+     * @param context  Toast表示用
      * @return フーリエ変換によるローパスフィルタリングにより滑らかになったdouble型三次元配列データ
      */
     public double[][][] LowpassFilter (double[][][] data, String dataName, Context context) {
@@ -58,7 +58,8 @@ public class Fourier {
                         if (countReal == 99) {
                             countReal = 0;
                         }
-                    } else {
+                    }
+                    else {
                         imaginary[i][j][countImaginary] = data[i][j][k];
                         countImaginary++;
                         if (countImaginary == 99) {
@@ -114,19 +115,26 @@ public class Fourier {
                 for (int k = 0; k < data[i][j].length; k++) {
                     if (k > 10) {
                         testData1[i][j][k] = 0;
-                    } else if (k > 20) {
+                    }
+                    else if (k > 20) {
                         testData2[i][j][k] = 0;
-                    } else if (k > 30) {
+                    }
+                    else if (k > 30) {
                         data[i][j][k] = 0;
-                    } else if (k > 40) {
+                    }
+                    else if (k > 40) {
                         testData3[i][j][k] = 0;
-                    } else if (k > 50) {
+                    }
+                    else if (k > 50) {
                         testData4[i][j][k] = 0;
-                    } else if (k > 60) {
+                    }
+                    else if (k > 60) {
                         testData5[i][j][k] = 0;
-                    } else if (k > 70) {
+                    }
+                    else if (k > 70) {
                         testData6[i][j][k] = 0;
-                    } else if (k > 80) {
+                    }
+                    else if (k > 80) {
                         testData7[i][j][k] = 0;
                     }
                 }
@@ -166,9 +174,10 @@ public class Fourier {
 
     /**
      * double型二次元配列の入力データに対し，フーリエ変換を用いてローパスフィルタリングを行ってデータの平滑化を行う
-     * @param data データ平滑化を行うdouble型三次元配列データ
+     *
+     * @param data     データ平滑化を行うdouble型三次元配列データ
      * @param dataName アウトプット用，データ種別
-     * @param context Toast表示用
+     * @param context  Toast表示用
      * @return フーリエ変換によるローパスフィルタリングにより滑らかになったdouble型三次元配列データ
      */
     public double[][] LowpassFilter (double[][] data, String dataName, Context context) {
@@ -197,7 +206,8 @@ public class Fourier {
                     if (countReal == 99) {
                         countReal = 0;
                     }
-                } else {
+                }
+                else {
                     imaginary[i][countImaginary] = data[i][j];
                     countImaginary++;
                     if (countImaginary == 99) {

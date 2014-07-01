@@ -37,58 +37,57 @@ import com.example.motionauth.Utility.WriteData;
 public class RegistMotion extends Activity implements SensorEventListener {
     private static final String TAG = RegistMotion.class.getSimpleName();
 
-    private Fourier mFourier = new Fourier();
-    private Formatter mFormatter = new Formatter();
-    private Calc mCalc = new Calc();
-    private Amplifier mAmplifier = new Amplifier();
+    private static final int VIBRATOR_SHORT  = 40;
+    private static final int VIBRATOR_NORMAL = 50;
+    private static final int VIBRATOR_LONG   = 60;
+
+    private static final int PREPARATION = 1;
+    private static final int GET_MOTION  = 2;
+
+    private static final int PREPARATION_INTERVAL = 1000;
+    private static final int GET_MOTION_INTERVAL  = 30;
 
     private SensorManager mSensorManager;
-    private Sensor mAccelerometerSensor;
-    private Sensor mGyroscopeSensor;
+    private Sensor        mAccelerometerSensor;
+    private Sensor        mGyroscopeSensor;
 
     private Vibrator mVibrator;
-    private static final int VIBRATOR_SHORT = 40;
-    private static final int VIBRATOR_NORMAL = 50;
-    private static final int VIBRATOR_LONG = 60;
+
+    private TextView secondTv;
+    private TextView countSecondTv;
+    private Button   getMotionBtn;
+
+    private Fourier     mFourier     = new Fourier();
+    private Formatter   mFormatter   = new Formatter();
+    private Calc        mCalc        = new Calc();
+    private Amplifier   mAmplifier   = new Amplifier();
+    private WriteData   mWriteData   = new WriteData();
+    private Correlation mCorrelation = new Correlation();
+
+    // データ取得カウント用
+    private int accelCount = 0;
+    private int gyroCount  = 0;
+    private int getCount   = 0;
+
+    private int prepareCount = 0;
+
+    private boolean btnStatus = false;
+
+    private boolean isAmplified = false;
 
     // モーションの生データ
     private float[] vAccel;
     private float[] vGyro;
 
-    private boolean btnStatus = false;
-
-    private static final int PREPARATION = 1;
-    private static final int GET_MOTION = 2;
-
-    private static final int PREPARATION_INTERVAL = 1000;
-    private static final int GET_MOTION_INTERVAL = 30;
-
-    // データ取得カウント用
-    private int accelCount = 0;
-    private int gyroCount = 0;
-    private int getCount = 0;
-
-    private int prepareCount = 0;
-
     private float[][][] accelFloat = new float[3][3][100];
-    private float[][][] gyroFloat = new float[3][3][100];
+    private float[][][] gyroFloat  = new float[3][3][100];
 
     // 移動平均後のデータを格納する配列
     private double[][][] distance = new double[3][3][100];
-    private double[][][] angle = new double[3][3][100];
+    private double[][][] angle    = new double[3][3][100];
 
     private double[][] averageDistance = new double[3][100];
-    private double[][] averageAngle = new double[3][100];
-
-    private boolean isAmplified = false;
-
-    private TextView secondTv;
-    private TextView countSecondTv;
-    private Button getMotionBtn;
-
-
-    private WriteData mWriteData = new WriteData();
-    private Correlation mCorrelation = new Correlation();
+    private double[][] averageAngle    = new double[3][100];
 
 
     @Override
@@ -221,7 +220,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
                     // INTERVALで指定したミリ秒後に再度timeHandler（これ自身）を呼び出す
                     timeHandler.sendEmptyMessageDelayed(GET_MOTION, GET_MOTION_INTERVAL);
-                } else if (accelCount >= 100 && gyroCount >= 100 && getCount >= 0 && getCount < 4) {
+                }
+                else if (accelCount >= 100 && gyroCount >= 100 && getCount >= 0 && getCount < 4) {
                     // 取得完了
                     btnStatus = false;
                     getCount++;
@@ -293,7 +293,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
                             });
 
                             alert.show();
-                        } else {
+                        }
+                        else {
                             // 3回のモーションの平均値をファイルに書き出す
                             mWriteData.writeRegistedData("MotionAuth", RegistNameInput.name, averageDistance, averageAngle, isAmplified, RegistMotion.this);
 
@@ -323,7 +324,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
                             alert.show();
                         }
                     }
-                } else {
+                }
+                else {
                     super.dispatchMessage(msg);
                 }
             }
@@ -382,14 +384,17 @@ public class RegistMotion extends Activity implements SensorEventListener {
             // 相関係数が0.4以下
             Toast.makeText(RegistMotion.this, "同一モーションですか？", Toast.LENGTH_SHORT).show();
             return false;
-        } else if (Enum.MEASURE.INCORRECT == measure) {
+        }
+        else if (Enum.MEASURE.INCORRECT == measure) {
             // 相関係数が0.4よりも高く，0.8以下の場合
             // ズレ修正を行う
             distance = CorrectDeviation.correctDeviation(distance);
             angle = CorrectDeviation.correctDeviation(angle);
-        } else if (Enum.MEASURE.PERFECT == measure || Enum.MEASURE.CORRECT == measure) {
+        }
+        else if (Enum.MEASURE.PERFECT == measure || Enum.MEASURE.CORRECT == measure) {
             // PERFECTなら，何もしない
-        } else {
+        }
+        else {
             // なにかがおかしい
             Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_LONG).show();
             return false;

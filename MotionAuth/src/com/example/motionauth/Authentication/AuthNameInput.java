@@ -30,8 +30,10 @@ import java.io.File;
  */
 public class AuthNameInput extends Activity {
     private static final String TAG = AuthNameInput.class.getSimpleName();
+
     // ユーザが入力した文字列（名前）を格納する
     public static String name;
+
     private Context current;
 
 
@@ -105,7 +107,8 @@ public class AuthNameInput extends Activity {
                 if (checkFileExists()) {
                     Log.i(TAG, "User is Existed");
                     moveActivity("com.example.motionauth", "com.example.motionauth.Authentication.AuthMotion", true);
-                } else {
+                }
+                else {
                     Log.i(TAG, "User is not Existed");
                     Toast.makeText(current, "ユーザが登録されていません", Toast.LENGTH_LONG).show();
                 }

@@ -47,7 +47,9 @@ public class RegistMotion extends Activity implements SensorEventListener {
     private Sensor mGyroscopeSensor;
 
     private Vibrator mVibrator;
-    private static final int vibratorDurationTime = 50;
+    private static final int VIBRATOR_SHORT = 40;
+    private static final int VIBRATOR_NORMAL = 50;
+    private static final int VIBRATOR_LONG = 60;
 
     // モーションの生データ
     private float[] vAccel;
@@ -55,15 +57,18 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
     private boolean btnStatus = false;
 
-    private static final int TIMEOUT_MESSAGE = 1;
+    private static final int PREPARATION = 1;
+    private static final int GET_MOTION = 2;
 
-    // データを取得する間隔
-    private static final int INTERVAL = 30;
+    private static final int PREPARATION_INTERVAL = 1000;
+    private static final int GET_MOTION_INTERVAL = 30;
 
     // データ取得カウント用
     private int accelCount = 0;
     private int gyroCount = 0;
     private int getCount = 0;
+
+    private int prepareCount = 0;
 
     private float[][][] accelFloat = new float[3][3][100];
     private float[][][] gyroFloat = new float[3][3][100];
@@ -132,7 +137,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
                     getMotionBtn.setText("取得中");
                     countSecondTv.setText("秒");
-                    timeHandler.sendEmptyMessage(TIMEOUT_MESSAGE);
+                    timeHandler.sendEmptyMessage(PREPARATION);
                 }
             }
         });
@@ -161,7 +166,32 @@ public class RegistMotion extends Activity implements SensorEventListener {
         public void dispatchMessage (Message msg) {
             Log.i(TAG, "--- dispatchMessage ---");
 
-            if (msg.what == TIMEOUT_MESSAGE && btnStatus) {
+            if (msg.what == PREPARATION && btnStatus) {
+                if (prepareCount == 0) {
+                    secondTv.setText("3");
+                    mVibrator.vibrate(VIBRATOR_SHORT);
+                    timeHandler.sendEmptyMessageDelayed(PREPARATION, PREPARATION_INTERVAL);
+
+                }
+                else if (prepareCount == 1) {
+                    secondTv.setText("2");
+                    mVibrator.vibrate(VIBRATOR_SHORT);
+                    timeHandler.sendEmptyMessageDelayed(PREPARATION, PREPARATION_INTERVAL);
+                }
+                else if (prepareCount == 2) {
+                    secondTv.setText("1");
+                    mVibrator.vibrate(VIBRATOR_SHORT);
+                    timeHandler.sendEmptyMessageDelayed(PREPARATION, PREPARATION_INTERVAL);
+                }
+                else if (prepareCount == 3) {
+                    secondTv.setText("START");
+                    mVibrator.vibrate(VIBRATOR_LONG);
+                    timeHandler.sendEmptyMessage(GET_MOTION);
+                }
+
+                prepareCount++;
+            }
+            else if (msg.what == GET_MOTION && btnStatus) {
                 if (accelCount < 100 && gyroCount < 100 && getCount >= 0 && getCount < 3) {
                     // 取得した値を，0.03秒ごとに配列に入れる
                     for (int i = 0; i < 3; i++) {
@@ -177,20 +207,20 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
                     if (accelCount == 1) {
                         secondTv.setText("3");
-                        mVibrator.vibrate(vibratorDurationTime);
+                        mVibrator.vibrate(VIBRATOR_NORMAL);
                     }
 
                     if (accelCount == 33) {
                         secondTv.setText("2");
-                        mVibrator.vibrate(vibratorDurationTime);
+                        mVibrator.vibrate(VIBRATOR_NORMAL);
                     }
                     if (accelCount == 66) {
                         secondTv.setText("1");
-                        mVibrator.vibrate(vibratorDurationTime);
+                        mVibrator.vibrate(VIBRATOR_NORMAL);
                     }
 
                     // INTERVALで指定したミリ秒後に再度timeHandler（これ自身）を呼び出す
-                    timeHandler.sendEmptyMessageDelayed(TIMEOUT_MESSAGE, INTERVAL);
+                    timeHandler.sendEmptyMessageDelayed(GET_MOTION, GET_MOTION_INTERVAL);
                 } else if (accelCount >= 100 && gyroCount >= 100 && getCount >= 0 && getCount < 4) {
                     // 取得完了
                     btnStatus = false;
@@ -200,6 +230,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
                     accelCount = 0;
                     gyroCount = 0;
+
+                    prepareCount = 0;
 
                     // 取り終わったら，ボタンのstatusをenableにして押せるようにする
                     if (getCount == 1) {

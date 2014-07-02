@@ -222,6 +222,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
                 }
                 else if (accelCount >= 100 && gyroCount >= 100 && getCount >= 0 && getCount < 4) {
                     // 取得完了
+                    mVibrator.vibrate(VIBRATOR_LONG);
                     btnStatus = false;
                     getCount++;
                     countSecondTv.setText("回");

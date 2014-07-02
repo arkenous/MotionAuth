@@ -54,14 +54,12 @@ public class Amplifier {
                 range = max[i][j] - min[i][j];
                 Log.e(TAG, "range = " + range);
                 if (range < CHECK_RANGE_VALUE) {
-                    Log.e(TAG, "return: " + true);
 //                    return true;
                     rangeTest = true;
                 }
             }
         }
 
-        Log.e(TAG, "return: "+ false);
 //        return false;
         return rangeTest;
     }

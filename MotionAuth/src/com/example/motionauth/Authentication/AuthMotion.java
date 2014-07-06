@@ -2,6 +2,7 @@ package com.example.motionauth.Authentication;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -32,7 +33,7 @@ import java.io.*;
  *
  * @author Kensuke Kousaka
  */
-public class AuthMotion extends Activity implements SensorEventListener {
+public class AuthMotion extends Activity implements SensorEventListener, Runnable{
     private static final String TAG = AuthMotion.class.getSimpleName();
 
     private static final int VIBRATOR_SHORT  = 40;
@@ -44,6 +45,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
 
     private static final int PREPARATION_INTERVAL = 1000;
     private static final int GET_MOTION_INTERVAL  = 30;
+
+    private static final int FINISH = 5;
 
     private SensorManager mSensorManager;
     private Sensor        mAccelerometerSensor;
@@ -85,6 +88,11 @@ public class AuthMotion extends Activity implements SensorEventListener {
     // RegistMotionにて登録された平均データ
     private double[][] registed_ave_distance = new double[3][100];
     private double[][] registed_ave_angle    = new double[3][100];
+
+    // 計算処理のスレッドに関する変数
+    private boolean resultSoukan = false;
+    private ProgressDialog progressDialog;
+    private Thread thread;
 
 
     @Override
@@ -220,48 +228,8 @@ public class AuthMotion extends Activity implements SensorEventListener {
                 }
                 else if (accelCount >= 100 && gyroCount >= 100) {
                     Log.i(TAG, "Complete Getting Motion Data");
-                    // 取得完了
-                    btnStatus = false;
-                    getMotionBtn.setText("認証処理中");
 
-                    prepareCount = 0;
-
-                    readRegistedData();
-                    calc();
-
-                    if (!soukan()) {
-                        Log.i(TAG, "False Authentication");
-                        AlertDialog.Builder alert = new AlertDialog.Builder(AuthMotion.this);
-                        alert.setTitle("認証失敗です");
-                        alert.setMessage("認証に失敗しました");
-                        alert.setCancelable(false);
-                        alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick (DialogInterface dialog, int which) {
-                                getMotionBtn.setClickable(true);
-                                // データ取得関係の変数を初期化
-                                accelCount = 0;
-                                gyroCount = 0;
-                                secondTv.setText("3");
-                                getMotionBtn.setText("モーションデータ取得");
-                            }
-                        });
-                        alert.show();
-                    }
-                    else {
-                        Log.i(TAG, "Success Authentication");
-                        AlertDialog.Builder alert = new AlertDialog.Builder(AuthMotion.this);
-                        alert.setTitle("認証成功");
-                        alert.setMessage("認証に成功しました．\nスタート画面に戻ります．");
-                        alert.setCancelable(false);
-                        alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick (DialogInterface dialog, int which) {
-                                moveActivity("com.example.motionauth", "com.example.motionauth.Start", true);
-                            }
-                        });
-                        alert.show();
-                    }
+                    finishGetMotion();
                 }
             }
             else {
@@ -269,6 +237,45 @@ public class AuthMotion extends Activity implements SensorEventListener {
             }
         }
     };
+
+
+    private void finishGetMotion() {
+        // 取得完了
+        btnStatus = false;
+        getMotionBtn.setText("認証処理中");
+
+        prepareCount = 0;
+
+        Log.e(TAG, "progressInitStart");
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("計算処理中");
+        progressDialog.setMessage("しばらくお待ちください");
+        progressDialog.setIndeterminate(false);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(false);
+        Log.e(TAG, "progressInitFinish");
+
+        progressDialog.show();
+        thread = new Thread(this);
+        thread.start();
+    }
+
+
+    @Override
+    public void run() {
+        Log.e(TAG, "Thread Start");
+        readRegistedData();
+        calc();
+
+        resultSoukan = soukan();
+
+        Log.e(TAG, "Task Finished");
+
+        progressDialog.dismiss();
+        progressDialog = null;
+        resultHandler.sendEmptyMessage(FINISH);
+    }
 
 
     /**
@@ -400,6 +407,47 @@ public class AuthMotion extends Activity implements SensorEventListener {
 
         return measure == Enum.MEASURE.CORRECT;
     }
+
+
+    private Handler resultHandler = new Handler() {
+        public void handleMessage (Message msg) {
+            if (msg.what == FINISH) {
+                if (!resultSoukan) {
+                    Log.i(TAG, "False Authentication");
+                    AlertDialog.Builder alert = new AlertDialog.Builder(AuthMotion.this);
+                    alert.setTitle("認証失敗です");
+                    alert.setMessage("認証に失敗しました");
+                    alert.setCancelable(false);
+                    alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick (DialogInterface dialog, int which) {
+                            getMotionBtn.setClickable(true);
+                            // データ取得関係の変数を初期化
+                            accelCount = 0;
+                            gyroCount = 0;
+                            secondTv.setText("3");
+                            getMotionBtn.setText("モーションデータ取得");
+                        }
+                    });
+                    alert.show();
+                }
+                else {
+                    Log.i(TAG, "Success Authentication");
+                    AlertDialog.Builder alert = new AlertDialog.Builder(AuthMotion.this);
+                    alert.setTitle("認証成功");
+                    alert.setMessage("認証に成功しました．\nスタート画面に戻ります．");
+                    alert.setCancelable(false);
+                    alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick (DialogInterface dialog, int which) {
+                            moveActivity("com.example.motionauth", "com.example.motionauth.Start", true);
+                        }
+                    });
+                    alert.show();
+                }
+            }
+        }
+    };
 
 
     @Override

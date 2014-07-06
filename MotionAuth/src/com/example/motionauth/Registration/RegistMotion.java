@@ -2,6 +2,7 @@ package com.example.motionauth.Registration;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,9 +23,9 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.example.motionauth.*;
 import com.example.motionauth.Lowpass.Fourier;
 import com.example.motionauth.Processing.*;
+import com.example.motionauth.R;
 import com.example.motionauth.Utility.Enum;
 import com.example.motionauth.Utility.WriteData;
 
@@ -34,7 +35,7 @@ import com.example.motionauth.Utility.WriteData;
  *
  * @author Kensuke Kousaka
  */
-public class RegistMotion extends Activity implements SensorEventListener {
+public class RegistMotion extends Activity implements SensorEventListener, Runnable{
     private static final String TAG = RegistMotion.class.getSimpleName();
 
     private static final int VIBRATOR_SHORT  = 40;
@@ -46,6 +47,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
     private static final int PREPARATION_INTERVAL = 1000;
     private static final int GET_MOTION_INTERVAL  = 30;
+
+    private static final int FINISH = 5;
 
     private SensorManager mSensorManager;
     private Sensor        mAccelerometerSensor;
@@ -88,6 +91,14 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
     private double[][] averageDistance = new double[3][100];
     private double[][] averageAngle    = new double[3][100];
+
+
+    // 計算処理のスレッド化に関する変数
+    private boolean resultCalc   = false;
+    private boolean resultSoukan = false;
+
+    private ProgressDialog progressDialog;
+    private Thread thread;
 
 
     @Override
@@ -140,6 +151,8 @@ public class RegistMotion extends Activity implements SensorEventListener {
                 }
             }
         });
+
+        Log.e(TAG, "aaaaa");
     }
 
 
@@ -248,82 +261,7 @@ public class RegistMotion extends Activity implements SensorEventListener {
                     }
 
                     if (getCount == 3) {
-                        // 全データ取得完了（3回分の加速度，ジャイロを取得完了）
-                        // ボタンのstatusをdisableにして押せないようにする
-                        if (getMotionBtn.isClickable()) {
-                            getMotionBtn.setClickable(false);
-                        }
-                        secondTv.setText("0");
-                        getMotionBtn.setText("データ処理中");
-
-                        mWriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accelFloat, RegistMotion.this);
-                        mWriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyroFloat, RegistMotion.this);
-                        Log.d(TAG, "writeRawData");
-
-
-                        if (!calc() || !soukan()) {
-                            // もう一度モーションを取り直す処理
-                            // ボタンのstatusをenableにして押せるようにする
-                            AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);
-                            alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
-                                @Override
-                                public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {
-                                    if (keyCode == KeyEvent.KEYCODE_BACK) {
-                                        return true;
-                                    }
-                                    return false;
-                                }
-                            });
-
-                            alert.setCancelable(false);
-
-                            alert.setTitle("登録失敗");
-                            alert.setMessage("登録に失敗しました．やり直して下さい");
-
-                            alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick (DialogInterface dialog, int which) {
-                                    getMotionBtn.setClickable(true);
-                                    // データ取得関係の変数を初期化
-                                    accelCount = 0;
-                                    gyroCount = 0;
-                                    getCount = 0;
-                                    secondTv.setText("3");
-                                    getMotionBtn.setText("モーションデータ取得");
-                                }
-                            });
-
-                            alert.show();
-                        }
-                        else {
-                            // 3回のモーションの平均値をファイルに書き出す
-                            mWriteData.writeRegistedData("MotionAuth", RegistNameInput.name, averageDistance, averageAngle, isAmplified, RegistMotion.this);
-
-                            AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);
-                            alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
-                                @Override
-                                public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {
-                                    if (keyCode == KeyEvent.KEYCODE_BACK) {
-                                        return true;
-                                    }
-                                    return false;
-                                }
-                            });
-
-                            alert.setCancelable(false);
-
-                            alert.setTitle("登録完了");
-                            alert.setMessage("登録が完了しました．\nスタート画面に戻ります");
-
-                            alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick (DialogInterface dialog, int which) {
-                                    finishRegist();
-                                }
-                            });
-
-                            alert.show();
-                        }
+                        finishGetMotion();
                     }
                 }
                 else {
@@ -332,6 +270,50 @@ public class RegistMotion extends Activity implements SensorEventListener {
             }
         }
     };
+
+
+    private void finishGetMotion() {
+        // 全データ取得完了（3回分の加速度，ジャイロを取得完了）
+        // ボタンのstatusをdisableにして押せないようにする
+        if (getMotionBtn.isClickable()) {
+            getMotionBtn.setClickable(false);
+        }
+        secondTv.setText("0");
+        getMotionBtn.setText("データ処理中");
+
+        Log.d(TAG, "writeRawData");
+
+        Log.e(TAG, "progressInitStart");
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("計算処理中");
+        progressDialog.setMessage("しばらくお待ちください");
+        progressDialog.setIndeterminate(false);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(false);
+        Log.e(TAG, "progressInitFinish");
+
+        progressDialog.show();
+        thread = new Thread(this);
+        thread.start();
+    }
+
+
+    @Override
+    public void run() {
+        Log.e(TAG, "Thread Start");
+
+        mWriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accelFloat, RegistMotion.this);
+        mWriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyroFloat, RegistMotion.this);
+
+        resultCalc = calc();
+        resultSoukan = soukan();
+
+        Log.e(TAG, "Task Finished");
+
+        progressDialog.dismiss();
+        progressDialog = null;
+        resultHander.sendEmptyMessage(FINISH);
+    }
 
 
     /**
@@ -429,6 +411,76 @@ public class RegistMotion extends Activity implements SensorEventListener {
 
         return measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT;
     }
+
+    private Handler resultHander = new Handler() {
+        public void handleMessage (Message msg) {
+            if (msg.what == FINISH) {
+                if (!resultCalc || !resultSoukan) {
+                    // もう一度モーションを取り直す処理
+                    // ボタンのstatusをenableにして押せるようにする
+                    AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);
+                    alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
+                        @Override
+                        public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {
+                            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                                return true;
+                            }
+                            return false;
+                        }
+                    });
+
+                    alert.setCancelable(false);
+
+                    alert.setTitle("登録失敗");
+                    alert.setMessage("登録に失敗しました．やり直して下さい");
+
+                    alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick (DialogInterface dialog, int which) {
+                            getMotionBtn.setClickable(true);
+                            // データ取得関係の変数を初期化
+                            accelCount = 0;
+                            gyroCount = 0;
+                            getCount = 0;
+                            secondTv.setText("3");
+                            getMotionBtn.setText("モーションデータ取得");
+                        }
+                    });
+
+                    alert.show();
+                }
+                else {
+                    // 3回のモーションの平均値をファイルに書き出す
+                    mWriteData.writeRegistedData("MotionAuth", RegistNameInput.name, averageDistance, averageAngle, isAmplified, RegistMotion.this);
+
+                    AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);
+                    alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
+                        @Override
+                        public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {
+                            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                                return true;
+                            }
+                            return false;
+                        }
+                    });
+
+                    alert.setCancelable(false);
+
+                    alert.setTitle("登録完了");
+                    alert.setMessage("登録が完了しました．\nスタート画面に戻ります");
+
+                    alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick (DialogInterface dialog, int which) {
+                            finishRegist();
+                        }
+                    });
+
+                    alert.show();
+                }
+            }
+        }
+    };
 
 
     @Override

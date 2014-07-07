@@ -35,7 +35,7 @@ public class Amplifier {
             }
         }
 
-        double range = 0;
+        double range;
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < data[i].length; j++) {
                 for (int k = 0; k < data[i][j].length; k++) {

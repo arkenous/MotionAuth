@@ -55,8 +55,8 @@ public class ViewRegistedData extends Activity {
         ArrayList<String> dataList = readData();
 
         // アイテム追加
-        for (int i = 0; i < dataList.size(); i++) {
-            adapter.add(dataList.get(i));
+        for (String i : dataList) {
+            adapter.add(i);
         }
 
         // リストビューにアダプタを設定

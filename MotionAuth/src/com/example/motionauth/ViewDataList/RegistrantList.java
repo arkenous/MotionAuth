@@ -64,8 +64,8 @@ public class RegistrantList extends Activity {
         try {
 
             // アイテム追加
-            for (int i = 0; i < fileNameStr.length; i++) {
-                adapter.add(fileNameStr[i]);
+            for (String s : fileNameStr) {
+                adapter.add(s);
             }
         }
         catch (NullPointerException e) {

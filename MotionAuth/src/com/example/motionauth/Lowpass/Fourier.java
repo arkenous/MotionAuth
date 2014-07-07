@@ -33,11 +33,13 @@ public class Fourier {
         DoubleFFT_1D realfft = new DoubleFFT_1D(data[0][0].length);
 
         // フーリエ変換（ForwardDFT）の実行
-        for (int i = 0; i < data.length; i++) {
-            for (int j = 0; j < data[i].length; j++) {
-                realfft.realForward(data[i][j]);
+        for (double[][] i : data) {
+            for (double[] j : i) {
+                realfft.realForward(j);
             }
         }
+
+
 
         // 実数部，虚数部それぞれを入れる配列
         double[][][] real = new double[data.length][data[0].length][data[0][0].length];
@@ -183,8 +185,8 @@ public class Fourier {
         DoubleFFT_1D realfft = new DoubleFFT_1D(data[0].length);
 
         // フーリエ変換（ForwardDFT）の実行
-        for (int i = 0; i < data.length; i++) {
-            realfft.realForward(data[i]);
+        for (double[] i : data) {
+            realfft.realForward(i);
         }
 
         // 実数部，虚数部それぞれを入れる配列
@@ -239,8 +241,8 @@ public class Fourier {
         }
 
         // 逆フーリエ変換（InverseDFT）
-        for (int i = 0; i < data.length; i++) {
-            realfft.realInverse(data[i], true);
+        for (double[] i : data) {
+            realfft.realInverse(i, true);
         }
 
         mWriteData.writeDoubleTwoArrayData("AfterFFT", dataName, AuthNameInput.name, data);

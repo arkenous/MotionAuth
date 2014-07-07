@@ -30,7 +30,7 @@ public class WriteData {
         if (!status.equals(Environment.MEDIA_MOUNTED)) {
             // マウントされていない場合
             Log.e(TAG, "SDCard not mounted");
-            
+
         }
 
         // SDカードのフォルダパスの取得
@@ -44,7 +44,9 @@ public class WriteData {
         try {
             if (!file.exists()) {
                 // フォルダがない場合
-                file.mkdirs();
+                if (!file.mkdirs()) {
+                    Log.e(TAG, "Make Folder Error");
+                }
             }
         }
         catch (Exception e) {
@@ -121,7 +123,9 @@ public class WriteData {
         try {
             if (!file.exists()) {
                 // フォルダがない場合
-                file.mkdirs();
+                if (!file.mkdirs()) {
+                    Log.e(TAG, "Make Folder Error");
+                }
             }
         }
         catch (Exception e) {
@@ -139,9 +143,10 @@ public class WriteData {
             OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
             BufferedWriter bw = new BufferedWriter(osw);
 
-            for (int i = 0; i < data.length; i++) {
-                bw.write(dataName + "@" + data[i] + "\n");
+            for (double i : data) {
+                bw.write(dataName + "@" + i + "\n");
             }
+
             bw.close();
         }
         catch (Exception e) {
@@ -182,7 +187,9 @@ public class WriteData {
         try {
             if (!file.exists()) {
                 // フォルダがない場合
-                file.mkdirs();
+                if (!file.mkdirs()) {
+                    Log.e(TAG, "Make Folder Error");
+                }
             }
         }
         catch (Exception e) {
@@ -258,7 +265,9 @@ public class WriteData {
         try {
             if (!file.exists()) {
                 // フォルダがない場合
-                file.mkdirs();
+                if (!file.mkdirs()) {
+                    Log.e(TAG, "Make Folder Error");
+                }
             }
         }
         catch (Exception e) {
@@ -335,7 +344,9 @@ public class WriteData {
         try {
             if (!file.exists()) {
                 // フォルダがない場合
-                file.mkdirs();
+                if (!file.mkdirs()) {
+                    Log.e(TAG, "Make Folder Error");
+                }
             }
         }
         catch (Exception e) {
@@ -386,7 +397,9 @@ public class WriteData {
             Log.d(TAG, "--- writeRegistedData ---");
             String filePath = Environment.getExternalStorageDirectory() + File.separator + "MotionAuth" + File.separator + folderName + File.separator + userName;
             File file = new File(filePath);
-            file.getParentFile().mkdirs();
+            if (!file.getParentFile().mkdirs()) {
+                Log.e(TAG, "Make Folder Error");
+            }
             FileOutputStream fos;
 
             fos = new FileOutputStream(file, false);

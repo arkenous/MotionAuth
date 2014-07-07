@@ -17,9 +17,9 @@ import android.os.Vibrator;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import com.example.motionauth.Lowpass.Fourier;
@@ -99,6 +99,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
     private ProgressDialog progressDialog;
 
+    private double checkRangeValue = 2.5;
+
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -107,7 +109,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
         Log.v(TAG, "--- onCreate ---");
 
         // タイトルバーの非表示
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_regist_motion);
 
         registMotion();
@@ -324,7 +326,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
         mWriteData.writeDoubleThreeArrayData("BeforeFFT", "accel", RegistNameInput.name, accel_double);
         mWriteData.writeDoubleThreeArrayData("BeforeFFT", "gyro", RegistNameInput.name, gyro_double);
 
-        if (mAmplifier.CheckValueRange(accel_double) || mAmplifier.CheckValueRange(gyro_double)) {
+        if (mAmplifier.CheckValueRange(accel_double, checkRangeValue) || mAmplifier.CheckValueRange(gyro_double, checkRangeValue)) {
             accel_double = mAmplifier.Amplify(accel_double);
             gyro_double = mAmplifier.Amplify(gyro_double);
             isAmplified = true;
@@ -511,6 +513,38 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.regist_motion, menu);
         return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected (MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.check_range_value:
+                AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);
+                alert.setTitle("CHECK_RANGE_VALUE");
+                alert.setMessage("CHECK_RANGE_VALUEの値を変更できます");
+                alert.setNegativeButton("きつめ", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick (DialogInterface dialog, int which) {
+                        checkRangeValue = 2.0;
+                    }
+                });
+                alert.setNeutralButton("ふつう", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick (DialogInterface dialog, int which) {
+                        checkRangeValue = 2.5;
+                    }
+                });
+                alert.setPositiveButton("ゆるめ", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick (DialogInterface dialog, int which) {
+                        checkRangeValue = 3.0;
+                    }
+                });
+                alert.show();
+                return true;
+        }
+        return false;
     }
 
 

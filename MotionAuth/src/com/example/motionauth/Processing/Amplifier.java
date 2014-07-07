@@ -10,7 +10,6 @@ import android.util.Log;
 public class Amplifier {
     private static final String TAG = Amplifier.class.getSimpleName();
 
-    private static final double CHECK_RANGE_VALUE   = 2.5;
     private static final double AMPLIFICATION_VALUE = 2;
 
     private boolean rangeTest = false;
@@ -22,8 +21,10 @@ public class Amplifier {
      * @param data チェックするdouble型三次元配列データ
      * @return 全試行回数中，一回でもデータの幅が閾値よりも小さければtrue，そうでなければfalse
      */
-    public boolean CheckValueRange (double[][][] data) {
+    public boolean CheckValueRange (double[][][] data, double checkRangeValue) {
         Log.v(TAG, "--- CheckValueRange ---");
+
+        Log.i(TAG, "checkRangeValue = " + checkRangeValue);
 
         double[][] max = new double[data.length][data[0].length];
         double[][] min = new double[data.length][data[0].length];
@@ -53,7 +54,7 @@ public class Amplifier {
             for (int j = 0; j < max[i].length; j++) {
                 range = max[i][j] - min[i][j];
                 Log.e(TAG, "range = " + range);
-                if (range < CHECK_RANGE_VALUE) {
+                if (range < checkRangeValue) {
 //                    return true;
                     rangeTest = true;
                 }

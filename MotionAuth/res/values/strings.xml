@@ -26,5 +26,6 @@
     <string name="discription4">データ取得完了後，認証を行います．</string>
     <string name="title_activity_registrant_list">RegistrantList</string>
     <string name="title_activity_view_registed_data">ViewRegistedData</string>
+    <string name="check_range_value">Check Range Value</string>
 
 </resources>

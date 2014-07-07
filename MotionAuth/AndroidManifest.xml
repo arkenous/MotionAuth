@@ -21,7 +21,8 @@
         android:debuggable="true">
         <activity
             android:name="com.example.motionauth.Start"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -30,27 +31,33 @@
         </activity>
         <activity
             android:name=".Registration.RegistNameInput"
-            android:label="@string/title_activity_regist_name_input" >
+            android:label="@string/title_activity_regist_name_input"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".Registration.RegistMotion"
-            android:label="@string/title_activity_regist_motion" >
+            android:label="@string/title_activity_regist_motion"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".Authentication.AuthNameInput"
-            android:label="@string/title_activity_auth_name_input" >
+            android:label="@string/title_activity_auth_name_input"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".Authentication.AuthMotion"
-            android:label="@string/title_activity_auth_motion" >
+            android:label="@string/title_activity_auth_motion"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".ViewDataList.RegistrantList"
-            android:label="@string/title_activity_registrant_list" >
+            android:label="@string/title_activity_registrant_list"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".ViewDataList.ViewRegistedData"
-            android:label="@string/title_activity_view_registed_data" >
+            android:label="@string/title_activity_view_registed_data"
+            android:screenOrientation="portrait">
         </activity>
     </application>
 </manifest>

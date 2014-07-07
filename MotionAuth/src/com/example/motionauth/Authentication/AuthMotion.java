@@ -38,7 +38,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
     private static final int VIBRATOR_SHORT  = 40;
     private static final int VIBRATOR_NORMAL = 50;
-    private static final int VIBRATOR_LONG   = 60;
+    private static final int VIBRATOR_LONG   = 100;
 
     private static final int PREPARATION = 1;
     private static final int GET_MOTION  = 2;

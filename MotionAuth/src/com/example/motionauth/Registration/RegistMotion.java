@@ -35,7 +35,7 @@ import com.example.motionauth.Utility.WriteData;
  *
  * @author Kensuke Kousaka
  */
-public class RegistMotion extends Activity implements SensorEventListener, Runnable{
+public class RegistMotion extends Activity implements SensorEventListener, Runnable {
     private static final String TAG = RegistMotion.class.getSimpleName();
 
     private static final int VIBRATOR_SHORT  = 40;
@@ -98,7 +98,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
     private boolean resultSoukan = false;
 
     private ProgressDialog progressDialog;
-    private Thread thread;
+    private Thread         thread;
 
 
     @Override
@@ -272,7 +272,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
     };
 
 
-    private void finishGetMotion() {
+    private void finishGetMotion () {
         // 全データ取得完了（3回分の加速度，ジャイロを取得完了）
         // ボタンのstatusをdisableにして押せないようにする
         if (getMotionBtn.isClickable()) {
@@ -299,7 +299,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
 
     @Override
-    public void run() {
+    public void run () {
         Log.e(TAG, "Thread Start");
 
         mWriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accelFloat, RegistMotion.this);

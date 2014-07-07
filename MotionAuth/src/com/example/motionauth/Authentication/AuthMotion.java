@@ -33,7 +33,7 @@ import java.io.*;
  *
  * @author Kensuke Kousaka
  */
-public class AuthMotion extends Activity implements SensorEventListener, Runnable{
+public class AuthMotion extends Activity implements SensorEventListener, Runnable {
     private static final String TAG = AuthMotion.class.getSimpleName();
 
     private static final int VIBRATOR_SHORT  = 40;
@@ -92,7 +92,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
     // 計算処理のスレッドに関する変数
     private boolean resultSoukan = false;
     private ProgressDialog progressDialog;
-    private Thread thread;
+    private Thread         thread;
 
 
     @Override
@@ -239,7 +239,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
     };
 
 
-    private void finishGetMotion() {
+    private void finishGetMotion () {
         // 取得完了
         btnStatus = false;
         getMotionBtn.setText("認証処理中");
@@ -263,7 +263,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
 
     @Override
-    public void run() {
+    public void run () {
         Log.e(TAG, "Thread Start");
         readRegistedData();
         calc();

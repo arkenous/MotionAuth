@@ -21,7 +21,7 @@ public class CorrectDeviation {
      * @param data 修正するdouble型の3次元配列データ
      * @return newData ズレ修正後のdouble型の3次元配列データ
      */
-    public static double[][][] correctDeviation (double[][][] data) {
+    public double[][][] correctDeviation (double[][][] data) {
         Log.v(TAG, "--- correctDeviation ---");
 
         double[][][] newData = new double[3][3][100];

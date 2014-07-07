@@ -59,12 +59,13 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
     private TextView countSecondTv;
     private Button   getMotionBtn;
 
-    private Fourier     mFourier     = new Fourier();
-    private Formatter   mFormatter   = new Formatter();
-    private Calc        mCalc        = new Calc();
-    private Amplifier   mAmplifier   = new Amplifier();
-    private WriteData   mWriteData   = new WriteData();
-    private Correlation mCorrelation = new Correlation();
+    private Fourier          mFourier          = new Fourier();
+    private Formatter        mFormatter        = new Formatter();
+    private Calc             mCalc             = new Calc();
+    private Amplifier        mAmplifier        = new Amplifier();
+    private WriteData        mWriteData        = new WriteData();
+    private Correlation      mCorrelation      = new Correlation();
+    private CorrectDeviation mCorrectDeviation = new CorrectDeviation();
 
     // データ取得カウント用
     private int accelCount = 0;
@@ -366,8 +367,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
             // 相関係数が0.4よりも高く，0.8以下の場合
             // ズレ修正を行う
             Log.i(TAG, "measure: INCORRECT");
-            distance = CorrectDeviation.correctDeviation(distance);
-            angle = CorrectDeviation.correctDeviation(angle);
+            distance = mCorrectDeviation.correctDeviation(distance);
+            angle = mCorrectDeviation.correctDeviation(angle);
         }
         else if (Enum.MEASURE.PERFECT == measure || Enum.MEASURE.CORRECT == measure) {
             Log.i(TAG, "measure: CORRECT or PERFECT");

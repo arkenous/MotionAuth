@@ -1,9 +1,7 @@
 package com.example.motionauth.Utility;
 
-import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.*;
 
@@ -23,16 +21,16 @@ public class WriteData {
      * @param dataName   保存するデータ名
      * @param userName   保存するユーザ名
      * @param data       保存するfloat型の3次元配列データ
-     * @param context    実行するアクティビティのコンテキスト
      */
-    public void writeFloatThreeArrayData (String folderName, String dataName, String userName, float[][][] data, Context context) {
+    public void writeFloatThreeArrayData (String folderName, String dataName, String userName, float[][][] data) {
         Log.v(TAG, "--- writeFloatThreeArrayData ---");
 
         // SDカードのマウント確認
         String status = Environment.getExternalStorageState();
         if (!status.equals(Environment.MEDIA_MOUNTED)) {
             // マウントされていない場合
-            Toast.makeText(context, "SDカードがマウントされていません", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "SDCard not mounted");
+            
         }
 
         // SDカードのフォルダパスの取得
@@ -50,9 +48,7 @@ public class WriteData {
             }
         }
         catch (Exception e) {
-            Toast.makeText(context, "makeFolderException", Toast.LENGTH_SHORT).show();
-            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
+            Log.e(TAG, "Make Folder Exception");
         }
 
         try {
@@ -89,7 +85,7 @@ public class WriteData {
             }
         }
         catch (Exception e) {
-            Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Error");
         }
     }
 
@@ -101,17 +97,16 @@ public class WriteData {
      * @param dataName   保存するデータ名
      * @param userName   保存するユーザ名
      * @param data       保存するdouble型の1次元配列データ
-     * @param context    実行するアクティビティのコンテキスト
      * @return 保存に成功したらtrue，失敗したらfalseを返す
      */
-    public boolean writeDoubleOneArrayData (String folderName, String dataName, String userName, double[] data, Context context) {
+    public boolean writeDoubleOneArrayData (String folderName, String dataName, String userName, double[] data) {
         Log.v(TAG, "--- writeDoubleOneArrayData ---");
 
         // SDカードのマウント確認
         String status = Environment.getExternalStorageState();
         if (!status.equals(Environment.MEDIA_MOUNTED)) {
             // マウントされていない場合
-            Toast.makeText(context, "SDカードがマウントされていません", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "SDCard not mounted");
             return false;
         }
 
@@ -130,9 +125,7 @@ public class WriteData {
             }
         }
         catch (Exception e) {
-            Toast.makeText(context, "makeFolderException", Toast.LENGTH_SHORT).show();
-            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
+            Log.e(TAG, "Make FolderException");
             return false;
         }
 
@@ -152,7 +145,7 @@ public class WriteData {
             bw.close();
         }
         catch (Exception e) {
-            Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Error");
             return false;
         }
         return true;
@@ -166,16 +159,15 @@ public class WriteData {
      * @param dataName   保存するデータ名
      * @param userName   保存するユーザ名
      * @param data       保存するdouble型の２次元配列データ
-     * @param context    実行するアクティビティのコンテキスト
      * @return 保存に成功したらtrue，失敗したらfalseを返す
      */
-    public boolean writeDoubleTwoArrayData (String folderName, String dataName, String userName, double[][] data, Context context) {
+    public boolean writeDoubleTwoArrayData (String folderName, String dataName, String userName, double[][] data) {
         Log.v(TAG, "--- writeDoubleTwoArrayData ---");
         // SDカードのマウント確認
         String status = Environment.getExternalStorageState();
         if (!status.equals(Environment.MEDIA_MOUNTED)) {
             // マウントされていない場合
-            Toast.makeText(context, "SDカードがマウントされていません", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "SDCard not mounted");
             return false;
         }
 
@@ -194,8 +186,7 @@ public class WriteData {
             }
         }
         catch (Exception e) {
-            Toast.makeText(context, "makeFolderException", Toast.LENGTH_SHORT).show();
-            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "MakeFolderException");
             e.printStackTrace();
             return false;
         }
@@ -231,8 +222,7 @@ public class WriteData {
             }
         }
         catch (Exception e) {
-            Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
-            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Error");
             return false;
         }
         return true;
@@ -246,16 +236,15 @@ public class WriteData {
      * @param dataName   保存するデータ名
      * @param userName   保存するユーザ名
      * @param data       保存するdouble型の３次元配列データ
-     * @param context    実行するアクティビティのコンテキスト
      */
-    public void writeDoubleThreeArrayData (String folderName, String dataName, String userName, double[][][] data, Context context) {
+    public void writeDoubleThreeArrayData (String folderName, String dataName, String userName, double[][][] data) {
         Log.v(TAG, "--- writeDoubleThreeArrayData ---");
 
         // SDカードのマウント確認
         String status = Environment.getExternalStorageState();
         if (!status.equals(Environment.MEDIA_MOUNTED)) {
             // マウントされていない場合
-            Toast.makeText(context, "SDカードがマウントされていません", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "SDCard not mounted");
         }
 
         // SDカードのフォルダパスの取得
@@ -273,7 +262,7 @@ public class WriteData {
             }
         }
         catch (Exception e) {
-            Toast.makeText(context, "makeFolderException", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "MakeFolderException");
         }
 
         try {
@@ -312,7 +301,7 @@ public class WriteData {
             }
         }
         catch (Exception e) {
-            Toast.makeText(context, "ErrorWhileWriting", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Error");
         }
     }
 
@@ -324,16 +313,15 @@ public class WriteData {
      * @param dataName   保存するデータ名
      * @param userName   保存するユーザ名
      * @param data       保存するdouble型の２次元配列データ
-     * @param context    実行するアクティビティのコンテキスト
      */
-    public void writeRData (String folderName, String dataName, String userName, double[][] data, Context context) {
+    public void writeRData (String folderName, String dataName, String userName, double[][] data) {
         Log.v(TAG, "--- writeRData ---");
 
         // SDカードのマウント確認
         String status = Environment.getExternalStorageState();
         if (!status.equals(Environment.MEDIA_MOUNTED)) {
             // マウントされていない場合
-            Toast.makeText(context, "SDカードがマウントされていません", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "SDCard not mounted");
         }
 
         // SDカードのフォルダパスの取得
@@ -351,7 +339,7 @@ public class WriteData {
             }
         }
         catch (Exception e) {
-            Toast.makeText(context, "makeFolderException", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Make Folder Exception");
         }
 
         try {
@@ -386,12 +374,12 @@ public class WriteData {
             }
         }
         catch (Exception e) {
-            Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Error");
         }
     }
 
 
-    public boolean writeRegistedData (String folderName, String userName, double[][] averageDistance, double[][] averageAngle, boolean isAmplify, Context context) {
+    public boolean writeRegistedData (String folderName, String userName, double[][] averageDistance, double[][] averageAngle, boolean isAmplify) {
         Log.v(TAG, "--- writeRegistedData ---");
 
         try {
@@ -466,7 +454,7 @@ public class WriteData {
             return true;
         }
         catch (IOException e) {
-            Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Error");
             return false;
         }
     }

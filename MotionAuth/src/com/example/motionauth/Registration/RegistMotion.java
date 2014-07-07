@@ -297,8 +297,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
     @Override
     public void run () {
         Log.i(TAG, "Thread Running");
-        mWriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accelFloat, RegistMotion.this);
-        mWriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyroFloat, RegistMotion.this);
+        mWriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accelFloat);
+        mWriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyroFloat);
 
         resultCalc = calc();
         resultSoukan = soukan();
@@ -320,8 +320,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
         double[][][] accel_double = mFormatter.floatToDoubleFormatter(accelFloat);
         double[][][] gyro_double = mFormatter.floatToDoubleFormatter(gyroFloat);
 
-        mWriteData.writeDoubleThreeArrayData("BeforeFFT", "accel", RegistNameInput.name, accel_double, this);
-        mWriteData.writeDoubleThreeArrayData("BeforeFFT", "gyro", RegistNameInput.name, gyro_double, this);
+        mWriteData.writeDoubleThreeArrayData("BeforeFFT", "accel", RegistNameInput.name, accel_double);
+        mWriteData.writeDoubleThreeArrayData("BeforeFFT", "gyro", RegistNameInput.name, gyro_double);
 
         if (mAmplifier.CheckValueRange(accel_double) || mAmplifier.CheckValueRange(gyro_double)) {
             accel_double = mAmplifier.Amplify(accel_double);
@@ -330,8 +330,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
         }
 
         // フーリエ変換によるローパスフィルタ
-        accel_double = mFourier.LowpassFilter(accel_double, "accel", this);
-        gyro_double = mFourier.LowpassFilter(gyro_double, "gyro", this);
+        accel_double = mFourier.LowpassFilter(accel_double, "accel");
+        gyro_double = mFourier.LowpassFilter(gyro_double, "gyro");
 
         Log.d(TAG, "*** finishFourier ***");
 
@@ -352,7 +352,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
         }
 
         //region 同一のモーションであるかの確認をし，必要に応じてズレ修正を行う
-        Enum.MEASURE measure = mCorrelation.measureCorrelation(this, distance, angle, averageDistance, averageAngle);
+        Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, angle, averageDistance, averageAngle);
 
         Log.d(TAG, "*** afterMeasureCorrelation");
         Log.d(TAG, "measure = " + String.valueOf(measure));
@@ -380,8 +380,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
         }
         //endregion
 
-        mWriteData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatDistance", RegistNameInput.name, distance, RegistMotion.this);
-        mWriteData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatAngle", RegistNameInput.name, angle, RegistMotion.this);
+        mWriteData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatDistance", RegistNameInput.name, distance);
+        mWriteData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatAngle", RegistNameInput.name, angle);
 
         // ズレ修正後の平均値データを出す
         for (int i = 0; i < 3; i++) {
@@ -401,7 +401,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
      */
     private boolean soukan () {
         Log.v(TAG, "--- soukan ---");
-        Enum.MEASURE measure = mCorrelation.measureCorrelation(this, distance, angle, averageDistance, averageAngle);
+        Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, angle, averageDistance, averageAngle);
 
         Log.d(TAG, "measure = " + measure);
 
@@ -452,7 +452,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
                 }
                 else {
                     // 3回のモーションの平均値をファイルに書き出す
-                    mWriteData.writeRegistedData("MotionAuth", RegistNameInput.name, averageDistance, averageAngle, isAmplified, RegistMotion.this);
+                    mWriteData.writeRegistedData("MotionAuth", RegistNameInput.name, averageDistance, averageAngle, isAmplified);
 
                     AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);
                     alert.setOnKeyListener(new DialogInterface.OnKeyListener() {

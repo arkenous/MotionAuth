@@ -390,8 +390,8 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
         }
 
         // フーリエ変換を用いたローパス処理
-        accel = mFourier.LowpassFilter(accel, "accel", this);
-        gyro = mFourier.LowpassFilter(gyro, "gyro", this);
+        accel = mFourier.LowpassFilter(accel, "accel");
+        gyro = mFourier.LowpassFilter(gyro, "gyro");
 
         distance = mCalc.accelToDistance(accel, 0.03);
         angle = mCalc.gyroToAngle(gyro, 0.03);
@@ -403,7 +403,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
     private boolean soukan () {
         Log.v(TAG, "--- soukan ---");
-        Enum.MEASURE measure = mCorrelation.measureCorrelation(this, distance, angle, registed_ave_distance, registed_ave_angle);
+        Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, angle, registed_ave_distance, registed_ave_angle);
 
         return measure == Enum.MEASURE.CORRECT;
     }

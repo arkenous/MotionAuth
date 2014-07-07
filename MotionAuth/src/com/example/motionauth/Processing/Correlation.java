@@ -1,6 +1,5 @@
 package com.example.motionauth.Processing;
 
-import android.content.Context;
 import android.util.Log;
 import com.example.motionauth.Registration.RegistNameInput;
 import com.example.motionauth.Utility.Enum;
@@ -21,14 +20,13 @@ public class Correlation {
     /**
      * 相関を求め，同一のモーションであるかどうかを確認する
      *
-     * @param context      呼び出し元のcontext
      * @param distance     double型の3次元配列距離データ
      * @param angle        double型の三次元配列角度データ
      * @param ave_distance double型の二次元配列距離データ
      * @param ave_angle    double型の二次元配列角度データ
      * @return EnumクラスのMEASURE列挙体の値が返る
      */
-    public Enum.MEASURE measureCorrelation (Context context, double[][][] distance, double[][][] angle, double[][] ave_distance, double[][] ave_angle) {
+    public Enum.MEASURE measureCorrelation (double[][][] distance, double[][][] angle, double[][] ave_distance, double[][] ave_angle) {
         Log.v(TAG, "--- measureCorrelation ---");
 
         // 相関係数の計算
@@ -119,8 +117,8 @@ public class Correlation {
             }
         }
 
-        mWriteData.writeRData("RegistLRdata", "R_accel", RegistNameInput.name, R_accel, context);
-        mWriteData.writeRData("RegistLRdata", "R_gyro", RegistNameInput.name, R_gyro, context);
+        mWriteData.writeRData("RegistLRdata", "R_accel", RegistNameInput.name, R_accel);
+        mWriteData.writeRData("RegistLRdata", "R_gyro", RegistNameInput.name, R_gyro);
 
         // TODO 評価軸見直し
 
@@ -249,14 +247,13 @@ public class Correlation {
     /**
      * 相関を求め，同一のモーションであるかどうかを確認する
      *
-     * @param context      呼び出し元のcontext
      * @param distance     double型の二次元配列距離データ
      * @param angle        double型の二次元配列角度データ
      * @param ave_distance double型の二次元配列距離データ
      * @param ave_angle    double型の虹連配列角度データ
      * @return EnumクラスのMEASURE列挙体の値が返る
      */
-    public Enum.MEASURE measureCorrelation (Context context, double[][] distance, double[][] angle, double[][] ave_distance, double[][] ave_angle) {
+    public Enum.MEASURE measureCorrelation (double[][] distance, double[][] angle, double[][] ave_distance, double[][] ave_angle) {
         Log.v(TAG, "--- measureCorrelation ---");
 
         //region Calculate of Average A

@@ -1,6 +1,5 @@
 package com.example.motionauth.Lowpass;
 
-import android.content.Context;
 import android.util.Log;
 import com.example.motionauth.Authentication.AuthNameInput;
 import com.example.motionauth.Registration.RegistNameInput;
@@ -26,10 +25,9 @@ public class Fourier {
      *
      * @param data     データ平滑化を行うdouble型三次元配列データ
      * @param dataName アウトプット用，データ種別
-     * @param context  Toast表示用
      * @return フーリエ変換によるローパスフィルタリングにより滑らかになったdouble型三次元配列データ
      */
-    public double[][][] LowpassFilter (double[][][] data, String dataName, Context context) {
+    public double[][][] LowpassFilter (double[][][] data, String dataName) {
         Log.v(TAG, "--- LowpassFilter ---");
 
         DoubleFFT_1D realfft = new DoubleFFT_1D(data[0][0].length);
@@ -70,8 +68,8 @@ public class Fourier {
             }
         }
 
-        mWriteData.writeDoubleThreeArrayData("ResultFFT", "rFFT" + dataName, RegistNameInput.name, real, context);
-        mWriteData.writeDoubleThreeArrayData("ResultFFT", "iFFT" + dataName, RegistNameInput.name, imaginary, context);
+        mWriteData.writeDoubleThreeArrayData("ResultFFT", "rFFT" + dataName, RegistNameInput.name, real);
+        mWriteData.writeDoubleThreeArrayData("ResultFFT", "iFFT" + dataName, RegistNameInput.name, imaginary);
 
         // パワースペクトルを求めるために，実数部（k），虚数部（k + 1）それぞれを二乗して加算し，平方根を取り，絶対値を求める
         double[][][] power = new double[data.length][data[0].length][data[0][0].length / 2];
@@ -84,7 +82,7 @@ public class Fourier {
             }
         }
 
-        mWriteData.writeDoubleThreeArrayData("ResultFFT", "powerFFT" + dataName, RegistNameInput.name, power, context);
+        mWriteData.writeDoubleThreeArrayData("ResultFFT", "powerFFT" + dataName, RegistNameInput.name, power);
 
         // For Test Purpose
         // ローパスの閾値を複数パターン試すために，元データを複数の配列にディープコピーする
@@ -157,15 +155,15 @@ public class Fourier {
             }
         }
 
-        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName, RegistNameInput.name, data, context);
+        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName, RegistNameInput.name, data);
 
-        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData1", RegistNameInput.name, testData1, context);
-        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData2", RegistNameInput.name, testData2, context);
-        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData3", RegistNameInput.name, testData3, context);
-        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData4", RegistNameInput.name, testData4, context);
-        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData5", RegistNameInput.name, testData5, context);
-        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData6", RegistNameInput.name, testData6, context);
-        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData7", RegistNameInput.name, testData7, context);
+        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData1", RegistNameInput.name, testData1);
+        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData2", RegistNameInput.name, testData2);
+        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData3", RegistNameInput.name, testData3);
+        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData4", RegistNameInput.name, testData4);
+        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData5", RegistNameInput.name, testData5);
+        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData6", RegistNameInput.name, testData6);
+        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData7", RegistNameInput.name, testData7);
 
 
         return data;
@@ -177,10 +175,9 @@ public class Fourier {
      *
      * @param data     データ平滑化を行うdouble型三次元配列データ
      * @param dataName アウトプット用，データ種別
-     * @param context  Toast表示用
      * @return フーリエ変換によるローパスフィルタリングにより滑らかになったdouble型三次元配列データ
      */
-    public double[][] LowpassFilter (double[][] data, String dataName, Context context) {
+    public double[][] LowpassFilter (double[][] data, String dataName) {
         Log.v(TAG, "--- LowpassFilter ---");
 
         DoubleFFT_1D realfft = new DoubleFFT_1D(data[0].length);
@@ -218,8 +215,8 @@ public class Fourier {
             }
         }
 
-        mWriteData.writeDoubleTwoArrayData("ResultFFT", "rFFT" + dataName, AuthNameInput.name, real, context);
-        mWriteData.writeDoubleTwoArrayData("ResultFFT", "iFFT" + dataName, AuthNameInput.name, imaginary, context);
+        mWriteData.writeDoubleTwoArrayData("ResultFFT", "rFFT" + dataName, AuthNameInput.name, real);
+        mWriteData.writeDoubleTwoArrayData("ResultFFT", "iFFT" + dataName, AuthNameInput.name, imaginary);
 
         // パワースペクトルを求めるために，実数部（k），虚数部（k + 1）それぞれを二乗して加算し，平方根を取り，絶対値を求める
         double[][] power = new double[data.length][data[0].length / 2];
@@ -230,7 +227,7 @@ public class Fourier {
             }
         }
 
-        mWriteData.writeDoubleTwoArrayData("ResultFFT", "powerFFT" + dataName, AuthNameInput.name, power, context);
+        mWriteData.writeDoubleTwoArrayData("ResultFFT", "powerFFT" + dataName, AuthNameInput.name, power);
 
         // ローパスフィルタ処理
         for (int i = 0; i < data.length; i++) {
@@ -246,7 +243,7 @@ public class Fourier {
             realfft.realInverse(data[i], true);
         }
 
-        mWriteData.writeDoubleTwoArrayData("AfterFFT", dataName, AuthNameInput.name, data, context);
+        mWriteData.writeDoubleTwoArrayData("AfterFFT", dataName, AuthNameInput.name, data);
 
         return data;
     }

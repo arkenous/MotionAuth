@@ -94,8 +94,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
 
     // 計算処理のスレッド化に関する変数
-    private boolean resultCalc   = false;
-    private boolean resultSoukan = false;
+    private boolean resultCalc        = false;
+    private boolean resultCorrelation = false;
 
     private ProgressDialog progressDialog;
 
@@ -302,7 +302,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
         mWriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyroFloat);
 
         resultCalc = calc();
-        resultSoukan = soukan();
+        resultCorrelation = measureCorrelation();
 
         progressDialog.dismiss();
         progressDialog = null;
@@ -400,8 +400,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
     /**
      * 相関係数を導出し，ユーザが入力した3回のモーションの類似性を確認する
      */
-    private boolean soukan () {
-        Log.v(TAG, "--- soukan ---");
+    private boolean measureCorrelation () {
+        Log.v(TAG, "--- measureCorrelation ---");
         Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, angle, averageDistance, averageAngle);
 
         Log.d(TAG, "measure = " + measure);
@@ -417,7 +417,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
     private Handler resultHander = new Handler() {
         public void handleMessage (Message msg) {
             if (msg.what == FINISH) {
-                if (!resultCalc || !resultSoukan) {
+                if (!resultCalc || !resultCorrelation) {
                     // もう一度モーションを取り直す処理
                     // ボタンのstatusをenableにして押せるようにする
                     AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);

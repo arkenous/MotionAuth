@@ -90,7 +90,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
     private double[][] registed_ave_angle    = new double[3][100];
 
     // 計算処理のスレッドに関する変数
-    private boolean resultSoukan = false;
+    private boolean resultCorrelation = false;
     private ProgressDialog progressDialog;
 
 
@@ -268,7 +268,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
         readRegistedData();
         calc();
 
-        resultSoukan = soukan();
+        resultCorrelation = measureCorrelation();
 
         progressDialog.dismiss();
         progressDialog = null;
@@ -401,8 +401,8 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
     }
 
 
-    private boolean soukan () {
-        Log.v(TAG, "--- soukan ---");
+    private boolean measureCorrelation () {
+        Log.v(TAG, "--- measureCorrelation ---");
         Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, angle, registed_ave_distance, registed_ave_angle);
 
         return measure == Enum.MEASURE.CORRECT;
@@ -416,7 +416,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
     private Handler resultHandler = new Handler() {
         public void handleMessage (Message msg) {
             if (msg.what == FINISH) {
-                if (!resultSoukan) {
+                if (!resultCorrelation) {
                     Log.i(TAG, "False Authentication");
                     AlertDialog.Builder alert = new AlertDialog.Builder(AuthMotion.this);
                     alert.setTitle("認証失敗です");

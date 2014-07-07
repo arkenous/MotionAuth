@@ -39,7 +39,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
     private static final int VIBRATOR_SHORT  = 40;
     private static final int VIBRATOR_NORMAL = 50;
-    private static final int VIBRATOR_LONG   = 80;
+    private static final int VIBRATOR_LONG   = 100;
 
     private static final int PREPARATION = 1;
     private static final int GET_MOTION  = 2;

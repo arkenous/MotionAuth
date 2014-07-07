@@ -92,7 +92,6 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
     // 計算処理のスレッドに関する変数
     private boolean resultSoukan = false;
     private ProgressDialog progressDialog;
-    private Thread         thread;
 
 
     @Override
@@ -246,7 +245,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
         prepareCount = 0;
 
-        Log.e(TAG, "progressInitStart");
+        Log.i(TAG, "Start Initialize ProgressDialog");
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("計算処理中");
@@ -254,27 +253,28 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
         progressDialog.setIndeterminate(false);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setCancelable(false);
-        Log.e(TAG, "progressInitFinish");
+
+        Log.i(TAG, "Finish Initialize ProgressDialog");
 
         progressDialog.show();
-        thread = new Thread(this);
+        Thread thread = new Thread(this);
         thread.start();
     }
 
 
     @Override
     public void run () {
-        Log.e(TAG, "Thread Start");
+        Log.i(TAG, "Thread Start");
         readRegistedData();
         calc();
 
         resultSoukan = soukan();
 
-        Log.e(TAG, "Task Finished");
-
         progressDialog.dismiss();
         progressDialog = null;
         resultHandler.sendEmptyMessage(FINISH);
+
+        Log.i(TAG, "Thread Finish");
     }
 
 
@@ -409,6 +409,10 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
     }
 
 
+    /**
+     * 認証処理終了後に呼び出されるハンドラ
+     * 認証に成功すればスタート画面に戻り，そうでなければ認証やり直しの処理を行う
+     */
     private Handler resultHandler = new Handler() {
         public void handleMessage (Message msg) {
             if (msg.what == FINISH) {

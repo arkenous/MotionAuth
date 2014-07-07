@@ -97,7 +97,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
     private boolean resultSoukan = false;
 
     private ProgressDialog progressDialog;
-    private Thread         thread;
 
 
     @Override
@@ -150,8 +149,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
                 }
             }
         });
-
-        Log.e(TAG, "aaaaa");
     }
 
 
@@ -280,38 +277,36 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
         secondTv.setText("0");
         getMotionBtn.setText("データ処理中");
 
-        Log.d(TAG, "writeRawData");
+        Log.i(TAG, "Start Initialize ProgressDialog");
 
-        Log.e(TAG, "progressInitStart");
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("計算処理中");
         progressDialog.setMessage("しばらくお待ちください");
         progressDialog.setIndeterminate(false);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setCancelable(false);
-        Log.e(TAG, "progressInitFinish");
+
+        Log.i(TAG, "Finish Initialize ProgressDialog");
 
         progressDialog.show();
-        thread = new Thread(this);
+        Thread thread = new Thread(this);
         thread.start();
     }
 
 
     @Override
     public void run () {
-        Log.e(TAG, "Thread Start");
-
+        Log.i(TAG, "Thread Running");
         mWriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accelFloat, RegistMotion.this);
         mWriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyroFloat, RegistMotion.this);
 
         resultCalc = calc();
         resultSoukan = soukan();
 
-        Log.e(TAG, "Task Finished");
-
         progressDialog.dismiss();
         progressDialog = null;
         resultHander.sendEmptyMessage(FINISH);
+        Log.i(TAG, "Thread Finish");
     }
 
 
@@ -413,6 +408,11 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
         return measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT;
     }
 
+
+    /**
+     * 計算，モーション照合処理終了後に呼ばれるハンドラ
+     * 同一のモーションであると確認されたら登録を行い，そうでなければ取り直しの処理を行う
+     */
     private Handler resultHander = new Handler() {
         public void handleMessage (Message msg) {
             if (msg.what == FINISH) {

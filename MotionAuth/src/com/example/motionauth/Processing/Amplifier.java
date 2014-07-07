@@ -10,7 +10,7 @@ import android.util.Log;
 public class Amplifier {
     private static final String TAG = Amplifier.class.getSimpleName();
 
-    private static final double CHECK_RANGE_VALUE   = 3;
+    private static final double CHECK_RANGE_VALUE   = 2.5;
     private static final double AMPLIFICATION_VALUE = 2;
 
     private boolean rangeTest = false;

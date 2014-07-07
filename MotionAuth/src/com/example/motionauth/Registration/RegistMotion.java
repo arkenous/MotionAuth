@@ -22,7 +22,6 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.example.motionauth.Lowpass.Fourier;
 import com.example.motionauth.Processing.*;
 import com.example.motionauth.R;
@@ -365,21 +364,23 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
         if (Enum.MEASURE.BAD == measure) {
             // 相関係数が0.4以下
-            Toast.makeText(RegistMotion.this, "同一モーションですか？", Toast.LENGTH_SHORT).show();
+            Log.i(TAG, "measure: BAD");
             return false;
         }
         else if (Enum.MEASURE.INCORRECT == measure) {
             // 相関係数が0.4よりも高く，0.8以下の場合
             // ズレ修正を行う
+            Log.i(TAG, "measure: INCORRECT");
             distance = CorrectDeviation.correctDeviation(distance);
             angle = CorrectDeviation.correctDeviation(angle);
         }
         else if (Enum.MEASURE.PERFECT == measure || Enum.MEASURE.CORRECT == measure) {
+            Log.i(TAG, "measure: CORRECT or PERFECT");
             // PERFECTなら，何もしない
         }
         else {
             // なにかがおかしい
-            Toast.makeText(RegistMotion.this, "Error", Toast.LENGTH_LONG).show();
+            Log.e(TAG, "measure: Error");
             return false;
         }
         //endregion

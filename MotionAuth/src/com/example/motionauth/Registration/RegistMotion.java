@@ -99,7 +99,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
     private double checkRangeValue = 2.5;
 
-    private double seekBarValue = 2.0;
+    private double seekBarValue = 2.5;
 
 
     @Override
@@ -326,7 +326,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
         mWriteData.writeDoubleThreeArrayData("BeforeFFT", "accel", RegistNameInput.name, accel_double);
         mWriteData.writeDoubleThreeArrayData("BeforeFFT", "gyro", RegistNameInput.name, gyro_double);
 
-        if (mAmplifier.CheckValueRange(accel_double, checkRangeValue) || mAmplifier.CheckValueRange(gyro_double, checkRangeValue)) {
+        if (mAmplifier.CheckValueRange(accel_double, seekBarValue) || mAmplifier.CheckValueRange(gyro_double, seekBarValue)) {
             accel_double = mAmplifier.Amplify(accel_double);
             gyro_double = mAmplifier.Amplify(gyro_double);
             isAmplified = true;
@@ -551,7 +551,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
                 seekText.setText("現在の値は" + seekBarValue + "です");
                 seekBar.setMax(30);
 
-                seekBar.setProgress(10);
+                seekBar.setProgress(16);
                 seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged (SeekBar seekBar, int progress, boolean fromUser) {

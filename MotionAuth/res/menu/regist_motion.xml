@@ -9,5 +9,9 @@
         android:id="@+id/check_range_value"
         android:title="@string/check_range_value"
     />
+    <item
+        android:id="@+id/test"
+        android:title="@string/test"
+    />
 
 </menu>

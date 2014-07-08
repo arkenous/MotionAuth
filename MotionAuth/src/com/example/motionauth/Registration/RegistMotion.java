@@ -15,12 +15,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Vibrator;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
+import android.view.*;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import com.example.motionauth.Lowpass.Fourier;
 import com.example.motionauth.Processing.*;
@@ -100,6 +98,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
     private ProgressDialog progressDialog;
 
     private double checkRangeValue = 2.5;
+
+    private double seekBarValue = 2.0;
 
 
     @Override
@@ -543,6 +543,42 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
                 });
                 alert.show();
                 return true;
+            case R.id.test:
+                LayoutInflater inflater = LayoutInflater.from(RegistMotion.this);
+                View seekView = inflater.inflate(R.layout.seekdialog, (ViewGroup) findViewById(R.id.dialog_root));
+                SeekBar seekBar = (SeekBar) seekView.findViewById(R.id.seekbar);
+                final TextView seekText = (TextView) seekView.findViewById(R.id.seektext);
+                seekText.setText("現在の値は" + seekBarValue + "です");
+                seekBar.setMax(30);
+
+                seekBar.setProgress(10);
+                seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged (SeekBar seekBar, int progress, boolean fromUser) {
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch (SeekBar seekBar) {
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch (SeekBar seekBar) {
+                        seekBarValue = (seekBar.getProgress() + 10) / 10.0;
+                        seekText.setText("現在の値は" + seekBarValue + "です");
+                    }
+                });
+
+                AlertDialog.Builder dialog = new AlertDialog.Builder(RegistMotion.this);
+                dialog.setTitle("seekbar");
+                dialog.setView(seekView);
+                dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick (DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                dialog.show();
         }
         return false;
     }

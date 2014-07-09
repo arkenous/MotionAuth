@@ -16,7 +16,7 @@
     <string name="regist_description2">データ取得は3回行います．データ取得が正常に完了すれば，登録は終了です．</string>
     <string name="auth_description2">データ取得は1回行います．</string>
     <string name="three">③</string>
-    <string name="discription3">データ取得完了後，認証を行います．</string>
+    <string name="description3">データ取得完了後，認証を行います．</string>
     <string name="ato">あと</string>
     <string name="count">回</string>
     <string name="third">3</string>

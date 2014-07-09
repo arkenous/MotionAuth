@@ -3,7 +3,6 @@
 
     <string name="app_name">MotionAuth</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
     <string name="start">Start</string>
     <string name="title_activity_regist_name_input">RegistNameInput</string>
     <string name="name_input">あなたの名前を入力してください</string>

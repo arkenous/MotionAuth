@@ -40,7 +40,6 @@ public class Fourier {
         }
 
 
-
         // 実数部，虚数部それぞれを入れる配列
         double[][][] real = new double[data.length][data[0].length][data[0][0].length];
         double[][][] imaginary = new double[data.length][data[0].length][data[0][0].length];

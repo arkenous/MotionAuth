@@ -520,30 +520,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
     public boolean onOptionsItemSelected (MenuItem item) {
         switch (item.getItemId()) {
             case R.id.check_range_value:
-                AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);
-                alert.setTitle("CHECK_RANGE_VALUE");
-                alert.setMessage("CHECK_RANGE_VALUEの値を変更できます");
-                alert.setNegativeButton("きつめ", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick (DialogInterface dialog, int which) {
-                        checkRangeValue = 2.0;
-                    }
-                });
-                alert.setNeutralButton("ふつう", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick (DialogInterface dialog, int which) {
-                        checkRangeValue = 2.5;
-                    }
-                });
-                alert.setPositiveButton("ゆるめ", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick (DialogInterface dialog, int which) {
-                        checkRangeValue = 3.0;
-                    }
-                });
-                alert.show();
-                return true;
-            case R.id.test:
                 LayoutInflater inflater = LayoutInflater.from(RegistMotion.this);
                 View seekView = inflater.inflate(R.layout.seekdialog, (ViewGroup) findViewById(R.id.dialog_root));
                 SeekBar seekBar = (SeekBar) seekView.findViewById(R.id.seekbar);
@@ -555,6 +531,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
                 seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged (SeekBar seekBar, int progress, boolean fromUser) {
+                        seekBarValue = (seekBar.getProgress() + 10) / 10.0;
+                        seekText.setText("現在の値は" + seekBarValue + "です");
                     }
 
                     @Override
@@ -569,16 +547,25 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
                 });
 
                 AlertDialog.Builder dialog = new AlertDialog.Builder(RegistMotion.this);
-                dialog.setTitle("seekbar");
+                dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+                    @Override
+                    public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {
+                        return keyCode == KeyEvent.KEYCODE_BACK;
+                    }
+                });
+                dialog.setTitle("増幅器の閾値調整");
+                dialog.setMessage("増幅器にかけるかどうかを判断する閾値を調整できます．\n" +
+                        "2.5を中心に，値が小さければ増幅器にかかりづらく，大きければかかりやすくなります．");
                 dialog.setView(seekView);
+                dialog.setCancelable(false);
                 dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick (DialogInterface dialog, int which) {
 
                     }
                 });
-
                 dialog.show();
+                return true;
         }
         return false;
     }

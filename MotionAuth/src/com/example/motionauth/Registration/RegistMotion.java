@@ -99,8 +99,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
     private double checkRangeValue = 2.5;
 
-    private double seekBarValue = 2.5;
-
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -326,7 +324,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
         mWriteData.writeDoubleThreeArrayData("BeforeFFT", "accel", RegistNameInput.name, accel_double);
         mWriteData.writeDoubleThreeArrayData("BeforeFFT", "gyro", RegistNameInput.name, gyro_double);
 
-        if (mAmplifier.CheckValueRange(accel_double, seekBarValue) || mAmplifier.CheckValueRange(gyro_double, seekBarValue)) {
+        if (mAmplifier.CheckValueRange(accel_double, checkRangeValue) || mAmplifier.CheckValueRange(gyro_double, checkRangeValue)) {
             accel_double = mAmplifier.Amplify(accel_double);
             gyro_double = mAmplifier.Amplify(gyro_double);
             isAmplified = true;
@@ -524,15 +522,15 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
                 View seekView = inflater.inflate(R.layout.seekdialog, (ViewGroup) findViewById(R.id.dialog_root));
                 SeekBar seekBar = (SeekBar) seekView.findViewById(R.id.seekbar);
                 final TextView seekText = (TextView) seekView.findViewById(R.id.seektext);
-                seekText.setText("現在の値は" + seekBarValue + "です");
+                seekText.setText("現在の値は" + checkRangeValue + "です");
                 seekBar.setMax(30);
 
                 seekBar.setProgress(16);
                 seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged (SeekBar seekBar, int progress, boolean fromUser) {
-                        seekBarValue = (seekBar.getProgress() + 10) / 10.0;
-                        seekText.setText("現在の値は" + seekBarValue + "です");
+                        checkRangeValue = (seekBar.getProgress() + 10) / 10.0;
+                        seekText.setText("現在の値は" + checkRangeValue + "です");
                     }
 
                     @Override
@@ -541,8 +539,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
                     @Override
                     public void onStopTrackingTouch (SeekBar seekBar) {
-                        seekBarValue = (seekBar.getProgress() + 10) / 10.0;
-                        seekText.setText("現在の値は" + seekBarValue + "です");
+                        checkRangeValue = (seekBar.getProgress() + 10) / 10.0;
+                        seekText.setText("現在の値は" + checkRangeValue + "です");
                     }
                 });
 

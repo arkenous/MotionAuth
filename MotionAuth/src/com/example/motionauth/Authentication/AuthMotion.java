@@ -149,7 +149,6 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
     @Override
     public void onSensorChanged (SensorEvent event) {
-        Log.v(TAG, "--- onSensorChanged ---");
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             vAccel = event.values.clone();
         }

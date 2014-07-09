@@ -120,6 +120,18 @@ public class Correlation {
         mWriteData.writeRData("RegistLRdata", "R_accel", RegistNameInput.name, R_accel);
         mWriteData.writeRData("RegistLRdata", "R_gyro", RegistNameInput.name, R_gyro);
 
+        for (double[] i : R_accel) {
+            for (double j : i) {
+                Log.e(TAG, "R_accel: " + j);
+            }
+        }
+
+        for (double[] i : R_gyro) {
+            for (double j : i) {
+                Log.e(TAG, "R_gyro: " + j);
+            }
+        }
+
         // TODO 評価軸見直し
 
         // X

@@ -12,6 +12,8 @@ public class Amplifier {
 
     private static final double AMPLIFICATION_VALUE = 2;
 
+    private boolean isRangeCheck = false;
+
 
     /**
      * 全試行回数中，一回でもデータの幅が閾値よりも小さければtrueを返す
@@ -53,12 +55,14 @@ public class Amplifier {
                 range = max[i][j] - min[i][j];
                 Log.e(TAG, "range = " + range);
                 if (range < checkRangeValue) {
-                    return true;
+//                    return true;
+                    isRangeCheck = true;
                 }
             }
         }
 
-        return false;
+//        return false;
+        return isRangeCheck;
     }
 
 

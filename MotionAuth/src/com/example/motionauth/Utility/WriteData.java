@@ -75,7 +75,7 @@ public class WriteData {
                     file = new File(filePath);
 
                     // ファイルを追記モードで書き込む
-                    FileOutputStream fos = new FileOutputStream(file, true);
+                    FileOutputStream fos = new FileOutputStream(file, false);
                     OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
                     BufferedWriter bw = new BufferedWriter(osw);
 
@@ -83,6 +83,8 @@ public class WriteData {
                         bw.write(dataName + "_" + dimension + "_" + String.valueOf(i + 1) + "@" + data[i][j][k] + "\n");
                     }
                     bw.close();
+                    osw.close();
+                    fos.close();
                 }
             }
         }
@@ -139,15 +141,16 @@ public class WriteData {
             file = new File(filePath);
 
             // ファイルを追記モードで書き込む
-            FileOutputStream fos = new FileOutputStream(file, true);
+            FileOutputStream fos = new FileOutputStream(file, false);
             OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
             BufferedWriter bw = new BufferedWriter(osw);
 
             for (double i : data) {
                 bw.write(dataName + "@" + i + "\n");
             }
-
             bw.close();
+            osw.close();
+            fos.close();
         }
         catch (Exception e) {
             Log.e(TAG, "Error");
@@ -218,7 +221,7 @@ public class WriteData {
                 file = new File(filePath);
 
                 // ファイルを追記モードで書き込む
-                FileOutputStream fos = new FileOutputStream(file, true);
+                FileOutputStream fos = new FileOutputStream(file, false);
                 OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
                 BufferedWriter bw = new BufferedWriter(osw);
 
@@ -226,6 +229,8 @@ public class WriteData {
                     bw.write(dataName + "_" + dimension + "@" + data[i][j] + "\n");
                 }
                 bw.close();
+                osw.close();
+                fos.close();
             }
         }
         catch (Exception e) {
@@ -305,6 +310,7 @@ public class WriteData {
                         bw.flush();
                     }
                     bw.close();
+                    osw.close();
                     fos.close();
                 }
             }
@@ -375,12 +381,14 @@ public class WriteData {
                     file = new File(filePath);
 
                     // ファイルを追記モードで書き込む
-                    FileOutputStream fos = new FileOutputStream(file, true);
+                    FileOutputStream fos = new FileOutputStream(file, false);
                     OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
                     BufferedWriter bw = new BufferedWriter(osw);
 
                     bw.write(dataName + "_" + dimension + "_" + String.valueOf(i + 1) + "@" + data[i][j] + "\n");
                     bw.close();
+                    osw.close();
+                    fos.close();
                 }
             }
         }
@@ -462,6 +470,7 @@ public class WriteData {
             }
 
             bw.close();
+            osw.close();
             fos.close();
 
             return true;

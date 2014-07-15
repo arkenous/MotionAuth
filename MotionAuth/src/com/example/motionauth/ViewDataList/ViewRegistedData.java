@@ -1,14 +1,17 @@
 package com.example.motionauth.ViewDataList;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
-import android.view.Window;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 import com.example.motionauth.R;
 
 import java.io.*;
@@ -22,6 +25,7 @@ public class ViewRegistedData extends Activity {
     private static final String TAG = ViewRegistedData.class.getSimpleName();
 
     String item = null;
+    int flgCount;
 
 
     @Override
@@ -31,8 +35,16 @@ public class ViewRegistedData extends Activity {
         Log.v(TAG, "--- onCreate ---");
 
         // タイトルバーの非表示
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_view_registed_data);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            ActionBar actionBar = getActionBar();
+            if (actionBar != null) {
+                actionBar.setHomeButtonEnabled(true);
+            }
+        }
+        flgCount = 0;
 
         viewRegistedData();
     }
@@ -109,5 +121,40 @@ public class ViewRegistedData extends Activity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.view_registed_data, menu);
         return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected (MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                if (flgCount == 10) {
+                    Toast.makeText(ViewRegistedData.this, "TEST", Toast.LENGTH_SHORT).show();
+                    flgCount = 0;
+
+                    moveActivity("com.example.motionauth", "com.example.motionauth.ViewDataList.ViewRegistedRData", true);
+                }
+                else {
+                    flgCount++;
+                }
+                return true;
+        }
+        return false;
+    }
+
+
+    private void moveActivity (String pkgName, String actName, boolean flg) {
+        Log.v(TAG, "--- moveActivity ---");
+
+        Intent intent = new Intent();
+        intent.setClassName(pkgName, actName);
+
+        intent.putExtra("item", item);
+
+        if (flg) {
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
+
+        startActivityForResult(intent, 0);
     }
 }

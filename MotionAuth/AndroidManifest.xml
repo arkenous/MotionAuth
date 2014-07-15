@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
     package="com.example.motionauth"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.0">
 
     <!-- 対象となるAndroid Versionの指定 -->
     <uses-sdk
@@ -15,10 +16,10 @@
 
     <application
         android:allowBackup="true"
+        android:debuggable="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:debuggable="true">
+        android:theme="@style/AppTheme">
         <activity
             android:name="com.example.motionauth.Start"
             android:label="@string/app_name"
@@ -32,32 +33,30 @@
         <activity
             android:name=".Registration.RegistNameInput"
             android:label="@string/title_activity_regist_name_input"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".Registration.RegistMotion"
             android:label="@string/title_activity_regist_motion"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".Authentication.AuthNameInput"
             android:label="@string/title_activity_auth_name_input"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".Authentication.AuthMotion"
             android:label="@string/title_activity_auth_motion"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".ViewDataList.RegistrantList"
             android:label="@string/title_activity_registrant_list"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".ViewDataList.ViewRegistedData"
             android:label="@string/title_activity_view_registed_data"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".ViewDataList.ViewRegistedRData"
+            android:label="@string/title_activity_view_registed_rdata"
+            android:screenOrientation="portrait"></activity>
     </application>
 </manifest>

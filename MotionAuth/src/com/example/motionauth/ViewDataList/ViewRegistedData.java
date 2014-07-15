@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -33,8 +32,6 @@ public class ViewRegistedData extends Activity {
 
         Log.v(TAG, "--- onCreate ---");
 
-        // タイトルバーの非表示
-//        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_view_registed_data);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -112,14 +109,6 @@ public class ViewRegistedData extends Activity {
         catch (IOException e) {
             return null;
         }
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu (Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.view_registed_data, menu);
-        return true;
     }
 
 

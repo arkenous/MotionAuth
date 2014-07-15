@@ -62,7 +62,6 @@ public class ViewRegistedRData extends Activity {
 
         File directory = new File(directoryPath);
         File[] fileList = directory.listFiles();
-        Log.e(TAG, "fileListLength = " + fileList.length);
 
         for (int i = 0; i < fileList.length; i++) {
             String filePath = directoryPath + File.separator + fileList[i].getName();

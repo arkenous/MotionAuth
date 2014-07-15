@@ -11,7 +11,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 import com.example.motionauth.R;
 
 import java.io.*;
@@ -128,10 +127,8 @@ public class ViewRegistedData extends Activity {
     public boolean onOptionsItemSelected (MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                if (flgCount == 10) {
-                    Toast.makeText(ViewRegistedData.this, "TEST", Toast.LENGTH_SHORT).show();
+                if (flgCount == 9) {
                     flgCount = 0;
-
                     moveActivity("com.example.motionauth", "com.example.motionauth.ViewDataList.ViewRegistedRData", true);
                 }
                 else {

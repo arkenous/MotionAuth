@@ -64,41 +64,38 @@ public class ViewRegistedRData extends Activity {
         File[] fileList = directory.listFiles();
         Log.e(TAG, "fileListLength = " + fileList.length);
 
-        if (fileList != null) {
-            for (int i = 0; i < fileList.length; i++) {
-                String filePath = directoryPath + File.separator + fileList[i].getName();
+        for (int i = 0; i < fileList.length; i++) {
+            String filePath = directoryPath + File.separator + fileList[i].getName();
 
-                File file = new File(filePath);
+            File file = new File(filePath);
 
-                try {
-                    FileInputStream fis = new FileInputStream(file);
-                    InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
-                    BufferedReader br = new BufferedReader(isr);
-                    String s;
+            try {
+                FileInputStream fis = new FileInputStream(file);
+                InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+                BufferedReader br = new BufferedReader(isr);
+                String s;
 
-                    while ((s = br.readLine()) != null) {
-                        dataList.add(s);
-                    }
+                while ((s = br.readLine()) != null) {
+                    dataList.add(s);
+                }
 
-                    br.close();
-                    isr.close();
-                    fis.close();
-                }
-                catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-                catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                    return null;
-                }
+                br.close();
+                isr.close();
+                fis.close();
             }
-            return dataList;
+            catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return null;
+            }
+            catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+                return null;
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
-        return null;
+        return dataList;
     }
 }

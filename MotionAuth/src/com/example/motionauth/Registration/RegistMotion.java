@@ -261,7 +261,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
         }
     };
     private ProgressDialog progressDialog;
-    private double checkRangeValue = 2.5;
+    private double checkRangeValue = 2.0;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {

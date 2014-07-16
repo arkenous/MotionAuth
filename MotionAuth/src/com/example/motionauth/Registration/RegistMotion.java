@@ -489,6 +489,13 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
 
     @Override
+    public boolean onCreateOptionsMenu (Menu menu) {
+        getMenuInflater().inflate(R.menu.regist_motion, menu);
+        return true;
+    }
+
+
+    @Override
     public boolean onOptionsItemSelected (MenuItem item) {
         switch (item.getItemId()) {
             case R.id.check_range_value:

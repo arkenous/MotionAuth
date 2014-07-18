@@ -102,8 +102,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
         Log.v(TAG, "--- onCreate ---");
 
-        // タイトルバーの非表示
-//        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_regist_motion);
 
         registMotion();

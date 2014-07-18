@@ -132,8 +132,6 @@ public class Correlation {
             }
         }
 
-        // TODO 評価軸見直し
-
         // X
         if ((R_accel[0][0] > mEnum.LOOSE && R_accel[1][0] > mEnum.LOOSE) || (R_accel[1][0] > mEnum.LOOSE && R_accel[2][0] > mEnum.LOOSE) || (R_accel[0][0] > mEnum.LOOSE && R_accel[2][0] > mEnum.LOOSE)) {
             // Y

@@ -15,25 +15,6 @@ public class Formatter {
 
 
     /**
-     * float型の数値データを小数点以下2桁に揃え，doubleに変換する
-     *
-     * @param inputVal float型の数値データ
-     * @return 小数点以下2桁に揃え，double型に変換した数値データ
-     */
-    public static double floatToDoubleFormatter (float inputVal) {
-        Log.v(TAG, "--- floatToDoubleFormatter ---");
-
-        double returnVal;
-
-        String afterFormat = String.format(Locale.getDefault(), "%.2f", inputVal);
-
-        returnVal = Double.valueOf(afterFormat);
-
-        return returnVal;
-    }
-
-
-    /**
      * float型の２次元数値データを小数点以下２桁に揃え，doubleに変換する
      *
      * @param inputVal float型の２次元配列データ
@@ -74,25 +55,6 @@ public class Formatter {
                 }
             }
         }
-
-        return returnVal;
-    }
-
-
-    /**
-     * double型の数値データを小数点以下2桁に揃える
-     *
-     * @param inputVal double型の数値データ
-     * @return 小数点以下2桁に揃えたdouble型数値データ
-     */
-    public static double doubleToDoubleFormatter (double inputVal) {
-        Log.v(TAG, "--- doubleToDoubleFormatter ---");
-
-        double returnVal;
-
-        String afterFormat = String.format(Locale.getDefault(), "%.2f", inputVal);
-
-        returnVal = Double.valueOf(afterFormat);
 
         return returnVal;
     }

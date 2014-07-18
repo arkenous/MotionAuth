@@ -26,7 +26,6 @@ public class RegistrantList extends Activity {
     private static final String TAG = RegistrantList.class.getSimpleName();
 
     // ファイル名を格納するためのリスト
-    // List<String> fileName = null;
     String[] fileNameStr = null;
 
     String item;

@@ -83,78 +83,16 @@ public class Fourier {
 
         mWriteData.writeDoubleThreeArrayData("ResultFFT", "powerFFT" + dataName, RegistNameInput.name, power);
 
-        // For Test Purpose
-        // ローパスの閾値を複数パターン試すために，元データを複数の配列にディープコピーする
-//        double[][][] testData1 = new double[data.length][data[0].length][data[0][0].length];
-//        double[][][] testData2 = new double[data.length][data[0].length][data[0][0].length];
-//        double[][][] testData3 = new double[data.length][data[0].length][data[0][0].length];
-//        double[][][] testData4 = new double[data.length][data[0].length][data[0][0].length];
-//        double[][][] testData5 = new double[data.length][data[0].length][data[0][0].length];
-//        double[][][] testData6 = new double[data.length][data[0].length][data[0][0].length];
-//        double[][][] testData7 = new double[data.length][data[0].length][data[0][0].length];
-//
-//        for (int i = 0; i < data.length; i++) {
-//            for (int j = 0; j < data[i].length; j++) {
-//                testData1[i][j] = Arrays.copyOf(data[i][j], data[i][j].length);
-//                testData2[i][j] = Arrays.copyOf(data[i][j], data[i][j].length);
-//                testData3[i][j] = Arrays.copyOf(data[i][j], data[i][j].length);
-//                testData4[i][j] = Arrays.copyOf(data[i][j], data[i][j].length);
-//                testData5[i][j] = Arrays.copyOf(data[i][j], data[i][j].length);
-//                testData6[i][j] = Arrays.copyOf(data[i][j], data[i][j].length);
-//                testData7[i][j] = Arrays.copyOf(data[i][j], data[i][j].length);
-//            }
-//        }
-
-
         // ローパスフィルタ処理
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < data[i].length; j++) {
                 for (int k = 0; k < data[i][j].length; k++) {
-//                    if (k > 10) {
-//                        testData1[i][j][k] = 0;
-//                    }
-//                    else if (k > 20) {
-//                        testData2[i][j][k] = 0;
-//                    }
-//                    else if (k > 30) {
-//                        data[i][j][k] = 0;
-//                    }
-//                    else if (k > 40) {
-//                        testData3[i][j][k] = 0;
-//                    }
-//                    else if (k > 50) {
-//                        testData4[i][j][k] = 0;
-//                    }
-//                    else if (k > 60) {
-//                        testData5[i][j][k] = 0;
-//                    }
-//                    else if (k > 70) {
-//                        testData6[i][j][k] = 0;
-//                    }
-//                    else if (k > 80) {
-//                        testData7[i][j][k] = 0;
-//                    }
                     if (k > 30) {
                         data[i][j][k] = 0;
                     }
                 }
             }
         }
-
-        // 逆フーリエ変換（InverseDFT）
-//        for (int i = 0; i < data.length; i++) {
-//            for (int j = 0; j < data[i].length; j++) {
-//                realfft.realInverse(data[i][j], true);
-
-//                realfft.realInverse(testData1[i][j], true);
-//                realfft.realInverse(testData2[i][j], true);
-//                realfft.realInverse(testData3[i][j], true);
-//                realfft.realInverse(testData4[i][j], true);
-//                realfft.realInverse(testData5[i][j], true);
-//                realfft.realInverse(testData6[i][j], true);
-//                realfft.realInverse(testData7[i][j], true);
-//            }
-//        }
 
         for (double[][] i : data) {
             for (double[] j : i) {
@@ -163,14 +101,6 @@ public class Fourier {
         }
 
         mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName, RegistNameInput.name, data);
-
-//        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData1", RegistNameInput.name, testData1);
-//        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData2", RegistNameInput.name, testData2);
-//        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData3", RegistNameInput.name, testData3);
-//        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData4", RegistNameInput.name, testData4);
-//        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData5", RegistNameInput.name, testData5);
-//        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData6", RegistNameInput.name, testData6);
-//        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName + "testData7", RegistNameInput.name, testData7);
 
         return data;
     }

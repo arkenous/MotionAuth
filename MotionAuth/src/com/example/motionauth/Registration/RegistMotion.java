@@ -544,7 +544,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
                 });
                 dialog.setTitle("増幅器の閾値調整");
                 dialog.setMessage("増幅器にかけるかどうかを判断する閾値を調整できます．\n" +
-                        "2.5を中心に，値が小さければ増幅器にかかりづらく，大きければかかりやすくなります．");
+                        "2.5を中心に，値が小さければ登録・認証が難しくなり，大きければ易しくなります．");
                 dialog.setView(seekView);
                 dialog.setCancelable(false);
                 dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {

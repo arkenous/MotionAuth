@@ -79,6 +79,70 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
     private float[][] accelFloat = new float[3][100];
     private float[][] gyroFloat  = new float[3][100];
+
+    // 移動平均後のデータを格納する配列
+    private double[][] distance              = new double[3][100];
+    private double[][] angle                 = new double[3][100];
+    // RegistMotionにて登録された平均データ
+    private double[][] registed_ave_distance = new double[3][100];
+    private double[][] registed_ave_angle    = new double[3][100];
+    // 計算処理のスレッドに関する変数
+    private boolean    resultCorrelation     = false;
+
+    private ProgressDialog progressDialog;
+
+    @Override
+    protected void onCreate (Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Log.v(TAG, "--- onCreate ---");
+
+        // タイトルバーの非表示
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.activity_auth_motion);
+
+        authMotion();
+    }
+
+    /**
+     * 認証画面にイベントリスナ等を設定する
+     */
+    private void authMotion () {
+        Log.v(TAG, "--- authMotion ---");
+
+        // センササービス，各種センサを取得する
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mGyroscopeSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+
+        mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+
+        TextView nameTv = (TextView) findViewById(R.id.textView1);
+        secondTv = (TextView) findViewById(R.id.secondTextView);
+        countSecondTv = (TextView) findViewById(R.id.textView4);
+        getMotionBtn = (Button) findViewById(R.id.button1);
+
+        nameTv.setText(AuthNameInput.name + "さん読んでね！");
+
+        getMotionBtn.setOnClickListener(new OnClickListener() {
+            public void onClick (View v) {
+                Log.i(TAG, "Click Get Motion Button");
+                if (!btnStatus) {
+                    // ボタンを押したら，statusをfalseにして押せないようにする
+                    btnStatus = true;
+
+                    // ボタンをクリックできないようにする
+                    v.setClickable(false);
+
+                    getMotionBtn.setText("インターバル中");
+                    countSecondTv.setText("秒");
+                    timeHandler.sendEmptyMessage(PREPARATION);
+                }
+            }
+        });
+    }
+
+
     /**
      * 一定時間ごとにモーションデータを取得するハンドラ
      * 計算処理や相関係数計算関数もここから呼び出す
@@ -156,109 +220,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
             }
         }
     };
-    // 移動平均後のデータを格納する配列
-    private double[][] distance              = new double[3][100];
-    private double[][] angle                 = new double[3][100];
-    // RegistMotionにて登録された平均データ
-    private double[][] registed_ave_distance = new double[3][100];
-    private double[][] registed_ave_angle    = new double[3][100];
-    // 計算処理のスレッドに関する変数
-    private boolean    resultCorrelation     = false;
-    /**
-     * 認証処理終了後に呼び出されるハンドラ
-     * 認証に成功すればスタート画面に戻り，そうでなければ認証やり直しの処理を行う
-     */
-    private Handler    resultHandler         = new Handler() {
-        public void handleMessage (Message msg) {
-            if (msg.what == FINISH) {
-                if (!resultCorrelation) {
-                    Log.i(TAG, "False Authentication");
-                    AlertDialog.Builder alert = new AlertDialog.Builder(AuthMotion.this);
-                    alert.setTitle("認証失敗です");
-                    alert.setMessage("認証に失敗しました");
-                    alert.setCancelable(false);
-                    alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick (DialogInterface dialog, int which) {
-                            getMotionBtn.setClickable(true);
-                            // データ取得関係の変数を初期化
-                            accelCount = 0;
-                            gyroCount = 0;
-                            secondTv.setText("3");
-                            getMotionBtn.setText("モーションデータ取得");
-                        }
-                    });
-                    alert.show();
-                }
-                else {
-                    Log.i(TAG, "Success Authentication");
-                    AlertDialog.Builder alert = new AlertDialog.Builder(AuthMotion.this);
-                    alert.setTitle("認証成功");
-                    alert.setMessage("認証に成功しました．\nスタート画面に戻ります．");
-                    alert.setCancelable(false);
-                    alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick (DialogInterface dialog, int which) {
-                            moveActivity("com.example.motionauth", "com.example.motionauth.Start", true);
-                        }
-                    });
-                    alert.show();
-                }
-            }
-        }
-    };
-    private ProgressDialog progressDialog;
 
-    @Override
-    protected void onCreate (Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        Log.v(TAG, "--- onCreate ---");
-
-        // タイトルバーの非表示
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.activity_auth_motion);
-
-        authMotion();
-    }
-
-    /**
-     * 認証画面にイベントリスナ等を設定する
-     */
-    private void authMotion () {
-        Log.v(TAG, "--- authMotion ---");
-
-        // センササービス，各種センサを取得する
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mGyroscopeSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-
-        mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-
-        TextView nameTv = (TextView) findViewById(R.id.textView1);
-        secondTv = (TextView) findViewById(R.id.secondTextView);
-        countSecondTv = (TextView) findViewById(R.id.textView4);
-        getMotionBtn = (Button) findViewById(R.id.button1);
-
-        nameTv.setText(AuthNameInput.name + "さん読んでね！");
-
-        getMotionBtn.setOnClickListener(new OnClickListener() {
-            public void onClick (View v) {
-                Log.i(TAG, "Click Get Motion Button");
-                if (!btnStatus) {
-                    // ボタンを押したら，statusをfalseにして押せないようにする
-                    btnStatus = true;
-
-                    // ボタンをクリックできないようにする
-                    v.setClickable(false);
-
-                    getMotionBtn.setText("インターバル中");
-                    countSecondTv.setText("秒");
-                    timeHandler.sendEmptyMessage(PREPARATION);
-                }
-            }
-        });
-    }
 
     @Override
     public void onSensorChanged (SensorEvent event) {
@@ -428,6 +390,52 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
         distance = mFormatter.doubleToDoubleFormatter(distance);
         angle = mFormatter.doubleToDoubleFormatter(angle);
     }
+
+
+    /**
+     * 認証処理終了後に呼び出されるハンドラ
+     * 認証に成功すればスタート画面に戻り，そうでなければ認証やり直しの処理を行う
+     */
+    private Handler resultHandler = new Handler() {
+        public void handleMessage (Message msg) {
+            if (msg.what == FINISH) {
+                if (!resultCorrelation) {
+                    Log.i(TAG, "False Authentication");
+                    AlertDialog.Builder alert = new AlertDialog.Builder(AuthMotion.this);
+                    alert.setTitle("認証失敗です");
+                    alert.setMessage("認証に失敗しました");
+                    alert.setCancelable(false);
+                    alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick (DialogInterface dialog, int which) {
+                            getMotionBtn.setClickable(true);
+                            // データ取得関係の変数を初期化
+                            accelCount = 0;
+                            gyroCount = 0;
+                            secondTv.setText("3");
+                            getMotionBtn.setText("モーションデータ取得");
+                        }
+                    });
+                    alert.show();
+                }
+                else {
+                    Log.i(TAG, "Success Authentication");
+                    AlertDialog.Builder alert = new AlertDialog.Builder(AuthMotion.this);
+                    alert.setTitle("認証成功");
+                    alert.setMessage("認証に成功しました．\nスタート画面に戻ります．");
+                    alert.setCancelable(false);
+                    alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick (DialogInterface dialog, int which) {
+                            moveActivity("com.example.motionauth", "com.example.motionauth.Start", true);
+                        }
+                    });
+                    alert.show();
+                }
+            }
+        }
+    };
+
 
     private boolean measureCorrelation () {
         Log.v(TAG, "--- measureCorrelation ---");

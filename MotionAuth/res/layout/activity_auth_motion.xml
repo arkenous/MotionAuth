@@ -32,7 +32,7 @@
         android:layout_above="@+id/button1"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="29dp"
-        android:text="@string/third"
+        android:text="@string/first"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView

@@ -19,6 +19,7 @@
     <string name="ato">あと</string>
     <string name="count">回</string>
     <string name="third">3</string>
+    <string name="first">1</string>
     <string name="hoge">hoge</string>
     <string name="getData">モーションデータ取得</string>
     <string name="title_activity_auth_name_input">AuthNameInput</string>

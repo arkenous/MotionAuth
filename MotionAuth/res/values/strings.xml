@@ -28,5 +28,6 @@
     <string name="title_activity_view_registed_data">ViewRegistedData</string>
     <string name="check_range_value">増幅器の閾値調整</string>
     <string name="title_activity_view_registed_rdata">ViewRegistedRData</string>
+    <string name="reset">リセット</string>
 
 </resources>

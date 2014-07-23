@@ -72,7 +72,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
     private int prepareCount = 0;
 
-    private boolean btnStatus = false;
+    private boolean isGetMotionBtnClickable = true;
 
     private boolean isAmplified = false;
 
@@ -94,6 +94,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
     private ProgressDialog progressDialog;
     private double checkRangeValue = 2.0;
+
+    private boolean isResetButtonClickable = true;
 
 
     @Override
@@ -131,12 +133,13 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
         getMotionBtn.setOnClickListener(new OnClickListener() {
             public void onClick (View v) {
                 Log.i(TAG, "Click Get Motion Button");
-                if (!btnStatus) {
-                    // ボタンを押したら，statusをfalseにして押せないようにする
-                    btnStatus = true;
+                if (isGetMotionBtnClickable) {
+                    isGetMotionBtnClickable = false;
 
                     // ボタンをクリックできないようにする
                     v.setClickable(false);
+
+                    isResetButtonClickable = false;
 
                     getMotionBtn.setText("インターバル中");
                     countSecondTv.setText("秒");
@@ -156,7 +159,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
         public void dispatchMessage (Message msg) {
             Log.i(TAG, "--- dispatchMessage ---");
 
-            if (msg.what == PREPARATION && btnStatus) {
+            if (msg.what == PREPARATION && !isGetMotionBtnClickable) {
                 if (prepareCount == 0) {
                     secondTv.setText("3");
                     mVibrator.vibrate(VIBRATOR_SHORT);
@@ -182,7 +185,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
                 prepareCount++;
             }
-            else if (msg.what == GET_MOTION && btnStatus) {
+            else if (msg.what == GET_MOTION && !isGetMotionBtnClickable) {
                 if (accelCount < 100 && gyroCount < 100 && getCount >= 0 && getCount < 3) {
                     // 取得した値を，0.03秒ごとに配列に入れる
                     for (int i = 0; i < 3; i++) {
@@ -216,7 +219,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
                 else if (accelCount >= 100 && gyroCount >= 100 && getCount >= 0 && getCount < 4) {
                     // 取得完了
                     mVibrator.vibrate(VIBRATOR_LONG);
-                    btnStatus = false;
+                    isGetMotionBtnClickable = true;
+                    isResetButtonClickable = true;
                     getCount++;
                     countSecondTv.setText("回");
                     getMotionBtn.setText("モーションデータ取得");
@@ -268,6 +272,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
         if (getMotionBtn.isClickable()) {
             getMotionBtn.setClickable(false);
         }
+        isResetButtonClickable = false;
         secondTv.setText("0");
         getMotionBtn.setText("データ処理中");
 
@@ -426,13 +431,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
                     alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick (DialogInterface dialog, int which) {
-                            getMotionBtn.setClickable(true);
-                            // データ取得関係の変数を初期化
-                            accelCount = 0;
-                            gyroCount = 0;
-                            getCount = 0;
-                            secondTv.setText("3");
-                            getMotionBtn.setText("モーションデータ取得");
+                            resetValue();
                         }
                     });
 
@@ -467,6 +466,20 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
             }
         }
     };
+
+
+    /**
+     * モーション取得に関する変数群を初期化する
+     */
+    private void resetValue () {
+        getMotionBtn.setClickable(true);
+        // データ取得関係の変数を初期化
+        accelCount = 0;
+        gyroCount = 0;
+        getCount = 0;
+        secondTv.setText("3");
+        getMotionBtn.setText("モーションデータ取得");
+    }
 
 
     @Override
@@ -552,6 +565,38 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
                     }
                 });
                 dialog.show();
+                return true;
+
+            case R.id.reset:
+                if (isResetButtonClickable) {
+                    AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);
+                    alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
+                        @Override
+                        public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {
+                            return keyCode == KeyEvent.KEYCODE_BACK;
+                        }
+                    });
+
+                    alert.setCancelable(false);
+
+                    alert.setTitle("データ取得リセット");
+                    alert.setMessage("本当にデータ取得をやり直しますか？");
+
+                    alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick (DialogInterface dialog, int which) {
+                        }
+                    });
+
+                    alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick (DialogInterface dialog, int which) {
+                            resetValue();
+                        }
+                    });
+
+                    alert.show();
+                }
                 return true;
         }
         return false;

@@ -68,7 +68,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
     private int prepareCount = 0;
 
-    private boolean btnStatus = false;
+    private boolean isGetMotionBtnClickable = true;
 
     private boolean isAmplity = false;
 
@@ -124,9 +124,8 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
         getMotionBtn.setOnClickListener(new OnClickListener() {
             public void onClick (View v) {
                 Log.i(TAG, "Click Get Motion Button");
-                if (!btnStatus) {
-                    // ボタンを押したら，statusをfalseにして押せないようにする
-                    btnStatus = true;
+                if (isGetMotionBtnClickable) {
+                    isGetMotionBtnClickable = false;
 
                     // ボタンをクリックできないようにする
                     v.setClickable(false);
@@ -149,7 +148,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
         public void dispatchMessage (Message msg) {
             Log.v(TAG, "--- dispatchMessage ---");
 
-            if (msg.what == PREPARATION && btnStatus) {
+            if (msg.what == PREPARATION && !isGetMotionBtnClickable) {
                 if (prepareCount == 0) {
                     secondTv.setText("3");
                     mVibrator.vibrate(VIBRATOR_SHORT);
@@ -174,7 +173,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
                 prepareCount++;
             }
-            else if (msg.what == GET_MOTION && btnStatus) {
+            else if (msg.what == GET_MOTION && !isGetMotionBtnClickable) {
                 Log.i(TAG, "GET_MOTION");
 
                 if (accelCount < 100 && gyroCount < 100) {
@@ -230,8 +229,6 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
     }
 
     private void finishGetMotion () {
-        // 取得完了
-        btnStatus = false;
         getMotionBtn.setText("認証処理中");
 
         prepareCount = 0;
@@ -405,6 +402,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
                     alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick (DialogInterface dialog, int which) {
+                            isGetMotionBtnClickable = true;
                             getMotionBtn.setClickable(true);
                             // データ取得関係の変数を初期化
                             accelCount = 0;

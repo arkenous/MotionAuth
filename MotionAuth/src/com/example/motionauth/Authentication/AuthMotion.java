@@ -14,7 +14,6 @@ import android.os.*;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import com.example.motionauth.Lowpass.Fourier;
@@ -97,8 +96,6 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
         Log.v(TAG, "--- onCreate ---");
 
-        // タイトルバーの非表示
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_auth_motion);
 
         authMotion();

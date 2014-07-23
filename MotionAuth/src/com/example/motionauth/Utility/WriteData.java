@@ -332,6 +332,98 @@ public class WriteData {
     }
 
 
+    /**
+     * Double型の２次元配列データをアウトプットする． 保存先は，SDカードディレクトリ/MotionAuth/folderName/userName
+     *
+     * @param folderName 保存するフォルダ名
+     * @param userName   保存するユーザ名
+     * @param R_accel    保存する1次元double型配列の加速度Rデータ
+     * @param R_gyro     保存する1次元double型配列の角速度Rデータ
+     */
+    public void writeRData (String folderName, String userName, double[] R_accel, double[] R_gyro) {
+        Log.v(TAG, "--- writeRData ---");
+
+        // SDカードのマウント確認
+        String status = Environment.getExternalStorageState();
+        if (!status.equals(Environment.MEDIA_MOUNTED)) {
+            // マウントされていない場合
+            Log.e(TAG, "SDCard not mounted");
+        }
+
+        // SDカードのフォルダパスの取得
+        String SD_PATH = Environment.getExternalStorageDirectory().getPath();
+
+        // SDカードにフォルダを作成
+        String FOLDER_PATH = SD_PATH + File.separator + "MotionAuth" + File.separator + folderName;
+
+        File file = new File(FOLDER_PATH);
+
+        try {
+            if (!file.exists()) {
+                // フォルダがない場合
+                if (!file.mkdirs()) {
+                    Log.e(TAG, "Make Folder Error");
+                }
+            }
+        }
+        catch (Exception e) {
+            Log.e(TAG, "Make Folder Exception");
+        }
+
+        try {
+            // ファイルパス
+            String filePath = FOLDER_PATH + File.separator + userName;
+            file = new File(filePath);
+
+            // ファイルを追記モードで書き込む
+            FileOutputStream fos = new FileOutputStream(file, false);
+            OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+            BufferedWriter bw = new BufferedWriter(osw);
+
+            for (int i = 0; i < 2; i++) {
+                if (i == 0) {
+                    for (int j = 0; j < 3; j++) {
+                        if (j == 0) {
+                            bw.write("R_accel_x@" + R_accel[j] + "\n");
+                            bw.flush();
+                        }
+                        if (j == 1) {
+                            bw.write("R_accel_y@" + R_accel[j] + "\n");
+                            bw.flush();
+                        }
+                        if (j == 2) {
+                            bw.write("R_accel_z@" + R_accel[j] + "\n");
+                            bw.flush();
+                        }
+                    }
+                }
+                else if (i == 1) {
+                    for (int j = 0; j < 3; j++) {
+                        if (j == 0) {
+                            bw.write("R_gyro_x@" + R_gyro[j] + "\n");
+                            bw.flush();
+                        }
+                        if (j == 1) {
+                            bw.write("R_gyro_y@" + R_gyro[j] + "\n");
+                            bw.flush();
+                        }
+                        if (j == 2) {
+                            bw.write("R_gyro_z@" + R_gyro[j] + "\n");
+                            bw.flush();
+                        }
+                    }
+                }
+            }
+            bw.close();
+            osw.close();
+            fos.close();
+        }
+        catch (Exception e) {
+            Log.e(TAG, "Error");
+        }
+    }
+
+
     public boolean writeRegistedData (String folderName, String userName, double[][] averageDistance, double[][] averageAngle, boolean isAmplify) {
         Log.v(TAG, "--- writeRegistedData ---");
 

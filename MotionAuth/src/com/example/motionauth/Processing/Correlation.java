@@ -1,6 +1,7 @@
 package com.example.motionauth.Processing;
 
 import android.util.Log;
+import com.example.motionauth.Authentication.AuthNameInput;
 import com.example.motionauth.Registration.RegistNameInput;
 import com.example.motionauth.Utility.Enum;
 import com.example.motionauth.Utility.WriteData;
@@ -346,7 +347,7 @@ public class Correlation {
         }
         //endregion
 
-        //TODO 認証試験モードのR値をファイルに出力する．
+        mWriteData.writeRData("AuthRData", AuthNameInput.name, R_accel, R_gyro);
 
         //region 相関の判定
         //相関係数が一定以上あるなら認証成功

@@ -18,7 +18,6 @@ import java.util.ArrayList;
 
 /**
  * @author Kensuke Kousaka
- * //TODO タイトルバー連続クリックで，認証試験モードのR値閲覧画面に移動する機能を追加する．
  */
 public class ViewRegistedRData extends Activity {
     private static final String TAG = ViewRegistedRData.class.getSimpleName();
@@ -97,15 +96,15 @@ public class ViewRegistedRData extends Activity {
             }
             catch (FileNotFoundException e) {
                 e.printStackTrace();
-                return null;
+                return dataList;
             }
             catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
-                return null;
+                return dataList;
             }
             catch (IOException e) {
                 e.printStackTrace();
-                return null;
+                return dataList;
             }
         }
         return dataList;

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 /**
  * @author Kensuke Kousaka
+ * //TODO タイトルバー連続クリックで，認証試験モードのR値閲覧画面に移動する機能を追加する．
  */
 public class ViewRegistedRData extends Activity {
     private static final String TAG = ViewRegistedRData.class.getSimpleName();

@@ -346,6 +346,8 @@ public class Correlation {
         }
         //endregion
 
+        //TODO 認証試験モードのR値をファイルに出力する．
+
         //region 相関の判定
         //相関係数が一定以上あるなら認証成功
         if (R_accel[0] > 0.5) {

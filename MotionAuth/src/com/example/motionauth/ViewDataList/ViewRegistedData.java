@@ -101,13 +101,13 @@ public class ViewRegistedData extends Activity {
             return dataList;
         }
         catch (FileNotFoundException e) {
-            return null;
+            return dataList;
         }
         catch (UnsupportedEncodingException e) {
-            return null;
+            return dataList;
         }
         catch (IOException e) {
-            return null;
+            return dataList;
         }
     }
 

@@ -95,7 +95,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
     private ProgressDialog progressDialog;
     private double checkRangeValue = 2.0;
 
-    private boolean isResetButtonClickable = true;
+    private boolean isMenuClickable = true;
 
 
     @Override
@@ -139,7 +139,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
                     // ボタンをクリックできないようにする
                     v.setClickable(false);
 
-                    isResetButtonClickable = false;
+                    isMenuClickable = false;
 
                     getMotionBtn.setText("インターバル中");
                     countSecondTv.setText("秒");
@@ -220,7 +220,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
                     // 取得完了
                     mVibrator.vibrate(VIBRATOR_LONG);
                     isGetMotionBtnClickable = true;
-                    isResetButtonClickable = true;
+                    isMenuClickable = true;
                     getCount++;
                     countSecondTv.setText("回");
                     getMotionBtn.setText("モーションデータ取得");
@@ -272,7 +272,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
         if (getMotionBtn.isClickable()) {
             getMotionBtn.setClickable(false);
         }
-        isResetButtonClickable = false;
+        isMenuClickable = false;
         secondTv.setText("0");
         getMotionBtn.setText("データ処理中");
 
@@ -520,55 +520,57 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
     public boolean onOptionsItemSelected (MenuItem item) {
         switch (item.getItemId()) {
             case R.id.check_range_value:
-                LayoutInflater inflater = LayoutInflater.from(RegistMotion.this);
-                View seekView = inflater.inflate(R.layout.seekdialog, (ViewGroup) findViewById(R.id.dialog_root));
-                SeekBar seekBar = (SeekBar) seekView.findViewById(R.id.seekbar);
-                final TextView seekText = (TextView) seekView.findViewById(R.id.seektext);
-                seekText.setText("現在の値は" + checkRangeValue + "です");
-                seekBar.setMax(30);
+                if (isMenuClickable) {
+                    LayoutInflater inflater = LayoutInflater.from(RegistMotion.this);
+                    View seekView = inflater.inflate(R.layout.seekdialog, (ViewGroup) findViewById(R.id.dialog_root));
+                    SeekBar seekBar = (SeekBar) seekView.findViewById(R.id.seekbar);
+                    final TextView seekText = (TextView) seekView.findViewById(R.id.seektext);
+                    seekText.setText("現在の値は" + checkRangeValue + "です");
+                    seekBar.setMax(30);
 
-                seekBar.setProgress(16);
-                seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                    @Override
-                    public void onProgressChanged (SeekBar seekBar, int progress, boolean fromUser) {
-                        checkRangeValue = (seekBar.getProgress() + 10) / 10.0;
-                        seekText.setText("現在の値は" + checkRangeValue + "です");
-                    }
+                    seekBar.setProgress(16);
+                    seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                        @Override
+                        public void onProgressChanged (SeekBar seekBar, int progress, boolean fromUser) {
+                            checkRangeValue = (seekBar.getProgress() + 10) / 10.0;
+                            seekText.setText("現在の値は" + checkRangeValue + "です");
+                        }
 
-                    @Override
-                    public void onStartTrackingTouch (SeekBar seekBar) {
-                    }
+                        @Override
+                        public void onStartTrackingTouch (SeekBar seekBar) {
+                        }
 
-                    @Override
-                    public void onStopTrackingTouch (SeekBar seekBar) {
-                        checkRangeValue = (seekBar.getProgress() + 10) / 10.0;
-                        seekText.setText("現在の値は" + checkRangeValue + "です");
-                    }
-                });
+                        @Override
+                        public void onStopTrackingTouch (SeekBar seekBar) {
+                            checkRangeValue = (seekBar.getProgress() + 10) / 10.0;
+                            seekText.setText("現在の値は" + checkRangeValue + "です");
+                        }
+                    });
 
-                AlertDialog.Builder dialog = new AlertDialog.Builder(RegistMotion.this);
-                dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
-                    @Override
-                    public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {
-                        return keyCode == KeyEvent.KEYCODE_BACK;
-                    }
-                });
-                dialog.setTitle("増幅器の閾値調整");
-                dialog.setMessage("増幅器にかけるかどうかを判断する閾値を調整できます．\n" +
-                        "2.5を中心に，値が小さければ登録・認証が難しくなり，大きければ易しくなります．");
-                dialog.setView(seekView);
-                dialog.setCancelable(false);
-                dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick (DialogInterface dialog, int which) {
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(RegistMotion.this);
+                    dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+                        @Override
+                        public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {
+                            return keyCode == KeyEvent.KEYCODE_BACK;
+                        }
+                    });
+                    dialog.setTitle("増幅器の閾値調整");
+                    dialog.setMessage("増幅器にかけるかどうかを判断する閾値を調整できます．\n" +
+                            "2.5を中心に，値が小さければ登録・認証が難しくなり，大きければ易しくなります．");
+                    dialog.setView(seekView);
+                    dialog.setCancelable(false);
+                    dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick (DialogInterface dialog, int which) {
 
-                    }
-                });
-                dialog.show();
+                        }
+                    });
+                    dialog.show();
+                }
                 return true;
 
             case R.id.reset:
-                if (isResetButtonClickable) {
+                if (isMenuClickable) {
                     AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);
                     alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
                         @Override

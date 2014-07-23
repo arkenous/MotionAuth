@@ -1,10 +1,13 @@
 package com.example.motionauth.ViewDataList;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.example.motionauth.R;
@@ -21,6 +24,7 @@ public class ViewRegistedRData extends Activity {
     private static final String TAG = ViewRegistedRData.class.getSimpleName();
 
     String item = null;
+    int flgCount;
 
 
     @Override
@@ -30,6 +34,14 @@ public class ViewRegistedRData extends Activity {
         Log.v(TAG, "--- onCreate ---");
 
         setContentView(R.layout.activity_view_registed_rdata);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            ActionBar actionBar = getActionBar();
+            if (actionBar != null) {
+                actionBar.setHomeButtonEnabled(true);
+            }
+        }
+        flgCount = 0;
 
         viewRegistedData();
     }
@@ -97,5 +109,38 @@ public class ViewRegistedRData extends Activity {
             }
         }
         return dataList;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected (MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                if (flgCount == 9) {
+                    flgCount = 0;
+                    moveActivity("com.example.motionauth", "com.example.motionauth.ViewDataList.ViewAuthRData", true);
+                }
+                else {
+                    flgCount++;
+                }
+                return true;
+        }
+        return false;
+    }
+
+
+    private void moveActivity (String pkgName, String actName, boolean flg) {
+        Log.v(TAG, "--- moveActivity ---");
+
+        Intent intent = new Intent();
+        intent.setClassName(pkgName, actName);
+
+        intent.putExtra("item", item);
+
+        if (flg) {
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
+
+        startActivityForResult(intent, 0);
     }
 }

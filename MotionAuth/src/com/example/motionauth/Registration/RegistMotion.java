@@ -519,7 +519,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
     @Override
     public boolean onOptionsItemSelected (MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.check_range_value:
+            case R.id.change_range_value:
                 if (isMenuClickable) {
                     LayoutInflater inflater = LayoutInflater.from(RegistMotion.this);
                     View seekView = inflater.inflate(R.layout.seekdialog, (ViewGroup) findViewById(R.id.dialog_root));

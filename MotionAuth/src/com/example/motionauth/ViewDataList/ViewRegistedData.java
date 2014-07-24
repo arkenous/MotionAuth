@@ -18,6 +18,8 @@ import java.util.ArrayList;
 
 /**
  * RegistrantListより渡されたユーザ名を元に，そのユーザのデータを表示する
+ *
+ * @author Kensuke Kousaka
  */
 public class ViewRegistedData extends Activity {
     private static final String TAG = ViewRegistedData.class.getSimpleName();

@@ -2,6 +2,11 @@ package com.example.motionauth.Processing;
 
 import android.util.Log;
 
+/**
+ * 加速度や角速度から，速度や角度を求める
+ *
+ * @author Kensuke Kousaka
+ */
 public class Calc {
     private static final String TAG = Calc.class.getSimpleName();
 

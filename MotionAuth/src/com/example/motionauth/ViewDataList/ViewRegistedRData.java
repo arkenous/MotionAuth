@@ -17,6 +17,8 @@ import java.util.ArrayList;
 
 
 /**
+ * モーション登録時の相関係数の結果を表示する
+ *
  * @author Kensuke Kousaka
  */
 public class ViewRegistedRData extends Activity {

@@ -13,7 +13,9 @@ import java.io.*;
 import java.util.ArrayList;
 
 /**
- * Created by kousaka on 7/23/14.
+ * 認証試験モードにおいて出た相関係数の結果を表示する
+ *
+ * @author Kensuke Kousaka
  */
 public class ViewAuthRData extends Activity {
     private static final String TAG = ViewAuthRData.class.getSimpleName();

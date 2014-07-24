@@ -21,6 +21,8 @@ import java.io.File;
 /**
  * 登録されているユーザ名を一覧表示する．
  * ユーザ名が選択されたら，そのユーザのデータをViewRegistedDataアクティビティにて表示する
+ *
+ * @author Kensuke Kousaka
  */
 public class RegistrantList extends Activity {
     private static final String TAG = RegistrantList.class.getSimpleName();

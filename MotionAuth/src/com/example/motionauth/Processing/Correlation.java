@@ -9,6 +9,7 @@ import com.example.motionauth.Utility.WriteData;
 
 /**
  * 相関を求める
+ * //TODO 変数名や内部構造を分かりやすくする．
  *
  * @author Kensuke Kousaka
  */

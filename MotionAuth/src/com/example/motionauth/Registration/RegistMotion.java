@@ -35,7 +35,7 @@ import com.example.motionauth.Utility.WriteData;
 public class RegistMotion extends Activity implements SensorEventListener, Runnable {
     private static final String TAG = RegistMotion.class.getSimpleName();
 
-    private static final int VIBRATOR_SHORT = 25;
+    private static final int VIBRATOR_SHORT  = 25;
     private static final int VIBRATOR_NORMAL = 50;
     private static final int VIBRATOR_LONG   = 100;
 
@@ -65,11 +65,9 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
     private Correlation      mCorrelation      = new Correlation();
     private CorrectDeviation mCorrectDeviation = new CorrectDeviation();
 
-    // データ取得カウント用
-    private int accelCount = 0;
-    private int gyroCount  = 0;
-    private int getCount   = 0;
-
+    private int accelCount   = 0;
+    private int gyroCount    = 0;
+    private int getCount     = 0;
     private int prepareCount = 0;
 
     private boolean isGetMotionBtnClickable = true;
@@ -83,14 +81,13 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
     private float[][][] accelFloat = new float[3][3][100];
     private float[][][] gyroFloat  = new float[3][3][100];
 
-    // 移動平均後のデータを格納する配列
-    private double[][][] distance          = new double[3][3][100];
-    private double[][][] angle             = new double[3][3][100];
-    private double[][]   averageDistance   = new double[3][100];
-    private double[][]   averageAngle      = new double[3][100];
-    // 計算処理のスレッド化に関する変数
-    private boolean      resultCalc        = false;
-    private boolean      resultCorrelation = false;
+    private double[][][] distance        = new double[3][3][100];
+    private double[][][] angle           = new double[3][3][100];
+    private double[][]   averageDistance = new double[3][100];
+    private double[][]   averageAngle    = new double[3][100];
+
+    private boolean resultCalc        = false;
+    private boolean resultCorrelation = false;
 
     private ProgressDialog progressDialog;
     private double checkRangeValue = 2.0;
@@ -143,6 +140,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
                     getMotionBtn.setText("インターバル中");
                     countSecondTv.setText("秒");
+
+                    // timeHandler呼び出し
                     timeHandler.sendEmptyMessage(PREPARATION);
                 }
             }
@@ -163,6 +162,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
                 if (prepareCount == 0) {
                     secondTv.setText("3");
                     mVibrator.vibrate(VIBRATOR_SHORT);
+
+                    // 第二引数で指定したミリ秒分遅延させてから，第一引数のメッセージを添えてtimeHandlerを呼び出す
                     timeHandler.sendEmptyMessageDelayed(PREPARATION, PREPARATION_INTERVAL);
 
                 }
@@ -179,6 +180,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
                 else if (prepareCount == 3) {
                     secondTv.setText("START");
                     mVibrator.vibrate(VIBRATOR_LONG);
+
+                    // GET_MOTIONメッセージを添えて，timeHandlerを呼び出す
                     timeHandler.sendEmptyMessage(GET_MOTION);
                     getMotionBtn.setText("取得中");
                 }
@@ -213,7 +216,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
                         mVibrator.vibrate(VIBRATOR_NORMAL);
                     }
 
-                    // INTERVALで指定したミリ秒後に再度timeHandler（これ自身）を呼び出す
                     timeHandler.sendEmptyMessageDelayed(GET_MOTION, GET_MOTION_INTERVAL);
                 }
                 else if (accelCount >= 100 && gyroCount >= 100 && getCount >= 0 && getCount < 4) {
@@ -230,17 +232,14 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
                     prepareCount = 0;
 
-                    // 取り終わったら，ボタンのstatusをenableにして押せるようにする
                     if (getCount == 1) {
                         secondTv.setText("2");
 
-                        // ボタンを押せるようにする
                         getMotionBtn.setClickable(true);
                     }
                     if (getCount == 2) {
                         secondTv.setText("1");
 
-                        // ボタンを押せるようにする
                         getMotionBtn.setClickable(true);
                     }
 
@@ -267,8 +266,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
     }
 
     private void finishGetMotion () {
-        // 全データ取得完了（3回分の加速度，ジャイロを取得完了）
-        // ボタンのstatusをdisableにして押せないようにする
         if (getMotionBtn.isClickable()) {
             getMotionBtn.setClickable(false);
         }
@@ -288,6 +285,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
         Log.i(TAG, "Finish Initialize ProgressDialog");
 
         progressDialog.show();
+
+        // スレッドを作り，開始する（runメソッドに飛ぶ）．表面ではプログレスダイアログがくるくる
         Thread thread = new Thread(this);
         thread.start();
     }
@@ -312,7 +311,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
      */
     private boolean calc () {
         Log.v(TAG, "--- calc ---");
-        // データ加工，計算処理
         // データの桁揃え
         double[][][] accel_double = mFormatter.floatToDoubleFormatter(accelFloat);
         double[][][] gyro_double = mFormatter.floatToDoubleFormatter(gyroFloat);

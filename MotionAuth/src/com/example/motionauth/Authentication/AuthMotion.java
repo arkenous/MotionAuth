@@ -34,7 +34,7 @@ import java.io.*;
 public class AuthMotion extends Activity implements SensorEventListener, Runnable {
     private static final String TAG = AuthMotion.class.getSimpleName();
 
-    private static final int VIBRATOR_SHORT = 25;
+    private static final int VIBRATOR_SHORT  = 25;
     private static final int VIBRATOR_NORMAL = 50;
     private static final int VIBRATOR_LONG   = 100;
 
@@ -62,10 +62,8 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
     private Correlation mCorrelation = new Correlation();
     private Amplifier   mAmplifier   = new Amplifier();
 
-    // データ取得カウント用
-    private int accelCount = 0;
-    private int gyroCount  = 0;
-
+    private int accelCount   = 0;
+    private int gyroCount    = 0;
     private int prepareCount = 0;
 
     private boolean isGetMotionBtnClickable = true;
@@ -79,14 +77,13 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
     private float[][] accelFloat = new float[3][100];
     private float[][] gyroFloat  = new float[3][100];
 
-    // 移動平均後のデータを格納する配列
-    private double[][] distance              = new double[3][100];
-    private double[][] angle                 = new double[3][100];
-    // RegistMotionにて登録された平均データ
+    private double[][] distance = new double[3][100];
+    private double[][] angle    = new double[3][100];
+
     private double[][] registed_ave_distance = new double[3][100];
     private double[][] registed_ave_angle    = new double[3][100];
-    // 計算処理のスレッドに関する変数
-    private boolean    resultCorrelation     = false;
+
+    private boolean resultCorrelation = false;
 
     private ProgressDialog progressDialog;
 
@@ -132,6 +129,8 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
                     getMotionBtn.setText("インターバル中");
                     countSecondTv.setText("秒");
+
+                    // timeHandler呼び出し
                     timeHandler.sendEmptyMessage(PREPARATION);
                 }
             }
@@ -152,6 +151,8 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
                 if (prepareCount == 0) {
                     secondTv.setText("3");
                     mVibrator.vibrate(VIBRATOR_SHORT);
+
+                    // 第二引数で指定したミリ秒分遅延させてから，第一引数のメッセージを添えてtimeHandlerを呼び出す
                     timeHandler.sendEmptyMessageDelayed(PREPARATION, PREPARATION_INTERVAL);
                 }
                 else if (prepareCount == 1) {
@@ -167,6 +168,8 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
                 else if (prepareCount == 3) {
                     secondTv.setText("START");
                     mVibrator.vibrate(VIBRATOR_LONG);
+
+                    // GET_MOTIONメッセージを添えて，timeHandlerを呼び出す
                     timeHandler.sendEmptyMessage(GET_MOTION);
                     getMotionBtn.setText("取得中");
                 }
@@ -245,6 +248,8 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
         Log.i(TAG, "Finish Initialize ProgressDialog");
 
         progressDialog.show();
+
+        // スレッドを作り，開始する（runメソッドに飛ぶ）．表面ではプログレスダイアログがくるくる
         Thread thread = new Thread(this);
         thread.start();
     }
@@ -252,9 +257,9 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
     @Override
     public void run () {
         Log.i(TAG, "Thread Start");
+
         readRegistedData();
         calc();
-
         resultCorrelation = measureCorrelation();
 
         progressDialog.dismiss();

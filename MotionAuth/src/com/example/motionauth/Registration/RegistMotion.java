@@ -35,7 +35,7 @@ import com.example.motionauth.Utility.WriteData;
 public class RegistMotion extends Activity implements SensorEventListener, Runnable {
     private static final String TAG = RegistMotion.class.getSimpleName();
 
-    private static final int VIBRATOR_SHORT  = 40;
+    private static final int VIBRATOR_SHORT = 25;
     private static final int VIBRATOR_NORMAL = 50;
     private static final int VIBRATOR_LONG   = 100;
 

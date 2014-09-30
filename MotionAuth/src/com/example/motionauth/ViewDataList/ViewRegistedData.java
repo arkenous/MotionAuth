@@ -79,6 +79,7 @@ public class ViewRegistedData extends Activity {
      *
      * @return 取得したデータ
      */
+    //TODO 復号化処理を行い，データを読み込む
     private ArrayList<String> readData () {
         Log.v(TAG, "--- readData ---");
         ArrayList<String> dataList = new ArrayList<String>();

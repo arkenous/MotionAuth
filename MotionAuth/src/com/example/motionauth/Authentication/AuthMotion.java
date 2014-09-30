@@ -272,6 +272,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
     /**
      * RegistMotionにて登録したモーションの平均値データを読み込む
      */
+    //TODO 復号化処理を行い，データを読み込む
     private void readRegistedData () {
         Log.v(TAG, "--- readRegistedData ---");
         int readCount = 0;

@@ -424,6 +424,17 @@ public class WriteData {
     }
 
 
+    /**
+     * RegistMotionより渡された，認証のキーとなるデータをアウトプットする
+     *
+     * @param folderName      保存するフォルダ名
+     * @param userName        保存するユーザ名
+     * @param averageDistance 保存する距離データ
+     * @param averageAngle    保存する角度データ
+     * @param isAmplify       データ増幅フラグ
+     * @return 保存できたらtrue，失敗したらfalseを返す
+     */
+    //TODO データ保存時に暗号化処理を行う
     public boolean writeRegistedData (String folderName, String userName, double[][] averageDistance, double[][] averageAngle, boolean isAmplify) {
         Log.v(TAG, "--- writeRegistedData ---");
 

@@ -302,7 +302,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
         progressDialog.dismiss();
         progressDialog = null;
-        resultHander.sendEmptyMessage(FINISH);
+        resultHandler.sendEmptyMessage(FINISH);
         Log.i(TAG, "Thread Finish");
     }
 
@@ -407,7 +407,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
      * 計算，モーション照合処理終了後に呼ばれるハンドラ
      * 同一のモーションであると確認されたら登録を行い，そうでなければ取り直しの処理を行う
      */
-    private Handler resultHander = new Handler() {
+    private Handler resultHandler = new Handler() {
         public void handleMessage (Message msg) {
             if (msg.what == FINISH) {
                 if (!resultCalc || !resultCorrelation) {

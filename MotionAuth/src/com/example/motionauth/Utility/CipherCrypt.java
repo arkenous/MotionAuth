@@ -28,7 +28,7 @@ public class CipherCrypt {
 
 
     /**
-     * 暗号化・復号化に必要なSecret Key，IV（Initialization Vector）の準備を行う
+     * 暗号化・復号に必要なSecret Key，IV（Initialization Vector）の準備を行う
      *
      * @param context アプリケーション固有のSharedPreferencesを取得する際に用いるContext
      */
@@ -94,7 +94,7 @@ public class CipherCrypt {
 
 
     /**
-     * 暗号化・復号化に使用するSecret Keyを生成する
+     * 暗号化・復号に使用するSecret Keyを生成する
      *
      * @return Secret Key
      */
@@ -115,7 +115,7 @@ public class CipherCrypt {
 
 
     /**
-     * 暗号化・復号化に使用するIVを生成する
+     * 暗号化・復号に使用するIVを生成する
      *
      * @return byte配列型のIV
      */
@@ -191,10 +191,10 @@ public class CipherCrypt {
 
 
     /**
-     * 入力された暗号化済みString型二次元配列データを復号化したものを返す
+     * 入力された暗号化済みString型二次元配列データを復号したものを返す
      *
      * @param input 暗号化されたString型二次元配列データ
-     * @return 復号化されたString型二次元配列データ
+     * @return 復号されたString型二次元配列データ
      */
     public String[][] decrypt (String[][] input) {
         Log.v(TAG, "--- decrypt ---");
@@ -206,7 +206,7 @@ public class CipherCrypt {
         String[][] decrypted = new String[input.length][input[0].length];
 
         try {
-            // 復号化を行う
+            // 復号を行う
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.DECRYPT_MODE, key, iv);
 

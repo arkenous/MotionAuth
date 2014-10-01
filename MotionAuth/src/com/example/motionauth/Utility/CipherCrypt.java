@@ -27,6 +27,11 @@ public class CipherCrypt {
     private final IvParameterSpec iv;
 
 
+    /**
+     * 暗号化・復号化に必要なSecret Key，IV（Initialization Vector）の準備を行う
+     *
+     * @param context アプリケーション固有のSharedPreferencesを取得する際に用いるContext
+     */
     public CipherCrypt (Context context) {
         Log.v(TAG, "--- CipherCrypt ---");
 
@@ -36,18 +41,18 @@ public class CipherCrypt {
         SharedPreferences preferences = mContext.getSharedPreferences(PREF_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
 
-        // Preferenceから暗号化キーを取得（値が保存されていなければ，空文字を返す）
+        // PreferenceからSecret Keyを取得（値が保存されていなければ，空文字を返す）
         String keyStr = preferences.getString(CIPHER_KEY, "");
 
         if ("".equals(keyStr)) {
             Log.i(TAG, "Coundn't get cipher key from preferences");
             // Preferenceから取得できなかった場合
-            // 暗号化キーを生成し，保存する
+            // Secret Keyを生成し，保存する
 
-            // 暗号化キーを生成
+            // Secret Keyを生成
             key = generateKey();
 
-            // 生成したキーを保存
+            // 生成したSecret Keyを保存
             String base64Key = Base64.encodeToString(key.getEncoded(), Base64.URL_SAFE | Base64.NO_WRAP);
 
             editor.putString(CIPHER_KEY, base64Key).apply();
@@ -55,7 +60,7 @@ public class CipherCrypt {
         else {
             Log.i(TAG, "Get cipher key from preferences");
             // Preferenceから取得できた場合
-            // 暗号化キーを復元
+            // Secret Keyを復元
             byte[] byteKey = Base64.decode(keyStr, Base64.URL_SAFE | Base64.NO_WRAP);
             key = new SecretKeySpec(byteKey, "AES");
         }
@@ -67,13 +72,13 @@ public class CipherCrypt {
         if ("".equals(ivStr)) {
             Log.i(TAG, "Coundn't get iv from preferences");
             // Preferenceから取得できなかった場合
-            // Ivを生成し，保存する
+            // IVを生成し，保存する
 
-            // Ivを生成
+            // IVを生成
             byte[] byteIv = generateIv();
             iv = new IvParameterSpec(byteIv);
 
-            // 生成したIvを保存
+            // 生成したIVを保存
             String base64Iv = Base64.encodeToString(byteIv, Base64.URL_SAFE | Base64.NO_WRAP);
 
             editor.putString(CIPHER_IV, base64Iv).apply();
@@ -81,7 +86,7 @@ public class CipherCrypt {
         else {
             Log.i(TAG, "Get iv from preferences");
             // Preferenceから取得できた場合
-            // Ivを復元
+            // IVを復元
             byte[] byteIv = Base64.decode(ivStr, Base64.URL_SAFE | Base64.NO_WRAP);
             iv = new IvParameterSpec(byteIv);
         }
@@ -89,9 +94,9 @@ public class CipherCrypt {
 
 
     /**
-     * 暗号化・復号化に使用する秘密鍵を生成する
+     * 暗号化・復号化に使用するSecret Keyを生成する
      *
-     * @return 秘密鍵
+     * @return Secret Key
      */
     private Key generateKey () {
         Log.v(TAG, "--- generateKey ---");
@@ -110,9 +115,9 @@ public class CipherCrypt {
 
 
     /**
-     * 暗号化・復号化に使用するIvを生成する
+     * 暗号化・復号化に使用するIVを生成する
      *
-     * @return byte配列型のIv
+     * @return byte配列型のIV
      */
     private byte[] generateIv () {
         Log.v(TAG, "--- generateIv ---");

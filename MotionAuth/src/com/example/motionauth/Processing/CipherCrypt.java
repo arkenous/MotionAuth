@@ -1,4 +1,4 @@
-package com.example.motionauth.Utility;
+package com.example.motionauth.Processing;
 
 import android.content.Context;
 import android.content.SharedPreferences;

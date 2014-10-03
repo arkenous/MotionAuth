@@ -80,7 +80,6 @@ public class ViewRegistedData extends Activity {
      *
      * @return 取得したデータ
      */
-    //TODO 復号処理を行い，データを読み込む
     private ArrayList<String> readData () {
         Log.v(TAG, "--- readData ---");
         ArrayList<String> dataList = new ArrayList<String>();
@@ -109,15 +108,13 @@ public class ViewRegistedData extends Activity {
 
                 String encryptedData = splitIndex[1];
                 encryptedDataList.add(encryptedData);
-
-//                dataList.add(s);
             }
 
             br.close();
             isr.close();
             fis.close();
 
-            String[] encryptedDataArray = (String[]) encryptedDataList.toArray(new String[0]);
+            String[] encryptedDataArray = encryptedDataList.toArray(new String[0]);
             String[] decryptedDataArray = mCipherCrypt.decrypt(encryptedDataArray);
 
             for (int i = 0; i < decryptedDataArray.length; i++) {

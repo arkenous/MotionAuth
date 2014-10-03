@@ -269,7 +269,6 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
     /**
      * RegistMotionにて登録したモーションの平均値データを読み込む
      */
-    //TODO 復号処理を行い，データを読み込む
     private void readRegistedData () {
         Log.v(TAG, "--- readRegistedData ---");
         int readCount = 0;
@@ -301,7 +300,6 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
 
                 if (splitCheckedData[0].equals("ave_distance_x")) {
-                    //registed_ave_distance[0][readCount] = Double.valueOf(splitCheckedData[1]);
                     registedAverageDistance[0][readCount] = splitCheckedData[1];
 
                     if (readCount == 99) {
@@ -313,7 +311,6 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
                 }
 
                 if (splitCheckedData[0].equals("ave_distance_y")) {
-                    //registed_ave_distance[1][readCount] = Double.valueOf(splitCheckedData[1]);
                     registedAverageDistance[1][readCount] = splitCheckedData[1];
 
                     if (readCount == 99) {
@@ -325,7 +322,6 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
                 }
 
                 if (splitCheckedData[0].equals("ave_distance_z")) {
-                    //registed_ave_distance[2][readCount] = Double.valueOf(splitCheckedData[1]);
                     registedAverageDistance[2][readCount] = splitCheckedData[1];
 
                     if (readCount == 99) {
@@ -337,7 +333,6 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
                 }
 
                 if (splitCheckedData[0].equals("ave_angle_x")) {
-                    //registed_ave_angle[0][readCount] = Double.valueOf(splitCheckedData[1]);
                     registedAverageAngle[0][readCount] = splitCheckedData[1];
 
                     if (readCount == 99) {
@@ -349,7 +344,6 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
                 }
 
                 if (splitCheckedData[0].equals("ave_angle_y")) {
-                    //registed_ave_angle[1][readCount] = Double.valueOf(splitCheckedData[1]);
                     registedAverageAngle[1][readCount] = splitCheckedData[1];
 
                     if (readCount == 99) {
@@ -361,7 +355,6 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
                 }
 
                 if (splitCheckedData[0].equals("ave_angle_z")) {
-                    //registed_ave_angle[2][readCount] = Double.valueOf(splitCheckedData[1]);
                     registedAverageAngle[2][readCount] = splitCheckedData[1];
 
                     if (readCount == 99) {

@@ -438,7 +438,6 @@ public class WriteData {
      * @param context         呼び出し元のコンテキスト
      * @return 保存できたらtrue，失敗したらfalseを返す
      */
-    //TODO データ保存時に暗号化処理を行う
     // 受け取ったデータをCipherクラスに渡し，暗号化されたデータを保存する
     public boolean writeRegistedData (String folderName, String userName, double[][] averageDistance, double[][] averageAngle, boolean isAmplify, Context context) {
         Log.v(TAG, "--- writeRegistedData ---");

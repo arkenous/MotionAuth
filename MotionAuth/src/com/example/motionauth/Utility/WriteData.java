@@ -1,7 +1,9 @@
 package com.example.motionauth.Utility;
 
+import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
+import com.example.motionauth.Processing.CipherCrypt;
 
 import java.io.*;
 
@@ -13,6 +15,7 @@ import java.io.*;
  */
 public class WriteData {
     private static final String TAG = WriteData.class.getSimpleName();
+    private CipherCrypt mCipherCrypt;
 
     /**
      * Float型の三次元配列データをアウトプットする．保存先は，SDカードディレクトリ/folderName/userName/fileName+回数+次元
@@ -432,12 +435,32 @@ public class WriteData {
      * @param averageDistance 保存する距離データ
      * @param averageAngle    保存する角度データ
      * @param isAmplify       データ増幅フラグ
+     * @param context         呼び出し元のコンテキスト
      * @return 保存できたらtrue，失敗したらfalseを返す
      */
     //TODO データ保存時に暗号化処理を行う
     // 受け取ったデータをCipherクラスに渡し，暗号化されたデータを保存する
-    public boolean writeRegistedData (String folderName, String userName, double[][] averageDistance, double[][] averageAngle, boolean isAmplify) {
+    public boolean writeRegistedData (String folderName, String userName, double[][] averageDistance, double[][] averageAngle, boolean isAmplify, Context context) {
         Log.v(TAG, "--- writeRegistedData ---");
+
+        // 暗号処理を担うオブジェクトを生成
+        mCipherCrypt = new CipherCrypt(context);
+
+        String[][] averageDistanceStr = new String[averageDistance.length][averageDistance[0].length];
+        String[][] averageAngleStr = new String[averageAngle.length][averageAngle[0].length];
+
+        // 暗号化処理
+        // double型二次元配列で受け取ったデータをString型二次元配列に変換する
+        for (int i = 0; i < averageDistance.length; i++) {
+            for (int j = 0; j < averageDistance[i].length; j++) {
+                averageDistanceStr[i][j] = String.valueOf(averageDistance[i][j]);
+                averageAngleStr[i][j] = String.valueOf(averageAngle[i][j]);
+            }
+        }
+
+        // 暗号化
+        String[][] encryptedAvarageDistanceStr = mCipherCrypt.encrypt(averageDistanceStr);
+        String[][] encryptedAverageAngleStr = mCipherCrypt.encrypt(averageAngleStr);
 
         try {
             Log.d(TAG, "--- writeRegistedData ---");
@@ -454,57 +477,38 @@ public class WriteData {
 
             Log.d(TAG, "*** Preparing is finished ***");
 
+            String amplifyStatus;
+
             if (isAmplify) {
-                for (int i = 0; i < 100; i++) {
-                    bw.write("ave_distance_x@" + averageDistance[0][i] + ":" + "true" + "\n");
-                    bw.flush();
-                }
-                for (int i = 0; i < 100; i++) {
-                    bw.write("ave_distance_y@" + averageDistance[1][i] + ":" + "true" + "\n");
-                    bw.flush();
-                }
-                for (int i = 0; i < 100; i++) {
-                    bw.write("ave_distance_z@" + averageDistance[2][i] + ":" + "true" + "\n");
-                    bw.flush();
-                }
-                for (int i = 0; i < 100; i++) {
-                    bw.write("ave_angle_x@" + averageAngle[0][i] + ":" + "true" + "\n");
-                    bw.flush();
-                }
-                for (int i = 0; i < 100; i++) {
-                    bw.write("ave_angle_y@" + averageAngle[1][i] + ":" + "true" + "\n");
-                    bw.flush();
-                }
-                for (int i = 0; i < 100; i++) {
-                    bw.write("ave_angle_z@" + averageAngle[2][i] + ":" + "true" + "\n");
-                    bw.flush();
-                }
+                amplifyStatus = "true";
             }
             else {
-                for (int i = 0; i < 100; i++) {
-                    bw.write("ave_distance_x@" + averageDistance[0][i] + ":" + "false" + "\n");
-                    bw.flush();
-                }
-                for (int i = 0; i < 100; i++) {
-                    bw.write("ave_distance_y@" + averageDistance[1][i] + ":" + "false" + "\n");
-                    bw.flush();
-                }
-                for (int i = 0; i < 100; i++) {
-                    bw.write("ave_distance_z@" + averageDistance[2][i] + ":" + "false" + "\n");
-                    bw.flush();
-                }
-                for (int i = 0; i < 100; i++) {
-                    bw.write("ave_angle_x@" + averageAngle[0][i] + ":" + "false" + "\n");
-                    bw.flush();
-                }
-                for (int i = 0; i < 100; i++) {
-                    bw.write("ave_angle_y@" + averageAngle[1][i] + ":" + "false" + "\n");
-                    bw.flush();
-                }
-                for (int i = 0; i < 100; i++) {
-                    bw.write("ave_angle_z@" + averageAngle[2][i] + ":" + "false" + "\n");
-                    bw.flush();
-                }
+                amplifyStatus = "false";
+            }
+
+            for (int i = 0; i < 100; i++) {
+                bw.write("ave_distance_x@" + encryptedAvarageDistanceStr[0][i] + ":" + amplifyStatus + "\n");
+                bw.flush();
+            }
+            for (int i = 0; i < 100; i++) {
+                bw.write("ave_distance_y@" + encryptedAvarageDistanceStr[1][i] + ":" + amplifyStatus + "\n");
+                bw.flush();
+            }
+            for (int i = 0; i < 100; i++) {
+                bw.write("ave_distance_z@" + encryptedAvarageDistanceStr[2][i] + ":" + amplifyStatus + "\n");
+                bw.flush();
+            }
+            for (int i = 0; i < 100; i++) {
+                bw.write("ave_angle_x@" + encryptedAverageAngleStr[0][i] + ":" + amplifyStatus + "\n");
+                bw.flush();
+            }
+            for (int i = 0; i < 100; i++) {
+                bw.write("ave_angle_y@" + encryptedAverageAngleStr[1][i] + ":" + amplifyStatus + "\n");
+                bw.flush();
+            }
+            for (int i = 0; i < 100; i++) {
+                bw.write("ave_angle_z@" + encryptedAverageAngleStr[2][i] + ":" + amplifyStatus + "\n");
+                bw.flush();
             }
 
             bw.close();

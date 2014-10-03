@@ -267,6 +267,11 @@ public class Correlation {
     public Enum.MEASURE measureCorrelation (double[][] distance, double[][] angle, double[][] ave_distance, double[][] ave_angle) {
         Log.v(TAG, "--- measureCorrelation ---");
 
+        Log.d(TAG, "distancesample: " + String.valueOf(distance[0][0]));
+        Log.d(TAG, "anglesample: " + String.valueOf(angle[0][0]));
+        Log.d(TAG, "avedistancesample: " + String.valueOf(ave_distance[0][0]));
+        Log.d(TAG, "aveanglesample: " + String.valueOf(ave_angle[0][0]));
+
         //region Calculate of Average A
         float[] sample_accel = new float[3];
         float[] sample_gyro = new float[3];

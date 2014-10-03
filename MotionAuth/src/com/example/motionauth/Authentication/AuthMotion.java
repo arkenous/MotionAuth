@@ -17,10 +17,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 import com.example.motionauth.Lowpass.Fourier;
-import com.example.motionauth.Processing.Amplifier;
-import com.example.motionauth.Processing.Calc;
-import com.example.motionauth.Processing.Correlation;
-import com.example.motionauth.Processing.Formatter;
+import com.example.motionauth.Processing.*;
 import com.example.motionauth.R;
 import com.example.motionauth.Utility.Enum;
 
@@ -277,6 +274,8 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
         Log.v(TAG, "--- readRegistedData ---");
         int readCount = 0;
 
+        CipherCrypt mCipherCrypt = new CipherCrypt(AuthMotion.this);
+
         try {
             String filePath = Environment.getExternalStorageDirectory() + File.separator + "MotionAuth" + File.separator + "MotionAuth" + File.separator + AuthNameInput.name;
             File file = new File(filePath);
@@ -287,6 +286,10 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
             String beforeSplitData;
             String[] checkAmplify;
 
+            String[][] registedAverageDistance = new String[3][100];
+            String[][] registedAverageAngle = new String[3][100];
+
+
             while ((beforeSplitData = br.readLine()) != null) {
                 checkAmplify = beforeSplitData.split(":");
                 if (checkAmplify[1].equals("true")) {
@@ -294,9 +297,13 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
                 }
 
                 String checkedData = checkAmplify[0];
-                String[] checkedSplitData = checkedData.split("@");
-                if (checkedSplitData[0].equals("ave_distance_x")) {
-                    registed_ave_distance[0][readCount] = Double.valueOf(checkedSplitData[1]);
+                String[] splitCheckedData = checkedData.split("@");
+
+
+                if (splitCheckedData[0].equals("ave_distance_x")) {
+                    //registed_ave_distance[0][readCount] = Double.valueOf(splitCheckedData[1]);
+                    registedAverageDistance[0][readCount] = splitCheckedData[1];
+
                     if (readCount == 99) {
                         readCount = 0;
                     }
@@ -305,8 +312,10 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
                     }
                 }
 
-                if (checkedSplitData[0].equals("ave_distance_y")) {
-                    registed_ave_distance[1][readCount] = Double.valueOf(checkedSplitData[1]);
+                if (splitCheckedData[0].equals("ave_distance_y")) {
+                    //registed_ave_distance[1][readCount] = Double.valueOf(splitCheckedData[1]);
+                    registedAverageDistance[1][readCount] = splitCheckedData[1];
+
                     if (readCount == 99) {
                         readCount = 0;
                     }
@@ -315,8 +324,10 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
                     }
                 }
 
-                if (checkedSplitData[0].equals("ave_distance_z")) {
-                    registed_ave_distance[2][readCount] = Double.valueOf(checkedSplitData[1]);
+                if (splitCheckedData[0].equals("ave_distance_z")) {
+                    //registed_ave_distance[2][readCount] = Double.valueOf(splitCheckedData[1]);
+                    registedAverageDistance[2][readCount] = splitCheckedData[1];
+
                     if (readCount == 99) {
                         readCount = 0;
                     }
@@ -325,8 +336,10 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
                     }
                 }
 
-                if (checkedSplitData[0].equals("ave_angle_x")) {
-                    registed_ave_angle[0][readCount] = Double.valueOf(checkedSplitData[1]);
+                if (splitCheckedData[0].equals("ave_angle_x")) {
+                    //registed_ave_angle[0][readCount] = Double.valueOf(splitCheckedData[1]);
+                    registedAverageAngle[0][readCount] = splitCheckedData[1];
+
                     if (readCount == 99) {
                         readCount = 0;
                     }
@@ -335,8 +348,10 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
                     }
                 }
 
-                if (checkedSplitData[0].equals("ave_angle_y")) {
-                    registed_ave_angle[1][readCount] = Double.valueOf(checkedSplitData[1]);
+                if (splitCheckedData[0].equals("ave_angle_y")) {
+                    //registed_ave_angle[1][readCount] = Double.valueOf(splitCheckedData[1]);
+                    registedAverageAngle[1][readCount] = splitCheckedData[1];
+
                     if (readCount == 99) {
                         readCount = 0;
                     }
@@ -345,8 +360,10 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
                     }
                 }
 
-                if (checkedSplitData[0].equals("ave_angle_z")) {
-                    registed_ave_angle[2][readCount] = Double.valueOf(checkedSplitData[1]);
+                if (splitCheckedData[0].equals("ave_angle_z")) {
+                    //registed_ave_angle[2][readCount] = Double.valueOf(splitCheckedData[1]);
+                    registedAverageAngle[2][readCount] = splitCheckedData[1];
+
                     if (readCount == 99) {
                         readCount = 0;
                     }
@@ -355,6 +372,18 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
                     }
                 }
             }
+
+            // 復号を行う
+            String[][] decryptedRegistedAverageDistance = mCipherCrypt.decrypt(registedAverageDistance);
+            String[][] decryptedRegistedAverageAngle = mCipherCrypt.decrypt(registedAverageAngle);
+
+            for (int i = 0; i < decryptedRegistedAverageDistance.length; i++) {
+                for (int j = 0; j < decryptedRegistedAverageDistance[i].length; j++) {
+                    registed_ave_distance[i][j] = Double.valueOf(decryptedRegistedAverageDistance[i][j]);
+                    registed_ave_angle[i][j] = Double.valueOf(decryptedRegistedAverageAngle[i][j]);
+                }
+            }
+
 
             br.close();
             isr.close();

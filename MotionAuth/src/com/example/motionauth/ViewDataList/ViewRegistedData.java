@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import com.example.motionauth.Processing.CipherCrypt;
 import com.example.motionauth.R;
 
 import java.io.*;
@@ -79,10 +80,11 @@ public class ViewRegistedData extends Activity {
      *
      * @return 取得したデータ
      */
-    //TODO 復号化処理を行い，データを読み込む
+    //TODO 復号処理を行い，データを読み込む
     private ArrayList<String> readData () {
         Log.v(TAG, "--- readData ---");
         ArrayList<String> dataList = new ArrayList<String>();
+        CipherCrypt mCipherCrypt = new CipherCrypt(ViewRegistedData.this);
 
         String filePath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + "MotionAuth" + File.separator + item;
         File file = new File(filePath);
@@ -93,13 +95,34 @@ public class ViewRegistedData extends Activity {
             BufferedReader br = new BufferedReader(isr);
             String s;
 
+            ArrayList<String> amplify = new ArrayList<String>();
+            ArrayList<String> index = new ArrayList<String>();
+            ArrayList<String> encryptedDataList = new ArrayList<String>();
+
             while ((s = br.readLine()) != null) {
-                dataList.add(s);
+                // 読みだした各行のうち，データ部分のみを抜き出す
+                String[] splitAmplify = s.split(":");
+                amplify.add(splitAmplify[1]);
+
+                String[] splitIndex = splitAmplify[0].split("@");
+                index.add(splitIndex[0]);
+
+                String encryptedData = splitIndex[1];
+                encryptedDataList.add(encryptedData);
+
+//                dataList.add(s);
             }
 
             br.close();
             isr.close();
             fis.close();
+
+            String[] encryptedDataArray = (String[]) encryptedDataList.toArray(new String[0]);
+            String[] decryptedDataArray = mCipherCrypt.decrypt(encryptedDataArray);
+
+            for (int i = 0; i < decryptedDataArray.length; i++) {
+                dataList.add(index.get(i) + "@" + decryptedDataArray[i] + ":" + amplify.get(i));
+            }
 
             return dataList;
         }

@@ -437,7 +437,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
                 }
                 else {
                     // 3回のモーションの平均値をファイルに書き出す
-                    mWriteData.writeRegistedData("MotionAuth", RegistNameInput.name, averageDistance, averageAngle, isAmplified);
+                    mWriteData.writeRegistedData("MotionAuth", RegistNameInput.name, averageDistance, averageAngle, isAmplified, RegistMotion.this);
 
                     AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);
                     alert.setOnKeyListener(new DialogInterface.OnKeyListener() {

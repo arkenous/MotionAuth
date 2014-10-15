@@ -24,7 +24,7 @@ import com.example.motionauth.Lowpass.Fourier;
 import com.example.motionauth.Processing.*;
 import com.example.motionauth.R;
 import com.example.motionauth.Utility.Enum;
-import com.example.motionauth.Utility.WriteData;
+import com.example.motionauth.Utility.ManageData;
 
 
 /**
@@ -61,7 +61,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
     private Formatter        mFormatter        = new Formatter();
     private Calc             mCalc             = new Calc();
     private Amplifier        mAmplifier        = new Amplifier();
-    private WriteData        mWriteData        = new WriteData();
+    private ManageData mManageData = new ManageData();
     private Correlation      mCorrelation      = new Correlation();
     private CorrectDeviation mCorrectDeviation = new CorrectDeviation();
 
@@ -294,8 +294,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
     @Override
     public void run () {
         Log.i(TAG, "Thread Running");
-        mWriteData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accelFloat);
-        mWriteData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyroFloat);
+        mManageData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accelFloat);
+        mManageData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyroFloat);
 
         resultCalc = calc();
         resultCorrelation = measureCorrelation();
@@ -315,8 +315,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
         double[][][] accel_double = mFormatter.floatToDoubleFormatter(accelFloat);
         double[][][] gyro_double = mFormatter.floatToDoubleFormatter(gyroFloat);
 
-        mWriteData.writeDoubleThreeArrayData("BeforeFFT", "accel", RegistNameInput.name, accel_double);
-        mWriteData.writeDoubleThreeArrayData("BeforeFFT", "gyro", RegistNameInput.name, gyro_double);
+        mManageData.writeDoubleThreeArrayData("BeforeFFT", "accel", RegistNameInput.name, accel_double);
+        mManageData.writeDoubleThreeArrayData("BeforeFFT", "gyro", RegistNameInput.name, gyro_double);
 
         if (mAmplifier.CheckValueRange(accel_double, checkRangeValue) || mAmplifier.CheckValueRange(gyro_double, checkRangeValue)) {
             accel_double = mAmplifier.Amplify(accel_double);
@@ -375,8 +375,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
         }
         //endregion
 
-        mWriteData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatDistance", RegistNameInput.name, distance);
-        mWriteData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatAngle", RegistNameInput.name, angle);
+        mManageData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatDistance", RegistNameInput.name, distance);
+        mManageData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatAngle", RegistNameInput.name, angle);
 
         // ズレ修正後の平均値データを出す
         for (int i = 0; i < 3; i++) {
@@ -437,7 +437,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
                 }
                 else {
                     // 3回のモーションの平均値をファイルに書き出す
-                    mWriteData.writeRegistedData("MotionAuth", RegistNameInput.name, averageDistance, averageAngle, isAmplified, RegistMotion.this);
+                    mManageData.writeRegistedData("MotionAuth", RegistNameInput.name, averageDistance, averageAngle, isAmplified, RegistMotion.this);
 
                     AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);
                     alert.setOnKeyListener(new DialogInterface.OnKeyListener() {

@@ -4,7 +4,7 @@ import android.util.Log;
 import com.example.motionauth.Authentication.AuthNameInput;
 import com.example.motionauth.Registration.RegistNameInput;
 import com.example.motionauth.Utility.Enum;
-import com.example.motionauth.Utility.WriteData;
+import com.example.motionauth.Utility.ManageData;
 
 
 /**
@@ -15,8 +15,8 @@ import com.example.motionauth.Utility.WriteData;
 public class Correlation {
     private static final String TAG = Correlation.class.getSimpleName();
 
-    private WriteData mWriteData = new WriteData();
-    private Enum      mEnum      = new Enum();
+    private ManageData mManageData = new ManageData();
+    private Enum       mEnum       = new Enum();
 
     /**
      * 相関を求め，同一のモーションであるかどうかを確認する
@@ -118,8 +118,8 @@ public class Correlation {
             }
         }
 
-        mWriteData.writeRData("RegistLRdata", "R_accel", RegistNameInput.name, R_accel);
-        mWriteData.writeRData("RegistLRdata", "R_gyro", RegistNameInput.name, R_gyro);
+        mManageData.writeRData("RegistLRdata", "R_accel", RegistNameInput.name, R_accel);
+        mManageData.writeRData("RegistLRdata", "R_gyro", RegistNameInput.name, R_gyro);
 
         for (double[] i : R_accel) {
             for (double j : i) {
@@ -352,7 +352,7 @@ public class Correlation {
         }
         //endregion
 
-        mWriteData.writeRData("AuthRData", AuthNameInput.name, R_accel, R_gyro);
+        mManageData.writeRData("AuthRData", AuthNameInput.name, R_accel, R_gyro);
 
         //region 相関の判定
         //相関係数が一定以上あるなら認証成功

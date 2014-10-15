@@ -3,7 +3,7 @@ package com.example.motionauth.Lowpass;
 import android.util.Log;
 import com.example.motionauth.Authentication.AuthNameInput;
 import com.example.motionauth.Registration.RegistNameInput;
-import com.example.motionauth.Utility.WriteData;
+import com.example.motionauth.Utility.ManageData;
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 
 /**
@@ -16,7 +16,7 @@ import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 public class Fourier {
     private static final String TAG = Fourier.class.getSimpleName();
 
-    private WriteData mWriteData = new WriteData();
+    private ManageData mManageData = new ManageData();
 
     /**
      * double型三次元配列の入力データに対し，フーリエ変換を用いてローパスフィルタリングを行ってデータの平滑化を行う
@@ -67,8 +67,8 @@ public class Fourier {
             }
         }
 
-        mWriteData.writeDoubleThreeArrayData("ResultFFT", "rFFT" + dataName, RegistNameInput.name, real);
-        mWriteData.writeDoubleThreeArrayData("ResultFFT", "iFFT" + dataName, RegistNameInput.name, imaginary);
+        mManageData.writeDoubleThreeArrayData("ResultFFT", "rFFT" + dataName, RegistNameInput.name, real);
+        mManageData.writeDoubleThreeArrayData("ResultFFT", "iFFT" + dataName, RegistNameInput.name, imaginary);
 
         // パワースペクトルを求めるために，実数部（k），虚数部（k + 1）それぞれを二乗して加算し，平方根を取り，絶対値を求める
         double[][][] power = new double[data.length][data[0].length][data[0][0].length / 2];
@@ -81,7 +81,7 @@ public class Fourier {
             }
         }
 
-        mWriteData.writeDoubleThreeArrayData("ResultFFT", "powerFFT" + dataName, RegistNameInput.name, power);
+        mManageData.writeDoubleThreeArrayData("ResultFFT", "powerFFT" + dataName, RegistNameInput.name, power);
 
         // ローパスフィルタ処理
         for (int i = 0; i < data.length; i++) {
@@ -100,7 +100,7 @@ public class Fourier {
             }
         }
 
-        mWriteData.writeDoubleThreeArrayData("AfterFFT", dataName, RegistNameInput.name, data);
+        mManageData.writeDoubleThreeArrayData("AfterFFT", dataName, RegistNameInput.name, data);
 
         return data;
     }
@@ -151,8 +151,8 @@ public class Fourier {
             }
         }
 
-        mWriteData.writeDoubleTwoArrayData("ResultFFT", "rFFT" + dataName, AuthNameInput.name, real);
-        mWriteData.writeDoubleTwoArrayData("ResultFFT", "iFFT" + dataName, AuthNameInput.name, imaginary);
+        mManageData.writeDoubleTwoArrayData("ResultFFT", "rFFT" + dataName, AuthNameInput.name, real);
+        mManageData.writeDoubleTwoArrayData("ResultFFT", "iFFT" + dataName, AuthNameInput.name, imaginary);
 
         // パワースペクトルを求めるために，実数部（k），虚数部（k + 1）それぞれを二乗して加算し，平方根を取り，絶対値を求める
         double[][] power = new double[data.length][data[0].length / 2];
@@ -163,7 +163,7 @@ public class Fourier {
             }
         }
 
-        mWriteData.writeDoubleTwoArrayData("ResultFFT", "powerFFT" + dataName, AuthNameInput.name, power);
+        mManageData.writeDoubleTwoArrayData("ResultFFT", "powerFFT" + dataName, AuthNameInput.name, power);
 
         // ローパスフィルタ処理
         for (int i = 0; i < data.length; i++) {
@@ -179,7 +179,7 @@ public class Fourier {
             realfft.realInverse(i, true);
         }
 
-        mWriteData.writeDoubleTwoArrayData("AfterFFT", dataName, AuthNameInput.name, data);
+        mManageData.writeDoubleTwoArrayData("AfterFFT", dataName, AuthNameInput.name, data);
 
         return data;
     }

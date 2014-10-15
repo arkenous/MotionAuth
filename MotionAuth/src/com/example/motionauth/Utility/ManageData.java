@@ -13,8 +13,8 @@ import java.io.*;
  *
  * @author Kensuke Kousaka
  */
-public class WriteData {
-    private static final String TAG = WriteData.class.getSimpleName();
+public class ManageData {
+    private static final String TAG = ManageData.class.getSimpleName();
     private CipherCrypt mCipherCrypt;
 
     /**

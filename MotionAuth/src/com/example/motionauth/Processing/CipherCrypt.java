@@ -19,8 +19,8 @@ import java.security.*;
 public class CipherCrypt {
     private static final String TAG                = CipherCrypt.class.getSimpleName();
     private static final int    ENCRYPT_KEY_LENGTH = 128;
-    private static final String PREF_KEY           = "MotionAuth";
-    private static final String CIPHER_KEY         = "CipherCrypt";
+	private static final String PREF_KEY = "Cipher";
+	private static final String CIPHER_KEY         = "CipherCrypt";
     private static final String CIPHER_IV          = "CipherIv";
 
     private final Key             key;
@@ -214,6 +214,7 @@ public class CipherCrypt {
                 for (int j = 0; j < input[i].length; j++) {
                     byte[] result = cipher.doFinal(Base64.decode(input[i][j], Base64.URL_SAFE | Base64.NO_WRAP));
                     decrypted[i][j] = new String(result);
+	                Log.i(TAG, "decrypted : " + decrypted[i][j]);
                 }
             }
 

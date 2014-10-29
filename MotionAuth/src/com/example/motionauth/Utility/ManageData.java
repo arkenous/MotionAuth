@@ -1,11 +1,16 @@
 package com.example.motionauth.Utility;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Environment;
 import android.util.Log;
 import com.example.motionauth.Processing.CipherCrypt;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 
 
 /**
@@ -439,7 +444,7 @@ public class ManageData {
      * @return 保存できたらtrue，失敗したらfalseを返す
      */
     // 受け取ったデータをCipherクラスに渡し，暗号化されたデータを保存する
-    public boolean writeRegistedData (String folderName, String userName, double[][] averageDistance, double[][] averageAngle, boolean isAmplify, Context context) {
+    public void writeRegistedData (String folderName, String userName, double[][] averageDistance, double[][] averageAngle, boolean isAmplify, Context context) {
         Log.v(TAG, "--- writeRegistedData ---");
 
         // 暗号処理を担うオブジェクトを生成
@@ -461,6 +466,26 @@ public class ManageData {
         String[][] encryptedAvarageDistanceStr = mCipherCrypt.encrypt(averageDistanceStr);
         String[][] encryptedAverageAngleStr = mCipherCrypt.encrypt(averageAngleStr);
 
+	    // 配列データを特定文字列を挟んで連結する
+	    ConvertArrayAndString mConvertArrayAndString = new ConvertArrayAndString();
+	    String registDistanceData = mConvertArrayAndString.arrayToString(encryptedAvarageDistanceStr);
+	    String registAngleData = mConvertArrayAndString.arrayToString(encryptedAverageAngleStr);
+
+	    Context mContext = context.getApplicationContext();
+	    SharedPreferences userPref = mContext.getSharedPreferences("UserList", Context.MODE_PRIVATE);
+	    SharedPreferences.Editor userPrefEditor = userPref.edit();
+
+	    userPrefEditor.putString(userName, "");
+	    userPrefEditor.apply();
+
+	    SharedPreferences preferences = mContext.getSharedPreferences("MotionAuth", Context.MODE_PRIVATE);
+	    SharedPreferences.Editor editor = preferences.edit();
+
+	    editor.putString(userName + "distance", registDistanceData);
+	    editor.putString(userName + "angle", registAngleData);
+	    editor.putString(userName + "amplify", String.valueOf(isAmplify));
+	    editor.apply();
+/*
         try {
             Log.d(TAG, "--- writeRegistedData ---");
             String filePath = Environment.getExternalStorageDirectory() + File.separator + "MotionAuth" + File.separator + folderName + File.separator + userName;
@@ -520,5 +545,44 @@ public class ManageData {
             Log.e(TAG, "Error");
             return false;
         }
+*/
     }
+
+
+	public ArrayList<double[][]> readRegistedData (Context context, String userName) {
+		Log.v(TAG, "--- readRegistedData ---");
+		Context mContext = context.getApplicationContext();
+
+		SharedPreferences preferences = mContext.getSharedPreferences("MotionAuth", Context.MODE_PRIVATE);
+
+		String registedDistanceData = preferences.getString(userName + "distance", "");
+		String registedAngleData = preferences.getString(userName + "angle", "");
+
+		if ("".equals(registedDistanceData)) {
+			throw new RuntimeException();
+		}
+
+		ConvertArrayAndString mConvertArrayAndString = new ConvertArrayAndString();
+		CipherCrypt mCipherCrypt = new CipherCrypt(context);
+
+		Log.e(TAG, "registedData : " + registedDistanceData);
+
+		String[][] decryptedDistance = mCipherCrypt.decrypt(mConvertArrayAndString.stringToArray(registedDistanceData));
+		String[][] decryptedAngle = mCipherCrypt.decrypt(mConvertArrayAndString.stringToArray(registedAngleData));
+
+		double[][] distance = new double[3][100], angle = new double[3][100];
+
+		for (int i = 0; i < decryptedDistance.length; i++) {
+			for (int j = 0; j < decryptedDistance[i].length; j++) {
+				distance[i][j] = Double.valueOf(decryptedDistance[i][j]);
+				angle[i][j] = Double.valueOf(decryptedAngle[i][j]);
+			}
+		}
+
+		ArrayList<double[][]> result = new ArrayList<double[][]>();
+		result.add(distance);
+		result.add(angle);
+
+		return result;
+	}
 }

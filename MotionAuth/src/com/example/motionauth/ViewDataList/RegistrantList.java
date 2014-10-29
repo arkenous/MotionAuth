@@ -2,10 +2,11 @@ package com.example.motionauth.ViewDataList;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -15,7 +16,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.example.motionauth.R;
 
-import java.io.File;
+import java.util.ArrayList;
+import java.util.Map;
 
 
 /**
@@ -55,17 +57,16 @@ public class RegistrantList extends Activity {
         Log.v(TAG, "--- registrantList ---");
 
         // 登録されているユーザ名のリストを作成する
-        fileNameStr = getRegistrantName();
+	    ArrayList<String> userList = getRegistrantName();
 
         final ListView lv = (ListView) findViewById(R.id.listView1);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
 
         try {
-
             // アイテム追加
-            for (String s : fileNameStr) {
-                adapter.add(s);
+	        for (String s : userList) {
+		        adapter.add(s);
             }
         }
         catch (NullPointerException e) {
@@ -108,29 +109,20 @@ public class RegistrantList extends Activity {
      *
      * @return 作成されたString配列型のリスト
      */
-    private String[] getRegistrantName () {
+    private ArrayList<String> getRegistrantName () {
         Log.v(TAG, "--- getRegistrantName ---");
 
-        try {
-            // 専用ディレクトリを指定
-            String dirPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + "MotionAuth";
-            File dir = new File(dirPath);
+	    Context mContext = RegistrantList.this.getApplicationContext();
+	    SharedPreferences preferences = mContext.getSharedPreferences("UserList", Context.MODE_PRIVATE);
 
-            // 指定されたディレクトリのファイル名（ディレクトリ名）を取得
-            final File[] files = dir.listFiles();
-            final String[] str_items;
-            str_items = new String[files.length];
-            for (int i = 0; i < files.length; i++) {
-                File file = files[i];
-                str_items[i] = file.getName();
-            }
+	    ArrayList<String> keyList = new ArrayList<String>();
 
-            return str_items;
+	    Map<String, ?> allEntries = preferences.getAll();
+	    for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+		    keyList.add(entry.getKey());
+	    }
 
-        }
-        catch (NullPointerException e) {
-            return null;
-        }
+	    return keyList;
     }
 
 

@@ -2,18 +2,18 @@ package com.example.motionauth.ViewDataList;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import com.example.motionauth.Processing.CipherCrypt;
 import com.example.motionauth.R;
+import com.example.motionauth.Utility.ManageData;
 
-import java.io.*;
 import java.util.ArrayList;
 
 
@@ -83,55 +83,66 @@ public class ViewRegistedData extends Activity {
     private ArrayList<String> readData () {
         Log.v(TAG, "--- readData ---");
         ArrayList<String> dataList = new ArrayList<String>();
-        CipherCrypt mCipherCrypt = new CipherCrypt(ViewRegistedData.this);
 
-        String filePath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + "MotionAuth" + File.separator + item;
-        File file = new File(filePath);
+	    ManageData mManageData = new ManageData();
+	    ArrayList<double[][]> readData = mManageData.readRegistedData(ViewRegistedData.this, item);
+	    double[][] readDistance = readData.get(0);
+	    double[][] readAngle = readData.get(1);
 
-        try {
-            FileInputStream fis = new FileInputStream(file);
-            InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
-            BufferedReader br = new BufferedReader(isr);
-            String s;
+	    String[][] registedDistance = new String[3][100], registedAngle = new String[3][100];
+	    for (int i = 0; i < readDistance.length; i++) {
+		    for (int j = 0; j < readDistance[i].length; j++) {
+			    registedDistance[i][j] = String.valueOf(readDistance[i][j]);
+			    registedAngle[i][j] = String.valueOf(readAngle[i][j]);
+		    }
+	    }
 
-            ArrayList<String> amplify = new ArrayList<String>();
-            ArrayList<String> index = new ArrayList<String>();
-            ArrayList<String> encryptedDataList = new ArrayList<String>();
+	    Context mContext = ViewRegistedData.this.getApplicationContext();
+	    SharedPreferences preferences = mContext.getSharedPreferences("MotionAuth", Context.MODE_PRIVATE);
 
-            while ((s = br.readLine()) != null) {
-                // 読みだした各行のうち，データ部分のみを抜き出す
-                String[] splitAmplify = s.split(":");
-                amplify.add(splitAmplify[1]);
+	    String amplifierStatus = preferences.getString(item + "amplify", "");
 
-                String[] splitIndex = splitAmplify[0].split("@");
-                index.add(splitIndex[0]);
+	    if ("".equals(amplifierStatus)) {
+		    throw new RuntimeException();
+	    }
 
-                String encryptedData = splitIndex[1];
-                encryptedDataList.add(encryptedData);
-            }
+	    String index = "";
 
-            br.close();
-            isr.close();
-            fis.close();
+	    for (int i = 0; i < registedDistance.length; i++) {
+		    switch (i) {
+			    case 0:
+				    index = "DistanceX";
+				    break;
+			    case 1:
+				    index = "DistanceY";
+				    break;
+			    case 2:
+				    index = "DistanceZ";
+				    break;
+		    }
+		    for (int j = 0; j < registedDistance[i].length; j++) {
+			    dataList.add(index + " : " + registedDistance[i][j] + " : " + amplifierStatus);
+		    }
+	    }
 
-            String[] encryptedDataArray = encryptedDataList.toArray(new String[0]);
-            String[] decryptedDataArray = mCipherCrypt.decrypt(encryptedDataArray);
+	    for (int i = 0; i < registedAngle.length; i++) {
+		    switch (i) {
+			    case 0:
+				    index = "AngleX";
+				    break;
+			    case 1:
+				    index = "AngleY";
+				    break;
+			    case 2:
+				    index = "AngleZ";
+				    break;
+		    }
+		    for (int j = 0; j < registedAngle[i].length; j++) {
+			    dataList.add(index + " : " + registedAngle[i][j] + " : " + amplifierStatus);
+		    }
+	    }
 
-            for (int i = 0; i < decryptedDataArray.length; i++) {
-                dataList.add(index.get(i) + "@" + decryptedDataArray[i] + ":" + amplify.get(i));
-            }
-
-            return dataList;
-        }
-        catch (FileNotFoundException e) {
-            return dataList;
-        }
-        catch (UnsupportedEncodingException e) {
-            return dataList;
-        }
-        catch (IOException e) {
-            return dataList;
-        }
+	    return dataList;
     }
 
 

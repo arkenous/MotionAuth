@@ -6,22 +6,30 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.*;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 import com.example.motionauth.Lowpass.Fourier;
-import com.example.motionauth.Processing.*;
+import com.example.motionauth.Processing.Amplifier;
+import com.example.motionauth.Processing.Calc;
+import com.example.motionauth.Processing.Correlation;
+import com.example.motionauth.Processing.Formatter;
 import com.example.motionauth.R;
 import com.example.motionauth.Utility.Enum;
+import com.example.motionauth.Utility.ManageData;
 
-import java.io.*;
+import java.util.ArrayList;
 
 /**
  * ユーザ認証を行う
@@ -271,10 +279,23 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
      */
     private void readRegistedData () {
         Log.v(TAG, "--- readRegistedData ---");
-        int readCount = 0;
 
-        CipherCrypt mCipherCrypt = new CipherCrypt(AuthMotion.this);
+	    ManageData mManageData = new ManageData();
+	    ArrayList<double[][]> readDataList = mManageData.readRegistedData(AuthMotion.this, AuthNameInput.name);
 
+	    registed_ave_distance = readDataList.get(0);
+	    registed_ave_angle = readDataList.get(1);
+
+	    SharedPreferences preferences = AuthMotion.this.getApplicationContext().getSharedPreferences("MotionAuth", Context.MODE_PRIVATE);
+
+	    String registedAmplifyStatus = preferences.getString(AuthNameInput.name + "amplify", "");
+
+	    if ("".equals(registedAmplifyStatus)) {
+		    throw new RuntimeException();
+	    }
+
+	    isAmplity = Boolean.valueOf(registedAmplifyStatus);
+/*
         try {
             String filePath = Environment.getExternalStorageDirectory() + File.separator + "MotionAuth" + File.separator + "MotionAuth" + File.separator + AuthNameInput.name;
             File file = new File(filePath);
@@ -385,6 +406,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
         catch (IOException e) {
             e.printStackTrace();
         }
+*/
     }
 
     /**

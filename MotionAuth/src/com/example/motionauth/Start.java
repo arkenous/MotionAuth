@@ -1,4 +1,3 @@
-
 package com.example.motionauth;
 
 import android.app.Activity;
@@ -24,205 +23,205 @@ import android.widget.Button;
  * @author Kensuke Kousaka
  */
 public class Start extends Activity {
-    private static final String TAG = Start.class.getSimpleName();
+	private static final String TAG = Start.class.getSimpleName();
 
-    private final static int POSITIVE = 1;
-    private final static int NEUTRAL  = 2;
-    private final static int NEGATIVE = 3;
+	private final static int POSITIVE = 1;
+	private final static int NEUTRAL = 2;
+	private final static int NEGATIVE = 3;
 
-    private final static int DOUBLE = 2;
-    private final static int TRIPLE = 3;
+	private final static int DOUBLE = 2;
+	private final static int TRIPLE = 3;
 
-    private Handler handler;
+	private Handler handler;
 
-    @Override
-    protected void onCreate (Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+	@Override
+	protected void onCreate (Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-        Log.v(TAG, "--- onCreate ---");
+		Log.v(TAG, "--- onCreate ---");
 
-        // タイトルバーの非表示
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.activity_start);
+		// タイトルバーの非表示
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		setContentView(R.layout.activity_start);
 
-        selectMode();
-    }
-
-
-    /**
-     * モード選択
-     */
-    private void selectMode () {
-        Log.v(TAG, "--- selectMode ---");
-
-        Button startBtn = (Button) findViewById(R.id.start);
-
-        startBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick (View v) {
-                Log.i(TAG, "Click Start Button");
-
-                String[] btnMsg = {"登録者一覧モード", "認証試験モード", "新規登録モード"};
-                alertDialog(TRIPLE, btnMsg, "モード選択", "モードを選択してください");
-                handler = new Handler() {
-                    public void handleMessage (Message msg) {
-                        if (msg.arg1 == POSITIVE) {
-                            Log.i(TAG, "POSITIVE");
-                            // 登録者一覧モード
-                            moveActivity("com.example.motionauth", "com.example.motionauth.ViewDataList.RegistrantList", true);
-                        }
-                        else if (msg.arg1 == NEUTRAL) {
-                            Log.i(TAG, "NEUTRAL");
-                            // 認証試験モード
-                            moveActivity("com.example.motionauth", "com.example.motionauth.Authentication.AuthNameInput", true);
-                        }
-                        else if (msg.arg1 == NEGATIVE) {
-                            Log.i(TAG, "NEGATIVE");
-                            // 新規登録モード
-                            moveActivity("com.example.motionauth", "com.example.motionauth.Registration.RegistNameInput", true);
-                        }
-                    }
-                };
-            }
-        });
-    }
+		selectMode();
+	}
 
 
-    /**
-     * アラートダイアログ作成
-     *
-     * @param choiceNum 2択か3択か
-     * @param btnMsg    選択肢ボタンの文字列
-     * @param title     ダイアログのタイトル
-     * @param msg       ダイアログの説明
-     */
-    private void alertDialog (int choiceNum, String[] btnMsg, String title, String msg) {
-        Log.v(TAG, "--- alertDialog ---");
+	/**
+	 * モード選択
+	 */
+	private void selectMode () {
+		Log.v(TAG, "--- selectMode ---");
 
-        if (choiceNum == DOUBLE) {
-            Log.i(TAG, "DOUBLE");
+		Button startBtn = (Button) findViewById(R.id.start);
 
-            AlertDialog.Builder alert = new AlertDialog.Builder(this);
-            alert.setOnKeyListener(new OnKeyListener() {
-                public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {
-                    // アラート画面に特定のキー動作をかませる
-                    if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        // Backキーが押された場合
-                        // ダイアログを閉じて，アクティビティを閉じる
-                        dialog.dismiss();
-                        finish();
+		startBtn.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick (View v) {
+				Log.i(TAG, "Click Start Button");
 
-                        return true;
-                    }
-                    return false;
-                }
-            });
-
-            // ダイアログ外をタッチしてもダイアログが閉じないようにする
-            alert.setCancelable(false);
-
-            alert.setTitle(title);
-            alert.setMessage(msg);
-
-            // PositiveButtonにより，ダイアログの左側に配置される
-            alert.setPositiveButton(btnMsg[0], new DialogInterface.OnClickListener() {
-                public void onClick (DialogInterface dialog, int which) {
-                    Message msg = new Message();
-                    msg.arg1 = POSITIVE;
-
-                    handler.sendMessage(msg);
-                }
-            });
-
-            alert.setNegativeButton(btnMsg[1], new DialogInterface.OnClickListener() {
-                public void onClick (DialogInterface dialog, int which) {
-                    Message msg = new Message();
-                    msg.arg1 = NEGATIVE;
-
-                    handler.sendMessage(msg);
-                }
-            });
-
-            // ダイアログを表示する
-            alert.show();
-        }
-        else if (choiceNum == TRIPLE) {
-            Log.i(TAG, "TRIPLE");
-
-            AlertDialog.Builder alert = new AlertDialog.Builder(this);
-            alert.setOnKeyListener(new OnKeyListener() {
-                public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {
-                    // アラート画面に特定のキー動作をかませる
-                    if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        // Backキーを押した場合
-                        // ダイアログを閉じて，アクティビティを閉じる
-                        dialog.dismiss();
-                        finish();
-
-                        return true;
-                    }
-                    return false;
-                }
-            });
-
-            // ダイアログ外をタッチしてもダイアログを閉じないようにする
-            alert.setCancelable(false);
-
-            alert.setTitle(title);
-            alert.setMessage(msg);
-
-            // PositiveButtonにより，ダイアログの左側に配置される
-            alert.setPositiveButton(btnMsg[0], new DialogInterface.OnClickListener() {
-                public void onClick (DialogInterface dialog, int which) {
-                    Message msg = new Message();
-                    msg.arg1 = POSITIVE;
-
-                    handler.sendMessage(msg);
-                }
-            });
-
-            alert.setNeutralButton(btnMsg[1], new DialogInterface.OnClickListener() {
-                public void onClick (DialogInterface dialog, int which) {
-                    Message msg = new Message();
-                    msg.arg1 = NEUTRAL;
-
-                    handler.sendMessage(msg);
-                }
-            });
-
-            alert.setNegativeButton(btnMsg[2], new DialogInterface.OnClickListener() {
-                public void onClick (DialogInterface dialog, int which) {
-                    Message msg = new Message();
-                    msg.arg1 = NEGATIVE;
-
-                    handler.sendMessage(msg);
-                }
-            });
-
-            // ダイアログを表示する
-            alert.show();
-        }
-    }
+				String[] btnMsg = {"登録者一覧モード", "認証試験モード", "新規登録モード"};
+				alertDialog(TRIPLE, btnMsg, "モード選択", "モードを選択してください");
+				handler = new Handler() {
+					public void handleMessage (Message msg) {
+						if (msg.arg1 == POSITIVE) {
+							Log.i(TAG, "POSITIVE");
+							// 登録者一覧モード
+							moveActivity("com.example.motionauth", "com.example.motionauth.ViewDataList.RegistrantList", true);
+						}
+						else if (msg.arg1 == NEUTRAL) {
+							Log.i(TAG, "NEUTRAL");
+							// 認証試験モード
+							moveActivity("com.example.motionauth", "com.example.motionauth.Authentication.AuthNameInput", true);
+						}
+						else if (msg.arg1 == NEGATIVE) {
+							Log.i(TAG, "NEGATIVE");
+							// 新規登録モード
+							moveActivity("com.example.motionauth", "com.example.motionauth.Registration.RegistNameInput", true);
+						}
+					}
+				};
+			}
+		});
+	}
 
 
-    /**
-     * アクティビティを移動する
-     *
-     * @param pkgName 移動先のパッケージ名
-     * @param actName 移動先のアクティビティ名
-     * @param flg     戻るキーを押した際にこのアクティビティを表示させるかどうか
-     */
-    private void moveActivity (String pkgName, String actName, boolean flg) {
-        Log.v(TAG, "--- moveActivity ---");
+	/**
+	 * アラートダイアログ作成
+	 *
+	 * @param choiceNum 2択か3択か
+	 * @param btnMsg    選択肢ボタンの文字列
+	 * @param title     ダイアログのタイトル
+	 * @param msg       ダイアログの説明
+	 */
+	private void alertDialog (int choiceNum, String[] btnMsg, String title, String msg) {
+		Log.v(TAG, "--- alertDialog ---");
 
-        Intent intent = new Intent();
+		if (choiceNum == DOUBLE) {
+			Log.i(TAG, "DOUBLE");
 
-        intent.setClassName(pkgName, actName);
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+			alert.setOnKeyListener(new OnKeyListener() {
+				public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {
+					// アラート画面に特定のキー動作をかませる
+					if (keyCode == KeyEvent.KEYCODE_BACK) {
+						// Backキーが押された場合
+						// ダイアログを閉じて，アクティビティを閉じる
+						dialog.dismiss();
+						finish();
 
-        if (flg) {
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        }
+						return true;
+					}
+					return false;
+				}
+			});
 
-        startActivityForResult(intent, 0);
-    }
+			// ダイアログ外をタッチしてもダイアログが閉じないようにする
+			alert.setCancelable(false);
+
+			alert.setTitle(title);
+			alert.setMessage(msg);
+
+			// PositiveButtonにより，ダイアログの左側に配置される
+			alert.setPositiveButton(btnMsg[0], new DialogInterface.OnClickListener() {
+				public void onClick (DialogInterface dialog, int which) {
+					Message msg = new Message();
+					msg.arg1 = POSITIVE;
+
+					handler.sendMessage(msg);
+				}
+			});
+
+			alert.setNegativeButton(btnMsg[1], new DialogInterface.OnClickListener() {
+				public void onClick (DialogInterface dialog, int which) {
+					Message msg = new Message();
+					msg.arg1 = NEGATIVE;
+
+					handler.sendMessage(msg);
+				}
+			});
+
+			// ダイアログを表示する
+			alert.show();
+		}
+		else if (choiceNum == TRIPLE) {
+			Log.i(TAG, "TRIPLE");
+
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+			alert.setOnKeyListener(new OnKeyListener() {
+				public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {
+					// アラート画面に特定のキー動作をかませる
+					if (keyCode == KeyEvent.KEYCODE_BACK) {
+						// Backキーを押した場合
+						// ダイアログを閉じて，アクティビティを閉じる
+						dialog.dismiss();
+						finish();
+
+						return true;
+					}
+					return false;
+				}
+			});
+
+			// ダイアログ外をタッチしてもダイアログを閉じないようにする
+			alert.setCancelable(false);
+
+			alert.setTitle(title);
+			alert.setMessage(msg);
+
+			// PositiveButtonにより，ダイアログの左側に配置される
+			alert.setPositiveButton(btnMsg[0], new DialogInterface.OnClickListener() {
+				public void onClick (DialogInterface dialog, int which) {
+					Message msg = new Message();
+					msg.arg1 = POSITIVE;
+
+					handler.sendMessage(msg);
+				}
+			});
+
+			alert.setNeutralButton(btnMsg[1], new DialogInterface.OnClickListener() {
+				public void onClick (DialogInterface dialog, int which) {
+					Message msg = new Message();
+					msg.arg1 = NEUTRAL;
+
+					handler.sendMessage(msg);
+				}
+			});
+
+			alert.setNegativeButton(btnMsg[2], new DialogInterface.OnClickListener() {
+				public void onClick (DialogInterface dialog, int which) {
+					Message msg = new Message();
+					msg.arg1 = NEGATIVE;
+
+					handler.sendMessage(msg);
+				}
+			});
+
+			// ダイアログを表示する
+			alert.show();
+		}
+	}
+
+
+	/**
+	 * アクティビティを移動する
+	 *
+	 * @param pkgName 移動先のパッケージ名
+	 * @param actName 移動先のアクティビティ名
+	 * @param flg     戻るキーを押した際にこのアクティビティを表示させるかどうか
+	 */
+	private void moveActivity (String pkgName, String actName, boolean flg) {
+		Log.v(TAG, "--- moveActivity ---");
+
+		Intent intent = new Intent();
+
+		intent.setClassName(pkgName, actName);
+
+		if (flg) {
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+		}
+
+		startActivityForResult(intent, 0);
+	}
 }

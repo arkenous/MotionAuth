@@ -6,11 +6,11 @@ package com.example.motionauth.Utility;
  * @author Kensuke Kousaka
  */
 public class Enum {
-    public static enum MEASURE {
-        BAD, INCORRECT, CORRECT, PERFECT
-    }
+	public static enum MEASURE {
+		BAD, INCORRECT, CORRECT, PERFECT
+	}
 
-    public final double LOOSE  = 0.4;
-    public final double NORMAL = 0.6;
-    public final double STRICT = 0.8;
+	public final double LOOSE = 0.4;
+	public final double NORMAL = 0.6;
+	public final double STRICT = 0.8;
 }

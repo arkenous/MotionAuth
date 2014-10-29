@@ -3,12 +3,20 @@ package com.example.motionauth.Utility;
 import android.util.Log;
 
 /**
- * Created by ken on 14/10/29.
+ * 文字列型配列データの要素を連結したり，分離して配列に戻すクラス
+ *
+ * @author Kensuke Kousaka
  */
 public class ConvertArrayAndString {
 	private static final String TAG = ConvertArrayAndString.class.getSimpleName();
 
 
+	/**
+	 * 受け取った配列データを，特定の文字を用いて連結する
+	 *
+	 * @param input 処理するString型二次元配列データ
+	 * @return 連結したString型データ
+	 */
 	public String arrayToString (String[][] input) {
 		Log.v(TAG, "--- arrayToString ---");
 		String join = "", result = "";
@@ -42,26 +50,23 @@ public class ConvertArrayAndString {
 		}
 		// a,a,a'b,b,b'c,c,c
 
-		Log.e(TAG, "result : " + result);
-
 		return result;
 	}
 
 
+	/**
+	 * 受け取ったString型データを特定文字列で分割して配列データにする
+	 *
+	 * @param input 処理するString型データ
+	 * @return 分割したString型二次元配列データ
+	 */
 	public String[][] stringToArray (String input) {
 		Log.i(TAG, "--- stringToArray ---");
-		Log.i(TAG, "input : " + input);
 		String[] splitDimention = input.split("'");
 		String[][] result = new String[3][100];
 
 		for (int i = 0; i < splitDimention.length; i++) {
 			result[i] = splitDimention[i].split(",");
-		}
-
-		for (int i = 0; i < result.length; i++) {
-			for (int j = 0; j < result[i].length; j++) {
-				Log.e(TAG, "result : " + result[i][j]);
-			}
 		}
 
 		return result;

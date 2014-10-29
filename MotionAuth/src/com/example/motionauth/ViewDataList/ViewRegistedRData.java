@@ -22,126 +22,126 @@ import java.util.ArrayList;
  * @author Kensuke Kousaka
  */
 public class ViewRegistedRData extends Activity {
-    private static final String TAG = ViewRegistedRData.class.getSimpleName();
+	private static final String TAG = ViewRegistedRData.class.getSimpleName();
 
-    String item = null;
-    int flgCount;
-
-
-    @Override
-    protected void onCreate (Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        Log.v(TAG, "--- onCreate ---");
-
-        setContentView(R.layout.activity_view_registed_rdata);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            ActionBar actionBar = getActionBar();
-            if (actionBar != null) {
-                actionBar.setHomeButtonEnabled(true);
-            }
-        }
-        flgCount = 0;
-
-        viewRegistedData();
-    }
+	String item = null;
+	int flgCount;
 
 
-    private void viewRegistedData () {
-        Log.v(TAG, "--- viewRegistedData ---");
+	@Override
+	protected void onCreate (Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-        Intent intent = getIntent();
-        item = intent.getStringExtra("item");
+		Log.v(TAG, "--- onCreate ---");
 
-        ListView lv = (ListView) findViewById(R.id.listView1);
+		setContentView(R.layout.activity_view_registed_rdata);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			ActionBar actionBar = getActionBar();
+			if (actionBar != null) {
+				actionBar.setHomeButtonEnabled(true);
+			}
+		}
+		flgCount = 0;
 
-        ArrayList<String> dataList = readData();
-
-        for (String i : dataList) {
-            adapter.add(i);
-        }
-
-        lv.setAdapter(adapter);
-    }
-
-
-    private ArrayList<String> readData () {
-        Log.v(TAG, "--- readData ---");
-        ArrayList<String> dataList = new ArrayList<String>();
-
-        String directoryPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + "RegistLRdata" + File.separator + item;
-
-        File directory = new File(directoryPath);
-        File[] fileList = directory.listFiles();
-
-        for (int i = 0; i < fileList.length; i++) {
-            String filePath = directoryPath + File.separator + fileList[i].getName();
-
-            File file = new File(filePath);
-
-            try {
-                FileInputStream fis = new FileInputStream(file);
-                InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
-                BufferedReader br = new BufferedReader(isr);
-                String s;
-
-                while ((s = br.readLine()) != null) {
-                    dataList.add(s);
-                }
-
-                br.close();
-                isr.close();
-                fis.close();
-            }
-            catch (FileNotFoundException e) {
-                e.printStackTrace();
-                return dataList;
-            }
-            catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-                return dataList;
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-                return dataList;
-            }
-        }
-        return dataList;
-    }
+		viewRegistedData();
+	}
 
 
-    @Override
-    public boolean onOptionsItemSelected (MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                if (flgCount == 9) {
-                    flgCount = 0;
-                    moveActivity("com.example.motionauth", "com.example.motionauth.ViewDataList.ViewAuthRData", true);
-                }
-                else {
-                    flgCount++;
-                }
-                return true;
-        }
-        return false;
-    }
+	private void viewRegistedData () {
+		Log.v(TAG, "--- viewRegistedData ---");
+
+		Intent intent = getIntent();
+		item = intent.getStringExtra("item");
+
+		ListView lv = (ListView) findViewById(R.id.listView1);
+
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+
+		ArrayList<String> dataList = readData();
+
+		for (String i : dataList) {
+			adapter.add(i);
+		}
+
+		lv.setAdapter(adapter);
+	}
 
 
-    private void moveActivity (String pkgName, String actName, boolean flg) {
-        Log.v(TAG, "--- moveActivity ---");
+	private ArrayList<String> readData () {
+		Log.v(TAG, "--- readData ---");
+		ArrayList<String> dataList = new ArrayList<String>();
 
-        Intent intent = new Intent();
-        intent.setClassName(pkgName, actName);
+		String directoryPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + "RegistLRdata" + File.separator + item;
 
-        intent.putExtra("item", item);
+		File directory = new File(directoryPath);
+		File[] fileList = directory.listFiles();
 
-        if (flg) {
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        }
+		for (int i = 0; i < fileList.length; i++) {
+			String filePath = directoryPath + File.separator + fileList[i].getName();
 
-        startActivityForResult(intent, 0);
-    }
+			File file = new File(filePath);
+
+			try {
+				FileInputStream fis = new FileInputStream(file);
+				InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+				BufferedReader br = new BufferedReader(isr);
+				String s;
+
+				while ((s = br.readLine()) != null) {
+					dataList.add(s);
+				}
+
+				br.close();
+				isr.close();
+				fis.close();
+			}
+			catch (FileNotFoundException e) {
+				e.printStackTrace();
+				return dataList;
+			}
+			catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+				return dataList;
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+				return dataList;
+			}
+		}
+		return dataList;
+	}
+
+
+	@Override
+	public boolean onOptionsItemSelected (MenuItem item) {
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				if (flgCount == 9) {
+					flgCount = 0;
+					moveActivity("com.example.motionauth", "com.example.motionauth.ViewDataList.ViewAuthRData", true);
+				}
+				else {
+					flgCount++;
+				}
+				return true;
+		}
+		return false;
+	}
+
+
+	private void moveActivity (String pkgName, String actName, boolean flg) {
+		Log.v(TAG, "--- moveActivity ---");
+
+		Intent intent = new Intent();
+		intent.setClassName(pkgName, actName);
+
+		intent.putExtra("item", item);
+
+		if (flg) {
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+		}
+
+		startActivityForResult(intent, 0);
+	}
 }

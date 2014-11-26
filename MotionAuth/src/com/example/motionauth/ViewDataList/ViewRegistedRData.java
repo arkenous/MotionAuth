@@ -36,11 +36,9 @@ public class ViewRegistedRData extends Activity {
 
 		setContentView(R.layout.activity_view_registed_rdata);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
 			ActionBar actionBar = getActionBar();
-			if (actionBar != null) {
-				actionBar.setHomeButtonEnabled(true);
-			}
+			if (actionBar != null) actionBar.setHomeButtonEnabled(true);
 		}
 		flgCount = 0;
 
@@ -56,13 +54,11 @@ public class ViewRegistedRData extends Activity {
 
 		ListView lv = (ListView) findViewById(R.id.listView1);
 
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+		ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
 
 		ArrayList<String> dataList = readData();
 
-		for (String i : dataList) {
-			adapter.add(i);
-		}
+		for (String i : dataList) adapter.add(i);
 
 		lv.setAdapter(adapter);
 	}
@@ -70,15 +66,15 @@ public class ViewRegistedRData extends Activity {
 
 	private ArrayList<String> readData () {
 		Log.v(TAG, "--- readData ---");
-		ArrayList<String> dataList = new ArrayList<String>();
+		ArrayList<String> dataList = new ArrayList<>();
 
 		String directoryPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + "RegistLRdata" + File.separator + item;
 
 		File directory = new File(directoryPath);
 		File[] fileList = directory.listFiles();
 
-		for (int i = 0; i < fileList.length; i++) {
-			String filePath = directoryPath + File.separator + fileList[i].getName();
+		for (File aFileList : fileList) {
+			String filePath = directoryPath + File.separator + aFileList.getName();
 
 			File file = new File(filePath);
 
@@ -88,9 +84,7 @@ public class ViewRegistedRData extends Activity {
 				BufferedReader br = new BufferedReader(isr);
 				String s;
 
-				while ((s = br.readLine()) != null) {
-					dataList.add(s);
-				}
+				while ((s = br.readLine()) != null) dataList.add(s);
 
 				br.close();
 				isr.close();
@@ -138,9 +132,7 @@ public class ViewRegistedRData extends Activity {
 
 		intent.putExtra("item", item);
 
-		if (flg) {
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-		}
+		if (flg) intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
 		startActivityForResult(intent, 0);
 	}

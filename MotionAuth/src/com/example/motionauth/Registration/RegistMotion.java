@@ -16,7 +16,6 @@ import android.os.Message;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.*;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -127,7 +126,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
 		nameTv.setText(RegistNameInput.name + "さん読んでね！");
 
-		getMotionBtn.setOnClickListener(new OnClickListener() {
+		getMotionBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick (View v) {
 				Log.i(TAG, "Click Get Motion Button");
 				if (isGetMotionBtnClickable) {
@@ -190,6 +190,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 			}
 			else if (msg.what == GET_MOTION && !isGetMotionBtnClickable) {
 				if (accelCount < 100 && gyroCount < 100 && getCount >= 0 && getCount < 3) {
+					//TODO 書き方が冗長なので，改善する
 					// 取得した値を，0.03秒ごとに配列に入れる
 					for (int i = 0; i < 3; i++) {
 						accelFloat[getCount][i][accelCount] = vAccel[i];
@@ -257,18 +258,12 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
 	@Override
 	public void onSensorChanged (SensorEvent event) {
-		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-			vAccel = event.values.clone();
-		}
-		if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-			vGyro = event.values.clone();
-		}
+		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) vAccel = event.values.clone();
+		if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) vGyro = event.values.clone();
 	}
 
 	private void finishGetMotion () {
-		if (getMotionBtn.isClickable()) {
-			getMotionBtn.setClickable(false);
-		}
+		if (getMotionBtn.isClickable()) getMotionBtn.setClickable(false);
 		isMenuClickable = false;
 		secondTv.setText("0");
 		getMotionBtn.setText("データ処理中");
@@ -347,10 +342,12 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 		}
 
 		//region 同一のモーションであるかの確認をし，必要に応じてズレ修正を行う
+		//TODO ズレ修正の再考
 		Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, angle, averageDistance, averageAngle);
 
 		Log.d(TAG, "*** afterMeasureCorrelation");
 		Log.d(TAG, "measure = " + String.valueOf(measure));
+
 
 		if (Enum.MEASURE.BAD == measure) {
 			// 相関係数が0.4以下
@@ -358,11 +355,55 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 			return false;
 		}
 		else if (Enum.MEASURE.INCORRECT == measure) {
-			// 相関係数が0.4よりも高く，0.8以下の場合
+			// 相関係数が0.4よりも高く，0.6以下の場合
 			// ズレ修正を行う
-			Log.i(TAG, "measure: INCORRECT");
-			distance = mCorrectDeviation.correctDeviation(distance);
-			angle = mCorrectDeviation.correctDeviation(angle);
+			int time = 0;
+			Enum.MODE mode = Enum.MODE.MAX;
+
+			double[][][] originalDistance = distance;
+			double[][][] originalAngle = angle;
+
+			while (true) {
+				//TODO 修正した結果，相関係数が悪化したら元も子もないので，ここでチェック
+				Log.i(TAG, "measure: INCORRECT");
+
+				switch (time) {
+					case 0:
+						mode = Enum.MODE.MAX;
+						break;
+					case 1:
+						mode = Enum.MODE.MIN;
+						break;
+					case 2:
+						mode = Enum.MODE.MEDIAN;
+						break;
+				}
+
+				distance = mCorrectDeviation.correctDeviation(originalDistance, mode);
+				angle = mCorrectDeviation.correctDeviation(originalAngle, mode);
+
+				for (int i = 0; i < 3; i++) {
+					for (int j = 0; j < 100; j++) {
+						averageDistance[i][j] = (distance[0][i][j] + distance[1][i][j] + distance[2][i][j]) / 3;
+						averageAngle[i][j] = (angle[0][i][j] + angle[1][i][j] + angle[2][i][j]) / 3;
+					}
+				}
+
+				Enum.MEASURE tmp = mCorrelation.measureCorrelation(distance, angle, averageDistance, averageAngle);
+
+				if (tmp == Enum.MEASURE.PERFECT || tmp == Enum.MEASURE.CORRECT) {
+					break;
+				}
+				else if (time == 2) {
+					// 相関係数が低いまま，アラートなどを出す？
+					Log.e(TAG, "Correlation value is low");
+					distance = originalDistance;
+					angle = originalAngle;
+					break;
+				}
+
+				time++;
+			}
 		}
 		else if (Enum.MEASURE.PERFECT == measure || Enum.MEASURE.CORRECT == measure) {
 			Log.i(TAG, "measure: CORRECT or PERFECT");
@@ -437,6 +478,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 				}
 				else {
 					// 3回のモーションの平均値をファイルに書き出す
+					mManageData.writeRegistedDataToSd("Test", RegistNameInput.name, averageDistance, averageAngle, isAmplified, RegistMotion.this);
 					mManageData.writeRegistedData(RegistNameInput.name, averageDistance, averageAngle, isAmplified, RegistMotion.this);
 
 					AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);
@@ -548,7 +590,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 					AlertDialog.Builder dialog = new AlertDialog.Builder(RegistMotion.this);
 					dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
 						@Override
-						public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {
+						public boolean onKey (DialogInterface dialog1, int keyCode, KeyEvent event) {
 							return keyCode == KeyEvent.KEYCODE_BACK;
 						}
 					});
@@ -559,8 +601,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 					dialog.setCancelable(false);
 					dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 						@Override
-						public void onClick (DialogInterface dialog, int which) {
-
+						public void onClick (DialogInterface dialog1, int which) {
 						}
 					});
 					dialog.show();
@@ -591,7 +632,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 					alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick (DialogInterface dialog, int which) {
-							resetValue();
+							RegistMotion.this.resetValue();
 						}
 					});
 

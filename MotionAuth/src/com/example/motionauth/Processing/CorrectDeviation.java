@@ -1,9 +1,11 @@
 package com.example.motionauth.Processing;
 
 import android.util.Log;
+import com.example.motionauth.Utility.Enum;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.TreeMap;
 
 
 /**
@@ -21,42 +23,79 @@ public class CorrectDeviation {
 	 * @param data 修正するdouble型の3次元配列データ
 	 * @return newData ズレ修正後のdouble型の3次元配列データ
 	 */
-	public double[][][] correctDeviation (double[][][] data) {
+	//TODO 一回目で失敗した際に，次どの点で持って修正するかの検討（最高値の次は最低値，その次は中間値…？）
+	public double[][][] correctDeviation (double[][][] data, Enum.MODE mode) {
 		Log.v(TAG, "--- correctDeviation ---");
 
 		double[][][] newData = new double[3][3][100];
 
-		// 試行回ごとの最大値の出ている時間を抽出
+		// 試行回ごとの代表値の出ている時間を抽出
 		// 変数は．桁揃え，計算後のdistance, angleを利用
 
 		// 回数・XYZを配列で
-		double maxValData[][] = new double[3][3];
+		double value[][] = new double[3][3];
 
-		// 最大値の出ている時間，回数，XYZ
-		int maxValCount[][] = new int[3][3];
+		// 代表値の出ている時間，回数，XYZ
+		int count[][] = new int[3][3];
 
 		// とりあえず，変数にXYZそれぞれの一個目の値を放り込む
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				maxValData[i][j] = data[i][j][0];
+				value[i][j] = data[i][j][0];
 			}
 		}
 
 
-		// 最大値を取得する
-		// 試行回数
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++) {
-				for (int k = 0; k < 100; k++) {
-					if (maxValData[i][j] < data[i][j][k]) {
-						maxValData[i][j] = data[i][j][k];
-						maxValCount[i][j] = k;
+		// 代表値が出ている場所を取得する
+		switch (mode) {
+			case MAX:
+				for (int i = 0; i < 3; i++) {
+					for (int j = 0; j < 3; j++) {
+						for (int k = 0; k < 100; k++) {
+							if (value[i][j] < data[i][j][k]) {
+								value[i][j] = data[i][j][k];
+								count[i][j] = k;
+							}
+						}
 					}
 				}
-			}
-		}
+				break;
+			case MIN:
+				for (int i = 0; i < 3; i++) {
+					for (int j = 0; j < 3; j++) {
+						for (int k = 0; k < 100; k++) {
+							if (value[i][j] > data[i][j][k]) {
+								value[i][j] = data[i][j][k];
+								count[i][j] = k;
+							}
+						}
+					}
+				}
+				break;
+			case MEDIAN:
+				//TODO どのようにして中央値を取得するか
+				// キーが自動ソートされるTreeMapを用いる．データと順番を紐付けしたものを作成し，中央値の初期の順番の値を取り出す．
+				for (int i = 0; i < 3; i++) {
+					for (int j = 0; j < 3; j++) {
+						TreeMap<Double, Integer> treeMap = new TreeMap<>();
 
-		// 1回目のデータの最大値が出た場合と，2回目・3回目のデータの最大値が出た時間の差をとる
+						for (int k = 0; k < 100; k++) {
+							treeMap.put(data[i][j][k], k);
+						}
+
+						int loopCount = 0;
+						for (Integer initCount : treeMap.values()) {
+							if (loopCount == 49) {
+								count[i][j] = initCount;
+							}
+
+							loopCount++;
+						}
+					}
+				}
+				break;
+		}
+		// 1回目のデータの代表値が出た場所と，2回目・3回目のデータの代表値が出た場所の差をとる
 		// とったら，その差だけデータをずらす（ずらしてはみ出たデータは空いたとこに入れる）
 
 		// sample
@@ -67,21 +106,21 @@ public class CorrectDeviation {
 		int lagData[][] = new int[2][3];
 
 
-		ArrayList<ArrayList<ArrayList<Double>>> tmpData = new ArrayList<ArrayList<ArrayList<Double>>>();
+		ArrayList<ArrayList<ArrayList<Double>>> tmpData = new ArrayList<>();
 
-		ArrayList<ArrayList<Double>> tmpData1 = new ArrayList<ArrayList<Double>>();
-		ArrayList<Double> tmpData1X = new ArrayList<Double>();
-		ArrayList<Double> tmpData1Y = new ArrayList<Double>();
-		ArrayList<Double> tmpData1Z = new ArrayList<Double>();
+		ArrayList<ArrayList<Double>> tmpData1 = new ArrayList<>();
+		ArrayList<Double> tmpData1X = new ArrayList<>();
+		ArrayList<Double> tmpData1Y = new ArrayList<>();
+		ArrayList<Double> tmpData1Z = new ArrayList<>();
 
 		tmpData1.add(tmpData1X);
 		tmpData1.add(tmpData1Y);
 		tmpData1.add(tmpData1Z);
 
-		ArrayList<ArrayList<Double>> tmpData2 = new ArrayList<ArrayList<Double>>();
-		ArrayList<Double> tmpData2X = new ArrayList<Double>();
-		ArrayList<Double> tmpData2Y = new ArrayList<Double>();
-		ArrayList<Double> tmpData2Z = new ArrayList<Double>();
+		ArrayList<ArrayList<Double>> tmpData2 = new ArrayList<>();
+		ArrayList<Double> tmpData2X = new ArrayList<>();
+		ArrayList<Double> tmpData2Y = new ArrayList<>();
+		ArrayList<Double> tmpData2Z = new ArrayList<>();
 
 		tmpData2.add(tmpData2X);
 		tmpData2.add(tmpData2Y);
@@ -101,8 +140,11 @@ public class CorrectDeviation {
 
 		// どれだけズレているかを計算する
 		for (int i = 0; i < 3; i++) {
-			lagData[0][i] = maxValCount[0][i] - maxValCount[1][i];
-			lagData[1][i] = maxValCount[0][i] - maxValCount[2][i];
+			lagData[0][i] = count[0][i] - count[1][i];
+			Log.d(TAG, "lagdata[0]" + "[" + i + "]" + ": " + lagData[0][i]);
+
+			lagData[1][i] = count[0][i] - count[2][i];
+			Log.d(TAG, "lagData[1]" + "[" + i + "]" + ": " + lagData[1][i]);
 		}
 
 

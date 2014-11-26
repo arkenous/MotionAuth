@@ -65,9 +65,7 @@ public class ConvertArrayAndString {
 		String[] splitDimention = input.split("'");
 		String[][] result = new String[3][100];
 
-		for (int i = 0; i < splitDimention.length; i++) {
-			result[i] = splitDimention[i].split(",");
-		}
+		for (int i = 0; i < splitDimention.length; i++) result[i] = splitDimention[i].split(",");
 
 		return result;
 	}

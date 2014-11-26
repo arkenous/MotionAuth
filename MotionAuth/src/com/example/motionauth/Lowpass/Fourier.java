@@ -52,16 +52,12 @@ public class Fourier {
 					if (k % 2 == 0) {
 						real[i][j][countReal] = data[i][j][k];
 						countReal++;
-						if (countReal == 99) {
-							countReal = 0;
-						}
+						if (countReal == 99) countReal = 0;
 					}
 					else {
 						imaginary[i][j][countImaginary] = data[i][j][k];
 						countImaginary++;
-						if (countImaginary == 99) {
-							countImaginary = 0;
-						}
+						if (countImaginary == 99) countImaginary = 0;
 					}
 				}
 			}
@@ -87,9 +83,7 @@ public class Fourier {
 		for (int i = 0; i < data.length; i++) {
 			for (int j = 0; j < data[i].length; j++) {
 				for (int k = 0; k < data[i][j].length; k++) {
-					if (k > 30) {
-						data[i][j][k] = 0;
-					}
+					if (k > 30) data[i][j][k] = 0;
 				}
 			}
 		}
@@ -119,9 +113,7 @@ public class Fourier {
 		DoubleFFT_1D realfft = new DoubleFFT_1D(data[0].length);
 
 		// フーリエ変換（ForwardDFT）の実行
-		for (double[] i : data) {
-			realfft.realForward(i);
-		}
+		for (double[] i : data) realfft.realForward(i);
 
 		// 実数部，虚数部それぞれを入れる配列
 		double[][] real = new double[data.length][data[0].length];
@@ -136,16 +128,12 @@ public class Fourier {
 				if (j % 2 == 0) {
 					real[i][countReal] = data[i][j];
 					countReal++;
-					if (countReal == 99) {
-						countReal = 0;
-					}
+					if (countReal == 99) countReal = 0;
 				}
 				else {
 					imaginary[i][countImaginary] = data[i][j];
 					countImaginary++;
-					if (countImaginary == 99) {
-						countImaginary = 0;
-					}
+					if (countImaginary == 99) countImaginary = 0;
 				}
 
 			}
@@ -168,16 +156,12 @@ public class Fourier {
 		// ローパスフィルタ処理
 		for (int i = 0; i < data.length; i++) {
 			for (int j = 0; j < data[i].length; j++) {
-				if (j > 30) {
-					data[i][j] = 0;
-				}
+				if (j > 30) data[i][j] = 0;
 			}
 		}
 
 		// 逆フーリエ変換（InverseDFT）
-		for (double[] i : data) {
-			realfft.realInverse(i, true);
-		}
+		for (double[] i : data) realfft.realInverse(i, true);
 
 		mManageData.writeDoubleTwoArrayData("AfterFFT", dataName, AuthNameInput.name, data);
 

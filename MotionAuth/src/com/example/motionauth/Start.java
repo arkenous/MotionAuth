@@ -3,7 +3,6 @@ package com.example.motionauth;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,7 +10,6 @@ import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 
@@ -56,13 +54,13 @@ public class Start extends Activity {
 
 		Button startBtn = (Button) findViewById(R.id.start);
 
-		startBtn.setOnClickListener(new OnClickListener() {
+		startBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick (View v) {
 				Log.i(TAG, "Click Start Button");
 
 				String[] btnMsg = {"登録者一覧モード", "認証試験モード", "新規登録モード"};
-				alertDialog(TRIPLE, btnMsg, "モード選択", "モードを選択してください");
+				Start.this.alertDialog(TRIPLE, btnMsg, "モード選択", "モードを選択してください");
 				handler = new Handler() {
 					public void handleMessage (Message msg) {
 						if (msg.arg1 == POSITIVE) {
@@ -102,14 +100,15 @@ public class Start extends Activity {
 			Log.i(TAG, "DOUBLE");
 
 			AlertDialog.Builder alert = new AlertDialog.Builder(this);
-			alert.setOnKeyListener(new OnKeyListener() {
+			alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
+				@Override
 				public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {
 					// アラート画面に特定のキー動作をかませる
 					if (keyCode == KeyEvent.KEYCODE_BACK) {
 						// Backキーが押された場合
 						// ダイアログを閉じて，アクティビティを閉じる
 						dialog.dismiss();
-						finish();
+						Start.this.finish();
 
 						return true;
 					}
@@ -125,20 +124,22 @@ public class Start extends Activity {
 
 			// PositiveButtonにより，ダイアログの左側に配置される
 			alert.setPositiveButton(btnMsg[0], new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick (DialogInterface dialog, int which) {
-					Message msg = new Message();
-					msg.arg1 = POSITIVE;
+					Message msg1 = new Message();
+					msg1.arg1 = POSITIVE;
 
-					handler.sendMessage(msg);
+					handler.sendMessage(msg1);
 				}
 			});
 
 			alert.setNegativeButton(btnMsg[1], new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick (DialogInterface dialog, int which) {
-					Message msg = new Message();
-					msg.arg1 = NEGATIVE;
+					Message msg1 = new Message();
+					msg1.arg1 = NEGATIVE;
 
-					handler.sendMessage(msg);
+					handler.sendMessage(msg1);
 				}
 			});
 
@@ -149,14 +150,15 @@ public class Start extends Activity {
 			Log.i(TAG, "TRIPLE");
 
 			AlertDialog.Builder alert = new AlertDialog.Builder(this);
-			alert.setOnKeyListener(new OnKeyListener() {
+			alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
+				@Override
 				public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event) {
 					// アラート画面に特定のキー動作をかませる
 					if (keyCode == KeyEvent.KEYCODE_BACK) {
 						// Backキーを押した場合
 						// ダイアログを閉じて，アクティビティを閉じる
 						dialog.dismiss();
-						finish();
+						Start.this.finish();
 
 						return true;
 					}
@@ -172,29 +174,32 @@ public class Start extends Activity {
 
 			// PositiveButtonにより，ダイアログの左側に配置される
 			alert.setPositiveButton(btnMsg[0], new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick (DialogInterface dialog, int which) {
-					Message msg = new Message();
-					msg.arg1 = POSITIVE;
+					Message msg1 = new Message();
+					msg1.arg1 = POSITIVE;
 
-					handler.sendMessage(msg);
+					handler.sendMessage(msg1);
 				}
 			});
 
 			alert.setNeutralButton(btnMsg[1], new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick (DialogInterface dialog, int which) {
-					Message msg = new Message();
-					msg.arg1 = NEUTRAL;
+					Message msg1 = new Message();
+					msg1.arg1 = NEUTRAL;
 
-					handler.sendMessage(msg);
+					handler.sendMessage(msg1);
 				}
 			});
 
 			alert.setNegativeButton(btnMsg[2], new DialogInterface.OnClickListener() {
+				@Override
 				public void onClick (DialogInterface dialog, int which) {
-					Message msg = new Message();
-					msg.arg1 = NEGATIVE;
+					Message msg1 = new Message();
+					msg1.arg1 = NEGATIVE;
 
-					handler.sendMessage(msg);
+					handler.sendMessage(msg1);
 				}
 			});
 
@@ -218,9 +223,7 @@ public class Start extends Activity {
 
 		intent.setClassName(pkgName, actName);
 
-		if (flg) {
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-		}
+		if (flg) intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
 		startActivityForResult(intent, 0);
 	}

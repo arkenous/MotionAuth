@@ -20,7 +20,6 @@ import java.util.ArrayList;
  */
 public class ManageData {
 	private static final String TAG = ManageData.class.getSimpleName();
-	private CipherCrypt mCipherCrypt;
 
 	/**
 	 * Float型の三次元配列データをアウトプットする．保存先は，SDカードディレクトリ/folderName/userName/fileName+回数+次元
@@ -35,10 +34,11 @@ public class ManageData {
 
 		// SDカードのマウント確認
 		String status = Environment.getExternalStorageState();
-		if (!status.equals(Environment.MEDIA_MOUNTED)) {
-			// マウントされていない場合
-			Log.e(TAG, "SDCard not mounted");
 
+		// マウントされていない場合
+		if (!status.equals(Environment.MEDIA_MOUNTED)) {
+			Log.e(TAG, "SDCard not mounted");
+			return;
 		}
 
 		// SDカードのフォルダパスの取得
@@ -431,6 +431,137 @@ public class ManageData {
 		}
 	}
 
+	// 実験用．新規登録モードにおける登録データをSDカードに保存する
+	public void writeRegistedDataToSd (String folderName, String userName, double[][] averageDistance, double[][] averageAngle, boolean isAmplify, Context context) {
+		Log.v(TAG, "--- writeRegistedDataToSd ---");
+
+		// SDカードのマウント確認
+		String status = Environment.getExternalStorageState();
+		if (!status.equals(Environment.MEDIA_MOUNTED)) {
+			Log.e(TAG, "SDCard not mounted");
+		}
+
+		String SD_PATH = Environment.getExternalStorageDirectory().getPath();
+
+		String FOLDER_PATH = SD_PATH + File.separator + "MotionAuth" + File.separator + folderName;
+
+		File file = new File(FOLDER_PATH);
+
+		try {
+			if (!file.exists()) {
+				if (!file.mkdirs()) {
+					Log.e(TAG, "Make Folder Error");
+				}
+			}
+		}
+		catch (Exception e) {
+			Log.e(TAG, "Make Folder Exception");
+		}
+
+		try {
+			String filePath = FOLDER_PATH + File.separator + userName;
+			file = new File(filePath);
+
+			FileOutputStream fileOutputStream = new FileOutputStream(file, false);
+			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, "UTF-8");
+			BufferedWriter bw = new BufferedWriter(outputStreamWriter);
+
+			// 距離データ書き込み
+			for (int i = 0; i < averageDistance.length; i++) {
+				for (int j = 0; j < averageDistance[i].length; j++) {
+					switch (i) {
+						case 0:
+							// dimention x
+							bw.write(String.valueOf(averageDistance[i][j]) + "\n");
+							break;
+						case 1:
+							// dimention y
+							bw.write(String.valueOf(averageDistance[i][j]) + "\n");
+							break;
+						case 2:
+							// dimention z
+							bw.write(String.valueOf(averageDistance[i][j]) + "\n");
+							break;
+					}
+				}
+			}
+
+
+			// 角度データ書き込み
+			for (int i = 0; i < averageAngle.length; i++) {
+				for (int j = 0; j < averageAngle[i].length; j++) {
+					switch (i) {
+						case 0:
+							// dimention x
+							bw.write(String.valueOf(averageAngle[i][j]) + "\n");
+							break;
+						case 1:
+							// dimention y
+							bw.write(String.valueOf(averageAngle[i][j]) + "\n");
+							break;
+						case 2:
+							// dimention z
+							bw.write(String.valueOf(averageAngle[i][j]) + "\n");
+							break;
+					}
+				}
+			}
+
+			bw.close();
+			outputStreamWriter.close();
+			fileOutputStream.close();
+		}
+		catch (Exception e) {
+			Log.e(TAG, "Error");
+		}
+	}
+
+
+	public void writeRpoint (String folderName, String userName, double data) {
+		Log.v(TAG, "--- writeRpoint ---");
+
+		// SDカードのマウント確認
+		String status = Environment.getExternalStorageState();
+		if (!status.equals(Environment.MEDIA_MOUNTED)) {
+			Log.e(TAG, "SDCard not mounted");
+		}
+
+		String SD_PATH = Environment.getExternalStorageDirectory().getPath();
+
+		String FOLDER_PATH = SD_PATH + File.separator + "MotionAuth" + File.separator + folderName;
+
+		File file = new File(FOLDER_PATH);
+
+		try {
+			if (!file.exists()) {
+				if (!file.mkdirs()) {
+					Log.e(TAG, "Make Folder Error");
+				}
+			}
+		}
+		catch (Exception e) {
+			Log.e(TAG, "Make Folder Exception");
+		}
+
+		try {
+			String filePath = FOLDER_PATH + File.separator + userName;
+			file = new File(filePath);
+
+			FileOutputStream fileOutputStream = new FileOutputStream(file, false);
+			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
+			BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
+
+			bufferedWriter.write(String.valueOf(data));
+
+			bufferedWriter.close();
+			outputStreamWriter.close();
+			fileOutputStream.close();
+		}
+		catch (Exception e) {
+			Log.e(TAG, "Error");
+		}
+	}
+
 
 	/**
 	 * RegistMotionより渡された，認証のキーとなるデータをアウトプットする
@@ -446,7 +577,7 @@ public class ManageData {
 		Log.v(TAG, "--- writeRegistedData ---");
 
 		// 暗号処理を担うオブジェクトを生成
-		mCipherCrypt = new CipherCrypt(context);
+		CipherCrypt mCipherCrypt = new CipherCrypt(context);
 
 		String[][] averageDistanceStr = new String[averageDistance.length][averageDistance[0].length];
 		String[][] averageAngleStr = new String[averageAngle.length][averageAngle[0].length];
@@ -502,9 +633,7 @@ public class ManageData {
 		String registedDistanceData = preferences.getString(userName + "distance", "");
 		String registedAngleData = preferences.getString(userName + "angle", "");
 
-		if ("".equals(registedDistanceData)) {
-			throw new RuntimeException();
-		}
+		if ("".equals(registedDistanceData)) throw new RuntimeException();
 
 		ConvertArrayAndString mConvertArrayAndString = new ConvertArrayAndString();
 		CipherCrypt mCipherCrypt = new CipherCrypt(context);
@@ -521,7 +650,7 @@ public class ManageData {
 			}
 		}
 
-		ArrayList<double[][]> result = new ArrayList<double[][]>();
+		ArrayList<double[][]> result = new ArrayList<>();
 		result.add(distance);
 		result.add(angle);
 

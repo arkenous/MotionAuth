@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.example.motionauth.R;
@@ -58,13 +57,11 @@ public class RegistrantList extends Activity {
 
 		final ListView lv = (ListView) findViewById(R.id.listView1);
 
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+		ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
 
 		try {
 			// アイテム追加
-			for (String s : userList) {
-				adapter.add(s);
-			}
+			for (String s : userList) adapter.add(s);
 		}
 		catch (NullPointerException e) {
 			AlertDialog.Builder alert = new AlertDialog.Builder(RegistrantList.this);
@@ -74,7 +71,7 @@ public class RegistrantList extends Activity {
 			alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick (DialogInterface dialog, int which) {
-					moveActivity("com.example.motionauth", "com.example.motionauth.Start", true);
+					RegistrantList.this.moveActivity("com.example.motionauth", "com.example.motionauth.Start", true);
 				}
 			});
 			alert.show();
@@ -85,7 +82,7 @@ public class RegistrantList extends Activity {
 		lv.setAdapter(adapter);
 
 		// リストビューのアイテムがクリックされた時
-		lv.setOnItemClickListener(new OnItemClickListener() {
+		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick (AdapterView<?> parent, View v, int position, long id) {
 				Log.i(TAG, "Click Item");
@@ -94,9 +91,8 @@ public class RegistrantList extends Activity {
 				item = lv.getItemAtPosition(position).toString();
 
 				// itemを次のアクティビティに送る
-				moveActivity("com.example.motionauth", "com.example.motionauth.ViewDataList.ViewRegistedData", true);
+				RegistrantList.this.moveActivity("com.example.motionauth", "com.example.motionauth.ViewDataList.ViewRegistedData", true);
 			}
-
 		});
 	}
 
@@ -112,12 +108,10 @@ public class RegistrantList extends Activity {
 		Context mContext = RegistrantList.this.getApplicationContext();
 		SharedPreferences preferences = mContext.getSharedPreferences("UserList", Context.MODE_PRIVATE);
 
-		ArrayList<String> keyList = new ArrayList<String>();
+		ArrayList<String> keyList = new ArrayList<>();
 
 		Map<String, ?> allEntries = preferences.getAll();
-		for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-			keyList.add(entry.getKey());
-		}
+		for (Map.Entry<String, ?> entry : allEntries.entrySet()) keyList.add(entry.getKey());
 
 		return keyList;
 	}
@@ -137,13 +131,9 @@ public class RegistrantList extends Activity {
 
 		intent.setClassName(pkgName, actName);
 
-		if (actName.equals("com.example.motionauth.ViewDataList.ViewRegistedData")) {
-			intent.putExtra("item", item);
-		}
+		if (actName.equals("com.example.motionauth.ViewDataList.ViewRegistedData")) intent.putExtra("item", item);
 
-		if (flg) {
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-		}
+		if (flg) intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
 		startActivityForResult(intent, 0);
 	}

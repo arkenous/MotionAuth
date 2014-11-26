@@ -17,7 +17,6 @@ import android.os.Message;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 import com.example.motionauth.Lowpass.Fourier;
@@ -123,7 +122,8 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
 		nameTv.setText(AuthNameInput.name + "さん読んでね！");
 
-		getMotionBtn.setOnClickListener(new OnClickListener() {
+		getMotionBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick (View v) {
 				Log.i(TAG, "Click Get Motion Button");
 				if (isGetMotionBtnClickable) {
@@ -191,9 +191,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 						accelFloat[i][accelCount] = vAccel[i];
 					}
 
-					for (int i = 0; i < 3; i++) {
-						gyroFloat[i][gyroCount] = vGyro[i];
-					}
+					for (int i = 0; i < 3; i++) gyroFloat[i][gyroCount] = vGyro[i];
 
 					accelCount++;
 					gyroCount++;
@@ -289,9 +287,8 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 		SharedPreferences preferences = AuthMotion.this.getApplicationContext().getSharedPreferences("MotionAuth", Context.MODE_PRIVATE);
 		String registedAmplifyStatus = preferences.getString(AuthNameInput.name + "amplify", "");
 
-		if ("".equals(registedAmplifyStatus)) {
-			throw new RuntimeException();
-		}
+		if ("".equals(registedAmplifyStatus)) throw new RuntimeException();
+
 
 		isAmplity = Boolean.valueOf(registedAmplifyStatus);
 	}
@@ -415,9 +412,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
 		intent.setClassName(pkgName, actName);
 
-		if (flg) {
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-		}
+		if (flg) intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
 		startActivityForResult(intent, 0);
 		finish();

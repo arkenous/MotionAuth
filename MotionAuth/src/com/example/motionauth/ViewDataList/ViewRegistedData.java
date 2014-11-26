@@ -37,11 +37,9 @@ public class ViewRegistedData extends Activity {
 
 		setContentView(R.layout.activity_view_registed_data);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
 			ActionBar actionBar = getActionBar();
-			if (actionBar != null) {
-				actionBar.setHomeButtonEnabled(true);
-			}
+			if (actionBar != null) actionBar.setHomeButtonEnabled(true);
 		}
 		flgCount = 0;
 
@@ -61,14 +59,12 @@ public class ViewRegistedData extends Activity {
 
 		ListView lv = (ListView) findViewById(R.id.listView1);
 
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+		ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
 
 		ArrayList<String> dataList = readData();
 
 		// アイテム追加
-		for (String i : dataList) {
-			adapter.add(i);
-		}
+		for (String i : dataList) adapter.add(i);
 
 		// リストビューにアダプタを設定
 		lv.setAdapter(adapter);
@@ -82,7 +78,7 @@ public class ViewRegistedData extends Activity {
 	 */
 	private ArrayList<String> readData () {
 		Log.v(TAG, "--- readData ---");
-		ArrayList<String> dataList = new ArrayList<String>();
+		ArrayList<String> dataList = new ArrayList<>();
 
 		ManageData mManageData = new ManageData();
 		ArrayList<double[][]> readData = mManageData.readRegistedData(ViewRegistedData.this, item);
@@ -102,9 +98,7 @@ public class ViewRegistedData extends Activity {
 
 		String amplifierStatus = preferences.getString(item + "amplify", "");
 
-		if ("".equals(amplifierStatus)) {
-			throw new RuntimeException();
-		}
+		if ("".equals(amplifierStatus)) throw new RuntimeException();
 
 		String index = "";
 
@@ -171,9 +165,7 @@ public class ViewRegistedData extends Activity {
 
 		intent.putExtra("item", item);
 
-		if (flg) {
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-		}
+		if (flg) intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
 		startActivityForResult(intent, 0);
 	}

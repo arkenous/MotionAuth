@@ -133,6 +133,22 @@ public class Correlation {
 			}
 		}
 
+		double R_point = 0.0;
+		for (double[] i : R_accel) {
+			for (double j : i) {
+				R_point += j;
+			}
+		}
+		for (double[] i : R_gyro) {
+			for (double j : i) {
+				R_point += j;
+			}
+		}
+
+		R_point = R_point / 18;
+
+		mManageData.writeRpoint("Rpoint", RegistNameInput.name, R_point);
+
 		// X
 		if ((R_accel[0][0] > mEnum.LOOSE && R_accel[1][0] > mEnum.LOOSE) || (R_accel[1][0] > mEnum.LOOSE && R_accel[2][0] > mEnum.LOOSE) || (R_accel[0][0] > mEnum.LOOSE && R_accel[2][0] > mEnum.LOOSE)) {
 			// Y

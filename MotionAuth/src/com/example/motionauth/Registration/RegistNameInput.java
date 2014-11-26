@@ -9,8 +9,6 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnKeyListener;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -58,31 +56,25 @@ public class RegistNameInput extends Activity {
 		nameInput.addTextChangedListener(new TextWatcher() {
 			// 変更前
 			public void beforeTextChanged (CharSequence s, int start, int count, int after) {
-
 			}
-
 
 			// 変更直前
 			public void onTextChanged (CharSequence s, int start, int before, int count) {
-
 			}
-
 
 			// 変更後
 			public void afterTextChanged (Editable s) {
 				// ユーザの入力した名前をnameに格納
-				if (nameInput.getText() != null) {
-					name = nameInput.getText().toString();
-				}
-
+				if (nameInput.getText() != null) name = nameInput.getText().toString();
 			}
 		});
 
-		nameInput.setOnKeyListener(new OnKeyListener() {
+		nameInput.setOnKeyListener(new View.OnKeyListener() {
+			@Override
 			public boolean onKey (View v, int keyCode, KeyEvent event) {
 				if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
 					// ソフトウェアキーボードのEnterキーを押した時，ソフトウェアキーボードを閉じる
-					InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+					InputMethodManager inputMethodManager = (InputMethodManager) RegistNameInput.this.getSystemService(Context.INPUT_METHOD_SERVICE);
 					inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
 					return true;
@@ -94,7 +86,8 @@ public class RegistNameInput extends Activity {
 		// OKボタンを押した時に，次のアクティビティに移動
 		final Button ok = (Button) findViewById(R.id.okButton);
 
-		ok.setOnClickListener(new OnClickListener() {
+		ok.setOnClickListener(new View.OnClickListener() {
+			@Override
 			public void onClick (View v) {
 				Log.i(TAG, "Click OK Button");
 				// nameが入力されているかの確認
@@ -102,7 +95,7 @@ public class RegistNameInput extends Activity {
 					Toast.makeText(RegistNameInput.this, "名前が入力されていません", Toast.LENGTH_LONG).show();
 				}
 				else {
-					moveActivity("com.example.motionauth", "com.example.motionauth.Registration.RegistMotion", true);
+					RegistNameInput.this.moveActivity("com.example.motionauth", "com.example.motionauth.Registration.RegistMotion", true);
 				}
 			}
 		});
@@ -122,9 +115,7 @@ public class RegistNameInput extends Activity {
 
 		intent.setClassName(pkgName, actName);
 
-		if (flg) {
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-		}
+		if (flg) intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
 		startActivityForResult(intent, 0);
 	}

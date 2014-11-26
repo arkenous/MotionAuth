@@ -64,8 +64,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 	private Correlation mCorrelation = new Correlation();
 	private CorrectDeviation mCorrectDeviation = new CorrectDeviation();
 
-	private int accelCount = 0;
-	private int gyroCount = 0;
+	private int dataCount = 0;
 	private int getCount = 0;
 	private int prepareCount = 0;
 
@@ -159,67 +158,64 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 			Log.i(TAG, "--- dispatchMessage ---");
 
 			if (msg.what == PREPARATION && !isGetMotionBtnClickable) {
-				if (prepareCount == 0) {
-					secondTv.setText("3");
-					mVibrator.vibrate(VIBRATOR_SHORT);
+				switch (prepareCount) {
+					case 0:
+						secondTv.setText("3");
+						mVibrator.vibrate(VIBRATOR_SHORT);
 
-					// 第二引数で指定したミリ秒分遅延させてから，第一引数のメッセージを添えてtimeHandlerを呼び出す
-					timeHandler.sendEmptyMessageDelayed(PREPARATION, PREPARATION_INTERVAL);
+						// 第二引数で指定したミリ秒分遅延させてから，第一引数のメッセージを添えてtimeHandlerを呼び出す
+						timeHandler.sendEmptyMessageDelayed(PREPARATION, PREPARATION_INTERVAL);
+						break;
+					case 1:
+						secondTv.setText("2");
+						mVibrator.vibrate(VIBRATOR_SHORT);
+						timeHandler.sendEmptyMessageDelayed(PREPARATION, PREPARATION_INTERVAL);
+						break;
+					case 2:
+						secondTv.setText("1");
+						mVibrator.vibrate(VIBRATOR_SHORT);
+						timeHandler.sendEmptyMessageDelayed(PREPARATION, PREPARATION_INTERVAL);
+						break;
+					case 3:
+						secondTv.setText("START");
+						mVibrator.vibrate(VIBRATOR_LONG);
 
-				}
-				else if (prepareCount == 1) {
-					secondTv.setText("2");
-					mVibrator.vibrate(VIBRATOR_SHORT);
-					timeHandler.sendEmptyMessageDelayed(PREPARATION, PREPARATION_INTERVAL);
-				}
-				else if (prepareCount == 2) {
-					secondTv.setText("1");
-					mVibrator.vibrate(VIBRATOR_SHORT);
-					timeHandler.sendEmptyMessageDelayed(PREPARATION, PREPARATION_INTERVAL);
-				}
-				else if (prepareCount == 3) {
-					secondTv.setText("START");
-					mVibrator.vibrate(VIBRATOR_LONG);
-
-					// GET_MOTIONメッセージを添えて，timeHandlerを呼び出す
-					timeHandler.sendEmptyMessage(GET_MOTION);
-					getMotionBtn.setText("取得中");
+						// GET_MOTIONメッセージを添えて，timeHandlerを呼び出す
+						timeHandler.sendEmptyMessage(GET_MOTION);
+						getMotionBtn.setText("取得中");
+						break;
 				}
 
 				prepareCount++;
 			}
 			else if (msg.what == GET_MOTION && !isGetMotionBtnClickable) {
-				if (accelCount < 100 && gyroCount < 100 && getCount >= 0 && getCount < 3) {
-					//TODO 書き方が冗長なので，改善する
+				if (dataCount < 100 && getCount >= 0 && getCount < 3) {
 					// 取得した値を，0.03秒ごとに配列に入れる
 					for (int i = 0; i < 3; i++) {
-						accelFloat[getCount][i][accelCount] = vAccel[i];
+						accelFloat[getCount][i][dataCount] = vAccel[i];
+						gyroFloat[getCount][i][dataCount] = vGyro[i];
 					}
 
-					for (int i = 0; i < 3; i++) {
-						gyroFloat[getCount][i][gyroCount] = vGyro[i];
-					}
+					dataCount++;
 
-					accelCount++;
-					gyroCount++;
-
-					if (accelCount == 1) {
-						secondTv.setText("3");
-						mVibrator.vibrate(VIBRATOR_NORMAL);
-					}
-
-					if (accelCount == 33) {
-						secondTv.setText("2");
-						mVibrator.vibrate(VIBRATOR_NORMAL);
-					}
-					if (accelCount == 66) {
-						secondTv.setText("1");
-						mVibrator.vibrate(VIBRATOR_NORMAL);
+					switch (dataCount) {
+						case 1:
+							secondTv.setText("3");
+							mVibrator.vibrate(VIBRATOR_NORMAL);
+							break;
+						case 33:
+							secondTv.setText("2");
+							mVibrator.vibrate(VIBRATOR_NORMAL);
+							break;
+						case 66:
+							secondTv.setText("1");
+							mVibrator.vibrate(VIBRATOR_NORMAL);
+							break;
 					}
 
 					timeHandler.sendEmptyMessageDelayed(GET_MOTION, GET_MOTION_INTERVAL);
 				}
-				else if (accelCount >= 100 && gyroCount >= 100 && getCount >= 0 && getCount < 4) {
+				else if (dataCount >= 100 && getCount >= 0 && getCount < 4) {
 					// 取得完了
 					mVibrator.vibrate(VIBRATOR_LONG);
 					isGetMotionBtnClickable = true;
@@ -228,24 +224,21 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 					countSecondTv.setText("回");
 					getMotionBtn.setText("モーションデータ取得");
 
-					accelCount = 0;
-					gyroCount = 0;
-
+					dataCount = 0;
 					prepareCount = 0;
 
-					if (getCount == 1) {
-						secondTv.setText("2");
-
-						getMotionBtn.setClickable(true);
-					}
-					if (getCount == 2) {
-						secondTv.setText("1");
-
-						getMotionBtn.setClickable(true);
-					}
-
-					if (getCount == 3) {
-						finishGetMotion();
+					switch (getCount) {
+						case 1:
+							secondTv.setText("2");
+							getMotionBtn.setClickable(true);
+							break;
+						case 2:
+							secondTv.setText("1");
+							getMotionBtn.setClickable(true);
+							break;
+						case 3:
+							finishGetMotion();
+							break;
 					}
 				}
 				else {
@@ -514,8 +507,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 	private void resetValue () {
 		getMotionBtn.setClickable(true);
 		// データ取得関係の変数を初期化
-		accelCount = 0;
-		gyroCount = 0;
+		dataCount = 0;
 		getCount = 0;
 		secondTv.setText("3");
 		getMotionBtn.setText("モーションデータ取得");

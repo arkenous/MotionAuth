@@ -66,8 +66,9 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 	private Correlation mCorrelation = new Correlation();
 	private Amplifier mAmplifier = new Amplifier();
 
-	private int accelCount = 0;
-	private int gyroCount = 0;
+	private int dataCount = 0;
+	//private int accelCount = 0;
+	//private int gyroCount = 0;
 	private int prepareCount = 0;
 
 	private boolean isGetMotionBtnClickable = true;
@@ -153,30 +154,32 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 			Log.v(TAG, "--- dispatchMessage ---");
 
 			if (msg.what == PREPARATION && !isGetMotionBtnClickable) {
-				if (prepareCount == 0) {
-					secondTv.setText("3");
-					mVibrator.vibrate(VIBRATOR_SHORT);
+				switch (prepareCount) {
+					case 0:
+						secondTv.setText("3");
+						mVibrator.vibrate(VIBRATOR_SHORT);
 
-					// 第二引数で指定したミリ秒分遅延させてから，第一引数のメッセージを添えてtimeHandlerを呼び出す
-					timeHandler.sendEmptyMessageDelayed(PREPARATION, PREPARATION_INTERVAL);
-				}
-				else if (prepareCount == 1) {
-					secondTv.setText("2");
-					mVibrator.vibrate(VIBRATOR_SHORT);
-					timeHandler.sendEmptyMessageDelayed(PREPARATION, PREPARATION_INTERVAL);
-				}
-				else if (prepareCount == 2) {
-					secondTv.setText("1");
-					mVibrator.vibrate(VIBRATOR_SHORT);
-					timeHandler.sendEmptyMessageDelayed(PREPARATION, PREPARATION_INTERVAL);
-				}
-				else if (prepareCount == 3) {
-					secondTv.setText("START");
-					mVibrator.vibrate(VIBRATOR_LONG);
+						// 第二引数で指定したミリ秒分遅延させてから，第一引数のメッセージを添えてtimeHandlerを呼び出す
+						timeHandler.sendEmptyMessageDelayed(PREPARATION, PREPARATION_INTERVAL);
+						break;
+					case 1:
+						secondTv.setText("2");
+						mVibrator.vibrate(VIBRATOR_SHORT);
+						timeHandler.sendEmptyMessageDelayed(PREPARATION, PREPARATION_INTERVAL);
+						break;
+					case 2:
+						secondTv.setText("1");
+						mVibrator.vibrate(VIBRATOR_SHORT);
+						timeHandler.sendEmptyMessageDelayed(PREPARATION, PREPARATION_INTERVAL);
+						break;
+					case 3:
+						secondTv.setText("START");
+						mVibrator.vibrate(VIBRATOR_LONG);
 
-					// GET_MOTIONメッセージを添えて，timeHandlerを呼び出す
-					timeHandler.sendEmptyMessage(GET_MOTION);
-					getMotionBtn.setText("取得中");
+						// GET_MOTIONメッセージを添えて，timeHandlerを呼び出す
+						timeHandler.sendEmptyMessage(GET_MOTION);
+						getMotionBtn.setText("取得中");
+						break;
 				}
 
 				prepareCount++;
@@ -184,34 +187,34 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 			else if (msg.what == GET_MOTION && !isGetMotionBtnClickable) {
 				Log.i(TAG, "GET_MOTION");
 
-				if (accelCount < 100 && gyroCount < 100) {
+				if (dataCount < 100) {
 					Log.i(TAG, "Getting Motion Data");
 					// 取得した値を，0.03秒ごとに配列に入れる
 					for (int i = 0; i < 3; i++) {
-						accelFloat[i][accelCount] = vAccel[i];
+						accelFloat[i][dataCount] = vAccel[i];
+						gyroFloat[i][dataCount] = vGyro[i];
 					}
 
-					for (int i = 0; i < 3; i++) gyroFloat[i][gyroCount] = vGyro[i];
+					dataCount++;
 
-					accelCount++;
-					gyroCount++;
-
-					if (accelCount == 1) {
-						secondTv.setText("3");
-						mVibrator.vibrate(VIBRATOR_NORMAL);
-					}
-					if (accelCount == 33) {
-						secondTv.setText("2");
-						mVibrator.vibrate(VIBRATOR_NORMAL);
-					}
-					if (accelCount == 66) {
-						secondTv.setText("1");
-						mVibrator.vibrate(VIBRATOR_NORMAL);
+					switch (dataCount) {
+						case 1:
+							secondTv.setText("3");
+							mVibrator.vibrate(VIBRATOR_NORMAL);
+							break;
+						case 33:
+							secondTv.setText("2");
+							mVibrator.vibrate(VIBRATOR_NORMAL);
+							break;
+						case 66:
+							secondTv.setText("1");
+							mVibrator.vibrate(VIBRATOR_NORMAL);
+							break;
 					}
 
 					timeHandler.sendEmptyMessageDelayed(GET_MOTION, GET_MOTION_INTERVAL);
 				}
-				else if (accelCount >= 100 && gyroCount >= 100) {
+				else if (dataCount >= 100) {
 					Log.i(TAG, "Complete Getting Motion Data");
 
 					finishGetMotion();
@@ -226,12 +229,8 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
 	@Override
 	public void onSensorChanged (SensorEvent event) {
-		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-			vAccel = event.values.clone();
-		}
-		if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-			vGyro = event.values.clone();
-		}
+		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) vAccel = event.values.clone();
+		if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) vGyro = event.values.clone();
 	}
 
 	private void finishGetMotion () {
@@ -339,8 +338,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 							isGetMotionBtnClickable = true;
 							getMotionBtn.setClickable(true);
 							// データ取得関係の変数を初期化
-							accelCount = 0;
-							gyroCount = 0;
+							dataCount = 0;
 							secondTv.setText("3");
 							getMotionBtn.setText("モーションデータ取得");
 						}
@@ -376,7 +374,6 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 	@Override
 	public void onAccuracyChanged (Sensor sensor, int accuracy) {
 		Log.v(TAG, "--- onAccuracyChanged ---");
-
 	}
 
 

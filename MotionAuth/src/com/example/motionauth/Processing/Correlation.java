@@ -363,7 +363,9 @@ public class Correlation {
 
 		for (int i = 0; i < 3; i++) {
 			R_accel[i] = Sxy_accel[i] / Math.sqrt(Sxx_accel[i] * Syy_accel[i]);
+			LogUtil.log(Log.DEBUG, "R_accel" + i + ": " + R_accel[i]);
 			R_gyro[i] = Sxy_gyro[i] / Math.sqrt(Sxx_gyro[i] * Syy_gyro[i]);
+			LogUtil.log(Log.DEBUG, "R_gyro" + i + ": " + R_gyro[i]);
 		}
 		//endregion
 

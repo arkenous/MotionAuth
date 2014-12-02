@@ -35,7 +35,7 @@ public class LogUtil {
 	}
 
 	private static void outputLog (int type, String message, Throwable throwable) {
-		if (mIsShowLog) {
+		if (!mIsShowLog) {
 			// ログ出力フラグが立っていない場合は何もしない．
 			return;
 		}

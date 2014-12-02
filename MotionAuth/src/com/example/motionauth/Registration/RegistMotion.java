@@ -342,7 +342,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
 		if (Enum.MEASURE.BAD == measure) {
 			// 相関係数が0.4以下
-			LogUtil.log(Log.DEBUG, "measure: BAD");
 			return false;
 		}
 		else if (Enum.MEASURE.INCORRECT == measure) {
@@ -356,8 +355,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
 			while (true) {
 				//TODO 修正した結果，相関係数が悪化したら元も子もないので，ここでチェック
-				LogUtil.log(Log.DEBUG, "measure: INCORRECT");
-
 				switch (time) {
 					case 0:
 						mode = Enum.MODE.MAX;
@@ -387,7 +384,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 				}
 				else if (time == 2) {
 					// 相関係数が低いまま，アラートなどを出す？
-					LogUtil.log(Log.DEBUG, "Correlation value is low");
 					distance = originalDistance;
 					angle = originalAngle;
 					break;
@@ -397,12 +393,10 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 			}
 		}
 		else if (Enum.MEASURE.PERFECT == measure || Enum.MEASURE.CORRECT == measure) {
-			LogUtil.log(Log.DEBUG, "measure: CORRECT or PERFECT");
 			// PERFECTなら，何もしない
 		}
 		else {
 			// なにかがおかしい
-			LogUtil.log(Log.DEBUG, "measure: ERROR");
 			return false;
 		}
 		//endregion

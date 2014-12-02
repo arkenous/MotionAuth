@@ -365,6 +365,8 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 		LogUtil.log(Log.INFO);
 		Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, angle, registed_ave_distance, registed_ave_angle);
 
+		LogUtil.log(Log.DEBUG, "measure: " + measure);
+
 		return measure == Enum.MEASURE.CORRECT;
 	}
 

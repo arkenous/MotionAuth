@@ -26,6 +26,7 @@ import com.example.motionauth.Processing.Correlation;
 import com.example.motionauth.Processing.Formatter;
 import com.example.motionauth.R;
 import com.example.motionauth.Utility.Enum;
+import com.example.motionauth.Utility.LogUtil;
 import com.example.motionauth.Utility.ManageData;
 
 import java.util.ArrayList;
@@ -36,8 +37,6 @@ import java.util.ArrayList;
  * @author Kensuke Kousaka
  */
 public class AuthMotion extends Activity implements SensorEventListener, Runnable {
-	private static final String TAG = AuthMotion.class.getSimpleName();
-
 	private static final int VIBRATOR_SHORT = 25;
 	private static final int VIBRATOR_NORMAL = 50;
 	private static final int VIBRATOR_LONG = 100;
@@ -67,8 +66,6 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 	private Amplifier mAmplifier = new Amplifier();
 
 	private int dataCount = 0;
-	//private int accelCount = 0;
-	//private int gyroCount = 0;
 	private int prepareCount = 0;
 
 	private boolean isGetMotionBtnClickable = true;
@@ -96,7 +93,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Log.v(TAG, "--- onCreate ---");
+		LogUtil.log(Log.INFO);
 
 		setContentView(R.layout.activity_auth_motion);
 
@@ -107,7 +104,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 	 * 認証画面にイベントリスナ等を設定する
 	 */
 	private void authMotion () {
-		Log.v(TAG, "--- authMotion ---");
+		LogUtil.log(Log.INFO);
 
 		// センササービス，各種センサを取得する
 		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -126,7 +123,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 		getMotionBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick (View v) {
-				Log.i(TAG, "Click Get Motion Button");
+				LogUtil.log(Log.DEBUG, "Click get motion button");
 				if (isGetMotionBtnClickable) {
 					isGetMotionBtnClickable = false;
 
@@ -151,7 +148,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 	Handler timeHandler = new Handler() {
 		@Override
 		public void dispatchMessage (Message msg) {
-			Log.v(TAG, "--- dispatchMessage ---");
+			LogUtil.log(Log.VERBOSE);
 
 			if (msg.what == PREPARATION && !isGetMotionBtnClickable) {
 				switch (prepareCount) {
@@ -185,10 +182,10 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 				prepareCount++;
 			}
 			else if (msg.what == GET_MOTION && !isGetMotionBtnClickable) {
-				Log.i(TAG, "GET_MOTION");
+				LogUtil.log(Log.VERBOSE, "Get motion");
 
 				if (dataCount < 100) {
-					Log.i(TAG, "Getting Motion Data");
+					LogUtil.log(Log.VERBOSE, "Getting motion data");
 					// 取得した値を，0.03秒ごとに配列に入れる
 					for (int i = 0; i < 3; i++) {
 						accelFloat[i][dataCount] = vAccel[i];
@@ -215,7 +212,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 					timeHandler.sendEmptyMessageDelayed(GET_MOTION, GET_MOTION_INTERVAL);
 				}
 				else if (dataCount >= 100) {
-					Log.i(TAG, "Complete Getting Motion Data");
+					LogUtil.log(Log.VERBOSE, "Complete getting motion data");
 
 					finishGetMotion();
 				}
@@ -238,7 +235,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
 		prepareCount = 0;
 
-		Log.i(TAG, "Start Initialize ProgressDialog");
+		LogUtil.log(Log.DEBUG, "Start initialize ProgressDialog");
 
 		progressDialog = new ProgressDialog(this);
 		progressDialog.setTitle("計算処理中");
@@ -247,7 +244,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 		progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		progressDialog.setCancelable(false);
 
-		Log.i(TAG, "Finish Initialize ProgressDialog");
+		LogUtil.log(Log.DEBUG, "Finish initialize ProgressDialog");
 
 		progressDialog.show();
 
@@ -258,7 +255,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
 	@Override
 	public void run () {
-		Log.i(TAG, "Thread Start");
+		LogUtil.log(Log.DEBUG, "Thread start");
 
 		readRegistedData();
 		calc();
@@ -268,14 +265,14 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 		progressDialog = null;
 		resultHandler.sendEmptyMessage(FINISH);
 
-		Log.i(TAG, "Thread Finish");
+		LogUtil.log(Log.DEBUG, "Thread finish");
 	}
 
 	/**
 	 * RegistMotionにて登録したモーションの平均値データを読み込む
 	 */
 	private void readRegistedData () {
-		Log.v(TAG, "--- readRegistedData ---");
+		LogUtil.log(Log.INFO);
 
 		ManageData mManageData = new ManageData();
 		ArrayList<double[][]> readDataList = mManageData.readRegistedData(AuthMotion.this, AuthNameInput.name);
@@ -296,13 +293,13 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 	 * データ加工・計算処理を行う
 	 */
 	private void calc () {
-		Log.v(TAG, "--- calc ---");
+		LogUtil.log(Log.INFO);
 		// 原データの桁揃え
 		double[][] accel = mFormatter.floatToDoubleFormatter(accelFloat);
 		double[][] gyro = mFormatter.floatToDoubleFormatter(gyroFloat);
 
 		if (isAmplity) {
-			Log.i(TAG, "Amplify");
+			LogUtil.log(Log.DEBUG, "Amplify on");
 			accel = mAmplifier.Amplify(accel);
 			gyro = mAmplifier.Amplify(gyro);
 		}
@@ -327,7 +324,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 		public void handleMessage (Message msg) {
 			if (msg.what == FINISH) {
 				if (!resultCorrelation) {
-					Log.i(TAG, "False Authentication");
+					LogUtil.log(Log.INFO, "False authentication");
 					AlertDialog.Builder alert = new AlertDialog.Builder(AuthMotion.this);
 					alert.setTitle("認証失敗です");
 					alert.setMessage("認証に失敗しました");
@@ -346,7 +343,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 					alert.show();
 				}
 				else {
-					Log.i(TAG, "Success Authentication");
+					LogUtil.log(Log.INFO, "Success authentication");
 					AlertDialog.Builder alert = new AlertDialog.Builder(AuthMotion.this);
 					alert.setTitle("認証成功");
 					alert.setMessage("認証に成功しました．\nスタート画面に戻ります．");
@@ -365,7 +362,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
 
 	private boolean measureCorrelation () {
-		Log.v(TAG, "--- measureCorrelation ---");
+		LogUtil.log(Log.INFO);
 		Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, angle, registed_ave_distance, registed_ave_angle);
 
 		return measure == Enum.MEASURE.CORRECT;
@@ -373,14 +370,14 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
 	@Override
 	public void onAccuracyChanged (Sensor sensor, int accuracy) {
-		Log.v(TAG, "--- onAccuracyChanged ---");
+		LogUtil.log(Log.INFO);
 	}
 
 
 	@Override
 	protected void onResume () {
 		super.onResume();
-		Log.v(TAG, "--- onResume ---");
+		LogUtil.log(Log.INFO);
 
 		mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
 		mSensorManager.registerListener(this, mGyroscopeSensor, SensorManager.SENSOR_DELAY_GAME);
@@ -390,7 +387,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 	@Override
 	protected void onPause () {
 		super.onPause();
-		Log.v(TAG, "--- onPause ---");
+		LogUtil.log(Log.INFO);
 
 		mSensorManager.unregisterListener(this);
 	}
@@ -404,7 +401,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 	 * @param flg     戻るキーを押した際にこのアクティビティを表示させるかどうか
 	 */
 	private void moveActivity (String pkgName, String actName, boolean flg) {
-		Log.v(TAG, "--- moveActivity ---");
+		LogUtil.log(Log.INFO);
 		Intent intent = new Intent();
 
 		intent.setClassName(pkgName, actName);

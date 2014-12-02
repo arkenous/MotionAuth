@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.example.motionauth.R;
+import com.example.motionauth.Utility.LogUtil;
 import com.example.motionauth.Utility.ManageData;
 
 import java.util.ArrayList;
@@ -23,8 +24,6 @@ import java.util.ArrayList;
  * @author Kensuke Kousaka
  */
 public class ViewRegistedData extends Activity {
-	private static final String TAG = ViewRegistedData.class.getSimpleName();
-
 	String item = null;
 	int flgCount;
 
@@ -33,7 +32,7 @@ public class ViewRegistedData extends Activity {
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Log.v(TAG, "--- onCreate ---");
+		LogUtil.log(Log.INFO);
 
 		setContentView(R.layout.activity_view_registed_data);
 
@@ -51,7 +50,7 @@ public class ViewRegistedData extends Activity {
 	 * ユーザのデータをリスト表示する
 	 */
 	private void viewRegistedData () {
-		Log.v(TAG, "--- viewRegistedData ---");
+		LogUtil.log(Log.INFO);
 
 		// RegistrantListから渡されたユーザ名を受け取る
 		Intent intent = getIntent();
@@ -77,7 +76,7 @@ public class ViewRegistedData extends Activity {
 	 * @return 取得したデータ
 	 */
 	private ArrayList<String> readData () {
-		Log.v(TAG, "--- readData ---");
+		LogUtil.log(Log.INFO);
 		ArrayList<String> dataList = new ArrayList<>();
 
 		ManageData mManageData = new ManageData();
@@ -158,7 +157,7 @@ public class ViewRegistedData extends Activity {
 
 
 	private void moveActivity (String pkgName, String actName, boolean flg) {
-		Log.v(TAG, "--- moveActivity ---");
+		LogUtil.log(Log.INFO);
 
 		Intent intent = new Intent();
 		intent.setClassName(pkgName, actName);

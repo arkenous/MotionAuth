@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
 import android.util.Log;
+import com.example.motionauth.Utility.LogUtil;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
@@ -17,7 +18,6 @@ import java.security.*;
  * @author Kensuke Kousaka
  */
 public class CipherCrypt {
-	private static final String TAG = CipherCrypt.class.getSimpleName();
 	private static final int ENCRYPT_KEY_LENGTH = 128;
 	private static final String PREF_KEY = "Cipher";
 	private static final String CIPHER_KEY = "CipherCrypt";
@@ -33,7 +33,7 @@ public class CipherCrypt {
 	 * @param context アプリケーション固有のSharedPreferencesを取得する際に用いるContext
 	 */
 	public CipherCrypt (Context context) {
-		Log.v(TAG, "--- CipherCrypt ---");
+		LogUtil.log(Log.INFO);
 
 		Context mContext = context.getApplicationContext();
 
@@ -45,7 +45,7 @@ public class CipherCrypt {
 		String keyStr = preferences.getString(CIPHER_KEY, "");
 
 		if ("".equals(keyStr)) {
-			Log.i(TAG, "Coundn't get cipher key from preferences");
+			LogUtil.log(Log.DEBUG, "Couldn't get cipher key from preferences");
 			// Preferenceから取得できなかった場合
 			// Secret Keyを生成し，保存する
 
@@ -58,7 +58,7 @@ public class CipherCrypt {
 			editor.putString(CIPHER_KEY, base64Key).apply();
 		}
 		else {
-			Log.i(TAG, "Get cipher key from preferences");
+			LogUtil.log(Log.DEBUG, "Get cipher key from preferences");
 			// Preferenceから取得できた場合
 			// Secret Keyを復元
 			byte[] byteKey = Base64.decode(keyStr, Base64.URL_SAFE | Base64.NO_WRAP);
@@ -70,7 +70,7 @@ public class CipherCrypt {
 		String ivStr = preferences.getString(CIPHER_IV, "");
 
 		if ("".equals(ivStr)) {
-			Log.i(TAG, "Coundn't get iv from preferences");
+			LogUtil.log(Log.DEBUG, "Couldn't get iv from preferences");
 			// Preferenceから取得できなかった場合
 			// IVを生成し，保存する
 
@@ -84,7 +84,7 @@ public class CipherCrypt {
 			editor.putString(CIPHER_IV, base64Iv).apply();
 		}
 		else {
-			Log.i(TAG, "Get iv from preferences");
+			LogUtil.log(Log.DEBUG, "Get iv from preferences");
 			// Preferenceから取得できた場合
 			// IVを復元
 			byte[] byteIv = Base64.decode(ivStr, Base64.URL_SAFE | Base64.NO_WRAP);
@@ -99,7 +99,7 @@ public class CipherCrypt {
 	 * @return Secret Key
 	 */
 	private Key generateKey () {
-		Log.v(TAG, "--- generateKey ---");
+		LogUtil.log(Log.INFO);
 		try {
 			KeyGenerator generator = KeyGenerator.getInstance("AES");
 			SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
@@ -120,7 +120,7 @@ public class CipherCrypt {
 	 * @return byte配列型のIV
 	 */
 	private byte[] generateIv () {
-		Log.v(TAG, "--- generateIv ---");
+		LogUtil.log(Log.INFO);
 		try {
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
 			cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -147,9 +147,9 @@ public class CipherCrypt {
 	 * @return 暗号化されたString型二次元配列データ
 	 */
 	public String[][] encrypt (String[][] input) {
-		Log.v(TAG, "--- encrypt ---");
+		LogUtil.log(Log.INFO);
 		if (input == null) {
-			Log.w(TAG, "Input data is NULL");
+			LogUtil.log(Log.WARN, "Input data is NULL");
 			return null;
 		}
 
@@ -197,9 +197,9 @@ public class CipherCrypt {
 	 * @return 復号されたString型二次元配列データ
 	 */
 	public String[][] decrypt (String[][] input) {
-		Log.v(TAG, "--- decrypt ---");
+		LogUtil.log(Log.INFO);
 		if (input == null) {
-			Log.w(TAG, "Input data is NULL");
+			LogUtil.log(Log.WARN, "Input data is NULL");
 			return null;
 		}
 
@@ -214,7 +214,7 @@ public class CipherCrypt {
 				for (int j = 0; j < input[i].length; j++) {
 					byte[] result = cipher.doFinal(Base64.decode(input[i][j], Base64.URL_SAFE | Base64.NO_WRAP));
 					decrypted[i][j] = new String(result);
-					Log.i(TAG, "decrypted : " + decrypted[i][j]);
+					LogUtil.log(Log.VERBOSE, "Decrypted : " + decrypted[i][j]);
 				}
 			}
 
@@ -248,9 +248,9 @@ public class CipherCrypt {
 	 * @return 復号されたString型一次元配列データ
 	 */
 	public String[] decrypt (String[] input) {
-		Log.v(TAG, "--- decrypt ---");
+		LogUtil.log(Log.INFO);
 		if (input == null) {
-			Log.w(TAG, "Input data is NULL");
+			LogUtil.log(Log.DEBUG, "Input data is NULL");
 			return null;
 		}
 
@@ -287,5 +287,4 @@ public class CipherCrypt {
 			throw new RuntimeException(e);
 		}
 	}
-
 }

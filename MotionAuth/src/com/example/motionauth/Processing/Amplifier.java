@@ -1,6 +1,7 @@
 package com.example.motionauth.Processing;
 
 import android.util.Log;
+import com.example.motionauth.Utility.LogUtil;
 
 /**
  * データの値を増幅させる
@@ -8,8 +9,6 @@ import android.util.Log;
  * @author Kensuke Kousaka
  */
 public class Amplifier {
-	private static final String TAG = Amplifier.class.getSimpleName();
-
 	private static final double AMPLIFICATION_VALUE = 2;
 
 	private boolean isRangeCheck = false;
@@ -22,9 +21,9 @@ public class Amplifier {
 	 * @return 全試行回数中，一回でもデータの幅が閾値よりも小さければtrue，そうでなければfalse
 	 */
 	public boolean CheckValueRange (double[][][] data, double checkRangeValue) {
-		Log.v(TAG, "--- CheckValueRange ---");
+		LogUtil.log(Log.INFO);
 
-		Log.i(TAG, "checkRangeValue = " + checkRangeValue);
+		LogUtil.log(Log.DEBUG, "checkRangeValue" + checkRangeValue);
 
 		double[][] max = new double[data.length][data[0].length];
 		double[][] min = new double[data.length][data[0].length];
@@ -53,7 +52,7 @@ public class Amplifier {
 		for (int i = 0; i < max.length; i++) {
 			for (int j = 0; j < max[i].length; j++) {
 				range = max[i][j] - min[i][j];
-				Log.e(TAG, "range = " + range);
+				LogUtil.log(Log.DEBUG, "range = " + range);
 				if (range < checkRangeValue) isRangeCheck = true;
 			}
 		}
@@ -69,7 +68,7 @@ public class Amplifier {
 	 * @return 増幅後のdouble型三次元配列データ
 	 */
 	public double[][][] Amplify (double[][][] data) {
-		Log.v(TAG, "--- Amplify ---");
+		LogUtil.log(Log.INFO);
 
 		for (int i = 0; i < data.length; i++) {
 			for (int j = 0; j < data[i].length; j++) {
@@ -90,7 +89,7 @@ public class Amplifier {
 	 * @return 増幅後のdouble型二次元配列データ
 	 */
 	public double[][] Amplify (double[][] data) {
-		Log.v(TAG, "--- Amplify ---");
+		LogUtil.log(Log.INFO);
 
 		for (int i = 0; i < data.length; i++) {
 			for (int j = 0; j < data[i].length; j++) {

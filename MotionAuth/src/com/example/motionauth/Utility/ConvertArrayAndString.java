@@ -8,8 +8,6 @@ import android.util.Log;
  * @author Kensuke Kousaka
  */
 public class ConvertArrayAndString {
-	private static final String TAG = ConvertArrayAndString.class.getSimpleName();
-
 
 	/**
 	 * 受け取った配列データを，特定の文字を用いて連結する
@@ -18,7 +16,7 @@ public class ConvertArrayAndString {
 	 * @return 連結したString型データ
 	 */
 	public String arrayToString (String[][] input) {
-		Log.v(TAG, "--- arrayToString ---");
+		LogUtil.log(Log.INFO);
 		String join = "", result = "";
 
 		// aaa   bbb   ccc
@@ -61,7 +59,7 @@ public class ConvertArrayAndString {
 	 * @return 分割したString型二次元配列データ
 	 */
 	public String[][] stringToArray (String input) {
-		Log.i(TAG, "--- stringToArray ---");
+		LogUtil.log(Log.INFO);
 		String[] splitDimention = input.split("'");
 		String[][] result = new String[3][100];
 

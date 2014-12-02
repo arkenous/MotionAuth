@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.example.motionauth.R;
+import com.example.motionauth.Utility.LogUtil;
 
 
 /**
@@ -23,8 +24,6 @@ import com.example.motionauth.R;
  * @author Kensuke Kousaka
  */
 public class RegistNameInput extends Activity {
-	private static final String TAG = RegistNameInput.class.getSimpleName();
-
 	// ユーザが入力した文字列（名前）を格納する
 	public static String name;
 
@@ -33,7 +32,7 @@ public class RegistNameInput extends Activity {
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Log.v(TAG, "--- onCreate ---");
+		LogUtil.log(Log.INFO);
 
 		// タイトルバーの非表示
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -49,7 +48,7 @@ public class RegistNameInput extends Activity {
 	 * ユーザの名前入力を受け付ける処理
 	 */
 	private void nameInput () {
-		Log.v(TAG, "--- nameInput ---");
+		LogUtil.log(Log.INFO);
 
 		final EditText nameInput = (EditText) findViewById(R.id.nameInputEditText);
 
@@ -89,7 +88,7 @@ public class RegistNameInput extends Activity {
 		ok.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick (View v) {
-				Log.i(TAG, "Click OK Button");
+				LogUtil.log(Log.DEBUG, "Click ok button");
 				// nameが入力されているかの確認
 				if (name.length() == 0) {
 					Toast.makeText(RegistNameInput.this, "名前が入力されていません", Toast.LENGTH_LONG).show();
@@ -110,7 +109,7 @@ public class RegistNameInput extends Activity {
 	 * @param flg     戻るキーを押した際にこのアクティビティを表示させるかどうか
 	 */
 	private void moveActivity (String pkgName, String actName, boolean flg) {
-		Log.v(TAG, "--- moveActivity ---");
+		LogUtil.log(Log.INFO);
 		Intent intent = new Intent();
 
 		intent.setClassName(pkgName, actName);

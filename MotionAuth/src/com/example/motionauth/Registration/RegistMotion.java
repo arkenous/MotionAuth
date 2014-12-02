@@ -23,6 +23,7 @@ import com.example.motionauth.Lowpass.Fourier;
 import com.example.motionauth.Processing.*;
 import com.example.motionauth.R;
 import com.example.motionauth.Utility.Enum;
+import com.example.motionauth.Utility.LogUtil;
 import com.example.motionauth.Utility.ManageData;
 
 
@@ -32,8 +33,6 @@ import com.example.motionauth.Utility.ManageData;
  * @author Kensuke Kousaka
  */
 public class RegistMotion extends Activity implements SensorEventListener, Runnable {
-	private static final String TAG = RegistMotion.class.getSimpleName();
-
 	private static final int VIBRATOR_SHORT = 25;
 	private static final int VIBRATOR_NORMAL = 50;
 	private static final int VIBRATOR_LONG = 100;
@@ -96,8 +95,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		Log.v(TAG, "--- onCreate ---");
+		LogUtil.log(Log.INFO);
 
 		setContentView(R.layout.activity_regist_motion);
 
@@ -109,7 +107,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 	 * モーション登録画面にイベントリスナ等を設定する
 	 */
 	private void registMotion () {
-		Log.v(TAG, "--- registMotion ---");
+		LogUtil.log(Log.INFO);
 
 		// センササービス，各種センサを取得する
 		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -128,7 +126,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 		getMotionBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick (View v) {
-				Log.i(TAG, "Click Get Motion Button");
+				LogUtil.log(Log.DEBUG, "Click get motion button");
 				if (isGetMotionBtnClickable) {
 					isGetMotionBtnClickable = false;
 
@@ -155,7 +153,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 	private Handler timeHandler = new Handler() {
 		@Override
 		public void dispatchMessage (Message msg) {
-			Log.i(TAG, "--- dispatchMessage ---");
+			LogUtil.log(Log.INFO);
 
 			if (msg.what == PREPARATION && !isGetMotionBtnClickable) {
 				switch (prepareCount) {
@@ -261,7 +259,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 		secondTv.setText("0");
 		getMotionBtn.setText("データ処理中");
 
-		Log.i(TAG, "Start Initialize ProgressDialog");
+		LogUtil.log(Log.DEBUG, "Start initialize progress dialog");
 
 		progressDialog = new ProgressDialog(this);
 		progressDialog.setTitle("計算処理中");
@@ -270,7 +268,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 		progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		progressDialog.setCancelable(false);
 
-		Log.i(TAG, "Finish Initialize ProgressDialog");
+		LogUtil.log(Log.DEBUG, "Finish initialize Progress dialog");
 
 		progressDialog.show();
 
@@ -281,7 +279,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
 	@Override
 	public void run () {
-		Log.i(TAG, "Thread Running");
+		LogUtil.log(Log.DEBUG, "Thread running");
 		mManageData.writeFloatThreeArrayData("RegistRawData", "rawAccelo", RegistNameInput.name, accelFloat);
 		mManageData.writeFloatThreeArrayData("RegistRawData", "rawGyro", RegistNameInput.name, gyroFloat);
 
@@ -291,14 +289,14 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 		progressDialog.dismiss();
 		progressDialog = null;
 		resultHandler.sendEmptyMessage(FINISH);
-		Log.i(TAG, "Thread Finish");
+		LogUtil.log(Log.DEBUG, "Thread finished");
 	}
 
 	/**
 	 * データ加工，計算処理を行う
 	 */
 	private boolean calc () {
-		Log.v(TAG, "--- calc ---");
+		LogUtil.log(Log.INFO);
 		// データの桁揃え
 		double[][][] accel_double = mFormatter.floatToDoubleFormatter(accelFloat);
 		double[][][] gyro_double = mFormatter.floatToDoubleFormatter(gyroFloat);
@@ -316,7 +314,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 		accel_double = mFourier.LowpassFilter(accel_double, "accel");
 		gyro_double = mFourier.LowpassFilter(gyro_double, "gyro");
 
-		Log.d(TAG, "*** finishFourier ***");
+		LogUtil.log(Log.DEBUG, "Finish fourier");
 
 		distance = mCalc.accelToDistance(accel_double, 0.03);
 		angle = mCalc.gyroToAngle(gyro_double, 0.03);
@@ -324,7 +322,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 		distance = mFormatter.doubleToDoubleFormatter(distance);
 		angle = mFormatter.doubleToDoubleFormatter(angle);
 
-		Log.d(TAG, "*** afterWriteData ***");
+		LogUtil.log(Log.DEBUG, "After write data");
 
 		// measureCorrelation用の平均値データを作成
 		for (int i = 0; i < 3; i++) {
@@ -338,13 +336,13 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 		//TODO ズレ修正の再考
 		Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, angle, averageDistance, averageAngle);
 
-		Log.d(TAG, "*** afterMeasureCorrelation");
-		Log.d(TAG, "measure = " + String.valueOf(measure));
+		LogUtil.log(Log.DEBUG, "After measure correlation");
+		LogUtil.log(Log.DEBUG, "measure = " + String.valueOf(measure));
 
 
 		if (Enum.MEASURE.BAD == measure) {
 			// 相関係数が0.4以下
-			Log.i(TAG, "measure: BAD");
+			LogUtil.log(Log.DEBUG, "measure: BAD");
 			return false;
 		}
 		else if (Enum.MEASURE.INCORRECT == measure) {
@@ -358,7 +356,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
 			while (true) {
 				//TODO 修正した結果，相関係数が悪化したら元も子もないので，ここでチェック
-				Log.i(TAG, "measure: INCORRECT");
+				LogUtil.log(Log.DEBUG, "measure: INCORRECT");
 
 				switch (time) {
 					case 0:
@@ -389,7 +387,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 				}
 				else if (time == 2) {
 					// 相関係数が低いまま，アラートなどを出す？
-					Log.e(TAG, "Correlation value is low");
+					LogUtil.log(Log.DEBUG, "Correlation value is low");
 					distance = originalDistance;
 					angle = originalAngle;
 					break;
@@ -399,12 +397,12 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 			}
 		}
 		else if (Enum.MEASURE.PERFECT == measure || Enum.MEASURE.CORRECT == measure) {
-			Log.i(TAG, "measure: CORRECT or PERFECT");
+			LogUtil.log(Log.DEBUG, "measure: CORRECT or PERFECT");
 			// PERFECTなら，何もしない
 		}
 		else {
 			// なにかがおかしい
-			Log.e(TAG, "measure: Error");
+			LogUtil.log(Log.DEBUG, "measure: ERROR");
 			return false;
 		}
 		//endregion
@@ -420,7 +418,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 			}
 		}
 
-		Log.d(TAG, "*** return ***");
+		LogUtil.log(Log.DEBUG, "return");
 		return true;
 	}
 
@@ -428,10 +426,10 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 	 * 相関係数を導出し，ユーザが入力した3回のモーションの類似性を確認する
 	 */
 	private boolean measureCorrelation () {
-		Log.v(TAG, "--- measureCorrelation ---");
+		LogUtil.log(Log.INFO);
 		Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, angle, averageDistance, averageAngle);
 
-		Log.d(TAG, "measure = " + measure);
+		LogUtil.log(Log.DEBUG, "measure = " + measure);
 
 		return measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT;
 	}
@@ -516,7 +514,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
 	@Override
 	public void onAccuracyChanged (Sensor sensor, int accuracy) {
-		Log.v(TAG, "--- onAccuracyChanged ---");
+		LogUtil.log(Log.INFO);
 	}
 
 
@@ -524,7 +522,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 	protected void onResume () {
 		super.onResume();
 
-		Log.v(TAG, "--- onResume ---");
+		LogUtil.log(Log.INFO);
 
 		mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
 		mSensorManager.registerListener(this, mGyroscopeSensor, SensorManager.SENSOR_DELAY_GAME);
@@ -535,7 +533,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 	protected void onPause () {
 		super.onPause();
 
-		Log.v(TAG, "--- onPause ---");
+		LogUtil.log(Log.INFO);
 
 		mSensorManager.unregisterListener(this);
 	}
@@ -640,7 +638,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 	 * スタート画面に移動するメソッド
 	 */
 	private void finishRegist () {
-		Log.v(TAG, "--- finishRegist ---");
+		LogUtil.log(Log.INFO);
 		Intent intent = new Intent();
 
 		intent.setClassName("com.example.motionauth", "com.example.motionauth.Start");

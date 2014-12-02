@@ -1,6 +1,7 @@
 package com.example.motionauth.Processing;
 
 import android.util.Log;
+import com.example.motionauth.Utility.LogUtil;
 
 import java.util.Locale;
 
@@ -11,8 +12,6 @@ import java.util.Locale;
  * @author Kensuke Kousaka
  */
 public class Formatter {
-	private static final String TAG = Formatter.class.getSimpleName();
-
 
 	/**
 	 * float型の２次元数値データを小数点以下２桁に揃え，doubleに変換する
@@ -21,7 +20,7 @@ public class Formatter {
 	 * @return 小数点以下２桁に揃え，double型に変換した２次元数値データ
 	 */
 	public double[][] floatToDoubleFormatter (float[][] inputVal) {
-		Log.v(TAG, "--- floatToDoubleFormatter ---");
+		LogUtil.log(Log.INFO);
 
 		double[][] returnVal = new double[inputVal.length][inputVal[0].length];
 
@@ -43,7 +42,7 @@ public class Formatter {
 	 * @return 小数点以下２桁に揃え，double型に変換した３次元数値データ
 	 */
 	public double[][][] floatToDoubleFormatter (float[][][] inputVal) {
-		Log.v(TAG, "--- floatToDoubleFormatter ---");
+		LogUtil.log(Log.INFO);
 
 		double[][][] returnVal = new double[inputVal.length][inputVal[0].length][inputVal[0][0].length];
 
@@ -67,7 +66,7 @@ public class Formatter {
 	 * @return 小数点以下二桁に揃えたdouble型二次元数値データ
 	 */
 	public double[][] doubleToDoubleFormatter (double[][] inputVal) {
-		Log.v(TAG, "--- doubleToDoubleFormatter ---");
+		LogUtil.log(Log.INFO);
 
 		double[][] returnVal = new double[inputVal.length][inputVal[0].length];
 
@@ -89,7 +88,7 @@ public class Formatter {
 	 * @return 小数点以下２桁に揃えたdouble型３次元数値データ
 	 */
 	public double[][][] doubleToDoubleFormatter (double[][][] inputVal) {
-		Log.v(TAG, "--- doubleToDoubleFormatter ---");
+		LogUtil.log(Log.INFO);
 
 		double[][][] returnVal = new double[inputVal.length][inputVal[0].length][inputVal[0][0].length];
 

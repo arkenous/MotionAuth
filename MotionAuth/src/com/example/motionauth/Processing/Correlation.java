@@ -4,6 +4,7 @@ import android.util.Log;
 import com.example.motionauth.Authentication.AuthNameInput;
 import com.example.motionauth.Registration.RegistNameInput;
 import com.example.motionauth.Utility.Enum;
+import com.example.motionauth.Utility.LogUtil;
 import com.example.motionauth.Utility.ManageData;
 
 
@@ -13,8 +14,6 @@ import com.example.motionauth.Utility.ManageData;
  * @author Kensuke Kousaka
  */
 public class Correlation {
-	private static final String TAG = Correlation.class.getSimpleName();
-
 	private ManageData mManageData = new ManageData();
 	private Enum mEnum = new Enum();
 
@@ -28,7 +27,7 @@ public class Correlation {
 	 * @return EnumクラスのMEASURE列挙体の値が返る
 	 */
 	public Enum.MEASURE measureCorrelation (double[][][] distance, double[][][] angle, double[][] ave_distance, double[][] ave_angle) {
-		Log.v(TAG, "--- measureCorrelation ---");
+		LogUtil.log(Log.INFO);
 
 		// 相関係数の計算
 
@@ -123,13 +122,13 @@ public class Correlation {
 
 		for (double[] i : R_accel) {
 			for (double j : i) {
-				Log.e(TAG, "R_accel: " + j);
+				LogUtil.log(Log.DEBUG, "R_accel: " + j);
 			}
 		}
 
 		for (double[] i : R_gyro) {
 			for (double j : i) {
-				Log.e(TAG, "R_gyro: " + j);
+				LogUtil.log(Log.DEBUG, "R_gyro: " + j);
 			}
 		}
 
@@ -281,12 +280,12 @@ public class Correlation {
 	 * @return EnumクラスのMEASURE列挙体の値が返る
 	 */
 	public Enum.MEASURE measureCorrelation (double[][] distance, double[][] angle, double[][] ave_distance, double[][] ave_angle) {
-		Log.v(TAG, "--- measureCorrelation ---");
+		LogUtil.log(Log.INFO);
 
-		Log.d(TAG, "distancesample: " + String.valueOf(distance[0][0]));
-		Log.d(TAG, "anglesample: " + String.valueOf(angle[0][0]));
-		Log.d(TAG, "avedistancesample: " + String.valueOf(ave_distance[0][0]));
-		Log.d(TAG, "aveanglesample: " + String.valueOf(ave_angle[0][0]));
+		LogUtil.log(Log.DEBUG, "distancesample: " + String.valueOf(distance[0][0]));
+		LogUtil.log(Log.DEBUG, "anglesample: " + String.valueOf(angle[0][0]));
+		LogUtil.log(Log.DEBUG, "avedistancesample: " + String.valueOf(ave_distance[0][0]));
+		LogUtil.log(Log.DEBUG, "aveanglesample: " + String.valueOf(ave_angle[0][0]));
 
 		//region Calculate of Average A
 		float[] sample_accel = new float[3];

@@ -8,6 +8,7 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.example.motionauth.R;
+import com.example.motionauth.Utility.LogUtil;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -18,8 +19,6 @@ import java.util.ArrayList;
  * @author Kensuke Kousaka
  */
 public class ViewAuthRData extends Activity {
-	private static final String TAG = ViewAuthRData.class.getSimpleName();
-
 	String item = null;
 
 
@@ -27,7 +26,7 @@ public class ViewAuthRData extends Activity {
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Log.v(TAG, "--- onCreate ---");
+		LogUtil.log(Log.INFO);
 
 		setContentView(R.layout.activity_view_auth_rdata);
 
@@ -36,7 +35,7 @@ public class ViewAuthRData extends Activity {
 
 
 	private void viewAuthRData () {
-		Log.v(TAG, "--- viewAuthRData ---");
+		LogUtil.log(Log.INFO);
 
 		Intent intent = getIntent();
 		item = intent.getStringExtra("item");
@@ -54,7 +53,7 @@ public class ViewAuthRData extends Activity {
 
 
 	private ArrayList<String> readData () {
-		Log.v(TAG, "--- readData ---");
+		LogUtil.log(Log.INFO);
 		ArrayList<String> dataList = new ArrayList<>();
 
 		String filePath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + "AuthRData" + File.separator + item;

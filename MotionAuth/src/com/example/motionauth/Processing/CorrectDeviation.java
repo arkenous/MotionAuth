@@ -2,6 +2,7 @@ package com.example.motionauth.Processing;
 
 import android.util.Log;
 import com.example.motionauth.Utility.Enum;
+import com.example.motionauth.Utility.LogUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,8 +15,6 @@ import java.util.TreeMap;
  * @author Kensuke Kousaka
  */
 public class CorrectDeviation {
-	private static final String TAG = CorrectDeviation.class.getSimpleName();
-
 
 	/**
 	 * 取得回数ごとのデータのズレを時間的なズレを修正する
@@ -25,7 +24,7 @@ public class CorrectDeviation {
 	 */
 	//TODO 一回目で失敗した際に，次どの点で持って修正するかの検討（最高値の次は最低値，その次は中間値…？）
 	public double[][][] correctDeviation (double[][][] data, Enum.MODE mode) {
-		Log.v(TAG, "--- correctDeviation ---");
+		LogUtil.log(Log.INFO);
 
 		double[][][] newData = new double[3][3][100];
 
@@ -141,10 +140,10 @@ public class CorrectDeviation {
 		// どれだけズレているかを計算する
 		for (int i = 0; i < 3; i++) {
 			lagData[0][i] = count[0][i] - count[1][i];
-			Log.d(TAG, "lagdata[0]" + "[" + i + "]" + ": " + lagData[0][i]);
+			LogUtil.log(Log.DEBUG, "lagData[0]" + "[" + i + "]" + ": " + lagData[0][i]);
 
 			lagData[1][i] = count[0][i] - count[2][i];
-			Log.d(TAG, "lagData[1]" + "[" + i + "]" + ": " + lagData[1][i]);
+			LogUtil.log(Log.DEBUG, "lagData[1]" + "[" + i + "]" + ": " + lagData[1][i]);
 		}
 
 

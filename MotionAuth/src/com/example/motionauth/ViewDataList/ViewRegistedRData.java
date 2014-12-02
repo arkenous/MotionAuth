@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.example.motionauth.R;
+import com.example.motionauth.Utility.LogUtil;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -22,8 +23,6 @@ import java.util.ArrayList;
  * @author Kensuke Kousaka
  */
 public class ViewRegistedRData extends Activity {
-	private static final String TAG = ViewRegistedRData.class.getSimpleName();
-
 	String item = null;
 	int flgCount;
 
@@ -32,7 +31,7 @@ public class ViewRegistedRData extends Activity {
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Log.v(TAG, "--- onCreate ---");
+		LogUtil.log(Log.INFO);
 
 		setContentView(R.layout.activity_view_registed_rdata);
 
@@ -47,7 +46,7 @@ public class ViewRegistedRData extends Activity {
 
 
 	private void viewRegistedData () {
-		Log.v(TAG, "--- viewRegistedData ---");
+		LogUtil.log(Log.INFO);
 
 		Intent intent = getIntent();
 		item = intent.getStringExtra("item");
@@ -65,7 +64,7 @@ public class ViewRegistedRData extends Activity {
 
 
 	private ArrayList<String> readData () {
-		Log.v(TAG, "--- readData ---");
+		LogUtil.log(Log.INFO);
 		ArrayList<String> dataList = new ArrayList<>();
 
 		String directoryPath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + "RegistLRdata" + File.separator + item;
@@ -125,7 +124,7 @@ public class ViewRegistedRData extends Activity {
 
 
 	private void moveActivity (String pkgName, String actName, boolean flg) {
-		Log.v(TAG, "--- moveActivity ---");
+		LogUtil.log(Log.INFO);
 
 		Intent intent = new Intent();
 		intent.setClassName(pkgName, actName);

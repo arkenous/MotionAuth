@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.example.motionauth.R;
+import com.example.motionauth.Utility.LogUtil;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -26,8 +27,6 @@ import java.util.Map;
  * @author Kensuke Kousaka
  */
 public class RegistrantList extends Activity {
-	private static final String TAG = RegistrantList.class.getSimpleName();
-
 	String item;
 
 
@@ -35,7 +34,7 @@ public class RegistrantList extends Activity {
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Log.v(TAG, "--- onCreate ---");
+		LogUtil.log(Log.INFO);
 
 		// タイトルバーの非表示
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -50,7 +49,7 @@ public class RegistrantList extends Activity {
 	 * ユーザ名が選択されたら，そのユーザ名をViewRegistedDataに送る
 	 */
 	private void registrantList () {
-		Log.v(TAG, "--- registrantList ---");
+		LogUtil.log(Log.INFO);
 
 		// 登録されているユーザ名のリストを作成する
 		ArrayList<String> userList = getRegistrantName();
@@ -85,7 +84,7 @@ public class RegistrantList extends Activity {
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick (AdapterView<?> parent, View v, int position, long id) {
-				Log.i(TAG, "Click Item");
+				LogUtil.log(Log.DEBUG, "Click item");
 
 				// クリックされたアイテムを取得
 				item = lv.getItemAtPosition(position).toString();
@@ -103,7 +102,7 @@ public class RegistrantList extends Activity {
 	 * @return 作成されたString配列型のリスト
 	 */
 	private ArrayList<String> getRegistrantName () {
-		Log.v(TAG, "--- getRegistrantName ---");
+		LogUtil.log(Log.INFO);
 
 		Context mContext = RegistrantList.this.getApplicationContext();
 		SharedPreferences preferences = mContext.getSharedPreferences("UserList", Context.MODE_PRIVATE);
@@ -125,7 +124,7 @@ public class RegistrantList extends Activity {
 	 * @param flg     戻るキーを押した際にこのアクティビティを表示させるかどうか
 	 */
 	private void moveActivity (String pkgName, String actName, boolean flg) {
-		Log.v(TAG, "--- moveActivity ---");
+		LogUtil.log(Log.INFO);
 
 		Intent intent = new Intent();
 

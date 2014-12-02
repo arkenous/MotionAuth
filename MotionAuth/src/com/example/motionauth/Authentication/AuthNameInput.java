@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.example.motionauth.R;
+import com.example.motionauth.Utility.LogUtil;
 
 
 /**
@@ -24,8 +25,6 @@ import com.example.motionauth.R;
  * @author Kensuke Kousaka
  */
 public class AuthNameInput extends Activity {
-	private static final String TAG = AuthNameInput.class.getSimpleName();
-
 	// ユーザが入力した文字列（名前）を格納する
 	public static String name;
 
@@ -36,7 +35,7 @@ public class AuthNameInput extends Activity {
 	protected void onCreate (Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Log.v(TAG, "--- onCreate ---");
+		LogUtil.log(Log.INFO);
 
 		// タイトルバーの非表示
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -53,7 +52,7 @@ public class AuthNameInput extends Activity {
 	 * ユーザ名を入力させる
 	 */
 	private void nameInput () {
-		Log.v(TAG, "--- nameInput ---");
+		LogUtil.log(Log.INFO);
 		final EditText nameInput = (EditText) findViewById(R.id.nameInputEditText);
 
 		nameInput.addTextChangedListener(new TextWatcher() {
@@ -76,7 +75,7 @@ public class AuthNameInput extends Activity {
 			@Override
 			public boolean onKey (View v, int keyCode, KeyEvent event) {
 				if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-					Log.i(TAG, "Push Enter Key");
+					LogUtil.log(Log.DEBUG, "Push enter key");
 					InputMethodManager inputMethodManager = (InputMethodManager) AuthNameInput.this.getSystemService(Context.INPUT_METHOD_SERVICE);
 					inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
@@ -92,15 +91,15 @@ public class AuthNameInput extends Activity {
 		ok.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick (View v) {
-				Log.i(TAG, "Click OK Button");
+				LogUtil.log(Log.DEBUG, "Click ok button");
 
 				// 指定したユーザが存在するかどうかを確認する
 				if (AuthNameInput.this.checkFileExists()) {
-					Log.i(TAG, "User is Existed");
+					LogUtil.log(Log.DEBUG, "User is existed");
 					AuthNameInput.this.moveActivity("com.example.motionauth", "com.example.motionauth.Authentication.AuthMotion", true);
 				}
 				else {
-					Log.i(TAG, "User is not Existed");
+					LogUtil.log(Log.DEBUG, "User is not existed");
 					Toast.makeText(current, "ユーザが登録されていません", Toast.LENGTH_LONG).show();
 				}
 			}
@@ -114,7 +113,7 @@ public class AuthNameInput extends Activity {
 	 * @return 登録したことがあるユーザであればtrue，登録したことがなければfalse
 	 */
 	private boolean checkFileExists () {
-		Log.v(TAG, "--- checkFileExists ---");
+		LogUtil.log(Log.INFO);
 
 		Context mContext = AuthNameInput.this.getApplicationContext();
 		SharedPreferences preferences = mContext.getSharedPreferences("UserList", Context.MODE_PRIVATE);
@@ -131,7 +130,7 @@ public class AuthNameInput extends Activity {
 	 * @param flg     戻るキーを押した際にこのアクティビティを表示させるかどうか
 	 */
 	private void moveActivity (String pkgName, String actName, boolean flg) {
-		Log.v(TAG, "--- moveActivity ---");
+		LogUtil.log(Log.INFO);
 		Intent intent = new Intent();
 
 		intent.setClassName(pkgName, actName);

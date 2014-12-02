@@ -19,8 +19,6 @@ import java.util.ArrayList;
  * @author Kensuke Kousaka
  */
 public class ManageData {
-	private static final String TAG = ManageData.class.getSimpleName();
-
 	/**
 	 * Float型の三次元配列データをアウトプットする．保存先は，SDカードディレクトリ/folderName/userName/fileName+回数+次元
 	 *
@@ -30,14 +28,14 @@ public class ManageData {
 	 * @param data       保存するfloat型の3次元配列データ
 	 */
 	public void writeFloatThreeArrayData (String folderName, String dataName, String userName, float[][][] data) {
-		Log.v(TAG, "--- writeFloatThreeArrayData ---");
+		LogUtil.log(Log.INFO);
 
 		// SDカードのマウント確認
 		String status = Environment.getExternalStorageState();
 
 		// マウントされていない場合
 		if (!status.equals(Environment.MEDIA_MOUNTED)) {
-			Log.e(TAG, "SDCard not mounted");
+			LogUtil.log(Log.ERROR, "SDCard not mounted");
 			return;
 		}
 
@@ -53,12 +51,12 @@ public class ManageData {
 			if (!file.exists()) {
 				// フォルダがない場合
 				if (!file.mkdirs()) {
-					Log.e(TAG, "Make Folder Error");
+					LogUtil.log(Log.DEBUG, "Make directory error");
 				}
 			}
 		}
 		catch (Exception e) {
-			Log.e(TAG, "Make Folder Exception");
+			LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
 		}
 
 		try {
@@ -97,7 +95,7 @@ public class ManageData {
 			}
 		}
 		catch (Exception e) {
-			Log.e(TAG, "Error");
+			LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
 		}
 	}
 
@@ -112,12 +110,12 @@ public class ManageData {
 	 * @return 保存に成功したらtrue，失敗したらfalseを返す
 	 */
 	public boolean writeDoubleTwoArrayData (String folderName, String dataName, String userName, double[][] data) {
-		Log.v(TAG, "--- writeDoubleTwoArrayData ---");
+		LogUtil.log(Log.INFO);
 		// SDカードのマウント確認
 		String status = Environment.getExternalStorageState();
 		if (!status.equals(Environment.MEDIA_MOUNTED)) {
 			// マウントされていない場合
-			Log.e(TAG, "SDCard not mounted");
+			LogUtil.log(Log.ERROR, "SDCard not mounted");
 			return false;
 		}
 
@@ -133,13 +131,12 @@ public class ManageData {
 			if (!file.exists()) {
 				// フォルダがない場合
 				if (!file.mkdirs()) {
-					Log.e(TAG, "Make Folder Error");
+					LogUtil.log(Log.ERROR, "Make directory error");
 				}
 			}
 		}
 		catch (Exception e) {
-			Log.e(TAG, "MakeFolderException");
-			e.printStackTrace();
+			LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
 			return false;
 		}
 
@@ -176,7 +173,7 @@ public class ManageData {
 			}
 		}
 		catch (Exception e) {
-			Log.e(TAG, "Error");
+			LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
 			return false;
 		}
 		return true;
@@ -192,13 +189,13 @@ public class ManageData {
 	 * @param data       保存するdouble型の３次元配列データ
 	 */
 	public void writeDoubleThreeArrayData (String folderName, String dataName, String userName, double[][][] data) {
-		Log.v(TAG, "--- writeDoubleThreeArrayData ---");
+		LogUtil.log(Log.INFO);
 
 		// SDカードのマウント確認
 		String status = Environment.getExternalStorageState();
 		if (!status.equals(Environment.MEDIA_MOUNTED)) {
 			// マウントされていない場合
-			Log.e(TAG, "SDCard not mounted");
+			LogUtil.log(Log.ERROR, "SDCard not mounted");
 		}
 
 		// SDカードのフォルダパスの取得
@@ -213,12 +210,12 @@ public class ManageData {
 			if (!file.exists()) {
 				// フォルダがない場合
 				if (!file.mkdirs()) {
-					Log.e(TAG, "Make Folder Error");
+					LogUtil.log(Log.ERROR, "Make directory Error");
 				}
 			}
 		}
 		catch (Exception e) {
-			Log.e(TAG, "MakeFolderException");
+			LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
 		}
 
 		try {
@@ -258,7 +255,7 @@ public class ManageData {
 			}
 		}
 		catch (Exception e) {
-			Log.e(TAG, "Error");
+			LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
 		}
 	}
 
@@ -272,13 +269,13 @@ public class ManageData {
 	 * @param data       保存するdouble型の２次元配列データ
 	 */
 	public void writeRData (String folderName, String dataName, String userName, double[][] data) {
-		Log.v(TAG, "--- writeRData ---");
+		LogUtil.log(Log.INFO);
 
 		// SDカードのマウント確認
 		String status = Environment.getExternalStorageState();
 		if (!status.equals(Environment.MEDIA_MOUNTED)) {
 			// マウントされていない場合
-			Log.e(TAG, "SDCard not mounted");
+			LogUtil.log(Log.ERROR, "SDCard not mounted");
 		}
 
 		// SDカードのフォルダパスの取得
@@ -293,12 +290,12 @@ public class ManageData {
 			if (!file.exists()) {
 				// フォルダがない場合
 				if (!file.mkdirs()) {
-					Log.e(TAG, "Make Folder Error");
+					LogUtil.log(Log.ERROR, "Make directory error");
 				}
 			}
 		}
 		catch (Exception e) {
-			Log.e(TAG, "Make Folder Exception");
+			LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
 		}
 
 		try {
@@ -335,7 +332,7 @@ public class ManageData {
 			}
 		}
 		catch (Exception e) {
-			Log.e(TAG, "Error");
+			LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
 		}
 	}
 
@@ -349,13 +346,13 @@ public class ManageData {
 	 * @param R_gyro     保存する1次元double型配列の角速度Rデータ
 	 */
 	public void writeRData (String folderName, String userName, double[] R_accel, double[] R_gyro) {
-		Log.v(TAG, "--- writeRData ---");
+		LogUtil.log(Log.INFO);
 
 		// SDカードのマウント確認
 		String status = Environment.getExternalStorageState();
 		if (!status.equals(Environment.MEDIA_MOUNTED)) {
 			// マウントされていない場合
-			Log.e(TAG, "SDCard not mounted");
+			LogUtil.log(Log.ERROR, "SDCard not mounted");
 		}
 
 		// SDカードのフォルダパスの取得
@@ -370,12 +367,12 @@ public class ManageData {
 			if (!file.exists()) {
 				// フォルダがない場合
 				if (!file.mkdirs()) {
-					Log.e(TAG, "Make Folder Error");
+					LogUtil.log(Log.ERROR, "Make directory error");
 				}
 			}
 		}
 		catch (Exception e) {
-			Log.e(TAG, "Make Folder Exception");
+			LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
 		}
 
 		try {
@@ -427,18 +424,18 @@ public class ManageData {
 			fos.close();
 		}
 		catch (Exception e) {
-			Log.e(TAG, "Error");
+			LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
 		}
 	}
 
 	// 実験用．新規登録モードにおける登録データをSDカードに保存する
 	public void writeRegistedDataToSd (String folderName, String userName, double[][] averageDistance, double[][] averageAngle, boolean isAmplify, Context context) {
-		Log.v(TAG, "--- writeRegistedDataToSd ---");
+		LogUtil.log(Log.INFO);
 
 		// SDカードのマウント確認
 		String status = Environment.getExternalStorageState();
 		if (!status.equals(Environment.MEDIA_MOUNTED)) {
-			Log.e(TAG, "SDCard not mounted");
+			LogUtil.log(Log.ERROR, "SDCard not mounted");
 		}
 
 		String SD_PATH = Environment.getExternalStorageDirectory().getPath();
@@ -450,12 +447,12 @@ public class ManageData {
 		try {
 			if (!file.exists()) {
 				if (!file.mkdirs()) {
-					Log.e(TAG, "Make Folder Error");
+					LogUtil.log(Log.ERROR, "Make directory error");
 				}
 			}
 		}
 		catch (Exception e) {
-			Log.e(TAG, "Make Folder Exception");
+			LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
 		}
 
 		try {
@@ -512,18 +509,18 @@ public class ManageData {
 			fileOutputStream.close();
 		}
 		catch (Exception e) {
-			Log.e(TAG, "Error");
+			LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
 		}
 	}
 
 
 	public void writeRpoint (String folderName, String userName, double data) {
-		Log.v(TAG, "--- writeRpoint ---");
+		LogUtil.log(Log.INFO);
 
 		// SDカードのマウント確認
 		String status = Environment.getExternalStorageState();
 		if (!status.equals(Environment.MEDIA_MOUNTED)) {
-			Log.e(TAG, "SDCard not mounted");
+			LogUtil.log(Log.ERROR, "SDCard not mounted");
 		}
 
 		String SD_PATH = Environment.getExternalStorageDirectory().getPath();
@@ -535,12 +532,12 @@ public class ManageData {
 		try {
 			if (!file.exists()) {
 				if (!file.mkdirs()) {
-					Log.e(TAG, "Make Folder Error");
+					LogUtil.log(Log.ERROR, "Make directory error");
 				}
 			}
 		}
 		catch (Exception e) {
-			Log.e(TAG, "Make Folder Exception");
+			LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
 		}
 
 		try {
@@ -558,7 +555,7 @@ public class ManageData {
 			fileOutputStream.close();
 		}
 		catch (Exception e) {
-			Log.e(TAG, "Error");
+			LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
 		}
 	}
 
@@ -574,7 +571,7 @@ public class ManageData {
 	 */
 	// 受け取ったデータをCipherクラスに渡し，暗号化されたデータを保存する
 	public void writeRegistedData (String userName, double[][] averageDistance, double[][] averageAngle, boolean isAmplify, Context context) {
-		Log.v(TAG, "--- writeRegistedData ---");
+		LogUtil.log(Log.INFO);
 
 		// 暗号処理を担うオブジェクトを生成
 		CipherCrypt mCipherCrypt = new CipherCrypt(context);
@@ -625,7 +622,7 @@ public class ManageData {
 	 * @return 読み取ったdouble型二次元配列データ
 	 */
 	public ArrayList<double[][]> readRegistedData (Context context, String userName) {
-		Log.v(TAG, "--- readRegistedData ---");
+		LogUtil.log(Log.INFO);
 		Context mContext = context.getApplicationContext();
 
 		SharedPreferences preferences = mContext.getSharedPreferences("MotionAuth", Context.MODE_PRIVATE);

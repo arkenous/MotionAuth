@@ -3,6 +3,7 @@ package com.example.motionauth.Lowpass;
 import android.util.Log;
 import com.example.motionauth.Authentication.AuthNameInput;
 import com.example.motionauth.Registration.RegistNameInput;
+import com.example.motionauth.Utility.LogUtil;
 import com.example.motionauth.Utility.ManageData;
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 
@@ -14,8 +15,6 @@ import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
  * @see <a href="https://sites.google.com/site/piotrwendykier/software/jtransforms">https://sites.google.com/site/piotrwendykier/software/jtransforms</a>
  */
 public class Fourier {
-	private static final String TAG = Fourier.class.getSimpleName();
-
 	private ManageData mManageData = new ManageData();
 
 	/**
@@ -26,7 +25,7 @@ public class Fourier {
 	 * @return フーリエ変換によるローパスフィルタリングにより滑らかになったdouble型三次元配列データ
 	 */
 	public double[][][] LowpassFilter (double[][][] data, String dataName) {
-		Log.v(TAG, "--- LowpassFilter ---");
+		LogUtil.log(Log.INFO);
 
 		DoubleFFT_1D realfft = new DoubleFFT_1D(data[0][0].length);
 
@@ -108,7 +107,7 @@ public class Fourier {
 	 * @return フーリエ変換によるローパスフィルタリングにより滑らかになったdouble型三次元配列データ
 	 */
 	public double[][] LowpassFilter (double[][] data, String dataName) {
-		Log.v(TAG, "--- LowpassFilter ---");
+		LogUtil.log(Log.INFO);
 
 		DoubleFFT_1D realfft = new DoubleFFT_1D(data[0].length);
 

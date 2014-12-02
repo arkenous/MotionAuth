@@ -22,7 +22,6 @@ public class CorrectDeviation {
 	 * @param data 修正するdouble型の3次元配列データ
 	 * @return newData ズレ修正後のdouble型の3次元配列データ
 	 */
-	//TODO 一回目で失敗した際に，次どの点で持って修正するかの検討（最高値の次は最低値，その次は中間値…？）
 	public double[][][] correctDeviation (double[][][] data, Enum.MODE mode) {
 		LogUtil.log(Log.INFO);
 
@@ -72,7 +71,6 @@ public class CorrectDeviation {
 				}
 				break;
 			case MEDIAN:
-				//TODO どのようにして中央値を取得するか
 				// キーが自動ソートされるTreeMapを用いる．データと順番を紐付けしたものを作成し，中央値の初期の順番の値を取り出す．
 				for (int i = 0; i < 3; i++) {
 					for (int j = 0; j < 3; j++) {

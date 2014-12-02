@@ -333,7 +333,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 		}
 
 		//region 同一のモーションであるかの確認をし，必要に応じてズレ修正を行う
-		//TODO ズレ修正の再考
 		Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, angle, averageDistance, averageAngle);
 
 		LogUtil.log(Log.DEBUG, "After measure correlation");
@@ -354,7 +353,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 			double[][][] originalAngle = angle;
 
 			while (true) {
-				//TODO 修正した結果，相関係数が悪化したら元も子もないので，ここでチェック
 				switch (time) {
 					case 0:
 						mode = Enum.MODE.MAX;

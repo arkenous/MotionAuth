@@ -35,7 +35,7 @@ import com.example.motionauth.Utility.ManageData;
 public class RegistMotion extends Activity implements SensorEventListener, Runnable {
 	private static final int VIBRATOR_SHORT = 25;
 	private static final int VIBRATOR_NORMAL = 50;
-	private static final int VIBRATOR_LONG = 100;
+	private static final int VIBRATOR_LONG  = 100;
 
 	private static final int PREPARATION = 1;
 	private static final int GET_MOTION = 2;
@@ -55,16 +55,16 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 	private TextView countSecondTv;
 	private Button getMotionBtn;
 
-	private Fourier mFourier = new Fourier();
-	private Formatter mFormatter = new Formatter();
-	private Calc mCalc = new Calc();
-	private Amplifier mAmplifier = new Amplifier();
-	private ManageData mManageData = new ManageData();
+	private Fourier     mFourier     = new Fourier();
+	private Formatter   mFormatter   = new Formatter();
+	private Calc        mCalc        = new Calc();
+	private Amplifier   mAmplifier   = new Amplifier();
+	private ManageData  mManageData  = new ManageData();
 	private Correlation mCorrelation = new Correlation();
 	private CorrectDeviation mCorrectDeviation = new CorrectDeviation();
 
 	private int dataCount = 0;
-	private int getCount = 0;
+	private int getCount  = 0;
 	private int prepareCount = 0;
 
 	private boolean isGetMotionBtnClickable = true;
@@ -78,10 +78,10 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 	private float[][][] accelFloat = new float[3][3][100];
 	private float[][][] gyroFloat = new float[3][3][100];
 
-	private double[][][] distance = new double[3][3][100];
-	private double[][][] angle = new double[3][3][100];
-	private double[][] averageDistance = new double[3][100];
-	private double[][] averageAngle = new double[3][100];
+	private double[][][] distance        = new double[3][3][100];
+	private double[][][] angle           = new double[3][3][100];
+	private double[][]   averageDistance = new double[3][100];
+	private double[][]   averageAngle    = new double[3][100];
 
 	private boolean resultCalc = false;
 	private boolean resultCorrelation = false;
@@ -578,7 +578,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 					});
 					dialog.setTitle("増幅器の閾値調整");
 					dialog.setMessage("増幅器にかけるかどうかを判断する閾値を調整できます．\n" +
-							"2.5を中心に，値が小さければ登録・認証が難しくなり，大きければ易しくなります．");
+					                  "2.5を中心に，値が小さければ登録・認証が難しくなり，大きければ易しくなります．");
 					dialog.setView(seekView);
 					dialog.setCancelable(false);
 					dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {

@@ -18,10 +18,10 @@ import java.security.*;
  * @author Kensuke Kousaka
  */
 public class CipherCrypt {
-	private static final int ENCRYPT_KEY_LENGTH = 128;
-	private static final String PREF_KEY = "Cipher";
-	private static final String CIPHER_KEY = "CipherCrypt";
-	private static final String CIPHER_IV = "CipherIv";
+	private static final int    ENCRYPT_KEY_LENGTH = 128;
+	private static final String PREF_KEY           = "Cipher";
+	private static final String CIPHER_KEY         = "CipherCrypt";
+	private static final String CIPHER_IV          = "CipherIv";
 
 	private final Key key;
 	private final IvParameterSpec iv;

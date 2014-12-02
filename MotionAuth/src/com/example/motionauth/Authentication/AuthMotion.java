@@ -39,7 +39,7 @@ import java.util.ArrayList;
 public class AuthMotion extends Activity implements SensorEventListener, Runnable {
 	private static final int VIBRATOR_SHORT = 25;
 	private static final int VIBRATOR_NORMAL = 50;
-	private static final int VIBRATOR_LONG = 100;
+	private static final int VIBRATOR_LONG  = 100;
 
 	private static final int PREPARATION = 1;
 	private static final int GET_MOTION = 2;
@@ -59,9 +59,9 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 	private TextView countSecondTv;
 	private Button getMotionBtn;
 
-	private Fourier mFourier = new Fourier();
+	private Fourier   mFourier   = new Fourier();
 	private Formatter mFormatter = new Formatter();
-	private Calc mCalc = new Calc();
+	private Calc      mCalc      = new Calc();
 	private Correlation mCorrelation = new Correlation();
 	private Amplifier mAmplifier = new Amplifier();
 
@@ -70,7 +70,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
 	private boolean isGetMotionBtnClickable = true;
 
-	private boolean isAmplity = false;
+	private boolean isAmplify = false;
 
 	// モーションの生データ
 	private float[] vAccel;
@@ -88,6 +88,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 	private boolean resultCorrelation = false;
 
 	private ProgressDialog progressDialog;
+
 
 	@Override
 	protected void onCreate (Bundle savedInstanceState) {
@@ -285,8 +286,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
 		if ("".equals(registedAmplifyStatus)) throw new RuntimeException();
 
-
-		isAmplity = Boolean.valueOf(registedAmplifyStatus);
+		isAmplify = Boolean.valueOf(registedAmplifyStatus);
 	}
 
 	/**
@@ -298,7 +298,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 		double[][] accel = mFormatter.floatToDoubleFormatter(accelFloat);
 		double[][] gyro = mFormatter.floatToDoubleFormatter(gyroFloat);
 
-		if (isAmplity) {
+		if (isAmplify) {
 			LogUtil.log(Log.DEBUG, "Amplify on");
 			accel = mAmplifier.Amplify(accel);
 			gyro = mAmplifier.Amplify(gyro);

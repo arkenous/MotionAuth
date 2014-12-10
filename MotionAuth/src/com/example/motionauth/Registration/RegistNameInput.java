@@ -64,7 +64,7 @@ public class RegistNameInput extends Activity {
 			// 変更後
 			public void afterTextChanged (Editable s) {
 				// ユーザの入力した名前をnameに格納
-				if (nameInput.getText() != null) name = nameInput.getText().toString();
+				if (nameInput.getText() != null) name = nameInput.getText().toString().trim();
 			}
 		});
 

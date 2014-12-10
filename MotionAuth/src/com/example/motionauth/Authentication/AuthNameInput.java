@@ -66,7 +66,7 @@ public class AuthNameInput extends Activity {
 
 			// 変更後
 			public void afterTextChanged (Editable s) {
-				if (nameInput.getText() != null) name = nameInput.getText().toString();
+				if (nameInput.getText() != null) name = nameInput.getText().toString().trim();
 			}
 		});
 

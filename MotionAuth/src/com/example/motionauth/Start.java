@@ -62,7 +62,7 @@ public class Start extends Activity {
 			public void onClick (View v) {
 				LogUtil.log(Log.DEBUG, "Click start button");
 
-				String[] btnMsg = {"登録者一覧モード", "認証試験モード", "新規登録モード"};
+				String[] btnMsg = {"データ閲覧モード", "認証試験モード", "新規登録モード"};
 				Start.this.alertDialog(TRIPLE, btnMsg, "モード選択", "モードを選択してください");
 				handler = new Handler() {
 					public void handleMessage (Message msg) {

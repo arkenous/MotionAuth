@@ -95,9 +95,9 @@ public class ViewRegistedData extends Activity {
 		Context mContext = ViewRegistedData.this.getApplicationContext();
 		SharedPreferences preferences = mContext.getSharedPreferences("MotionAuth", Context.MODE_PRIVATE);
 
-		String amplifierStatus = preferences.getString(item + "amplify", "");
+		String ampValue = preferences.getString(item + "amplify", "");
 
-		if ("".equals(amplifierStatus)) throw new RuntimeException();
+		if ("".equals(ampValue)) throw new RuntimeException();
 
 		String index = "";
 
@@ -114,7 +114,7 @@ public class ViewRegistedData extends Activity {
 					break;
 			}
 			for (int j = 0; j < registedDistance[i].length; j++) {
-				dataList.add(index + " : " + registedDistance[i][j] + " : " + amplifierStatus);
+				dataList.add(index + " : " + registedDistance[i][j] + " : " + ampValue);
 			}
 		}
 
@@ -131,7 +131,7 @@ public class ViewRegistedData extends Activity {
 					break;
 			}
 			for (int j = 0; j < registedAngle[i].length; j++) {
-				dataList.add(index + " : " + registedAngle[i][j] + " : " + amplifierStatus);
+				dataList.add(index + " : " + registedAngle[i][j] + " : " + ampValue);
 			}
 		}
 

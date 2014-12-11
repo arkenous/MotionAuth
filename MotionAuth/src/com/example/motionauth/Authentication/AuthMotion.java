@@ -37,53 +37,54 @@ import java.util.ArrayList;
  * @author Kensuke Kousaka
  */
 public class AuthMotion extends Activity implements SensorEventListener, Runnable {
-	private static final int VIBRATOR_SHORT = 25;
+	private static final int VIBRATOR_SHORT  = 25;
 	private static final int VIBRATOR_NORMAL = 50;
-	private static final int VIBRATOR_LONG  = 100;
+	private static final int VIBRATOR_LONG   = 100;
 
 	private static final int PREPARATION = 1;
-	private static final int GET_MOTION = 2;
+	private static final int GET_MOTION  = 2;
 
 	private static final int PREPARATION_INTERVAL = 1000;
-	private static final int GET_MOTION_INTERVAL = 30;
+	private static final int GET_MOTION_INTERVAL  = 30;
 
 	private static final int FINISH = 5;
 
 	private SensorManager mSensorManager;
-	private Sensor mAccelerometerSensor;
-	private Sensor mGyroscopeSensor;
+	private Sensor        mAccelerometerSensor;
+	private Sensor        mGyroscopeSensor;
 
 	private Vibrator mVibrator;
 
 	private TextView secondTv;
 	private TextView countSecondTv;
-	private Button getMotionBtn;
+	private Button   getMotionBtn;
 
-	private Fourier   mFourier   = new Fourier();
-	private Formatter mFormatter = new Formatter();
-	private Calc      mCalc      = new Calc();
+	private Fourier     mFourier     = new Fourier();
+	private Formatter   mFormatter   = new Formatter();
+	private Calc        mCalc        = new Calc();
 	private Correlation mCorrelation = new Correlation();
-	private Amplifier mAmplifier = new Amplifier();
+	private Amplifier   mAmplifier   = new Amplifier();
 
-	private int dataCount = 0;
+	private int dataCount    = 0;
 	private int prepareCount = 0;
 
 	private boolean isGetMotionBtnClickable = true;
 
-	private boolean isAmplify = false;
+	//	private boolean isAmplify = false;
+	private double ampValue = 0.0;
 
 	// モーションの生データ
 	private float[] vAccel;
 	private float[] vGyro;
 
 	private float[][] accelFloat = new float[3][100];
-	private float[][] gyroFloat = new float[3][100];
+	private float[][] gyroFloat  = new float[3][100];
 
 	private double[][] distance = new double[3][100];
-	private double[][] angle = new double[3][100];
+	private double[][] angle    = new double[3][100];
 
 	private double[][] registed_ave_distance = new double[3][100];
-	private double[][] registed_ave_angle = new double[3][100];
+	private double[][] registed_ave_angle    = new double[3][100];
 
 	private boolean resultCorrelation = false;
 
@@ -282,11 +283,11 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 		registed_ave_angle = readDataList.get(1);
 
 		SharedPreferences preferences = AuthMotion.this.getApplicationContext().getSharedPreferences("MotionAuth", Context.MODE_PRIVATE);
-		String registedAmplifyStatus = preferences.getString(AuthNameInput.name + "amplify", "");
+		String registedAmplify = preferences.getString(AuthNameInput.name + "amplify", "");
 
-		if ("".equals(registedAmplifyStatus)) throw new RuntimeException();
+		if ("".equals(registedAmplify)) throw new RuntimeException();
 
-		isAmplify = Boolean.valueOf(registedAmplifyStatus);
+		ampValue = Double.valueOf(registedAmplify);
 	}
 
 	/**
@@ -298,11 +299,11 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 		double[][] accel = mFormatter.floatToDoubleFormatter(accelFloat);
 		double[][] gyro = mFormatter.floatToDoubleFormatter(gyroFloat);
 
-		if (isAmplify) {
+//		if (isAmplify) {
 			LogUtil.log(Log.DEBUG, "Amplify on");
-			accel = mAmplifier.Amplify(accel);
-			gyro = mAmplifier.Amplify(gyro);
-		}
+		accel = mAmplifier.Amplify(accel, ampValue);
+		gyro = mAmplifier.Amplify(gyro, ampValue);
+//		}
 
 		// フーリエ変換を用いたローパス処理
 		accel = mFourier.LowpassFilter(accel, "accel");

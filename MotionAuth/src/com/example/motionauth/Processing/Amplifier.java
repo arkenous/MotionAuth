@@ -9,7 +9,8 @@ import com.example.motionauth.Utility.LogUtil;
  * @author Kensuke Kousaka
  */
 public class Amplifier {
-	private static final double AMPLIFICATION_VALUE = 2;
+	//TODO ampValueの値を新規登録時に一緒に保存する
+//	private static final double AMPLIFICATION_VALUE = 2;
 
 	private boolean isRangeCheck = false;
 
@@ -67,17 +68,18 @@ public class Amplifier {
 	 * @param data 増幅させるdouble型三次元配列データ
 	 * @return 増幅後のdouble型三次元配列データ
 	 */
-	public double[][][] Amplify (double[][][] data) {
+	public double[][][] Amplify (double[][][] data, double ampValue) {
 		LogUtil.log(Log.INFO);
 
-		for (int i = 0; i < data.length; i++) {
-			for (int j = 0; j < data[i].length; j++) {
-				for (int k = 0; k < data[i][j].length; k++) {
-					data[i][j][k] *= AMPLIFICATION_VALUE;
+		if (ampValue != 0.0) {
+			for (int i = 0; i < data.length; i++) {
+				for (int j = 0; j < data[i].length; j++) {
+					for (int k = 0; k < data[i][j].length; k++) {
+						data[i][j][k] *= ampValue;
+					}
 				}
 			}
 		}
-
 		return data;
 	}
 
@@ -88,12 +90,14 @@ public class Amplifier {
 	 * @param data 増幅させるdouble型二次元配列データ
 	 * @return 増幅後のdouble型二次元配列データ
 	 */
-	public double[][] Amplify (double[][] data) {
+	public double[][] Amplify (double[][] data, double ampValue) {
 		LogUtil.log(Log.INFO);
 
-		for (int i = 0; i < data.length; i++) {
-			for (int j = 0; j < data[i].length; j++) {
-				data[i][j] *= AMPLIFICATION_VALUE;
+		if (ampValue != 0.0) {
+			for (int i = 0; i < data.length; i++) {
+				for (int j = 0; j < data[i].length; j++) {
+					data[i][j] *= ampValue;
+				}
 			}
 		}
 

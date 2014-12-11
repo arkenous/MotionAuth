@@ -566,11 +566,13 @@ public class ManageData {
 	 * @param userName        保存するユーザ名
 	 * @param averageDistance 保存する距離データ
 	 * @param averageAngle    保存する角度データ
-	 * @param isAmplify       データ増幅フラグ
+	 * @param ampValue       データ増幅値
 	 * @param context         呼び出し元のコンテキスト
 	 */
 	// 受け取ったデータをCipherクラスに渡し，暗号化されたデータを保存する
-	public void writeRegistedData (String userName, double[][] averageDistance, double[][] averageAngle, boolean isAmplify, Context context) {
+	//public void writeRegistedData (String userName, double[][] averageDistance, double[][] averageAngle, boolean isAmplify, Context context) {
+	public void writeRegistedData (String userName, double[][] averageDistance, double[][] averageAngle, double ampValue, Context context) {
+
 		LogUtil.log(Log.INFO);
 
 		// 暗号処理を担うオブジェクトを生成
@@ -609,7 +611,7 @@ public class ManageData {
 
 		editor.putString(userName + "distance", registDistanceData);
 		editor.putString(userName + "angle", registAngleData);
-		editor.putString(userName + "amplify", String.valueOf(isAmplify));
+		editor.putString(userName + "amplify", String.valueOf(ampValue));
 		editor.apply();
 	}
 

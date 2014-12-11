@@ -88,6 +88,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
 	private ProgressDialog progressDialog;
 	private double checkRangeValue = 2.0;
+	private double ampValue = 2.0;
 
 	private boolean isMenuClickable = true;
 
@@ -305,8 +306,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 		mManageData.writeDoubleThreeArrayData("BeforeFFT", "gyro", RegistNameInput.name, gyro_double);
 
 		if (mAmplifier.CheckValueRange(accel_double, checkRangeValue) || mAmplifier.CheckValueRange(gyro_double, checkRangeValue)) {
-			accel_double = mAmplifier.Amplify(accel_double);
-			gyro_double = mAmplifier.Amplify(gyro_double);
+			accel_double = mAmplifier.Amplify(accel_double, ampValue);
+			gyro_double = mAmplifier.Amplify(gyro_double, ampValue);
 			isAmplified = true;
 		}
 
@@ -462,7 +463,10 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 				else {
 					// 3回のモーションの平均値をファイルに書き出す
 					mManageData.writeRegistedDataToSd("Test", RegistNameInput.name, averageDistance, averageAngle, isAmplified, RegistMotion.this);
-					mManageData.writeRegistedData(RegistNameInput.name, averageDistance, averageAngle, isAmplified, RegistMotion.this);
+					//mManageData.writeRegistedData(RegistNameInput.name, averageDistance, averageAngle, isAmplified, RegistMotion.this);
+					//TODO isAmplifiedのbool値の代わりに，ampValueを保存する
+					mManageData.writeRegistedData(RegistNameInput.name, averageDistance, averageAngle, ampValue, RegistMotion.this);
+
 
 					AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);
 					alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
@@ -545,17 +549,24 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 				if (isMenuClickable) {
 					LayoutInflater inflater = LayoutInflater.from(RegistMotion.this);
 					View seekView = inflater.inflate(R.layout.seekdialog, (ViewGroup) findViewById(R.id.dialog_root));
-					SeekBar seekBar = (SeekBar) seekView.findViewById(R.id.seekbar);
-					final TextView seekText = (TextView) seekView.findViewById(R.id.seektext);
-					seekText.setText("現在の値は" + checkRangeValue + "です");
-					seekBar.setMax(30);
 
-					seekBar.setProgress(16);
-					seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+					// 閾値調整
+					SeekBar thresholdSeekBar = (SeekBar) seekView.findViewById(R.id.threshold);
+					final TextView thresholdSeekText = (TextView) seekView.findViewById(R.id.thresholdtext);
+					thresholdSeekText.setText("増幅器にかけるかどうかを判断する閾値を調整できます．\n" +
+					                          "2.5を中心に，値が小さければ登録・認証が難しくなり，大きければ易しくなります．\n" +
+					                          "現在の値は" + checkRangeValue + "です．");
+
+					thresholdSeekBar.setMax(30);
+
+					thresholdSeekBar.setProgress(16);
+					thresholdSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 						@Override
 						public void onProgressChanged (SeekBar seekBar, int progress, boolean fromUser) {
 							checkRangeValue = (seekBar.getProgress() + 10) / 10.0;
-							seekText.setText("現在の値は" + checkRangeValue + "です");
+							thresholdSeekText.setText("増幅器にかけるかどうかを判断する閾値を調整できます．\n" +
+							                          "2.5を中心に，値が小さければ登録・認証が難しくなり，大きければ易しくなります．\n" +
+							                          "現在の値は" + checkRangeValue + "です．");
 						}
 
 						@Override
@@ -565,7 +576,39 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 						@Override
 						public void onStopTrackingTouch (SeekBar seekBar) {
 							checkRangeValue = (seekBar.getProgress() + 10) / 10.0;
-							seekText.setText("現在の値は" + checkRangeValue + "です");
+							thresholdSeekText.setText("増幅器にかけるかどうかを判断する閾値を調整できます．\n" +
+							                          "2.5を中心に，値が小さければ登録・認証が難しくなり，大きければ易しくなります．\n" +
+							                          "現在の値は" + checkRangeValue + "です．");
+						}
+					});
+
+					//TODO 項目追加
+					// 増幅値調整
+					SeekBar ampvalSeekBar = (SeekBar) seekView.findViewById(R.id.ampval);
+					final TextView ampvalText = (TextView) seekView.findViewById(R.id.ampvaltext);
+					ampvalText.setText("増幅器にかける場合に，何倍増幅するかを調整できます．標準は2倍です．\n" +
+					                   "現在の値は" + ampValue + "です．");
+
+					ampvalSeekBar.setMax(10);
+
+					ampvalSeekBar.setProgress(2);
+					ampvalSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+						@Override
+						public void onProgressChanged (SeekBar seekBar, int progress, boolean fromUser) {
+							ampValue = seekBar.getProgress() * 1.0;
+							ampvalText.setText("増幅器にかける場合に，何倍増幅するかを調整できます．標準は2倍です．\n" +
+							                   "現在の値は" + ampValue + "です．");
+						}
+
+						@Override
+						public void onStartTrackingTouch (SeekBar seekBar) {
+						}
+
+						@Override
+						public void onStopTrackingTouch (SeekBar seekBar) {
+							ampValue = seekBar.getProgress() * 1.0;
+							ampvalText.setText("増幅器にかける場合に，何倍増幅するかを調整できます．標準は2倍です．\n" +
+							                   "現在の値は" + ampValue + "です．");
 						}
 					});
 
@@ -576,9 +619,9 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 							return keyCode == KeyEvent.KEYCODE_BACK;
 						}
 					});
-					dialog.setTitle("増幅器の閾値調整");
-					dialog.setMessage("増幅器にかけるかどうかを判断する閾値を調整できます．\n" +
-					                  "2.5を中心に，値が小さければ登録・認証が難しくなり，大きければ易しくなります．");
+					dialog.setTitle("増幅器設定");
+//					dialog.setMessage("増幅器にかけるかどうかを判断する閾値を調整できます．\n" +
+//					                  "2.5を中心に，値が小さければ登録・認証が難しくなり，大きければ易しくなります．");
 					dialog.setView(seekView);
 					dialog.setCancelable(false);
 					dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {

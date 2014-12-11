@@ -9,9 +9,6 @@ import com.example.motionauth.Utility.LogUtil;
  * @author Kensuke Kousaka
  */
 public class Amplifier {
-	//TODO ampValueの値を新規登録時に一緒に保存する
-//	private static final double AMPLIFICATION_VALUE = 2;
-
 	private boolean isRangeCheck = false;
 
 

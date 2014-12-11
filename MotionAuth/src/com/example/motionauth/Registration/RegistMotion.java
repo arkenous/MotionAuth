@@ -69,8 +69,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
 	private boolean isGetMotionBtnClickable = true;
 
-	private boolean isAmplified = false;
-
 	// モーションの生データ
 	private float[] vAccel;
 	private float[] vGyro;
@@ -308,7 +306,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 		if (mAmplifier.CheckValueRange(accel_double, checkRangeValue) || mAmplifier.CheckValueRange(gyro_double, checkRangeValue)) {
 			accel_double = mAmplifier.Amplify(accel_double, ampValue);
 			gyro_double = mAmplifier.Amplify(gyro_double, ampValue);
-			isAmplified = true;
 		}
 
 		// フーリエ変換によるローパスフィルタ
@@ -462,9 +459,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 				}
 				else {
 					// 3回のモーションの平均値をファイルに書き出す
-					mManageData.writeRegistedDataToSd("Test", RegistNameInput.name, averageDistance, averageAngle, isAmplified, RegistMotion.this);
-					//mManageData.writeRegistedData(RegistNameInput.name, averageDistance, averageAngle, isAmplified, RegistMotion.this);
-					//TODO isAmplifiedのbool値の代わりに，ampValueを保存する
 					mManageData.writeRegistedData(RegistNameInput.name, averageDistance, averageAngle, ampValue, RegistMotion.this);
 
 
@@ -582,7 +576,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 						}
 					});
 
-					//TODO 項目追加
 					// 増幅値調整
 					SeekBar ampvalSeekBar = (SeekBar) seekView.findViewById(R.id.ampval);
 					final TextView ampvalText = (TextView) seekView.findViewById(R.id.ampvaltext);
@@ -620,8 +613,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 						}
 					});
 					dialog.setTitle("増幅器設定");
-//					dialog.setMessage("増幅器にかけるかどうかを判断する閾値を調整できます．\n" +
-//					                  "2.5を中心に，値が小さければ登録・認証が難しくなり，大きければ易しくなります．");
 					dialog.setView(seekView);
 					dialog.setCancelable(false);
 					dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {

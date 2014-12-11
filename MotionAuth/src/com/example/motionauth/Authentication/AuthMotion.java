@@ -70,7 +70,6 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
 	private boolean isGetMotionBtnClickable = true;
 
-	//	private boolean isAmplify = false;
 	private double ampValue = 0.0;
 
 	// モーションの生データ

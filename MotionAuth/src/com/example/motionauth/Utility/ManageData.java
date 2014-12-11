@@ -429,7 +429,7 @@ public class ManageData {
 	}
 
 	// 実験用．新規登録モードにおける登録データをSDカードに保存する
-	public void writeRegistedDataToSd (String folderName, String userName, double[][] averageDistance, double[][] averageAngle, boolean isAmplify, Context context) {
+	public void writeRegistedDataToSd (String folderName, String userName, double[][] averageDistance, double[][] averageAngle) {
 		LogUtil.log(Log.INFO);
 
 		// SDカードのマウント確認

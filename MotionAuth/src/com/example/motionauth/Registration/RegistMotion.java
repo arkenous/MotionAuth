@@ -667,6 +667,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 		LogUtil.log(Log.INFO);
 		Intent intent = new Intent();
 
+
 		intent.setClassName("com.example.motionauth", "com.example.motionauth.Start");
 
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);

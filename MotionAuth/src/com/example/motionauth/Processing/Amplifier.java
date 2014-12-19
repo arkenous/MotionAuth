@@ -60,9 +60,10 @@ public class Amplifier {
 
 
 	/**
-	 * 与えられたデータをAMPLIFICATION_VALUEで指定した値だけ増幅させる
+	 * 与えられたデータを増幅させる
 	 *
 	 * @param data 増幅させるdouble型三次元配列データ
+	 * @param ampValue どれだけデータを増幅させるか
 	 * @return 増幅後のdouble型三次元配列データ
 	 */
 	public double[][][] Amplify (double[][][] data, double ampValue) {
@@ -82,9 +83,10 @@ public class Amplifier {
 
 
 	/**
-	 * 与えられたデータをAMPLIFICATION_VALUEで指定した値だけ増幅させる
+	 * 与えられたデータを増幅させる
 	 *
 	 * @param data 増幅させるdouble型二次元配列データ
+	 * @param ampValue どれだけデータを増幅させるか
 	 * @return 増幅後のdouble型二次元配列データ
 	 */
 	public double[][] Amplify (double[][] data, double ampValue) {

@@ -94,7 +94,7 @@ public class AuthNameInput extends Activity {
 				LogUtil.log(Log.DEBUG, "Click ok button");
 
 				// 指定したユーザが存在するかどうかを確認する
-				if (AuthNameInput.this.checkFileExists()) {
+				if (AuthNameInput.this.checkUserExists()) {
 					LogUtil.log(Log.DEBUG, "User is existed");
 					AuthNameInput.this.moveActivity("com.example.motionauth", "com.example.motionauth.Authentication.AuthMotion", true);
 				}
@@ -112,7 +112,7 @@ public class AuthNameInput extends Activity {
 	 *
 	 * @return 登録したことがあるユーザであればtrue，登録したことがなければfalse
 	 */
-	private boolean checkFileExists () {
+	private boolean checkUserExists () {
 		LogUtil.log(Log.INFO);
 
 		Context mContext = AuthNameInput.this.getApplicationContext();

@@ -102,39 +102,6 @@ public class CorrectDeviation {
 		// ずらす移動量を計算（XYZそれぞれ）
 		int lagData[][] = new int[2][3];
 
-
-		ArrayList<ArrayList<ArrayList<Double>>> tmpData = new ArrayList<>();
-
-		ArrayList<ArrayList<Double>> tmpData1 = new ArrayList<>();
-		ArrayList<Double> tmpData1X = new ArrayList<>();
-		ArrayList<Double> tmpData1Y = new ArrayList<>();
-		ArrayList<Double> tmpData1Z = new ArrayList<>();
-
-		tmpData1.add(tmpData1X);
-		tmpData1.add(tmpData1Y);
-		tmpData1.add(tmpData1Z);
-
-		ArrayList<ArrayList<Double>> tmpData2 = new ArrayList<>();
-		ArrayList<Double> tmpData2X = new ArrayList<>();
-		ArrayList<Double> tmpData2Y = new ArrayList<>();
-		ArrayList<Double> tmpData2Z = new ArrayList<>();
-
-		tmpData2.add(tmpData2X);
-		tmpData2.add(tmpData2Y);
-		tmpData2.add(tmpData2Z);
-
-		tmpData.add(tmpData1);
-		tmpData.add(tmpData2);
-
-		for (int i = 0; i < 2; i++) {
-			for (int j = 0; j < 3; j++) {
-				for (int k = 0; k < 100; k++) {
-					tmpData.get(i).get(j).add(data[i][j][k]);
-				}
-			}
-		}
-
-
 		// どれだけズレているかを計算する
 		for (int i = 0; i < 3; i++) {
 			lagData[0][i] = count[0][i] - count[1][i];
@@ -145,16 +112,6 @@ public class CorrectDeviation {
 		}
 
 
-		// 実際にリストの要素をずらしていく
-
-		for (int i = 0; i < 2; i++) {
-			for (int j = 0; j < 3; j++) {
-				Collections.rotate(tmpData.get(i).get(j), lagData[i][j]);
-			}
-		}
-
-
-		// これでずらせたはずだ．成果はリストに入っているはずなので，ずらした後のデータを専用の配列に入れよう
 		// 1回目のデータに関しては基準となるデータなのでそのまま入れる
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 100; j++) {
@@ -162,11 +119,17 @@ public class CorrectDeviation {
 			}
 		}
 
-		// ずらしたデータを入れる
-		for (int i = 0; i < 2; i++) {
+		// 実際にリストの要素をずらしていく（ずらすのは，二回目と三回目のデータのみ）
+		for (int i = 1; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				for (int k = 0; k < 100; k++) {
-					newData[i + 1][j][k] = tmpData.get(i).get(j).get(k);
+				ArrayList<Double> temp = new ArrayList<>();
+
+				for (int k = 0; k < data[i][j].length; k++) {
+					temp.add(data[i][j][k]);
+				}
+				Collections.rotate(temp, lagData[i - 1][j]);
+				for (int k = 0; k < data[i][j].length; k++) {
+					newData[i][j][k] = temp.get(k);
 				}
 			}
 		}

@@ -152,8 +152,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 	private Handler timeHandler = new Handler() {
 		@Override
 		public void dispatchMessage (Message msg) {
-			LogUtil.log(Log.INFO);
-
 			if (msg.what == PREPARATION && !isGetMotionBtnClickable) {
 				switch (prepareCount) {
 					case 0:
@@ -300,17 +298,25 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 		double[][][] accel_double = mFormatter.floatToDoubleFormatter(accelFloat);
 		double[][][] gyro_double = mFormatter.floatToDoubleFormatter(gyroFloat);
 
-		mManageData.writeDoubleThreeArrayData("BeforeFFT", "accel", RegistNameInput.name, accel_double);
-		mManageData.writeDoubleThreeArrayData("BeforeFFT", "gyro", RegistNameInput.name, gyro_double);
+		mManageData.writeDoubleThreeArrayData("BeforeAMP", "accel", RegistNameInput.name, accel_double);
+		mManageData.writeDoubleThreeArrayData("BeforeAMP", "gyro", RegistNameInput.name, gyro_double);
 
 		if (mAmplifier.CheckValueRange(accel_double, checkRangeValue) || mAmplifier.CheckValueRange(gyro_double, checkRangeValue)) {
 			accel_double = mAmplifier.Amplify(accel_double, ampValue);
 			gyro_double = mAmplifier.Amplify(gyro_double, ampValue);
 		}
 
+		mManageData.writeDoubleThreeArrayData("AfterAMP", "accel", RegistNameInput.name, accel_double);
+		mManageData.writeDoubleThreeArrayData("AfterAMP", "gyro", RegistNameInput.name, gyro_double);
+
+
 		// フーリエ変換によるローパスフィルタ
 		accel_double = mFourier.LowpassFilter(accel_double, "accel");
 		gyro_double = mFourier.LowpassFilter(gyro_double, "gyro");
+
+		mManageData.writeDoubleThreeArrayData("AfterLowpass", "accel", RegistNameInput.name, accel_double);
+		mManageData.writeDoubleThreeArrayData("AfterLowpass", "gyro", RegistNameInput.name, gyro_double);
+
 
 		LogUtil.log(Log.DEBUG, "Finish fourier");
 
@@ -319,6 +325,9 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
 		distance = mFormatter.doubleToDoubleFormatter(distance);
 		angle = mFormatter.doubleToDoubleFormatter(angle);
+
+		mManageData.writeDoubleThreeArrayData("convertData", "distance", RegistNameInput.name, distance);
+		mManageData.writeDoubleThreeArrayData("convertData", "angle", RegistNameInput.name, angle);
 
 		LogUtil.log(Log.DEBUG, "After write data");
 
@@ -342,6 +351,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 			return false;
 		}
 		else if (Enum.MEASURE.INCORRECT == measure) {
+			LogUtil.log(Log.ERROR, "Deviation");
 			// 相関係数が0.4よりも高く，0.6以下の場合
 			// ズレ修正を行う
 			int time = 0;
@@ -374,6 +384,12 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 				}
 
 				Enum.MEASURE tmp = mCorrelation.measureCorrelation(distance, angle, averageDistance, averageAngle);
+
+				LogUtil.log(Log.ERROR, "MEASURE: " + String.valueOf(tmp));
+
+				mManageData.writeDoubleThreeArrayData("deviatedData" + String.valueOf(mode), "distance", RegistNameInput.name, distance);
+				mManageData.writeDoubleThreeArrayData("deviatedData" + String.valueOf(mode), "angle", RegistNameInput.name, angle);
+
 
 				if (tmp == Enum.MEASURE.PERFECT || tmp == Enum.MEASURE.CORRECT) {
 					break;

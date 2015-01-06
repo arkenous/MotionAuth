@@ -149,8 +149,6 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 	Handler timeHandler = new Handler() {
 		@Override
 		public void dispatchMessage (Message msg) {
-			LogUtil.log(Log.VERBOSE);
-
 			if (msg.what == PREPARATION && !isGetMotionBtnClickable) {
 				switch (prepareCount) {
 					case 0:
@@ -183,10 +181,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 				prepareCount++;
 			}
 			else if (msg.what == GET_MOTION && !isGetMotionBtnClickable) {
-				LogUtil.log(Log.VERBOSE, "Get motion");
-
 				if (dataCount < 100) {
-					LogUtil.log(Log.VERBOSE, "Getting motion data");
 					// 取得した値を，0.03秒ごとに配列に入れる
 					for (int i = 0; i < 3; i++) {
 						accelFloat[i][dataCount] = vAccel[i];
@@ -213,8 +208,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 					timeHandler.sendEmptyMessageDelayed(GET_MOTION, GET_MOTION_INTERVAL);
 				}
 				else if (dataCount >= 100) {
-					LogUtil.log(Log.VERBOSE, "Complete getting motion data");
-
+					mVibrator.vibrate(VIBRATOR_LONG);
 					finishGetMotion();
 				}
 			}
@@ -299,7 +293,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 		double[][] gyro = mFormatter.floatToDoubleFormatter(gyroFloat);
 
 //		if (isAmplify) {
-			LogUtil.log(Log.DEBUG, "Amplify on");
+		LogUtil.log(Log.DEBUG, "Amplify on");
 		accel = mAmplifier.Amplify(accel, ampValue);
 		gyro = mAmplifier.Amplify(gyro, ampValue);
 //		}

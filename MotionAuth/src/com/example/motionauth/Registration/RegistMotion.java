@@ -356,25 +356,50 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 			// ズレ修正を行う
 			int time = 0;
 			Enum.MODE mode = Enum.MODE.MAX;
+			Enum.TARGET target = Enum.TARGET.DISTANCE;
 
 			double[][][] originalDistance = distance;
 			double[][][] originalAngle = angle;
 
+			// ズレ修正は基準値を最大値，最小値，中央値の順に置き，さらに距離，角度の順にベースを置く．
 			while (true) {
 				switch (time) {
 					case 0:
 						mode = Enum.MODE.MAX;
+						target = Enum.TARGET.DISTANCE;
 						break;
 					case 1:
-						mode = Enum.MODE.MIN;
+						mode = Enum.MODE.MAX;
+						target = Enum.TARGET.ANGLE;
 						break;
 					case 2:
+						mode = Enum.MODE.MIN;
+						target = Enum.TARGET.DISTANCE;
+						break;
+					case 3:
+						mode = Enum.MODE.MIN;
+						target = Enum.TARGET.ANGLE;
+						break;
+					case 4:
 						mode = Enum.MODE.MEDIAN;
+						target = Enum.TARGET.DISTANCE;
+						break;
+					case 5:
+						mode = Enum.MODE.MEDIAN;
+						target = Enum.TARGET.ANGLE;
 						break;
 				}
 
-				distance = mCorrectDeviation.correctDeviation(originalDistance, mode);
-				angle = mCorrectDeviation.correctDeviation(originalAngle, mode);
+				double[][][][] deviatedValue = mCorrectDeviation.correctDeviation(originalDistance, originalAngle, mode, target);
+
+				for (int i = 0; i < 3; i++) {
+					for (int j = 0; j < 3; j++) {
+						for (int k = 0; k < 100; k++) {
+							distance[i][j][k] = deviatedValue[0][i][j][k];
+							angle[i][j][k] = deviatedValue[1][i][j][k];
+						}
+					}
+				}
 
 				for (int i = 0; i < 3; i++) {
 					for (int j = 0; j < 100; j++) {

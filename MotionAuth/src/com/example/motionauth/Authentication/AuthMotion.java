@@ -124,7 +124,7 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 		getMotionBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick (View v) {
-				LogUtil.log(Log.DEBUG, "Click get motion button");
+				LogUtil.log(Log.VERBOSE, "Click get motion button");
 				if (isGetMotionBtnClickable) {
 					isGetMotionBtnClickable = false;
 
@@ -149,7 +149,11 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 	Handler timeHandler = new Handler() {
 		@Override
 		public void dispatchMessage (Message msg) {
+			LogUtil.log(Log.VERBOSE);
+
 			if (msg.what == PREPARATION && !isGetMotionBtnClickable) {
+				LogUtil.log(Log.VERBOSE, "PREPARATION");
+
 				switch (prepareCount) {
 					case 0:
 						secondTv.setText("3");
@@ -181,6 +185,8 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 				prepareCount++;
 			}
 			else if (msg.what == GET_MOTION && !isGetMotionBtnClickable) {
+				LogUtil.log(Log.VERBOSE, "GET_MOTION");
+
 				if (dataCount < 100) {
 					// 取得した値を，0.03秒ごとに配列に入れる
 					for (int i = 0; i < 3; i++) {
@@ -221,11 +227,13 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 
 	@Override
 	public void onSensorChanged (SensorEvent event) {
+		LogUtil.log(Log.VERBOSE);
 		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) vAccel = event.values.clone();
 		if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) vGyro = event.values.clone();
 	}
 
 	private void finishGetMotion () {
+		LogUtil.log(Log.INFO);
 		getMotionBtn.setText("認証処理中");
 
 		prepareCount = 0;
@@ -288,15 +296,13 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 	 */
 	private void calc () {
 		LogUtil.log(Log.INFO);
+
 		// 原データの桁揃え
 		double[][] accel = mFormatter.floatToDoubleFormatter(accelFloat);
 		double[][] gyro = mFormatter.floatToDoubleFormatter(gyroFloat);
 
-//		if (isAmplify) {
-		LogUtil.log(Log.DEBUG, "Amplify on");
 		accel = mAmplifier.Amplify(accel, ampValue);
 		gyro = mAmplifier.Amplify(gyro, ampValue);
-//		}
 
 		// フーリエ変換を用いたローパス処理
 		accel = mFourier.LowpassFilter(accel, "accel");
@@ -316,6 +322,8 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 	 */
 	private Handler resultHandler = new Handler() {
 		public void handleMessage (Message msg) {
+			LogUtil.log(Log.INFO);
+
 			if (msg.what == FINISH) {
 				if (!resultCorrelation) {
 					LogUtil.log(Log.INFO, "False authentication");
@@ -359,14 +367,14 @@ public class AuthMotion extends Activity implements SensorEventListener, Runnabl
 		LogUtil.log(Log.INFO);
 		Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, angle, registed_ave_distance, registed_ave_angle);
 
-		LogUtil.log(Log.DEBUG, "measure: " + measure);
+		LogUtil.log(Log.INFO, "measure: " + measure);
 
 		return measure == Enum.MEASURE.CORRECT;
 	}
 
 	@Override
 	public void onAccuracyChanged (Sensor sensor, int accuracy) {
-		LogUtil.log(Log.INFO);
+		LogUtil.log(Log.VERBOSE);
 	}
 
 

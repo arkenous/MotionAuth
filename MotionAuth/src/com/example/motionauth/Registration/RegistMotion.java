@@ -125,7 +125,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 		getMotionBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick (View v) {
-				LogUtil.log(Log.DEBUG, "Click get motion button");
+				LogUtil.log(Log.VERBOSE, "Click get motion button");
 				if (isGetMotionBtnClickable) {
 					isGetMotionBtnClickable = false;
 
@@ -152,7 +152,11 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 	private Handler timeHandler = new Handler() {
 		@Override
 		public void dispatchMessage (Message msg) {
+			LogUtil.log(Log.VERBOSE);
+
 			if (msg.what == PREPARATION && !isGetMotionBtnClickable) {
+				LogUtil.log(Log.VERBOSE, "PREPARATION");
+
 				switch (prepareCount) {
 					case 0:
 						secondTv.setText("3");
@@ -184,6 +188,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 				prepareCount++;
 			}
 			else if (msg.what == GET_MOTION && !isGetMotionBtnClickable) {
+				LogUtil.log(Log.VERBOSE, "GET_MOTION");
+
 				if (dataCount < 100 && getCount >= 0 && getCount < 3) {
 					// 取得した値を，0.03秒ごとに配列に入れる
 					for (int i = 0; i < 3; i++) {
@@ -246,11 +252,13 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
 	@Override
 	public void onSensorChanged (SensorEvent event) {
+		LogUtil.log(Log.VERBOSE);
 		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) vAccel = event.values.clone();
 		if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) vGyro = event.values.clone();
 	}
 
 	private void finishGetMotion () {
+		LogUtil.log(Log.INFO);
 		if (getMotionBtn.isClickable()) getMotionBtn.setClickable(false);
 		isMenuClickable = false;
 		secondTv.setText("0");
@@ -317,7 +325,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 		mManageData.writeDoubleThreeArrayData("AfterLowpass", "accel", RegistNameInput.name, accel_double);
 		mManageData.writeDoubleThreeArrayData("AfterLowpass", "gyro", RegistNameInput.name, gyro_double);
 
-
 		LogUtil.log(Log.DEBUG, "Finish fourier");
 
 		distance = mCalc.accelToDistance(accel_double, 0.03);
@@ -342,16 +349,15 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 		//region 同一のモーションであるかの確認をし，必要に応じてズレ修正を行う
 		Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, angle, averageDistance, averageAngle);
 
-		LogUtil.log(Log.DEBUG, "After measure correlation");
-		LogUtil.log(Log.DEBUG, "measure = " + String.valueOf(measure));
-
+		LogUtil.log(Log.INFO, "After measure correlation");
+		LogUtil.log(Log.INFO, "measure = " + String.valueOf(measure));
 
 		if (Enum.MEASURE.BAD == measure) {
 			// 相関係数が0.4以下
 			return false;
 		}
 		else if (Enum.MEASURE.INCORRECT == measure) {
-			LogUtil.log(Log.ERROR, "Deviation");
+			LogUtil.log(Log.DEBUG, "Deviation");
 			// 相関係数が0.4よりも高く，0.6以下の場合
 			// ズレ修正を行う
 			int time = 0;
@@ -410,7 +416,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
 				Enum.MEASURE tmp = mCorrelation.measureCorrelation(distance, angle, averageDistance, averageAngle);
 
-				LogUtil.log(Log.ERROR, "MEASURE: " + String.valueOf(tmp));
+				LogUtil.log(Log.INFO, "MEASURE: " + String.valueOf(tmp));
 
 				mManageData.writeDoubleThreeArrayData("deviatedData" + String.valueOf(mode), "distance", RegistNameInput.name, distance);
 				mManageData.writeDoubleThreeArrayData("deviatedData" + String.valueOf(mode), "angle", RegistNameInput.name, angle);
@@ -460,7 +466,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 		LogUtil.log(Log.INFO);
 		Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, angle, averageDistance, averageAngle);
 
-		LogUtil.log(Log.DEBUG, "measure = " + measure);
+		LogUtil.log(Log.INFO, "measure = " + measure);
 
 		return measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT;
 	}
@@ -472,6 +478,8 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 	 */
 	private Handler resultHandler = new Handler() {
 		public void handleMessage (Message msg) {
+			LogUtil.log(Log.INFO);
+
 			if (msg.what == FINISH) {
 				if (!resultCalc || !resultCorrelation) {
 					// もう一度モーションを取り直す処理
@@ -501,7 +509,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 				else {
 					// 3回のモーションの平均値をファイルに書き出す
 					mManageData.writeRegistedData(RegistNameInput.name, averageDistance, averageAngle, ampValue, RegistMotion.this);
-
 
 					AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);
 					alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
@@ -534,6 +541,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 	 * モーション取得に関する変数群を初期化する
 	 */
 	private void resetValue () {
+		LogUtil.log(Log.INFO);
 		getMotionBtn.setClickable(true);
 		// データ取得関係の変数を初期化
 		dataCount = 0;
@@ -545,7 +553,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
 	@Override
 	public void onAccuracyChanged (Sensor sensor, int accuracy) {
-		LogUtil.log(Log.INFO);
+		LogUtil.log(Log.DEBUG);
 	}
 
 
@@ -707,7 +715,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 	private void finishRegist () {
 		LogUtil.log(Log.INFO);
 		Intent intent = new Intent();
-
 
 		intent.setClassName("com.example.motionauth", "com.example.motionauth.Start");
 

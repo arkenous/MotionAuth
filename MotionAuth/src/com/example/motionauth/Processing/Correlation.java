@@ -21,9 +21,9 @@ public class Correlation {
 	 * 相関を求め，同一のモーションであるかどうかを確認する
 	 *
 	 * @param distance     double型の3次元配列距離データ
-	 * @param angle        double型の三次元配列角度データ
-	 * @param ave_distance double型の二次元配列距離データ
-	 * @param ave_angle    double型の二次元配列角度データ
+	 * @param angle        double型の3次元配列角度データ
+	 * @param ave_distance double型の2次元配列距離データ
+	 * @param ave_angle    double型の2次元配列角度データ
 	 * @return EnumクラスのMEASURE列挙体の値が返る
 	 */
 	public Enum.MEASURE measureCorrelation (double[][][] distance, double[][][] angle, double[][] ave_distance, double[][] ave_angle) {
@@ -405,6 +405,5 @@ public class Correlation {
 			return Enum.MEASURE.INCORRECT;
 		}
 		//endregion
-
 	}
 }

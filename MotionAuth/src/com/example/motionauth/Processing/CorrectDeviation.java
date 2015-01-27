@@ -43,6 +43,7 @@ public class CorrectDeviation {
 		// 変数に3回分XYZそれぞれの1個目の値を放り込む
 		switch (target) {
 			case DISTANCE:
+				LogUtil.log(Log.DEBUG, "DISTANCE");
 				for (int i = 0; i < 3; i++) {
 					for (int j = 0; j < 3; j++) {
 						tmpValue[i][j] = distance[i][j][0];
@@ -50,6 +51,7 @@ public class CorrectDeviation {
 				}
 				break;
 			case ANGLE:
+				LogUtil.log(Log.DEBUG, "ANGLE");
 				for (int i = 0; i < 3; i++) {
 					for (int j = 0; j < 3; j++) {
 						tmpValue[i][j] = angle[i][j][0];
@@ -61,8 +63,10 @@ public class CorrectDeviation {
 		// 代表値が出ている場所を取得する
 		switch (target) {
 			case DISTANCE:
+				LogUtil.log(Log.DEBUG, "DISTANCE");
 				switch (mode) {
 					case MAX:
+						LogUtil.log(Log.DEBUG, "MAX");
 						for (int i = 0; i < 3; i++) {
 							for (int j = 0; j < 3; j++) {
 								for (int k = 0; k < 100; k++) {
@@ -75,6 +79,7 @@ public class CorrectDeviation {
 						}
 						break;
 					case MIN:
+						LogUtil.log(Log.DEBUG, "MIN");
 						for (int i = 0; i < 3; i++) {
 							for (int j = 0; j < 3; j++) {
 								for (int k = 0; k < 100; k++) {
@@ -87,6 +92,7 @@ public class CorrectDeviation {
 						}
 						break;
 					case MEDIAN:
+						LogUtil.log(Log.DEBUG, "MEDIAN");
 						// キーが自動ソートされるTreeMapを用いる．データと順番を紐付けしたものを作成し，中央値の初期の順番の値を取り出す．
 						for (int i = 0; i < 3; i++) {
 							for (int j = 0; j < 3; j++) {
@@ -110,8 +116,10 @@ public class CorrectDeviation {
 				}
 				break;
 			case ANGLE:
+				LogUtil.log(Log.DEBUG, "ANGLE");
 				switch (mode) {
 					case MAX:
+						LogUtil.log(Log.DEBUG, "MAX");
 						for (int i = 0; i < 3; i++) {
 							for (int j = 0; j < 3; j++) {
 								for (int k = 0; k < 100; k++) {
@@ -124,6 +132,7 @@ public class CorrectDeviation {
 						}
 						break;
 					case MIN:
+						LogUtil.log(Log.DEBUG, "MIN");
 						for (int i = 0; i < 3; i++) {
 							for (int j = 0; j < 3; j++) {
 								for (int k = 0; k < 100; k++) {
@@ -136,6 +145,7 @@ public class CorrectDeviation {
 						}
 						break;
 					case MEDIAN:
+						LogUtil.log(Log.DEBUG, "MEDIAN");
 						// キーが自動ソートされるTreeMapを用いる．データと順番を紐付けしたものを作成し，中央値の初期の順番の値を取り出す．
 						for (int i = 0; i < 3; i++) {
 							for (int j = 0; j < 3; j++) {

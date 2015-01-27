@@ -84,7 +84,7 @@ public class RegistrantList extends Activity {
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick (AdapterView<?> parent, View v, int position, long id) {
-				LogUtil.log(Log.DEBUG, "Click item");
+				LogUtil.log(Log.VERBOSE, "Click item");
 
 				// クリックされたアイテムを取得
 				item = lv.getItemAtPosition(position).toString();

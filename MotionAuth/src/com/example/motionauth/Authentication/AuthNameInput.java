@@ -75,7 +75,7 @@ public class AuthNameInput extends Activity {
 			@Override
 			public boolean onKey (View v, int keyCode, KeyEvent event) {
 				if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-					LogUtil.log(Log.DEBUG, "Push enter key");
+					LogUtil.log(Log.VERBOSE, "Push enter key");
 					InputMethodManager inputMethodManager = (InputMethodManager) AuthNameInput.this.getSystemService(Context.INPUT_METHOD_SERVICE);
 					inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
@@ -91,7 +91,7 @@ public class AuthNameInput extends Activity {
 		ok.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick (View v) {
-				LogUtil.log(Log.DEBUG, "Click ok button");
+				LogUtil.log(Log.VERBOSE, "Click ok button");
 
 				// 指定したユーザが存在するかどうかを確認する
 				if (AuthNameInput.this.checkUserExists()) {

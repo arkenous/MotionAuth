@@ -60,24 +60,24 @@ public class Start extends Activity {
 		startBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick (View v) {
-				LogUtil.log(Log.DEBUG, "Click start button");
+				LogUtil.log(Log.VERBOSE, "Click start button");
 
 				String[] btnMsg = {"データ閲覧モード", "認証試験モード", "新規登録モード"};
 				Start.this.alertDialog(TRIPLE, btnMsg, "モード選択", "モードを選択してください");
 				handler = new Handler() {
 					public void handleMessage (Message msg) {
 						if (msg.arg1 == POSITIVE) {
-							LogUtil.log(Log.DEBUG, "POSITIVE");
+							LogUtil.log(Log.VERBOSE, "POSITIVE");
 							// 登録者一覧モード
 							moveActivity("com.example.motionauth", "com.example.motionauth.ViewDataList.RegistrantList", true);
 						}
 						else if (msg.arg1 == NEUTRAL) {
-							LogUtil.log(Log.DEBUG, "NEUTRAL");
+							LogUtil.log(Log.VERBOSE, "NEUTRAL");
 							// 認証試験モード
 							moveActivity("com.example.motionauth", "com.example.motionauth.Authentication.AuthNameInput", true);
 						}
 						else if (msg.arg1 == NEGATIVE) {
-							LogUtil.log(Log.DEBUG, "NEGATIVE");
+							LogUtil.log(Log.VERBOSE, "NEGATIVE");
 							// 新規登録モード
 							moveActivity("com.example.motionauth", "com.example.motionauth.Registration.RegistNameInput", true);
 						}
@@ -100,7 +100,7 @@ public class Start extends Activity {
 		LogUtil.log(Log.INFO);
 
 		if (choiceNum == DOUBLE) {
-			LogUtil.log(Log.DEBUG, "DOUBLE");
+			LogUtil.log(Log.VERBOSE, "DOUBLE");
 
 			AlertDialog.Builder alert = new AlertDialog.Builder(this);
 			alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
@@ -150,7 +150,7 @@ public class Start extends Activity {
 			alert.show();
 		}
 		else if (choiceNum == TRIPLE) {
-			LogUtil.log(Log.DEBUG, "TRIPLE");
+			LogUtil.log(Log.VERBOSE, "TRIPLE");
 
 			AlertDialog.Builder alert = new AlertDialog.Builder(this);
 			alert.setOnKeyListener(new DialogInterface.OnKeyListener() {

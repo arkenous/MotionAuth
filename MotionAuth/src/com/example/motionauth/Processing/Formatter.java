@@ -3,6 +3,7 @@ package com.example.motionauth.Processing;
 import android.util.Log;
 import com.example.motionauth.Utility.LogUtil;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 
@@ -56,6 +57,33 @@ public class Formatter {
         }
 
         return returnVal;
+    }
+
+
+    /**
+     * float型の3次元リストデータをdouble型に変換する
+     *
+     * @param input float型3次元リストデータ
+     * @return double型3次元リストデータ
+     */
+    public ArrayList<ArrayList<ArrayList<Double>>> floatToDoubleFormatter(ArrayList<ArrayList<ArrayList<Float>>> input) {
+        LogUtil.log(Log.INFO);
+
+        ArrayList<ArrayList<ArrayList<Double>>> output = new ArrayList<>();
+        ArrayList<ArrayList<Double>> period = new ArrayList<>();
+        ArrayList<Double> data = new ArrayList<>();
+
+        for (ArrayList<ArrayList<Float>> anInput : input) {
+            for (ArrayList<Float> anAnInput : anInput) {
+                for (Float anAnAnInput : anAnInput) {
+                    data.add(Double.valueOf(anAnAnInput));
+                }
+                period.add(data);
+            }
+            output.add(period);
+        }
+
+        return output;
     }
 
 

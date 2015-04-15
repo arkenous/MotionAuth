@@ -6,10 +6,7 @@ import android.os.Environment;
 import android.util.Log;
 import com.example.motionauth.Processing.CipherCrypt;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.ArrayList;
 
 
@@ -19,6 +16,11 @@ import java.util.ArrayList;
  * @author Kensuke Kousaka
  */
 public class ManageData {
+    private static final String APP_NAME = "MotionAuth";
+    private FileOutputStream fos;
+    private OutputStreamWriter osw;
+    private BufferedWriter bw;
+    
     /**
      * Float型の三次元配列データをアウトプットする．保存先は，SDカードディレクトリ/folderName/userName/fileName+回数+次元
      *
@@ -43,7 +45,7 @@ public class ManageData {
         String SD_PATH = Environment.getExternalStorageDirectory ().getPath ();
 
         // SDカードにフォルダを作成
-        String FOLDER_PATH = SD_PATH + File.separator + "MotionAuth" + File.separator + folderName + File.separator + userName;
+        String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + folderName + File.separator + userName;
 
         File file = new File (FOLDER_PATH);
 
@@ -78,9 +80,9 @@ public class ManageData {
                     file = new File (filePath);
 
                     // ファイルを追記モードで書き込む
-                    FileOutputStream fos = new FileOutputStream (file, false);
-                    OutputStreamWriter osw = new OutputStreamWriter (fos, "UTF-8");
-                    BufferedWriter bw = new BufferedWriter (osw);
+                    fos = new FileOutputStream(file, false);
+                    osw = new OutputStreamWriter(fos, "UTF-8");
+                    bw = new BufferedWriter(osw);
 
                     for (int k = 0; k < data[i][j].length; k++) {
                         bw.write (dataName + "_" + dimension + "_" + String.valueOf (i + 1) + "@" + data[i][j][k] + "\n");
@@ -119,7 +121,7 @@ public class ManageData {
         String SD_PATH = Environment.getExternalStorageDirectory ().getPath ();
 
         // SDカードにフォルダを作成
-        String FOLDER_PATH = SD_PATH + File.separator + "MotionAuth" + File.separator + folderName + File.separator + userName;
+        String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + folderName + File.separator + userName;
 
         File file = new File (FOLDER_PATH);
 
@@ -153,9 +155,9 @@ public class ManageData {
                 file = new File (filePath);
 
                 // ファイルを追記モードで書き込む
-                FileOutputStream fos = new FileOutputStream (file, false);
-                OutputStreamWriter osw = new OutputStreamWriter (fos, "UTF-8");
-                BufferedWriter bw = new BufferedWriter (osw);
+                fos = new FileOutputStream(file, false);
+                osw = new OutputStreamWriter(fos, "UTF-8");
+                bw = new BufferedWriter(osw);
 
                 for (int j = 0; j < data[i].length; j++) {
                     bw.write (dataName + "_" + dimension + "@" + data[i][j] + "\n");
@@ -194,7 +196,7 @@ public class ManageData {
         String SD_PATH = Environment.getExternalStorageDirectory ().getPath ();
 
         // SDカードにフォルダを作成
-        String FOLDER_PATH = SD_PATH + File.separator + "MotionAuth" + File.separator + folderName + File.separator + userName;
+        String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + folderName + File.separator + userName;
 
         File file = new File (FOLDER_PATH);
 
@@ -228,9 +230,9 @@ public class ManageData {
                     file = new File (filePath);
 
                     // ファイルを追記モードで書き込む
-                    FileOutputStream fos = new FileOutputStream (file, false);
-                    OutputStreamWriter osw = new OutputStreamWriter (fos, "UTF-8");
-                    BufferedWriter bw = new BufferedWriter (osw);
+                    fos = new FileOutputStream(file, false);
+                    osw = new OutputStreamWriter(fos, "UTF-8");
+                    bw = new BufferedWriter(osw);
 
                     for (int k = 0; k < data[0][0].length; k++) {
                         //bw.write(dataName + "_" + dimension + "_" + String.valueOf(i + 1) + "@" + data[i][j][k] + "\n");
@@ -270,7 +272,7 @@ public class ManageData {
         String SD_PATH = Environment.getExternalStorageDirectory ().getPath ();
 
         // SDカードにフォルダを作成
-        String FOLDER_PATH = SD_PATH + File.separator + "MotionAuth" + File.separator + folderName + File.separator + userName;
+        String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + folderName + File.separator + userName;
 
         File file = new File (FOLDER_PATH);
 
@@ -305,9 +307,9 @@ public class ManageData {
                     file = new File (filePath);
 
                     // ファイルを追記モードで書き込む
-                    FileOutputStream fos = new FileOutputStream (file, false);
-                    OutputStreamWriter osw = new OutputStreamWriter (fos, "UTF-8");
-                    BufferedWriter bw = new BufferedWriter (osw);
+                    fos = new FileOutputStream(file, false);
+                    osw = new OutputStreamWriter(fos, "UTF-8");
+                    bw = new BufferedWriter(osw);
 
                     bw.write (dataName + "_" + dimension + "_" + String.valueOf (i + 1) + "@" + data[i][j] + "\n");
                     bw.close ();
@@ -343,7 +345,7 @@ public class ManageData {
         String SD_PATH = Environment.getExternalStorageDirectory ().getPath ();
 
         // SDカードにフォルダを作成
-        String FOLDER_PATH = SD_PATH + File.separator + "MotionAuth" + File.separator + folderName;
+        String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + folderName;
 
         File file = new File (FOLDER_PATH);
 
@@ -364,9 +366,9 @@ public class ManageData {
             file = new File (filePath);
 
             // ファイルを追記モードで書き込む
-            FileOutputStream fos = new FileOutputStream (file, false);
-            OutputStreamWriter osw = new OutputStreamWriter (fos, "UTF-8");
-            BufferedWriter bw = new BufferedWriter (osw);
+            fos = new FileOutputStream(file, false);
+            osw = new OutputStreamWriter(fos, "UTF-8");
+            bw = new BufferedWriter(osw);
 
             for (int i = 0; i < 2; i++) {
                 if (i == 0) {
@@ -421,7 +423,7 @@ public class ManageData {
 
         String SD_PATH = Environment.getExternalStorageDirectory ().getPath ();
 
-        String FOLDER_PATH = SD_PATH + File.separator + "MotionAuth" + File.separator + folderName;
+        String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + folderName;
 
         File file = new File (FOLDER_PATH);
 
@@ -439,9 +441,9 @@ public class ManageData {
             String filePath = FOLDER_PATH + File.separator + userName;
             file = new File (filePath);
 
-            FileOutputStream fileOutputStream = new FileOutputStream (file, false);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter (fileOutputStream, "UTF-8");
-            BufferedWriter bw = new BufferedWriter (outputStreamWriter);
+            fos = new FileOutputStream(file, false);
+            osw = new OutputStreamWriter(fos, "UTF-8");
+            bw = new BufferedWriter(osw);
 
             // 距離データ書き込み
             for (int i = 0; i < averageDistance.length; i++) {
@@ -485,8 +487,8 @@ public class ManageData {
             }
 
             bw.close ();
-            outputStreamWriter.close ();
-            fileOutputStream.close ();
+            osw.close();
+            fos.close();
         } catch (Exception e) {
             LogUtil.log (Log.ERROR, e.getMessage (), e.getCause ());
         }
@@ -504,7 +506,7 @@ public class ManageData {
 
         String SD_PATH = Environment.getExternalStorageDirectory ().getPath ();
 
-        String FOLDER_PATH = SD_PATH + File.separator + "MotionAuth" + File.separator + folderName;
+        String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + folderName;
 
         File file = new File (FOLDER_PATH);
 
@@ -522,15 +524,15 @@ public class ManageData {
             String filePath = FOLDER_PATH + File.separator + userName;
             file = new File (filePath);
 
-            FileOutputStream fileOutputStream = new FileOutputStream (file, false);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter (fileOutputStream);
-            BufferedWriter bufferedWriter = new BufferedWriter (outputStreamWriter);
+            fos = new FileOutputStream(file, false);
+            osw = new OutputStreamWriter(fos);
+            bw = new BufferedWriter(osw);
 
-            bufferedWriter.write (String.valueOf (data));
+            bw.write(String.valueOf(data));
 
-            bufferedWriter.close ();
-            outputStreamWriter.close ();
-            fileOutputStream.close ();
+            bw.close();
+            osw.close();
+            fos.close();
         } catch (Exception e) {
             LogUtil.log (Log.ERROR, e.getMessage (), e.getCause ());
         }
@@ -583,7 +585,7 @@ public class ManageData {
         userPrefEditor.putString (userName, "");
         userPrefEditor.apply ();
 
-        SharedPreferences preferences = mContext.getSharedPreferences ("MotionAuth", Context.MODE_PRIVATE);
+        SharedPreferences preferences = mContext.getSharedPreferences(APP_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit ();
 
         editor.putString (userName + "distance", registDistanceData);
@@ -604,7 +606,7 @@ public class ManageData {
         LogUtil.log (Log.INFO);
         Context mContext = context.getApplicationContext ();
 
-        SharedPreferences preferences = mContext.getSharedPreferences ("MotionAuth", Context.MODE_PRIVATE);
+        SharedPreferences preferences = mContext.getSharedPreferences(APP_NAME, Context.MODE_PRIVATE);
 
         String registedDistanceData = preferences.getString (userName + "distance", "");
         String registedAngleData = preferences.getString (userName + "angle", "");
@@ -631,5 +633,80 @@ public class ManageData {
         result.add (angle);
 
         return result;
+    }
+
+
+    /**
+     * Float型3次元リストデータをSD_PATH/MotionAuth/dir/user/type+回数+次元で保存する
+     *
+     * @param dir  任意のディレクトリ名
+     * @param user ユーザ名
+     * @param type 取得元のセンサ名
+     * @param data Float型3次元リストデータ
+     */
+    public void writeThreeDimenList(String dir, String user, String type, ArrayList<ArrayList<ArrayList<Float>>> data) {
+        LogUtil.log(Log.INFO);
+
+        // SDカードのマウント確認
+
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            LogUtil.log(Log.ERROR, "SD-Card not mounted");
+            return;
+        }
+
+        // SDカードのディレクトリパスを取得
+        String SD_PATH = Environment.getExternalStorageDirectory().getPath();
+
+        // SDカードにディレクトリを作成
+        String DIR_PATH = SD_PATH + File.separator + APP_NAME + File.separator + dir + File.separator + user;
+        File file = new File(DIR_PATH);
+        try {
+            if (!file.exists()) {
+                // ディレクトリが存在しない場合
+                if (!file.mkdirs()) {
+                    LogUtil.log(Log.DEBUG, "Make directory Error");
+                }
+            }
+        } catch (Exception e) {
+            LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
+        }
+
+        try {
+            String dimension;
+
+            for (int time = 0; time < data.size(); time++) {
+                for (int dimen = 0; dimen < data.get(time).size(); dimen++) {
+                    if (dimen == 0) {
+                        dimension = "x";
+                    } else if (dimen == 1) {
+                        dimension = "y";
+                    } else if (dimen == 2) {
+                        dimension = "z";
+                    } else {
+                        dimension = "";
+                    }
+
+                    // ファイルパスを指定
+                    String filePath = DIR_PATH + File.separator + type + String.valueOf(time) + dimension;
+                    file = new File(filePath);
+
+                    // ファイルを書き込む
+                    fos = new FileOutputStream(file, false);
+                    osw = new OutputStreamWriter(fos, "UTF-8");
+                    bw = new BufferedWriter(osw);
+
+                    for (int item = 0; item < data.get(time).get(dimen).size(); item++) {
+                        bw.write(type + "_" + dimension + "_" + String.valueOf(time + 1)
+                                + "@" + data.get(time).get(dimen).get(item) + "\n");
+                    }
+
+                    bw.close();
+                    osw.close();
+                    fos.close();
+                }
+            }
+        } catch (IOException e) {
+            LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
+        }
     }
 }

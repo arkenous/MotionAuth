@@ -19,68 +19,68 @@ import java.util.ArrayList;
  * @author Kensuke Kousaka
  */
 public class ViewAuthRData extends Activity {
-    String item = null;
+	String item = null;
 
 
-    @Override
-    protected void onCreate (Bundle savedInstanceState) {
-        super.onCreate (savedInstanceState);
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-        LogUtil.log (Log.INFO);
+		LogUtil.log(Log.INFO);
 
-        setContentView (R.layout.activity_view_auth_rdata);
+		setContentView(R.layout.activity_view_auth_rdata);
 
-        viewAuthRData ();
-    }
-
-
-    private void viewAuthRData () {
-        LogUtil.log (Log.INFO);
-
-        Intent intent = getIntent ();
-        item = intent.getStringExtra ("item");
-
-        ListView lv = (ListView) findViewById (R.id.listView1);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<> (this, android.R.layout.simple_list_item_1);
-
-        ArrayList<String> dataList = readData ();
-
-        for (String i : dataList) adapter.add (i);
-
-        lv.setAdapter (adapter);
-    }
+		viewAuthRData();
+	}
 
 
-    private ArrayList<String> readData () {
-        LogUtil.log (Log.INFO);
-        ArrayList<String> dataList = new ArrayList<> ();
+	private void viewAuthRData() {
+		LogUtil.log(Log.INFO);
 
-        String filePath = Environment.getExternalStorageDirectory ().getPath () + File.separator + "MotionAuth" + File.separator + "AuthRData" + File.separator + item;
+		Intent intent = getIntent();
+		item = intent.getStringExtra("item");
 
-        File file = new File (filePath);
+		ListView lv = (ListView) findViewById(R.id.listView1);
 
-        try {
-            FileInputStream fis = new FileInputStream (file);
-            InputStreamReader isr = new InputStreamReader (fis, "UTF-8");
-            BufferedReader br = new BufferedReader (isr);
-            String s;
+		ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
 
-            while ((s = br.readLine ()) != null) dataList.add (s);
+		ArrayList<String> dataList = readData();
 
-            br.close ();
-            isr.close ();
-            fis.close ();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace ();
-            return dataList;
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace ();
-            return dataList;
-        } catch (IOException e) {
-            e.printStackTrace ();
-            return dataList;
-        }
-        return dataList;
-    }
+		for (String i : dataList) adapter.add(i);
+
+		lv.setAdapter(adapter);
+	}
+
+
+	private ArrayList<String> readData() {
+		LogUtil.log(Log.INFO);
+		ArrayList<String> dataList = new ArrayList<>();
+
+		String filePath = Environment.getExternalStorageDirectory().getPath() + File.separator + "MotionAuth" + File.separator + "AuthRData" + File.separator + item;
+
+		File file = new File(filePath);
+
+		try {
+			FileInputStream fis = new FileInputStream(file);
+			InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+			BufferedReader br = new BufferedReader(isr);
+			String s;
+
+			while ((s = br.readLine()) != null) dataList.add(s);
+
+			br.close();
+			isr.close();
+			fis.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return dataList;
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return dataList;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return dataList;
+		}
+		return dataList;
+	}
 }

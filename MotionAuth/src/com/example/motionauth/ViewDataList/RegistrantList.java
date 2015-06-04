@@ -27,112 +27,112 @@ import java.util.Map;
  * @author Kensuke Kousaka
  */
 public class RegistrantList extends Activity {
-    String item;
+	String item;
 
 
-    @Override
-    protected void onCreate (Bundle savedInstanceState) {
-        super.onCreate (savedInstanceState);
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-        LogUtil.log (Log.INFO);
+		LogUtil.log(Log.INFO);
 
-        // タイトルバーの非表示
-        requestWindowFeature (Window.FEATURE_NO_TITLE);
-        setContentView (R.layout.activity_registrant_list);
+		// タイトルバーの非表示
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		setContentView(R.layout.activity_registrant_list);
 
-        registrantList ();
-    }
-
-
-    /**
-     * 登録されているユーザ名のリストを表示する
-     * ユーザ名が選択されたら，そのユーザ名をViewRegistedDataに送る
-     */
-    private void registrantList () {
-        LogUtil.log (Log.INFO);
-
-        // 登録されているユーザ名のリストを作成する
-        ArrayList<String> userList = getRegistrantName ();
-
-        final ListView lv = (ListView) findViewById (R.id.listView1);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<> (this, android.R.layout.simple_list_item_1);
-
-        try {
-            // アイテム追加
-            for (String s : userList) adapter.add (s);
-        } catch (NullPointerException e) {
-            AlertDialog.Builder alert = new AlertDialog.Builder (RegistrantList.this);
-            alert.setTitle ("エラー");
-            alert.setMessage ("登録されていないユーザです．\nスタート画面に戻ります．");
-            alert.setCancelable (false);
-            alert.setNeutralButton ("OK", new DialogInterface.OnClickListener () {
-                @Override
-                public void onClick (DialogInterface dialog, int which) {
-                    RegistrantList.this.moveActivity ("com.example.motionauth", "com.example.motionauth.Start", true);
-                }
-            });
-            alert.show ();
-            finish ();
-        }
-
-        // リストビューにアダプタを設定
-        lv.setAdapter (adapter);
-
-        // リストビューのアイテムがクリックされた時
-        lv.setOnItemClickListener (new AdapterView.OnItemClickListener () {
-            @Override
-            public void onItemClick (AdapterView<?> parent, View v, int position, long id) {
-                LogUtil.log (Log.VERBOSE, "Click item");
-
-                // クリックされたアイテムを取得
-                item = lv.getItemAtPosition (position).toString ();
-
-                // itemを次のアクティビティに送る
-                RegistrantList.this.moveActivity ("com.example.motionauth", "com.example.motionauth.ViewDataList.ViewRegistedData", true);
-            }
-        });
-    }
+		registrantList();
+	}
 
 
-    /**
-     * 指定されたディレクトリ以下のファイルリストを作成する
-     *
-     * @return 作成されたString配列型のリスト
-     */
-    private ArrayList<String> getRegistrantName () {
-        LogUtil.log (Log.INFO);
+	/**
+	 * 登録されているユーザ名のリストを表示する
+	 * ユーザ名が選択されたら，そのユーザ名をViewRegistedDataに送る
+	 */
+	private void registrantList() {
+		LogUtil.log(Log.INFO);
 
-        Context mContext = RegistrantList.this.getApplicationContext ();
-        SharedPreferences preferences = mContext.getSharedPreferences ("UserList", Context.MODE_PRIVATE);
+		// 登録されているユーザ名のリストを作成する
+		ArrayList<String> userList = getRegistrantName();
 
-        ArrayList<String> keyList = new ArrayList<> ();
+		final ListView lv = (ListView) findViewById(R.id.listView1);
 
-        Map<String, ?> allEntries = preferences.getAll ();
-        for (Map.Entry<String, ?> entry : allEntries.entrySet ()) keyList.add (entry.getKey ());
+		ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
 
-        return keyList;
-    }
+		try {
+			// アイテム追加
+			for (String s : userList) adapter.add(s);
+		} catch (NullPointerException e) {
+			AlertDialog.Builder alert = new AlertDialog.Builder(RegistrantList.this);
+			alert.setTitle("エラー");
+			alert.setMessage("登録されていないユーザです．\nスタート画面に戻ります．");
+			alert.setCancelable(false);
+			alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					RegistrantList.this.moveActivity("com.example.motionauth", "com.example.motionauth.Start", true);
+				}
+			});
+			alert.show();
+			finish();
+		}
+
+		// リストビューにアダプタを設定
+		lv.setAdapter(adapter);
+
+		// リストビューのアイテムがクリックされた時
+		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+				LogUtil.log(Log.VERBOSE, "Click item");
+
+				// クリックされたアイテムを取得
+				item = lv.getItemAtPosition(position).toString();
+
+				// itemを次のアクティビティに送る
+				RegistrantList.this.moveActivity("com.example.motionauth", "com.example.motionauth.ViewDataList.ViewRegistedData", true);
+			}
+		});
+	}
 
 
-    /**
-     * アクティビティを移動する
-     *
-     * @param pkgName 移動先のパッケージ名
-     * @param actName 移動先のアクティビティ名
-     * @param flg     戻るキーを押した際にこのアクティビティを表示させるかどうか
-     */
-    private void moveActivity (String pkgName, String actName, boolean flg) {
-        LogUtil.log (Log.INFO);
+	/**
+	 * 指定されたディレクトリ以下のファイルリストを作成する
+	 *
+	 * @return 作成されたString配列型のリスト
+	 */
+	private ArrayList<String> getRegistrantName() {
+		LogUtil.log(Log.INFO);
 
-        Intent intent = new Intent ();
+		Context mContext = RegistrantList.this.getApplicationContext();
+		SharedPreferences preferences = mContext.getSharedPreferences("UserList", Context.MODE_PRIVATE);
 
-        intent.setClassName (pkgName, actName);
+		ArrayList<String> keyList = new ArrayList<>();
 
-        if (actName.equals ("com.example.motionauth.ViewDataList.ViewRegistedData")) intent.putExtra ("item", item);
+		Map<String, ?> allEntries = preferences.getAll();
+		for (Map.Entry<String, ?> entry : allEntries.entrySet()) keyList.add(entry.getKey());
 
-        if (flg) intent.setFlags (Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+		return keyList;
+	}
 
-        startActivityForResult (intent, 0);
-    }
+
+	/**
+	 * アクティビティを移動する
+	 *
+	 * @param pkgName 移動先のパッケージ名
+	 * @param actName 移動先のアクティビティ名
+	 * @param flg     戻るキーを押した際にこのアクティビティを表示させるかどうか
+	 */
+	private void moveActivity(String pkgName, String actName, boolean flg) {
+		LogUtil.log(Log.INFO);
+
+		Intent intent = new Intent();
+
+		intent.setClassName(pkgName, actName);
+
+		if (actName.equals("com.example.motionauth.ViewDataList.ViewRegistedData")) intent.putExtra("item", item);
+
+		if (flg) intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+
+		startActivityForResult(intent, 0);
+	}
 }

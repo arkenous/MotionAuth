@@ -11,22 +11,19 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.*;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import com.example.motionauth.Handler.Regist;
 import com.example.motionauth.Lowpass.Fourier;
 import com.example.motionauth.Processing.*;
 import com.example.motionauth.R;
 import com.example.motionauth.Utility.Enum;
 import com.example.motionauth.Utility.LogUtil;
 import com.example.motionauth.Utility.ManageData;
-
-import java.lang.ref.WeakReference;
 
 
 /**
@@ -35,23 +32,13 @@ import java.lang.ref.WeakReference;
  * @author Kensuke Kousaka
  */
 public class RegistMotion extends Activity implements SensorEventListener, Runnable {
-	private static final int VIBRATOR_SHORT = 25;
-	private static final int VIBRATOR_NORMAL = 50;
-	private static final int VIBRATOR_LONG = 100;
-
 	private static final int PREPARATION = 1;
-	private static final int GET_MOTION = 2;
-
-	private static final int PREPARATION_INTERVAL = 1000;
-	private static final int GET_MOTION_INTERVAL = 30;
 
 	private static final int FINISH = 5;
 
 	private SensorManager mSensorManager;
 	private Sensor mAccelerometerSensor;
 	private Sensor mGyroscopeSensor;
-
-	private Vibrator mVibrator;
 
 	private TextView secondTv;
 	private TextView countSecondTv;
@@ -64,17 +51,12 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 	private ManageData mManageData = new ManageData();
 	private Correlation mCorrelation = new Correlation();
 	private CorrectDeviation mCorrectDeviation = new CorrectDeviation();
-	private Adjuster mAdjuster = new Adjuster();
-
-	private int dataCount = 0;
-	private int getCount = 0;
-	private int prepareCount = 0;
-
-	private boolean isGetMotionBtnClickable = true;
+	//	private Adjuster mAdjuster = new Adjuster();
+	private Regist mRegist;
 
 	// モーションの生データ
-	private float[] vAccel;
-	private float[] vGyro;
+	private float[] vAccel = new float[3];
+	private float[] vGyro = new float[3];
 
 	private float[][][] accelFloat = new float[3][3][100];
 	private float[][][] gyroFloat = new float[3][3][100];
@@ -93,8 +75,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
 	private boolean isMenuClickable = true;
 
-	private TimeHandler timeHandler = new TimeHandler(this);
-	private ResultHandler resultHandler = new ResultHandler(this);
+	private RegistMotion mRegistMotion;
 
 
 	@Override
@@ -103,7 +84,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 		LogUtil.log(Log.INFO);
 
 		setContentView(R.layout.activity_regist_motion);
-
+		mRegistMotion = this;
 		registMotion();
 	}
 
@@ -111,7 +92,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 	/**
 	 * モーション登録画面にイベントリスナ等を設定する
 	 */
-	private void registMotion() {
+	public void registMotion() {
 		LogUtil.log(Log.INFO);
 
 		// センササービス，各種センサを取得する
@@ -119,7 +100,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 		mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		mGyroscopeSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
-		mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+		Vibrator mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
 		TextView nameTv = (TextView) findViewById(R.id.textView2);
 		secondTv = (TextView) findViewById(R.id.secondTextView);
@@ -127,13 +108,15 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 		getMotionBtn = (Button) findViewById(R.id.button1);
 
 		nameTv.setText(RegistNameInput.name + "さん読んでね！");
+		mRegist = new Regist(mRegistMotion, getMotionBtn, secondTv, countSecondTv, mVibrator, vAccel, vGyro, accelFloat,
+				gyroFloat, resultCalc, resultCorrelation, averageDistance, averageAngle, ampValue, this);
+
 
 		getMotionBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				LogUtil.log(Log.VERBOSE, "Click get motion button");
-				if (isGetMotionBtnClickable) {
-					isGetMotionBtnClickable = false;
+				if (v.isClickable()) {
 
 					// ボタンをクリックできないようにする
 					v.setClickable(false);
@@ -144,138 +127,21 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 					countSecondTv.setText("秒");
 
 					// timeHandler呼び出し
-					timeHandler.sendEmptyMessage(PREPARATION);
+					mRegist.sendEmptyMessage(PREPARATION);
 				}
 			}
 		});
 	}
 
 
-	/**
-	 * 一定時間ごとにモーションデータを取得し配列に格納するハンドラ
-	 * 計算処理や相関係数取得関数の呼び出しもここで行う
-	 */
-	private class TimeHandler extends Handler {
-
-		private final WeakReference<RegistMotion> refRegistMotion;
-
-		public TimeHandler(RegistMotion registMotion) {
-			refRegistMotion = new WeakReference<>(registMotion);
-		}
-
-		@Override
-		public void dispatchMessage(Message msg) {
-			LogUtil.log(Log.VERBOSE);
-
-			RegistMotion activity = refRegistMotion.get();
-			if (activity == null) {
-				return;
-			}
-
-			activity.correctMotion(msg);
-		}
-	}
-
-
-	private void correctMotion(Message msg) {
-		if (msg.what == PREPARATION && !isGetMotionBtnClickable) {
-			LogUtil.log(Log.VERBOSE, "PREPARATION");
-
-			switch (prepareCount) {
-				case 0:
-					secondTv.setText("3");
-					mVibrator.vibrate(VIBRATOR_SHORT);
-
-					// 第二引数で指定したミリ秒分遅延させてから，第一引数のメッセージを添えてtimeHandlerを呼び出す
-					timeHandler.sendEmptyMessageDelayed(PREPARATION, PREPARATION_INTERVAL);
-					break;
-				case 1:
-					secondTv.setText("2");
-					mVibrator.vibrate(VIBRATOR_SHORT);
-					timeHandler.sendEmptyMessageDelayed(PREPARATION, PREPARATION_INTERVAL);
-					break;
-				case 2:
-					secondTv.setText("1");
-					mVibrator.vibrate(VIBRATOR_SHORT);
-					timeHandler.sendEmptyMessageDelayed(PREPARATION, PREPARATION_INTERVAL);
-					break;
-				case 3:
-					secondTv.setText("START");
-					mVibrator.vibrate(VIBRATOR_LONG);
-
-					// GET_MOTIONメッセージを添えて，timeHandlerを呼び出す
-					timeHandler.sendEmptyMessage(GET_MOTION);
-					getMotionBtn.setText("取得中");
-					break;
-			}
-
-			prepareCount++;
-		} else if (msg.what == GET_MOTION && !isGetMotionBtnClickable) {
-			LogUtil.log(Log.VERBOSE, "GET_MOTION");
-
-			if (dataCount < 100 && getCount >= 0 && getCount < 3) {
-				// 取得した値を，0.03秒ごとに配列に入れる
-				for (int i = 0; i < 3; i++) {
-					accelFloat[getCount][i][dataCount] = vAccel[i];
-					gyroFloat[getCount][i][dataCount] = vGyro[i];
-				}
-
-				dataCount++;
-
-				switch (dataCount) {
-					case 1:
-						secondTv.setText("3");
-						mVibrator.vibrate(VIBRATOR_NORMAL);
-						break;
-					case 33:
-						secondTv.setText("2");
-						mVibrator.vibrate(VIBRATOR_NORMAL);
-						break;
-					case 66:
-						secondTv.setText("1");
-						mVibrator.vibrate(VIBRATOR_NORMAL);
-						break;
-				}
-
-				timeHandler.sendEmptyMessageDelayed(GET_MOTION, GET_MOTION_INTERVAL);
-			} else if (dataCount >= 100 && getCount >= 0 && getCount < 4) {
-				// 取得完了
-				mVibrator.vibrate(VIBRATOR_LONG);
-				isGetMotionBtnClickable = true;
-				isMenuClickable = true;
-				getCount++;
-				countSecondTv.setText("回");
-				getMotionBtn.setText("モーションデータ取得");
-
-				dataCount = 0;
-				prepareCount = 0;
-
-				switch (getCount) {
-					case 1:
-						secondTv.setText("2");
-						getMotionBtn.setClickable(true);
-						break;
-					case 2:
-						secondTv.setText("1");
-						getMotionBtn.setClickable(true);
-						break;
-					case 3:
-						finishGetMotion();
-						break;
-				}
-			}
-		}
-	}
-
-
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		LogUtil.log(Log.VERBOSE);
+//		LogUtil.log(Log.VERBOSE);
 		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) vAccel = event.values.clone();
 		if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) vGyro = event.values.clone();
 	}
 
-	private void finishGetMotion() {
+	public void finishGetMotion() {
 		LogUtil.log(Log.INFO);
 		if (getMotionBtn.isClickable()) getMotionBtn.setClickable(false);
 		isMenuClickable = false;
@@ -311,7 +177,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
 		progressDialog.dismiss();
 		progressDialog = null;
-		resultHandler.sendEmptyMessage(FINISH);
+		mRegist.sendEmptyMessage(FINISH);
 		LogUtil.log(Log.DEBUG, "Thread finished");
 	}
 
@@ -489,100 +355,6 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 	}
 
 
-	/**
-	 * 計算，モーション照合処理終了後に呼ばれるハンドラ
-	 * 同一のモーションであると確認されたら登録を行い，そうでなければ取り直しの処理を行う
-	 */
-	private class ResultHandler extends Handler {
-
-		private final WeakReference<RegistMotion> refRegistMotion;
-
-		public ResultHandler(RegistMotion registMotion) {
-			refRegistMotion = new WeakReference<>(registMotion);
-		}
-
-		@Override
-		public void handleMessage(Message msg) {
-			LogUtil.log(Log.INFO);
-			RegistMotion activity = refRegistMotion.get();
-			if (activity == null) {
-				return;
-			}
-
-			activity.result(msg);
-		}
-	}
-
-	private void result(Message msg) {
-		if (msg.what == FINISH) {
-			if (!resultCalc || !resultCorrelation) {
-				// もう一度モーションを取り直す処理
-				// ボタンのstatusをenableにして押せるようにする
-				AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);
-				alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
-					@Override
-					public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-						return keyCode == KeyEvent.KEYCODE_BACK;
-					}
-				});
-
-				alert.setCancelable(false);
-
-				alert.setTitle("登録失敗");
-				alert.setMessage("登録に失敗しました．やり直して下さい");
-
-				alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						resetValue();
-					}
-				});
-
-				alert.show();
-			} else {
-				// 3回のモーションの平均値をファイルに書き出す
-				mManageData.writeRegistedData(RegistNameInput.name, averageDistance, averageAngle, ampValue, RegistMotion.this);
-
-				AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);
-				alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
-					@Override
-					public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-						return keyCode == KeyEvent.KEYCODE_BACK;
-					}
-				});
-
-				alert.setCancelable(false);
-
-				alert.setTitle("登録完了");
-				alert.setMessage("登録が完了しました．\nスタート画面に戻ります");
-
-				alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						finishRegist();
-					}
-				});
-
-				alert.show();
-			}
-		}
-	}
-
-
-	/**
-	 * モーション取得に関する変数群を初期化する
-	 */
-	private void resetValue() {
-		LogUtil.log(Log.INFO);
-		getMotionBtn.setClickable(true);
-		// データ取得関係の変数を初期化
-		dataCount = 0;
-		getCount = 0;
-		secondTv.setText("3");
-		getMotionBtn.setText("モーションデータ取得");
-	}
-
-
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		LogUtil.log(Log.DEBUG);
@@ -729,7 +501,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 					alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							RegistMotion.this.resetValue();
+							mRegist.reset();
 						}
 					});
 
@@ -744,7 +516,7 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 	/**
 	 * スタート画面に移動するメソッド
 	 */
-	private void finishRegist() {
+	public void finishRegist() {
 		LogUtil.log(Log.INFO);
 		Intent intent = new Intent();
 
@@ -754,12 +526,5 @@ public class RegistMotion extends Activity implements SensorEventListener, Runna
 
 		startActivityForResult(intent, 0);
 		finish();
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		timeHandler.removeCallbacksAndMessages(null);
-		resultHandler.removeCallbacksAndMessages(null);
 	}
 }

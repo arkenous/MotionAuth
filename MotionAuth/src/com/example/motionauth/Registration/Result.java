@@ -17,7 +17,13 @@ import com.example.motionauth.Utility.LogUtil;
 import com.example.motionauth.Utility.ManageData;
 
 public class Result extends Handler implements Runnable {
-	private static final int FINISH = 5;
+	private static final int FORMAT = 1;
+	private static final int AMPLIFY = 2;
+	private static final int FOURIER = 3;
+	private static final int CONVERT = 4;
+	private static final int DEVIATION = 5;
+	private static final int CORRELATION = 6;
+	private static final int FINISH = 10;
 
 	private ManageData mManageData = new ManageData();
 	private Formatter mFormatter = new Formatter();
@@ -36,7 +42,6 @@ public class Result extends Handler implements Runnable {
 	private double mAmp;
 	private float[][][] mAccel;
 	private float[][][] mGyro;
-
 	private double[][] averageDistance = new double[3][100];
 	private double[][] averageAngle = new double[3][100];
 	private boolean result = false;
@@ -70,6 +75,24 @@ public class Result extends Handler implements Runnable {
 	public void dispatchMessage(@NonNull Message msg) {
 		if (mGetMotion.isClickable()) mGetMotion.setClickable(false);
 		switch (msg.what) {
+			case FORMAT:
+				mProgressDialog.setMessage("データのフォーマット中");
+				break;
+			case AMPLIFY:
+				mProgressDialog.setMessage("データの増幅処理中");
+				break;
+			case FOURIER:
+				mProgressDialog.setMessage("フーリエ変換中");
+				break;
+			case CONVERT:
+				mProgressDialog.setMessage("データの変換中");
+				break;
+			case DEVIATION:
+				mProgressDialog.setMessage("データのズレを修正中");
+				break;
+			case CORRELATION:
+				mProgressDialog.setMessage("相関係数を算出中");
+				break;
 			case FINISH:
 				mProgressDialog.dismiss();
 				LogUtil.log(Log.DEBUG, "ProgressDialog was dismissed now");
@@ -137,6 +160,7 @@ public class Result extends Handler implements Runnable {
 		LogUtil.log(Log.INFO);
 
 		// データの桁揃え
+		this.sendEmptyMessage(FORMAT);
 		double[][][] accel_double = mFormatter.floatToDoubleFormatter(accel);
 		double[][][] gyro_double = mFormatter.floatToDoubleFormatter(gyro);
 
@@ -147,6 +171,7 @@ public class Result extends Handler implements Runnable {
 
 		// データの増幅処理
 		if (mAmplifier.CheckValueRange(accel_double, mCheckRange) || mAmplifier.CheckValueRange(gyro_double, mCheckRange)) {
+			this.sendEmptyMessage(AMPLIFY);
 			accel_double = mAmplifier.Amplify(accel_double, mAmp);
 			gyro_double = mAmplifier.Amplify(gyro_double, mAmp);
 		}
@@ -155,6 +180,7 @@ public class Result extends Handler implements Runnable {
 		mManageData.writeDoubleThreeArrayData("AfterAMP", "gyro", RegistNameInput.name, gyro_double);
 
 		// フーリエ変換によるローパスフィルタ
+		this.sendEmptyMessage(FOURIER);
 		accel_double = mFourier.LowpassFilter(accel_double, "accel");
 		gyro_double = mFourier.LowpassFilter(gyro_double, "gyro");
 
@@ -164,9 +190,11 @@ public class Result extends Handler implements Runnable {
 		LogUtil.log(Log.DEBUG, "Finish fourier");
 
 		// 加速度から距離，角速度から角度へ変換
+		this.sendEmptyMessage(CONVERT);
 		double[][][] distance = mCalc.accelToDistance(accel_double, 0.03);
 		double[][][] angle = mCalc.gyroToAngle(gyro_double, 0.03);
 
+		this.sendEmptyMessage(FORMAT);
 		distance = mFormatter.doubleToDoubleFormatter(distance);
 		angle = mFormatter.doubleToDoubleFormatter(angle);
 
@@ -175,6 +203,7 @@ public class Result extends Handler implements Runnable {
 
 		LogUtil.log(Log.DEBUG, "After write data");
 
+		this.sendEmptyMessage(DEVIATION);
 		// measureCorrelation用の平均値データを作成
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 100; j++) {
@@ -281,6 +310,7 @@ public class Result extends Handler implements Runnable {
 		mManageData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatDistance", RegistNameInput.name, distance);
 		mManageData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatAngle", RegistNameInput.name, angle);
 
+		this.sendEmptyMessage(CORRELATION);
 		// ズレ修正後の平均値データを出す
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 100; j++) {

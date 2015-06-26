@@ -4,10 +4,10 @@
     <string name="app_name">MotionAuth</string>
     <string name="action_settings">Settings</string>
     <string name="start">Start</string>
-    <string name="title_activity_regist_name_input">RegistNameInput</string>
-    <string name="name_input">あなたの名前を入力してください</string>
+    <string name="title_activity_regist_name_input">NameInput</string>
+    <string name="name_input">Please input your name.</string>
     <string name="OK">OK</string>
-    <string name="title_activity_regist_motion">RegistMotion</string>
+    <string name="title_activity_regist_motion">Registration</string>
     <string name="please_read">さん読んでね！！</string>
     <string name="one">①</string>
     <string name="description1">モーションデータ取得ボタンを押すと，３秒間の準備時間の後，スマートフォンの動きを取得し始めます．3秒間でお好きな動きをどうぞ</string>
@@ -22,8 +22,8 @@
     <string name="first">1</string>
     <string name="hoge">hoge</string>
     <string name="getData">モーションデータ取得</string>
-    <string name="title_activity_auth_name_input">AuthNameInput</string>
-    <string name="title_activity_auth_motion">AuthMotion</string>
+    <string name="title_activity_auth_name_input">NameInput</string>
+    <string name="title_activity_auth_motion">Authentication</string>
     <string name="title_activity_registrant_list">RegistrantList</string>
     <string name="title_activity_view_registed_data">ViewRegistedData</string>
     <string name="amplifier_settings">増幅器設定</string>

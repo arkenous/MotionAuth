@@ -1,8 +1,7 @@
 package com.example.motionauth.Processing;
 
 import android.util.Log;
-import com.example.motionauth.Authentication.AuthNameInput;
-import com.example.motionauth.Registration.RegistNameInput;
+import com.example.motionauth.Registration.InputName;
 import com.example.motionauth.Utility.Enum;
 import com.example.motionauth.Utility.LogUtil;
 import com.example.motionauth.Utility.ManageData;
@@ -117,8 +116,8 @@ public class Correlation {
 			}
 		}
 
-		mManageData.writeRData("RegistLRdata", "R_accel", RegistNameInput.name, R_accel);
-		mManageData.writeRData("RegistLRdata", "R_gyro", RegistNameInput.name, R_gyro);
+		mManageData.writeRData("RegistLRdata", "R_accel", InputName.name, R_accel);
+		mManageData.writeRData("RegistLRdata", "R_gyro", InputName.name, R_gyro);
 
 		for (double[] i : R_accel) {
 			for (double j : i) {
@@ -146,7 +145,7 @@ public class Correlation {
 
 		R_point = R_point / 18;
 
-		mManageData.writeRpoint("Rpoint", RegistNameInput.name, R_point);
+		mManageData.writeRpoint("Rpoint", InputName.name, R_point);
 
 		// X
 		if ((R_accel[0][0] > mEnum.LOOSE && R_accel[1][0] > mEnum.LOOSE) || (R_accel[1][0] > mEnum.LOOSE && R_accel[2][0] > mEnum.LOOSE) || (R_accel[0][0] > mEnum.LOOSE && R_accel[2][0] > mEnum.LOOSE)) {
@@ -354,7 +353,7 @@ public class Correlation {
 		}
 		//endregion
 
-		mManageData.writeRData("AuthRData", AuthNameInput.name, R_accel, R_gyro);
+		mManageData.writeRData("AuthRData", com.example.motionauth.Authentication.InputName.name, R_accel, R_gyro);
 
 		//region 相関の判定
 		//相関係数が一定以上あるなら認証成功

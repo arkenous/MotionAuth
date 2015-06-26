@@ -20,13 +20,13 @@ import java.util.concurrent.Executors;
  *
  * @author Kensuke Kousaka
  */
-public class AuthMotion extends Activity {
+public class Authentication extends Activity {
 	private TextView secondTv;
 	private TextView countSecondTv;
 	private Button getMotionBtn;
 
 	private GetData mGetData;
-	private AuthMotion mAuthMotion;
+	private Authentication mAuthentication;
 
 
 	@Override
@@ -36,7 +36,7 @@ public class AuthMotion extends Activity {
 		LogUtil.log(Log.INFO);
 
 		setContentView(R.layout.activity_auth_motion);
-		mAuthMotion = this;
+		mAuthentication = this;
 
 		authMotion();
 	}
@@ -53,8 +53,8 @@ public class AuthMotion extends Activity {
 		countSecondTv = (TextView) findViewById(R.id.textView4);
 		getMotionBtn = (Button) findViewById(R.id.button1);
 
-		nameTv.setText(AuthNameInput.name + "さん読んでね！");
-		mGetData = new GetData(mAuthMotion, getMotionBtn, secondTv, vibrator, this);
+		nameTv.setText(InputName.name + "さん読んでね！");
+		mGetData = new GetData(mAuthentication, getMotionBtn, secondTv, vibrator, this);
 
 		getMotionBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -92,7 +92,7 @@ public class AuthMotion extends Activity {
 
 		progressDialog.show();
 
-		Result mResult = new Result(mAuthMotion, accel, gyro, getMotionBtn, progressDialog, this, mGetData);
+		Result mResult = new Result(mAuthentication, accel, gyro, getMotionBtn, progressDialog, this, mGetData);
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
 		executorService.execute(mResult);
 	}

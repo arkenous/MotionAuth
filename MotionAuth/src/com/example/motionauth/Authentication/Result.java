@@ -37,7 +37,7 @@ public class Result extends Handler implements Runnable {
 	private Calc mCalc = new Calc();
 	private Correlation mCorrelation = new Correlation();
 
-	private AuthMotion mAuthMotion;
+	private Authentication mAuthentication;
 	private Button mGetMotion;
 	private Context mContext;
 	private GetData mGetData;
@@ -50,9 +50,9 @@ public class Result extends Handler implements Runnable {
 	private boolean result = false;
 
 
-	public Result(AuthMotion authMotion, float[][] accel, float[][] gyro, Button getMotion,
+	public Result(Authentication authentication, float[][] accel, float[][] gyro, Button getMotion,
 	              ProgressDialog progressDialog, Context context, GetData getData) {
-		mAuthMotion = authMotion;
+		mAuthentication = authentication;
 		mAccel = accel;
 		mGyro = gyro;
 		mGetMotion = getMotion;
@@ -117,7 +117,7 @@ public class Result extends Handler implements Runnable {
 					alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							mAuthMotion.finishAuth();
+							mAuthentication.finishAuth();
 						}
 					});
 					alert.show();
@@ -129,12 +129,12 @@ public class Result extends Handler implements Runnable {
 
 	private void readRegisteredData() {
 		this.sendEmptyMessage(READ_DATA);
-		ArrayList<double[][]> readDataList = mManageData.readRegistedData(mContext, AuthNameInput.name);
+		ArrayList<double[][]> readDataList = mManageData.readRegistedData(mContext, InputName.name);
 		registeredDistance = readDataList.get(0);
 		registeredAngle = readDataList.get(1);
 
 		SharedPreferences preferences = mContext.getApplicationContext().getSharedPreferences("MotionAuth", Context.MODE_PRIVATE);
-		String registeredAmplify = preferences.getString(AuthNameInput.name + "amplify", "");
+		String registeredAmplify = preferences.getString(InputName.name + "amplify", "");
 		if ("".equals(registeredAmplify)) throw new RuntimeException();
 		mAmp = Double.valueOf(registeredAmplify);
 	}

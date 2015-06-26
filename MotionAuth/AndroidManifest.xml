@@ -31,19 +31,19 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Registration.RegistNameInput"
+                android:name=".Registration.InputName"
             android:label="@string/title_activity_regist_name_input"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".Registration.RegistMotion"
+                android:name=".Registration.Registration"
             android:label="@string/title_activity_regist_motion"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".Authentication.AuthNameInput"
+                android:name=".Authentication.InputName"
             android:label="@string/title_activity_auth_name_input"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".Authentication.AuthMotion"
+                android:name=".Authentication.Authentication"
             android:label="@string/title_activity_auth_motion"
             android:screenOrientation="portrait"></activity>
         <activity

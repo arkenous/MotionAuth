@@ -33,7 +33,7 @@ public class Result extends Handler implements Runnable {
 	private Correlation mCorrelation = new Correlation();
 	private CorrectDeviation mCorrectDeviation = new CorrectDeviation();
 
-	private RegistMotion mRegistMotion;
+	private Registration mRegistration;
 	private Button mGetMotion;
 	private Context mContext;
 	private GetData mGetData;
@@ -47,9 +47,9 @@ public class Result extends Handler implements Runnable {
 	private boolean result = false;
 
 
-	public Result(RegistMotion registMotion, float[][][] accel, float[][][] gyro, Button getMotion,
+	public Result(Registration registration, float[][][] accel, float[][][] gyro, Button getMotion,
 	              ProgressDialog progressDialog, double checkRange, double amp, Context context, GetData getData) {
-		mRegistMotion = registMotion;
+		mRegistration = registration;
 		mAccel = accel;
 		mGyro = gyro;
 		mGetMotion = getMotion;
@@ -63,8 +63,8 @@ public class Result extends Handler implements Runnable {
 
 	@Override
 	public void run() {
-		mManageData.writeFloatThreeArrayData("RegistrationRaw", "Acceleration", RegistNameInput.name, mAccel);
-		mManageData.writeFloatThreeArrayData("RegistrationRaw", "Gyroscope", RegistNameInput.name, mGyro);
+		mManageData.writeFloatThreeArrayData("RegistrationRaw", "Acceleration", InputName.name, mAccel);
+		mManageData.writeFloatThreeArrayData("RegistrationRaw", "Gyroscope", InputName.name, mGyro);
 
 		result = calc(mAccel, mGyro);
 		this.sendEmptyMessage(FINISH);
@@ -118,7 +118,7 @@ public class Result extends Handler implements Runnable {
 					alert.show();
 				} else {
 					// 3回のモーションの平均値をファイルに書き出す
-					mManageData.writeRegistedData(RegistNameInput.name, averageDistance, averageAngle, mAmp, mContext);
+					mManageData.writeRegistedData(InputName.name, averageDistance, averageAngle, mAmp, mContext);
 
 					AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
 					alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
@@ -133,7 +133,7 @@ public class Result extends Handler implements Runnable {
 					alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							mRegistMotion.finishRegist();
+							mRegistration.finishRegist();
 						}
 					});
 
@@ -166,8 +166,8 @@ public class Result extends Handler implements Runnable {
 
 		//TODO 回数ごとのデータの時間的長さを揃える
 
-		mManageData.writeDoubleThreeArrayData("BeforeAMP", "accel", RegistNameInput.name, accel_double);
-		mManageData.writeDoubleThreeArrayData("BeforeAMP", "gyro", RegistNameInput.name, gyro_double);
+		mManageData.writeDoubleThreeArrayData("BeforeAMP", "accel", InputName.name, accel_double);
+		mManageData.writeDoubleThreeArrayData("BeforeAMP", "gyro", InputName.name, gyro_double);
 
 		// データの増幅処理
 		if (mAmplifier.CheckValueRange(accel_double, mCheckRange) || mAmplifier.CheckValueRange(gyro_double, mCheckRange)) {
@@ -176,16 +176,16 @@ public class Result extends Handler implements Runnable {
 			gyro_double = mAmplifier.Amplify(gyro_double, mAmp);
 		}
 
-		mManageData.writeDoubleThreeArrayData("AfterAMP", "accel", RegistNameInput.name, accel_double);
-		mManageData.writeDoubleThreeArrayData("AfterAMP", "gyro", RegistNameInput.name, gyro_double);
+		mManageData.writeDoubleThreeArrayData("AfterAMP", "accel", InputName.name, accel_double);
+		mManageData.writeDoubleThreeArrayData("AfterAMP", "gyro", InputName.name, gyro_double);
 
 		// フーリエ変換によるローパスフィルタ
 		this.sendEmptyMessage(FOURIER);
 		accel_double = mFourier.LowpassFilter(accel_double, "accel");
 		gyro_double = mFourier.LowpassFilter(gyro_double, "gyro");
 
-		mManageData.writeDoubleThreeArrayData("AfterLowpass", "accel", RegistNameInput.name, accel_double);
-		mManageData.writeDoubleThreeArrayData("AfterLowpass", "gyro", RegistNameInput.name, gyro_double);
+		mManageData.writeDoubleThreeArrayData("AfterLowpass", "accel", InputName.name, accel_double);
+		mManageData.writeDoubleThreeArrayData("AfterLowpass", "gyro", InputName.name, gyro_double);
 
 		LogUtil.log(Log.DEBUG, "Finish fourier");
 
@@ -198,8 +198,8 @@ public class Result extends Handler implements Runnable {
 		distance = mFormatter.doubleToDoubleFormatter(distance);
 		angle = mFormatter.doubleToDoubleFormatter(angle);
 
-		mManageData.writeDoubleThreeArrayData("convertData", "distance", RegistNameInput.name, distance);
-		mManageData.writeDoubleThreeArrayData("convertData", "angle", RegistNameInput.name, angle);
+		mManageData.writeDoubleThreeArrayData("convertData", "distance", InputName.name, distance);
+		mManageData.writeDoubleThreeArrayData("convertData", "angle", InputName.name, angle);
 
 		LogUtil.log(Log.DEBUG, "After write data");
 
@@ -284,8 +284,8 @@ public class Result extends Handler implements Runnable {
 
 				LogUtil.log(Log.INFO, "MEASURE: " + String.valueOf(tmp));
 
-				mManageData.writeDoubleThreeArrayData("deviatedData" + String.valueOf(mode), "distance", RegistNameInput.name, distance);
-				mManageData.writeDoubleThreeArrayData("deviatedData" + String.valueOf(mode), "angle", RegistNameInput.name, angle);
+				mManageData.writeDoubleThreeArrayData("deviatedData" + String.valueOf(mode), "distance", InputName.name, distance);
+				mManageData.writeDoubleThreeArrayData("deviatedData" + String.valueOf(mode), "angle", InputName.name, angle);
 
 
 				if (tmp == Enum.MEASURE.PERFECT || tmp == Enum.MEASURE.CORRECT) {
@@ -307,8 +307,8 @@ public class Result extends Handler implements Runnable {
 		}
 		//endregion
 
-		mManageData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatDistance", RegistNameInput.name, distance);
-		mManageData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatAngle", RegistNameInput.name, angle);
+		mManageData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatDistance", InputName.name, distance);
+		mManageData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatAngle", InputName.name, angle);
 
 		this.sendEmptyMessage(CORRELATION);
 		// ズレ修正後の平均値データを出す

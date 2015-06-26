@@ -28,7 +28,7 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 	private SensorManager mSensorManager;
 	private Sensor mAccelerometerSensor;
 	private Sensor mGyroscopeSensor;
-	private RegistMotion mRegistMotion;
+	private Registration mRegistration;
 
 	private int countdown = 4;
 	private int countData = 0;
@@ -39,9 +39,9 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 	private float[][][] mGyro = new float[3][3][100];
 
 
-	public GetData(RegistMotion registMotion, Button getMotion, TextView second, TextView count, Vibrator vibrator,
+	public GetData(Registration registration, Button getMotion, TextView second, TextView count, Vibrator vibrator,
 	               Context context) {
-		mRegistMotion = registMotion;
+		mRegistration = registration;
 		mGetMotion = getMotion;
 		mSecond = second;
 		mCount = count;
@@ -97,7 +97,7 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 				mGetMotion.setClickable(true);
 				break;
 			case 8:
-				mRegistMotion.finishGetMotion(mAcceleration, mGyro);
+				mRegistration.finishGetMotion(mAcceleration, mGyro);
 				break;
 			case 10:
 				mGetMotion.setClickable(true);

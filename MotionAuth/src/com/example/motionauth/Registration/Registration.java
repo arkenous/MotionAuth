@@ -23,13 +23,13 @@ import java.util.concurrent.Executors;
  *
  * @author Kensuke Kousaka
  */
-public class RegistMotion extends Activity {
+public class Registration extends Activity {
 	private TextView secondTv;
 	private TextView countSecondTv;
 	private Button getMotionBtn;
 	private GetData mGetData;
 	private Result mResult;
-	private RegistMotion mRegistMotion;
+	private Registration mRegistration;
 
 	private double checkRangeValue = 2.0;
 	private double ampValue = 2.0;
@@ -41,7 +41,7 @@ public class RegistMotion extends Activity {
 		LogUtil.log(Log.INFO);
 
 		setContentView(R.layout.activity_regist_motion);
-		mRegistMotion = this;
+		mRegistration = this;
 		registMotion();
 	}
 
@@ -58,8 +58,8 @@ public class RegistMotion extends Activity {
 		countSecondTv = (TextView) findViewById(R.id.textView4);
 		getMotionBtn = (Button) findViewById(R.id.button1);
 
-		nameTv.setText(RegistNameInput.name + "さん読んでね！");
-		mGetData = new GetData(mRegistMotion, getMotionBtn, secondTv, countSecondTv, mVibrator, this);
+		nameTv.setText(InputName.name + "さん読んでね！");
+		mGetData = new GetData(mRegistration, getMotionBtn, secondTv, countSecondTv, mVibrator, this);
 
 		getMotionBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -98,7 +98,7 @@ public class RegistMotion extends Activity {
 
 		progressDialog.show();
 
-		mResult = new Result(mRegistMotion, accel, gyro, getMotionBtn, progressDialog, checkRangeValue,
+		mResult = new Result(mRegistration, accel, gyro, getMotionBtn, progressDialog, checkRangeValue,
 				ampValue, this, mGetData);
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
 		executorService.submit(mResult);
@@ -133,7 +133,7 @@ public class RegistMotion extends Activity {
 		switch (item.getItemId()) {
 			case R.id.change_range_value:
 				if (getMotionBtn.isClickable()) {
-					LayoutInflater inflater = LayoutInflater.from(RegistMotion.this);
+					LayoutInflater inflater = LayoutInflater.from(Registration.this);
 					View seekView = inflater.inflate(R.layout.seekdialog, (ViewGroup) findViewById(R.id.dialog_root));
 
 					// 閾値調整
@@ -195,7 +195,7 @@ public class RegistMotion extends Activity {
 						}
 					});
 
-					AlertDialog.Builder dialog = new AlertDialog.Builder(RegistMotion.this);
+					AlertDialog.Builder dialog = new AlertDialog.Builder(Registration.this);
 					dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
 						@Override
 						public boolean onKey(DialogInterface dialog1, int keyCode, KeyEvent event) {
@@ -217,7 +217,7 @@ public class RegistMotion extends Activity {
 
 			case R.id.reset:
 				if (getMotionBtn.isClickable()) {
-					AlertDialog.Builder alert = new AlertDialog.Builder(RegistMotion.this);
+					AlertDialog.Builder alert = new AlertDialog.Builder(Registration.this);
 					alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
 						@Override
 						public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {

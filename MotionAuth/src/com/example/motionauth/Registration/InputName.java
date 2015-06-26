@@ -1,9 +1,8 @@
-package com.example.motionauth.Authentication;
+package com.example.motionauth.Registration;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,15 +19,13 @@ import com.example.motionauth.Utility.LogUtil;
 
 
 /**
- * 認証するユーザ名を入力させる
+ * ユーザに名前を入力させる
  *
  * @author Kensuke Kousaka
  */
-public class AuthNameInput extends Activity {
+public class InputName extends Activity {
 	// ユーザが入力した文字列（名前）を格納する
 	public static String name;
-
-	private Context current;
 
 
 	@Override
@@ -39,8 +36,7 @@ public class AuthNameInput extends Activity {
 
 		// タイトルバーの非表示
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.activity_auth_name_input);
-		current = this;
+		setContentView(R.layout.activity_regist_name_input);
 
 		name = "";
 
@@ -49,10 +45,11 @@ public class AuthNameInput extends Activity {
 
 
 	/**
-	 * ユーザ名を入力させる
+	 * ユーザの名前入力を受け付ける処理
 	 */
 	private void nameInput() {
 		LogUtil.log(Log.INFO);
+
 		final EditText nameInput = (EditText) findViewById(R.id.nameInputEditText);
 
 		nameInput.addTextChangedListener(new TextWatcher() {
@@ -66,17 +63,17 @@ public class AuthNameInput extends Activity {
 
 			// 変更後
 			public void afterTextChanged(Editable s) {
+				// ユーザの入力した名前をnameに格納
 				if (nameInput.getText() != null) name = nameInput.getText().toString().trim();
 			}
 		});
 
-		// ソフトウェアキーボートのEnterキーを押した際に，ソフトウェアキーボードを閉じるようにする
 		nameInput.setOnKeyListener(new View.OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-					LogUtil.log(Log.VERBOSE, "Push enter key");
-					InputMethodManager inputMethodManager = (InputMethodManager) AuthNameInput.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+					// ソフトウェアキーボードのEnterキーを押した時，ソフトウェアキーボードを閉じる
+					InputMethodManager inputMethodManager = (InputMethodManager) InputName.this.getSystemService(Context.INPUT_METHOD_SERVICE);
 					inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
 					return true;
@@ -91,33 +88,15 @@ public class AuthNameInput extends Activity {
 		ok.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				LogUtil.log(Log.VERBOSE, "Click ok button");
-
-				// 指定したユーザが存在するかどうかを確認する
-				if (AuthNameInput.this.checkUserExists()) {
-					LogUtil.log(Log.DEBUG, "User is existed");
-					AuthNameInput.this.moveActivity("com.example.motionauth", "com.example.motionauth.Authentication.AuthMotion", true);
+				LogUtil.log(Log.DEBUG, "Click ok button");
+				// nameが入力されているかの確認
+				if (name.length() == 0) {
+					Toast.makeText(InputName.this, "名前が入力されていません", Toast.LENGTH_LONG).show();
 				} else {
-					LogUtil.log(Log.DEBUG, "User is not existed");
-					Toast.makeText(current, "ユーザが登録されていません", Toast.LENGTH_LONG).show();
+					InputName.this.moveActivity("com.example.motionauth", "com.example.motionauth.Registration.Registration", true);
 				}
 			}
 		});
-	}
-
-
-	/**
-	 * 入力したユーザが以前に登録したことのあるユーザかどうかを確認 データがないのに認証はできない
-	 *
-	 * @return 登録したことがあるユーザであればtrue，登録したことがなければfalse
-	 */
-	private boolean checkUserExists() {
-		LogUtil.log(Log.INFO);
-
-		Context mContext = AuthNameInput.this.getApplicationContext();
-		SharedPreferences preferences = mContext.getSharedPreferences("UserList", Context.MODE_PRIVATE);
-
-		return preferences.contains(name);
 	}
 
 
@@ -138,4 +117,5 @@ public class AuthNameInput extends Activity {
 
 		startActivityForResult(intent, 0);
 	}
+
 }

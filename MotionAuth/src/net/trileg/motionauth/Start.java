@@ -23,6 +23,7 @@ import net.trileg.motionauth.Utility.LogUtil;
 public class Start extends Activity {
 	private Context mContext;
 
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -34,7 +35,7 @@ public class Start extends Activity {
 
 		LogUtil.log(Log.INFO);
 
-		// disable title bar.
+		// Disable title bar.
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_start);
 
@@ -103,7 +104,7 @@ public class Start extends Activity {
 	 *
 	 * @param pkgName Destination package name.
 	 * @param actName Destination activity name.
-	 * @param flg     Show this activity if user push BACK KEY.
+	 * @param flg     Whether to show this activity if user push BACK KEY.
 	 */
 	private void moveActivity(String pkgName, String actName, boolean flg) {
 		LogUtil.log(Log.INFO);

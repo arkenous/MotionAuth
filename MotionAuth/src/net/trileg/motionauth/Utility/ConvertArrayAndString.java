@@ -3,17 +3,17 @@ package net.trileg.motionauth.Utility;
 import android.util.Log;
 
 /**
- * 文字列型配列データの要素を連結したり，分離して配列に戻すクラス
+ * Join String type array to String, or separate String to String type array.
  *
- * @author Kensuke Kousaka
+ * @author Kensuke Kosaka
  */
 public class ConvertArrayAndString {
 
 	/**
-	 * 受け取った配列データを，特定の文字を用いて連結する
+	 * Join String type 2-array data to String by special character.
 	 *
-	 * @param input 処理するString型二次元配列データ
-	 * @return 連結したString型データ
+	 * @param input String type 2-array data.
+	 * @return Joined String data.
 	 */
 	public String arrayToString(String[][] input) {
 		LogUtil.log(Log.INFO);
@@ -28,10 +28,10 @@ public class ConvertArrayAndString {
 		}
 		// a,a,a,'b,b,b,'c,c,c,'
 
-		String[] splited = join.split("'");
+		String[] split = join.split("'");
 		// a,a,a   b,b,b   c,c,c
 
-		for (String i : splited) {
+		for (String i : split) {
 			if (i.endsWith(",")) {
 				int last = i.lastIndexOf(",");
 				i = i.substring(0, last);
@@ -53,17 +53,17 @@ public class ConvertArrayAndString {
 
 
 	/**
-	 * 受け取ったString型データを特定文字列で分割して配列データにする
+	 * Separate String data to String type 2-array data by special character.
 	 *
-	 * @param input 処理するString型データ
-	 * @return 分割したString型二次元配列データ
+	 * @param input String data.
+	 * @return Separated String type 2-array data.
 	 */
 	public String[][] stringToArray(String input) {
 		LogUtil.log(Log.INFO);
-		String[] splitDimention = input.split("'");
+		String[] splitDimension = input.split("'");
 		String[][] result = new String[3][100];
 
-		for (int i = 0; i < splitDimention.length; i++) result[i] = splitDimention[i].split(",");
+		for (int i = 0; i < splitDimension.length; i++) result[i] = splitDimension[i].split(",");
 
 		return result;
 	}

@@ -16,6 +16,11 @@ import net.trileg.motionauth.Utility.Enum;
 import net.trileg.motionauth.Utility.LogUtil;
 import net.trileg.motionauth.Utility.ManageData;
 
+/**
+ * Register and show result to user.
+ *
+ * @author Kensuke Kosaka
+ */
 public class Result extends Handler implements Runnable {
 	private static final int FORMAT = 1;
 	private static final int AMPLIFY = 2;
@@ -118,7 +123,7 @@ public class Result extends Handler implements Runnable {
 					alert.show();
 				} else {
 					// 3回のモーションの平均値をファイルに書き出す
-					mManageData.writeRegistedData(InputName.name, averageDistance, averageAngle, mAmp, mContext);
+					mManageData.writeRegisterData(InputName.name, averageDistance, averageAngle, mAmp, mContext);
 
 					AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
 					alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
@@ -133,7 +138,7 @@ public class Result extends Handler implements Runnable {
 					alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							mRegistration.finishRegist();
+							mRegistration.finishRegistration();
 						}
 					});
 
@@ -291,7 +296,6 @@ public class Result extends Handler implements Runnable {
 				if (tmp == Enum.MEASURE.PERFECT || tmp == Enum.MEASURE.CORRECT) {
 					break;
 				} else if (time == 2) {
-					// 相関係数が低いまま，アラートなどを出す？
 					distance = originalDistance;
 					angle = originalAngle;
 					break;
@@ -302,7 +306,6 @@ public class Result extends Handler implements Runnable {
 		} else if (measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT) {
 			LogUtil.log(Log.INFO, "SUCCESS");
 		} else {
-			// なにかがおかしい
 			return false;
 		}
 		//endregion
@@ -311,7 +314,7 @@ public class Result extends Handler implements Runnable {
 		mManageData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatAngle", InputName.name, angle);
 
 		this.sendEmptyMessage(CORRELATION);
-		// ズレ修正後の平均値データを出す
+		// Calculate average data.
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 100; j++) {
 				averageDistance[i][j] = (distance[0][i][j] + distance[1][i][j] + distance[2][i][j]) / 3;

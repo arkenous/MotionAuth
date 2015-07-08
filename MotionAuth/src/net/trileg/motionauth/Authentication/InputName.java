@@ -20,15 +20,13 @@ import net.trileg.motionauth.Utility.LogUtil;
 
 
 /**
- * 認証するユーザ名を入力させる
+ * Input user name.
  *
- * @author Kensuke Kousaka
+ * @author Kensuke Kosaka
  */
 public class InputName extends Activity {
-	// ユーザが入力した文字列（名前）を格納する
-	public static String name;
-
-	private Context current;
+	public static String userName = "";
+	private Context mContext;
 
 
 	@Override
@@ -37,46 +35,44 @@ public class InputName extends Activity {
 
 		LogUtil.log(Log.INFO);
 
-		// タイトルバーの非表示
+		// Disable title bar.
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_auth_name_input);
-		current = this;
-
-		name = "";
+		mContext = this;
 
 		nameInput();
 	}
 
 
 	/**
-	 * ユーザ名を入力させる
+	 * Input user name.
 	 */
 	private void nameInput() {
 		LogUtil.log(Log.INFO);
 		final EditText nameInput = (EditText) findViewById(R.id.nameInputEditText);
 
 		nameInput.addTextChangedListener(new TextWatcher() {
-			// 変更前
+			// Before text changed.
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 			}
 
-			// 変更直前
+			// Just before text changed.
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 			}
 
-			// 変更後
+			// After text changed.
 			public void afterTextChanged(Editable s) {
-				if (nameInput.getText() != null) name = nameInput.getText().toString().trim();
+				if (nameInput.getText() != null) userName = nameInput.getText().toString().trim();
 			}
 		});
 
-		// ソフトウェアキーボートのEnterキーを押した際に，ソフトウェアキーボードを閉じるようにする
+		// Close software keyboard if user push ENTER KEY.
 		nameInput.setOnKeyListener(new View.OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
 					LogUtil.log(Log.VERBOSE, "Push enter key");
-					InputMethodManager inputMethodManager = (InputMethodManager) InputName.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+					InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 					inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
 					return true;
@@ -85,21 +81,20 @@ public class InputName extends Activity {
 			}
 		});
 
-		// OKボタンを押した時に，次のアクティビティに移動
-		final Button ok = (Button) findViewById(R.id.okButton);
-
+		// Move activity if user push OK button.
+		Button ok = (Button) findViewById(R.id.okButton);
 		ok.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				LogUtil.log(Log.VERBOSE, "Click ok button");
 
-				// 指定したユーザが存在するかどうかを確認する
-				if (InputName.this.checkUserExists()) {
+				// Check user inputted name is already registered or not.
+				if (checkUserExists()) {
 					LogUtil.log(Log.DEBUG, "User is existed");
-					InputName.this.moveActivity(getPackageName(), getPackageName() + ".Authentication.Authentication", true);
+					moveActivity(getPackageName(), getPackageName() + ".Authentication.Authentication", true);
 				} else {
 					LogUtil.log(Log.DEBUG, "User is not existed");
-					Toast.makeText(current, "ユーザが登録されていません", Toast.LENGTH_LONG).show();
+					Toast.makeText(mContext, "ユーザが登録されていません", Toast.LENGTH_LONG).show();
 				}
 			}
 		});
@@ -107,35 +102,35 @@ public class InputName extends Activity {
 
 
 	/**
-	 * 入力したユーザが以前に登録したことのあるユーザかどうかを確認 データがないのに認証はできない
+	 * Check user inputted name is already registered or not.
 	 *
-	 * @return 登録したことがあるユーザであればtrue，登録したことがなければfalse
+	 * @return true if name is already registered, otherwise false.
 	 */
 	private boolean checkUserExists() {
 		LogUtil.log(Log.INFO);
 
-		Context mContext = InputName.this.getApplicationContext();
-		SharedPreferences preferences = mContext.getSharedPreferences("UserList", Context.MODE_PRIVATE);
+		// Get already registered user list from SharedPreferences using Application context.
+		Context context = getApplicationContext();
+		SharedPreferences preferences = context.getSharedPreferences("UserList", Context.MODE_PRIVATE);
 
-		return preferences.contains(name);
+		return preferences.contains(userName);
 	}
 
 
 	/**
-	 * アクティビティを移動する
+	 * Move activity.
 	 *
-	 * @param pkgName 移動先のパッケージ名
-	 * @param actName 移動先のアクティビティ名
-	 * @param flg     戻るキーを押した際にこのアクティビティを表示させるかどうか
+	 * @param pkgName destination package name.
+	 * @param actName destination activity name.
+	 * @param flg     Whether to show this activity if user push BACK KEY.
 	 */
 	private void moveActivity(String pkgName, String actName, boolean flg) {
 		LogUtil.log(Log.INFO);
+
 		Intent intent = new Intent();
-
 		intent.setClassName(pkgName, actName);
-
 		if (flg) intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
-		startActivityForResult(intent, 0);
+		startActivity(intent);
 	}
 }

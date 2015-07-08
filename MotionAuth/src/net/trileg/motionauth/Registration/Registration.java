@@ -19,9 +19,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * モーションを新規登録する
+ * Registration.
  *
- * @author Kensuke Kousaka
+ * @author Kensuke Kosaka
  */
 public class Registration extends Activity {
 	private TextView secondTv;
@@ -42,14 +42,14 @@ public class Registration extends Activity {
 
 		setContentView(R.layout.activity_regist_motion);
 		mRegistration = this;
-		registMotion();
+		registration();
 	}
 
 
 	/**
-	 * モーション登録画面にイベントリスナ等を設定する
+	 *  Registration event listener and call GetData using ExecutorService to collect data.
 	 */
-	public void registMotion() {
+	public void registration() {
 		LogUtil.log(Log.INFO);
 
 		Vibrator mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
@@ -66,7 +66,6 @@ public class Registration extends Activity {
 			public void onClick(View v) {
 				LogUtil.log(Log.VERBOSE, "Click get motion button");
 				if (v.isClickable()) {
-					// ボタンをクリックできないようにする
 					v.setClickable(false);
 					getMotionBtn.setText("インターバル中");
 					countSecondTv.setText("秒");
@@ -79,6 +78,13 @@ public class Registration extends Activity {
 	}
 
 
+	/**
+	 * Call when data collecting is finished.
+	 * Call Result using ExecutorService to register and show result.
+	 * 
+	 * @param accel Original acceleration data collecting from GetData.
+	 * @param gyro Original gyroscope data collecting from GetData.
+	 */
 	public void finishGetMotion(float[][][] accel, float[][][] gyro) {
 		LogUtil.log(Log.INFO);
 		if (getMotionBtn.isClickable()) getMotionBtn.setClickable(false);
@@ -168,18 +174,18 @@ public class Registration extends Activity {
 					});
 
 					// 増幅値調整
-					SeekBar ampvalSeekBar = (SeekBar) seekView.findViewById(R.id.ampval);
-					final TextView ampvalText = (TextView) seekView.findViewById(R.id.ampvaltext);
-					ampvalText.setText("増幅器にかける場合に，何倍増幅するかを調整できます．標準は2倍です．\n" +
+					SeekBar amplifierSeekBar = (SeekBar) seekView.findViewById(R.id.amplifier);
+					final TextView amplifierText = (TextView) seekView.findViewById(R.id.amplifierText);
+					amplifierText.setText("増幅器にかける場合に，何倍増幅するかを調整できます．標準は2倍です．\n" +
 							"現在の値は" + ampValue + "です．");
 
-					ampvalSeekBar.setMax(10);
-					ampvalSeekBar.setProgress(2);
-					ampvalSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+					amplifierSeekBar.setMax(10);
+					amplifierSeekBar.setProgress(2);
+					amplifierSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 						@Override
 						public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 							ampValue = seekBar.getProgress() * 1.0;
-							ampvalText.setText("増幅器にかける場合に，何倍増幅するかを調整できます．標準は2倍です．\n" +
+							amplifierText.setText("増幅器にかける場合に，何倍増幅するかを調整できます．標準は2倍です．\n" +
 									"現在の値は" + ampValue + "です．");
 						}
 
@@ -190,7 +196,7 @@ public class Registration extends Activity {
 						@Override
 						public void onStopTrackingTouch(SeekBar seekBar) {
 							ampValue = seekBar.getProgress() * 1.0;
-							ampvalText.setText("増幅器にかける場合に，何倍増幅するかを調整できます．標準は2倍です．\n" +
+							amplifierText.setText("増幅器にかける場合に，何倍増幅するかを調整できます．標準は2倍です．\n" +
 									"現在の値は" + ampValue + "です．");
 						}
 					});
@@ -249,15 +255,16 @@ public class Registration extends Activity {
 
 
 	/**
-	 * スタート画面に移動するメソッド
+	 * Move to Start activity.
 	 */
-	public void finishRegist() {
+	public void finishRegistration() {
 		LogUtil.log(Log.INFO);
+
 		Intent intent = new Intent();
 		intent.setClassName(getPackageName(), getPackageName() + ".Start");
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
-		startActivityForResult(intent, 0);
+		startActivity(intent);
 		finish();
 	}
 }

@@ -21,6 +21,11 @@ import net.trileg.motionauth.Utility.ManageData;
 
 import java.util.ArrayList;
 
+/**
+ * Authenticate and show result to user.
+ *
+ * @author Kensuke Kosaka
+ */
 public class Result extends Handler implements Runnable {
 	private static final int READ_DATA = 1;
 	private static final int FORMAT = 2;
@@ -39,7 +44,6 @@ public class Result extends Handler implements Runnable {
 
 	private Authentication mAuthentication;
 	private Button mGetMotion;
-	private Context mContext;
 	private GetData mGetData;
 	private ProgressDialog mProgressDialog;
 	private double mAmp;
@@ -51,13 +55,12 @@ public class Result extends Handler implements Runnable {
 
 
 	public Result(Authentication authentication, float[][] accel, float[][] gyro, Button getMotion,
-	              ProgressDialog progressDialog, Context context, GetData getData) {
+	              ProgressDialog progressDialog, GetData getData) {
 		mAuthentication = authentication;
 		mAccel = accel;
 		mGyro = gyro;
 		mGetMotion = getMotion;
 		mProgressDialog = progressDialog;
-		mContext = context;
 		mGetData = getData;
 	}
 
@@ -65,7 +68,7 @@ public class Result extends Handler implements Runnable {
 	@Override
 	public void run() {
 		readRegisteredData();
-		result = calc(mAccel, mGyro);
+		result = calculate(mAccel, mGyro);
 
 		this.sendEmptyMessage(FINISH);
 	}
@@ -97,7 +100,7 @@ public class Result extends Handler implements Runnable {
 				mProgressDialog.dismiss();
 				if (!result) {
 					LogUtil.log(Log.INFO, "False authentication");
-					AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
+					AlertDialog.Builder alert = new AlertDialog.Builder(mAuthentication);
 					alert.setTitle("認証失敗");
 					alert.setMessage("認証に失敗しました");
 					alert.setCancelable(false);
@@ -110,14 +113,14 @@ public class Result extends Handler implements Runnable {
 					alert.show();
 				} else {
 					LogUtil.log(Log.INFO, "Success authentication");
-					AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
+					AlertDialog.Builder alert = new AlertDialog.Builder(mAuthentication);
 					alert.setTitle("認証成功");
 					alert.setMessage("認証に成功しました．\nスタート画面に戻ります");
 					alert.setCancelable(false);
 					alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							mAuthentication.finishAuth();
+							mAuthentication.finishAuthentication();
 						}
 					});
 					alert.show();
@@ -127,20 +130,30 @@ public class Result extends Handler implements Runnable {
 	}
 
 
+	/**
+	 * Read already registered data.
+	 */
 	private void readRegisteredData() {
 		this.sendEmptyMessage(READ_DATA);
-		ArrayList<double[][]> readDataList = mManageData.readRegistedData(mContext, InputName.name);
+		ArrayList<double[][]> readDataList = mManageData.readRegisteredData(mAuthentication, InputName.userName);
 		registeredDistance = readDataList.get(0);
 		registeredAngle = readDataList.get(1);
 
-		SharedPreferences preferences = mContext.getApplicationContext().getSharedPreferences("MotionAuth", Context.MODE_PRIVATE);
-		String registeredAmplify = preferences.getString(InputName.name + "amplify", "");
+		SharedPreferences preferences = mAuthentication.getApplicationContext().getSharedPreferences("MotionAuth", Context.MODE_PRIVATE);
+		String registeredAmplify = preferences.getString(InputName.userName + "amplify", "");
 		if ("".equals(registeredAmplify)) throw new RuntimeException();
 		mAmp = Double.valueOf(registeredAmplify);
 	}
 
 
-	private boolean calc(float[][] accel, float[][] gyro) {
+	/**
+	 * Calculate data and authenticate.
+	 *
+	 * @param accel Acceleration data which collect in Authentication.GetData.
+	 * @param gyro  Gyroscope data which collect in Authentication.GetData.
+	 * @return true if authentication is succeed, otherwise false.
+	 */
+	private boolean calculate(float[][] accel, float[][] gyro) {
 		this.sendEmptyMessage(FORMAT);
 		double[][] accelDouble = mFormatter.floatToDoubleFormatter(accel);
 		double[][] gyroDouble = mFormatter.floatToDoubleFormatter(gyro);

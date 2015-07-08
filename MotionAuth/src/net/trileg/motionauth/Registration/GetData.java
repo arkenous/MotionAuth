@@ -12,12 +12,20 @@ import android.support.annotation.NonNull;
 import android.widget.Button;
 import android.widget.TextView;
 
+/**
+ * Collecting data and return it.
+ * Data collecting is running on the ExecutorService thread.
+ *
+ * @author Kensuke Kosaka
+ */
 public class GetData extends Handler implements Runnable, SensorEventListener {
 	private static final int PREPARATION = 1;
 	private static final int GET_MOTION = 0;
+
 	private static final int VIBRATOR_SHORT = 25;
 	private static final int VIBRATOR_NORMAL = 50;
 	private static final int VIBRATOR_LONG = 100;
+
 	private static final int PREPARATION_INTERVAL = 1000;
 	private static final int GET_INTERVAL = 30;
 
@@ -55,7 +63,7 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 
 	@Override
 	public void run() {
-		get(PREPARATION);
+		collect(PREPARATION);
 	}
 
 
@@ -108,14 +116,19 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 	}
 
 
-	private void get(int status) {
+	/**
+	 * Collecting data from sensor.
+	 *
+	 * @param status Stage of PREPARATION or GET_MOTION
+	 */
+	private void collect(int status) {
 		switch (status) {
 			case PREPARATION:
 				countdown--;
 				switch (countdown) {
 					case 0:
 						super.sendEmptyMessage(1);
-						get(GET_MOTION);
+						collect(GET_MOTION);
 						break;
 					default:
 						super.sendEmptyMessage(0);
@@ -124,7 +137,7 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-						get(PREPARATION);
+						collect(PREPARATION);
 						break;
 				}
 				break;
@@ -153,7 +166,7 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-					get(GET_MOTION);
+					collect(GET_MOTION);
 				} else {
 					countTime++;
 					countData = 0;
@@ -189,17 +202,26 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 	}
 
 
+	/**
+	 * Register sensor listener.
+	 */
 	public void registrationSensor() {
 		mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
 		mSensorManager.registerListener(this, mGyroscopeSensor, SensorManager.SENSOR_DELAY_GAME);
 	}
 
 
+	/**
+	 * Un-Register sensor listener.
+	 */
 	public void unRegistrationSensor() {
 		mSensorManager.unregisterListener(this);
 	}
 
 
+	/**
+	 * Reset value using count of collecting data.
+	 */
 	public void reset() {
 		countdown = 4;
 		countData = 0;

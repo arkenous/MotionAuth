@@ -19,12 +19,11 @@ import net.trileg.motionauth.Utility.LogUtil;
 
 
 /**
- * ユーザに名前を入力させる
+ * Input user name.
  *
- * @author Kensuke Kousaka
+ * @author Kensuke Kosaka
  */
 public class InputName extends Activity {
-	// ユーザが入力した文字列（名前）を格納する
 	public static String name;
 
 
@@ -34,7 +33,7 @@ public class InputName extends Activity {
 
 		LogUtil.log(Log.INFO);
 
-		// タイトルバーの非表示
+		// Disable title bar.
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_regist_name_input);
 
@@ -45,7 +44,7 @@ public class InputName extends Activity {
 
 
 	/**
-	 * ユーザの名前入力を受け付ける処理
+	 * Input user name.
 	 */
 	private void nameInput() {
 		LogUtil.log(Log.INFO);
@@ -53,26 +52,25 @@ public class InputName extends Activity {
 		final EditText nameInput = (EditText) findViewById(R.id.nameInputEditText);
 
 		nameInput.addTextChangedListener(new TextWatcher() {
-			// 変更前
+			// Before text changed.
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 			}
 
-			// 変更直前
+			// Just before text changed.
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 			}
 
-			// 変更後
+			// After text changed.
 			public void afterTextChanged(Editable s) {
-				// ユーザの入力した名前をnameに格納
 				if (nameInput.getText() != null) name = nameInput.getText().toString().trim();
 			}
 		});
 
+		// Close software keyboard if user push ENTER KEY.
 		nameInput.setOnKeyListener(new View.OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-					// ソフトウェアキーボードのEnterキーを押した時，ソフトウェアキーボードを閉じる
 					InputMethodManager inputMethodManager = (InputMethodManager) InputName.this.getSystemService(Context.INPUT_METHOD_SERVICE);
 					inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
@@ -82,14 +80,14 @@ public class InputName extends Activity {
 			}
 		});
 
-		// OKボタンを押した時に，次のアクティビティに移動
+		// Move activity if user push OK button.
 		final Button ok = (Button) findViewById(R.id.okButton);
 
 		ok.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				LogUtil.log(Log.DEBUG, "Click ok button");
-				// nameが入力されているかの確認
+				// Check user inputted name is correctly.
 				if (name.length() == 0) {
 					Toast.makeText(InputName.this, "名前が入力されていません", Toast.LENGTH_LONG).show();
 				} else {
@@ -101,21 +99,20 @@ public class InputName extends Activity {
 
 
 	/**
-	 * アクティビティを移動する
+	 * Move activity.
 	 *
-	 * @param pkgName 移動先のパッケージ名
-	 * @param actName 移動先のアクティビティ名
-	 * @param flg     戻るキーを押した際にこのアクティビティを表示させるかどうか
+	 * @param pkgName Destination package name.
+	 * @param actName Destination activity name.
+	 * @param flg     Whether to show this activity if user push BACK KEY.
 	 */
 	private void moveActivity(String pkgName, String actName, boolean flg) {
 		LogUtil.log(Log.INFO);
+
 		Intent intent = new Intent();
-
 		intent.setClassName(pkgName, actName);
-
 		if (flg) intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
-		startActivityForResult(intent, 0);
+		startActivity(intent);
 	}
 
 }

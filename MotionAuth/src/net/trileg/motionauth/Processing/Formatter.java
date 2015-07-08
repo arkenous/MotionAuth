@@ -8,17 +8,17 @@ import java.util.Locale;
 
 
 /**
- * データの桁揃えを行う．対応データはfloat及びdouble．返り値はdouble型．
+ * Round data length.
  *
- * @author Kensuke Kousaka
+ * @author Kensuke Kosaka
  */
 public class Formatter {
 
 	/**
-	 * float型の２次元数値データを小数点以下２桁に揃え，doubleに変換する
+	 * Round float type 2-array data to two digits after the decimal point, and convert it to double type.
 	 *
-	 * @param inputVal float型の２次元配列データ
-	 * @return 小数点以下２桁に揃え，double型に変換した２次元数値データ
+	 * @param inputVal Float type 2-array data.
+	 * @return Rounded and Converted double type 2-array data.
 	 */
 	public double[][] floatToDoubleFormatter(float[][] inputVal) {
 		LogUtil.log(Log.INFO);
@@ -37,10 +37,10 @@ public class Formatter {
 
 
 	/**
-	 * float型の３次元数値データを小数点以下２桁に揃え，doubleに変換する
+	 * Round float type 3-array data to two digits after the decimal point, and convert it to double type.
 	 *
-	 * @param inputVal float型の3次元配列データ
-	 * @return 小数点以下２桁に揃え，double型に変換した３次元数値データ
+	 * @param inputVal Float type 3-array data.
+	 * @return Rounded and Converted double type 3-array data.
 	 */
 	public double[][][] floatToDoubleFormatter(float[][][] inputVal) {
 		LogUtil.log(Log.INFO);
@@ -61,10 +61,10 @@ public class Formatter {
 
 
 	/**
-	 * float型の3次元リストデータをdouble型に変換する
+	 * Convert float type 3-array list data to double type.
 	 *
-	 * @param input float型3次元リストデータ
-	 * @return double型3次元リストデータ
+	 * @param input  Float type 3-array list data.
+	 * @return Double type 3-array list data.
 	 */
 	public ArrayList<ArrayList<ArrayList<Double>>> floatToDoubleFormatter(ArrayList<ArrayList<ArrayList<Float>>> input) {
 		LogUtil.log(Log.INFO);
@@ -88,10 +88,10 @@ public class Formatter {
 
 
 	/**
-	 * double型の二次元数値データを小数点以下二桁に揃える
+	 * Round double type 2-array data to two digits after the decimal point.
 	 *
-	 * @param inputVal double型の二次元配列データ
-	 * @return 小数点以下二桁に揃えたdouble型二次元数値データ
+	 * @param inputVal Double type 2-array data.
+	 * @return Rounded double type 2-array data.
 	 */
 	public double[][] doubleToDoubleFormatter(double[][] inputVal) {
 		LogUtil.log(Log.INFO);
@@ -110,10 +110,10 @@ public class Formatter {
 
 
 	/**
-	 * double型の３次元数値データを小数点以下２桁に揃える
+	 * Round double type 3-array data to two digits after the decimal point.
 	 *
-	 * @param inputVal double型の３次元配列データ
-	 * @return 小数点以下２桁に揃えたdouble型３次元数値データ
+	 * @param inputVal Double type 3-array data.
+	 * @return Rounded double type 3-array data.
 	 */
 	public double[][][] doubleToDoubleFormatter(double[][][] inputVal) {
 		LogUtil.log(Log.INFO);

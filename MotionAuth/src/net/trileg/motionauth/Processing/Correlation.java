@@ -8,22 +8,22 @@ import net.trileg.motionauth.Utility.ManageData;
 
 
 /**
- * 相関を求める
+ * Calculate correlation.
  *
- * @author Kensuke Kousaka
+ * @author Kensuke Kosaka
  */
 public class Correlation {
 	private ManageData mManageData = new ManageData();
 	private Enum mEnum = new Enum();
 
 	/**
-	 * 相関を求め，同一のモーションであるかどうかを確認する
+	 * Calculate correlation to check whether each motion data is same motion or not.
 	 *
-	 * @param distance     double型の3次元配列距離データ
-	 * @param angle        double型の3次元配列角度データ
-	 * @param ave_distance double型の2次元配列距離データ
-	 * @param ave_angle    double型の2次元配列角度データ
-	 * @return EnumクラスのMEASURE列挙体の値が返る
+	 * @param distance     Double type 3-array distance data.
+	 * @param angle        Double type 3-array angle data.
+	 * @param ave_distance Double type 2-array distance average data.
+	 * @param ave_angle    Double type 2-array angle average data.
+	 * @return Result of correlation (Enum.MEASURE value).
 	 */
 	public Enum.MEASURE measureCorrelation(double[][][] distance, double[][][] angle, double[][] ave_distance, double[][] ave_angle) {
 		LogUtil.log(Log.INFO);
@@ -145,7 +145,7 @@ public class Correlation {
 
 		R_point = R_point / 18;
 
-		mManageData.writeRpoint("Rpoint", net.trileg.motionauth.Registration.InputName.name, R_point);
+		mManageData.writeR("R", net.trileg.motionauth.Registration.InputName.name, R_point);
 
 		// X
 		if ((R_accel[0][0] > mEnum.LOOSE && R_accel[1][0] > mEnum.LOOSE) || (R_accel[1][0] > mEnum.LOOSE && R_accel[2][0] > mEnum.LOOSE) || (R_accel[0][0] > mEnum.LOOSE && R_accel[2][0] > mEnum.LOOSE)) {
@@ -255,13 +255,13 @@ public class Correlation {
 
 
 	/**
-	 * 相関を求め，同一のモーションであるかどうかを確認する
+	 * Calculate correlation to check whether each motion data is same motion or not.
 	 *
-	 * @param distance     double型の二次元配列距離データ
-	 * @param angle        double型の二次元配列角度データ
-	 * @param ave_distance double型の二次元配列距離データ
-	 * @param ave_angle    double型の虹連配列角度データ
-	 * @return EnumクラスのMEASURE列挙体の値が返る
+	 * @param distance     Double type 2-array distance data.
+	 * @param angle        Double type 2-array angle data.
+	 * @param ave_distance Double type 2-array distance average data.
+	 * @param ave_angle    Double type 2-array angle average data.
+	 * @return Result of correlation (Enum.MEASURE value).
 	 */
 	public Enum.MEASURE measureCorrelation(double[][] distance, double[][] angle, double[][] ave_distance, double[][] ave_angle) {
 		LogUtil.log(Log.INFO);
@@ -353,7 +353,7 @@ public class Correlation {
 		}
 		//endregion
 
-		mManageData.writeRData("AuthRData", InputName.name, R_accel, R_gyro);
+		mManageData.writeRData("AuthRData", InputName.userName, R_accel, R_gyro);
 
 		//region 相関の判定
 		//相関係数が一定以上あるなら認証成功

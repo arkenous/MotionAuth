@@ -1,9 +1,9 @@
 package net.trileg.motionauth.Utility;
 
 /**
- * 列挙型．相関周りの判定の際に使用
+ * Use for judgment of correlation.
  *
- * @author Kensuke Kousaka
+ * @author Kensuke Kosaka
  */
 public class Enum {
 	public enum MEASURE {

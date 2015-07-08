@@ -21,10 +21,9 @@ import java.util.Map;
 
 
 /**
- * 登録されているユーザ名を一覧表示する．
- * ユーザ名が選択されたら，そのユーザのデータをViewRegistedDataアクティビティにて表示する
+ * Show registered user name.
  *
- * @author Kensuke Kousaka
+ * @author Kensuke Kosaka
  */
 public class RegistrantList extends Activity {
 	String item;
@@ -36,7 +35,7 @@ public class RegistrantList extends Activity {
 
 		LogUtil.log(Log.INFO);
 
-		// タイトルバーの非表示
+		// Disable title bar.
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_registrant_list);
 
@@ -45,13 +44,13 @@ public class RegistrantList extends Activity {
 
 
 	/**
-	 * 登録されているユーザ名のリストを表示する
-	 * ユーザ名が選択されたら，そのユーザ名をViewRegistedDataに送る
+	 * Show registered user name.
+	 * Send user name to ViewRegisteredData when user name is selected.
 	 */
 	private void registrantList() {
 		LogUtil.log(Log.INFO);
 
-		// 登録されているユーザ名のリストを作成する
+		// Create registered user name list.
 		ArrayList<String> userList = getRegistrantName();
 
 		final ListView lv = (ListView) findViewById(R.id.listView1);
@@ -59,7 +58,6 @@ public class RegistrantList extends Activity {
 		ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
 
 		try {
-			// アイテム追加
 			for (String s : userList) adapter.add(s);
 		} catch (NullPointerException e) {
 			AlertDialog.Builder alert = new AlertDialog.Builder(RegistrantList.this);
@@ -76,29 +74,27 @@ public class RegistrantList extends Activity {
 			finish();
 		}
 
-		// リストビューにアダプタを設定
 		lv.setAdapter(adapter);
 
-		// リストビューのアイテムがクリックされた時
+		// When list item is selected.
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 				LogUtil.log(Log.VERBOSE, "Click item");
 
-				// クリックされたアイテムを取得
+				// Get item value which selected.
 				item = lv.getItemAtPosition(position).toString();
 
-				// itemを次のアクティビティに送る
-				RegistrantList.this.moveActivity(getPackageName(), getPackageName() + ".ViewDataList.ViewRegistedData", true);
+				RegistrantList.this.moveActivity(getPackageName(), getPackageName() + ".ViewDataList.ViewRegisteredData", true);
 			}
 		});
 	}
 
 
 	/**
-	 * 指定されたディレクトリ以下のファイルリストを作成する
+	 * Create file list under specified directory.
 	 *
-	 * @return 作成されたString配列型のリスト
+	 * @return Created String type list.
 	 */
 	private ArrayList<String> getRegistrantName() {
 		LogUtil.log(Log.INFO);
@@ -116,23 +112,20 @@ public class RegistrantList extends Activity {
 
 
 	/**
-	 * アクティビティを移動する
+	 * Move activity.
 	 *
-	 * @param pkgName 移動先のパッケージ名
-	 * @param actName 移動先のアクティビティ名
-	 * @param flg     戻るキーを押した際にこのアクティビティを表示させるかどうか
+	 * @param pkgName Destination package name.
+	 * @param actName Destination activity name.
+	 * @param flg     Whether to show this activity if user push BACK KEY.
 	 */
 	private void moveActivity(String pkgName, String actName, boolean flg) {
 		LogUtil.log(Log.INFO);
 
 		Intent intent = new Intent();
-
 		intent.setClassName(pkgName, actName);
-
-		if (actName.equals(getPackageName() + ".ViewDataList.ViewRegistedData")) intent.putExtra("item", item);
-
+		if (actName.equals(getPackageName() + ".ViewDataList.ViewRegisteredData")) intent.putExtra("item", item);
 		if (flg) intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
-		startActivityForResult(intent, 0);
+		startActivity(intent);
 	}
 }

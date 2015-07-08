@@ -51,11 +51,11 @@
             android:label="@string/title_activity_registrant_list"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".ViewDataList.ViewRegistedData"
+            android:name=".ViewDataList.ViewRegisteredData"
             android:label="@string/title_activity_view_registed_data"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".ViewDataList.ViewRegistedRData"
+            android:name=".ViewDataList.ViewRegisteredRData"
             android:label="@string/title_activity_view_registed_rdata"
             android:screenOrientation="portrait"></activity>
         <activity

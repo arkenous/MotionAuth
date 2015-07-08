@@ -10,20 +10,20 @@ import java.util.TreeMap;
 
 
 /**
- * データの時間的なズレを修正する
+ * Correct time gap of each data.
  *
- * @author Kensuke Kousaka
+ * @author Kensuke Kosaka
  */
 public class CorrectDeviation {
 
 	/**
-	 * 取得回数ごとのデータのズレを時間的なズレを修正する
+	 * Correct time gap of each data.
 	 *
-	 * @param distance 修正する距離データ
-	 * @param angle    修正する角度データ
-	 * @param mode     どこを基準にとるか
-	 * @param target   どちらのデータに基準を置くか
-	 * @return newData ズレ修正後のdouble型の4次元配列データ
+	 * @param distance Double type 3-array distance data.
+	 * @param angle    Double type 3-array angle data.
+	 * @param mode     Criterion for correction.
+	 * @param target   Which data to set standard.
+	 * @return newData Corrected double type 4-array data which include distance and angle data.
 	 */
 	public double[][][][] correctDeviation(double[][][] distance, double[][][] angle, Enum.MODE mode, Enum.TARGET target) {
 		LogUtil.log(Log.INFO);

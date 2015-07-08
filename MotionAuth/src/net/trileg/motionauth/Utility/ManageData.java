@@ -11,9 +11,9 @@ import java.util.ArrayList;
 
 
 /**
- * データをSDカードに書き込む
+ * Write data to SD Card.
  *
- * @author Kensuke Kousaka
+ * @author Kensuke Kosaka
  */
 public class ManageData {
 	private static final String APP_NAME = "MotionAuth";
@@ -22,36 +22,32 @@ public class ManageData {
 	private BufferedWriter bw;
 
 	/**
-	 * Float型の三次元配列データをアウトプットする．保存先は，SDカードディレクトリ/folderName/userName/fileName+回数+次元
+	 * Write float type 3-array data. Write destination is SD Card directory/folderName/userName/fileName+times+dimension
 	 *
-	 * @param folderName 保存するフォルダ名
-	 * @param dataName   保存するデータ名
-	 * @param userName   保存するユーザ名
-	 * @param data       保存するfloat型の3次元配列データ
+	 * @param folderName Directory name.
+	 * @param dataName   Data name.
+	 * @param userName   User name.
+	 * @param data       Float type 3-array data to write.
 	 */
 	public void writeFloatThreeArrayData(String folderName, String dataName, String userName, float[][][] data) {
 		LogUtil.log(Log.INFO);
 
-		// SDカードのマウント確認
+		// Get status of SD Card mounting.
 		String status = Environment.getExternalStorageState();
 
-		// マウントされていない場合
+		// SD Card is not mounted.
 		if (!status.equals(Environment.MEDIA_MOUNTED)) {
 			LogUtil.log(Log.ERROR, "SDCard not mounted");
 			return;
 		}
 
-		// SDカードのフォルダパスの取得
 		String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-
-		// SDカードにフォルダを作成
 		String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + folderName + File.separator + userName;
 
 		File file = new File(FOLDER_PATH);
 
 		try {
 			if (!file.exists()) {
-				// フォルダがない場合
 				if (!file.mkdirs()) {
 					LogUtil.log(Log.DEBUG, "Make directory error");
 				}
@@ -61,11 +57,10 @@ public class ManageData {
 		}
 
 		try {
-			// 1ファイルでave_distance_y_1@みたいな感じでやる
 			String dimension = null;
 
 			for (int i = 0; i < data.length; i++) {
-				// X,Y,Zループ
+				// X,Y,Z loop.
 				for (int j = 0; j < data[i].length; j++) {
 					if (j == 0) {
 						dimension = "x";
@@ -75,11 +70,10 @@ public class ManageData {
 						dimension = "z";
 					}
 
-					// ファイルパス
 					String filePath = FOLDER_PATH + File.separator + dataName + String.valueOf(i) + dimension;
 					file = new File(filePath);
 
-					// ファイルを追記モードで書き込む
+					// Write data to file.
 					fos = new FileOutputStream(file, false);
 					osw = new OutputStreamWriter(fos, "UTF-8");
 					bw = new BufferedWriter(osw);
@@ -99,35 +93,30 @@ public class ManageData {
 
 
 	/**
-	 * Double型の２次元配列データをアウトプットする． 保存先は，SDカードディレクトリ/folderName/userName/fileName+次元
+	 * Write double type 2-array data. Write destination is SD Card directory/folderName/userName/fileName+dimension
 	 *
-	 * @param folderName 保存するフォルダ名
-	 * @param dataName   保存するデータ名
-	 * @param userName   保存するユーザ名
-	 * @param data       保存するdouble型の２次元配列データ
-	 * @return 保存に成功したらtrue，失敗したらfalseを返す
+	 * @param folderName Directory name.
+	 * @param dataName   Data name.
+	 * @param userName   User name.
+	 * @param data       Double type 2-array data to write.
+	 * @return Return true when write data complete, otherwise false.
 	 */
 	public boolean writeDoubleTwoArrayData(String folderName, String dataName, String userName, double[][] data) {
 		LogUtil.log(Log.INFO);
-		// SDカードのマウント確認
+
 		String status = Environment.getExternalStorageState();
 		if (!status.equals(Environment.MEDIA_MOUNTED)) {
-			// マウントされていない場合
 			LogUtil.log(Log.ERROR, "SDCard not mounted");
 			return false;
 		}
 
-		// SDカードのフォルダパスの取得
 		String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-
-		// SDカードにフォルダを作成
 		String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + folderName + File.separator + userName;
 
 		File file = new File(FOLDER_PATH);
 
 		try {
 			if (!file.exists()) {
-				// フォルダがない場合
 				if (!file.mkdirs()) {
 					LogUtil.log(Log.ERROR, "Make directory error");
 				}
@@ -140,7 +129,7 @@ public class ManageData {
 		try {
 			String dimension = null;
 
-			// X,Y,Zループ
+			// X,Y,Z loop.
 			for (int i = 0; i < data.length; i++) {
 				if (i == 0) {
 					dimension = "x";
@@ -150,11 +139,10 @@ public class ManageData {
 					dimension = "z";
 				}
 
-				// ファイルパス
 				String filePath = FOLDER_PATH + File.separator + dataName + String.valueOf(i) + dimension;
 				file = new File(filePath);
 
-				// ファイルを追記モードで書き込む
+				// Write data to file.
 				fos = new FileOutputStream(file, false);
 				osw = new OutputStreamWriter(fos, "UTF-8");
 				bw = new BufferedWriter(osw);
@@ -175,34 +163,28 @@ public class ManageData {
 
 
 	/**
-	 * Double型の三次元配列データをアウトプットする． 保存先は，SDカードディレクトリ/folderName/userName/fileName+回数+次元
+	 * Write double type 3-array data. Write destination is SD Card directory/folderName/userName/fileName+times+dimension
 	 *
-	 * @param folderName 保存するフォルダ名
-	 * @param dataName   保存するデータ名
-	 * @param userName   保存するユーザ名
-	 * @param data       保存するdouble型の３次元配列データ
+	 * @param folderName Directory name.
+	 * @param dataName   Data name.
+	 * @param userName   User name.
+	 * @param data       Double type 3-array data to write.
 	 */
 	public void writeDoubleThreeArrayData(String folderName, String dataName, String userName, double[][][] data) {
 		LogUtil.log(Log.INFO);
 
-		// SDカードのマウント確認
 		String status = Environment.getExternalStorageState();
 		if (!status.equals(Environment.MEDIA_MOUNTED)) {
-			// マウントされていない場合
 			LogUtil.log(Log.ERROR, "SDCard not mounted");
 		}
 
-		// SDカードのフォルダパスの取得
 		String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-
-		// SDカードにフォルダを作成
 		String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + folderName + File.separator + userName;
 
 		File file = new File(FOLDER_PATH);
 
 		try {
 			if (!file.exists()) {
-				// フォルダがない場合
 				if (!file.mkdirs()) {
 					LogUtil.log(Log.ERROR, "Make directory Error");
 				}
@@ -215,7 +197,7 @@ public class ManageData {
 			String dimension = null;
 
 			for (int i = 0; i < data.length; i++) {
-				// X,Y,Zループ
+				// X,Y,Z loop.
 				for (int j = 0; j < data[i].length; j++) {
 					if (j == 0) {
 						dimension = "x";
@@ -225,17 +207,15 @@ public class ManageData {
 						dimension = "z";
 					}
 
-					// ファイルパス
 					String filePath = FOLDER_PATH + File.separator + dataName + String.valueOf(i) + dimension;
 					file = new File(filePath);
 
-					// ファイルを追記モードで書き込む
+					// Write data to file.
 					fos = new FileOutputStream(file, false);
 					osw = new OutputStreamWriter(fos, "UTF-8");
 					bw = new BufferedWriter(osw);
 
 					for (int k = 0; k < data[0][0].length; k++) {
-						//bw.write(dataName + "_" + dimension + "_" + String.valueOf(i + 1) + "@" + data[i][j][k] + "\n");
 						bw.write(data[i][j][k] + "\n");
 						bw.flush();
 					}
@@ -251,34 +231,28 @@ public class ManageData {
 
 
 	/**
-	 * Double型の２次元配列データをアウトプットする． 保存先は，SDカードディレクトリ/folderName/userName/fileName+次元
+	 * Write double type 2-array data. Write destination is SD Card directory/folderName/userName/fileName+dimension
 	 *
-	 * @param folderName 保存するフォルダ名
-	 * @param dataName   保存するデータ名
-	 * @param userName   保存するユーザ名
-	 * @param data       保存するdouble型の２次元配列データ
+	 * @param folderName Directory name.
+	 * @param dataName   Data name.
+	 * @param userName   User name.
+	 * @param data       Double type 2-array data to write.
 	 */
 	public void writeRData(String folderName, String dataName, String userName, double[][] data) {
 		LogUtil.log(Log.INFO);
 
-		// SDカードのマウント確認
 		String status = Environment.getExternalStorageState();
 		if (!status.equals(Environment.MEDIA_MOUNTED)) {
-			// マウントされていない場合
 			LogUtil.log(Log.ERROR, "SDCard not mounted");
 		}
 
-		// SDカードのフォルダパスの取得
 		String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-
-		// SDカードにフォルダを作成
 		String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + folderName + File.separator + userName;
 
 		File file = new File(FOLDER_PATH);
 
 		try {
 			if (!file.exists()) {
-				// フォルダがない場合
 				if (!file.mkdirs()) {
 					LogUtil.log(Log.ERROR, "Make directory error");
 				}
@@ -292,7 +266,7 @@ public class ManageData {
 
 			for (int i = 0; i < data.length; i++) {
 
-				// X,Y,Zループ
+				// X,Y,Z loop.
 				for (int j = 0; j < data[i].length; j++) {
 					if (j == 0) {
 						dimension = "x";
@@ -302,11 +276,10 @@ public class ManageData {
 						dimension = "z";
 					}
 
-					// ファイルパス
 					String filePath = FOLDER_PATH + File.separator + dataName + String.valueOf(i) + dimension;
 					file = new File(filePath);
 
-					// ファイルを追記モードで書き込む
+					// Write data to file.
 					fos = new FileOutputStream(file, false);
 					osw = new OutputStreamWriter(fos, "UTF-8");
 					bw = new BufferedWriter(osw);
@@ -324,34 +297,28 @@ public class ManageData {
 
 
 	/**
-	 * Double型の２次元配列データをアウトプットする． 保存先は，SDカードディレクトリ/MotionAuth/folderName/userName
+	 * Write double type 2-array data. Write destination is SD Card directory/MotionAuth/folderName/userName
 	 *
-	 * @param folderName 保存するフォルダ名
-	 * @param userName   保存するユーザ名
-	 * @param R_accel    保存する1次元double型配列の加速度Rデータ
-	 * @param R_gyro     保存する1次元double型配列の角速度Rデータ
+	 * @param folderName Directory name.
+	 * @param userName   User name.
+	 * @param R_accel    Double type 1-array distance-R data.
+	 * @param R_gyro     Double type 1-array angle-R data.
 	 */
 	public void writeRData(String folderName, String userName, double[] R_accel, double[] R_gyro) {
 		LogUtil.log(Log.INFO);
 
-		// SDカードのマウント確認
 		String status = Environment.getExternalStorageState();
 		if (!status.equals(Environment.MEDIA_MOUNTED)) {
-			// マウントされていない場合
 			LogUtil.log(Log.ERROR, "SDCard not mounted");
 		}
 
-		// SDカードのフォルダパスの取得
 		String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-
-		// SDカードにフォルダを作成
 		String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + folderName;
 
 		File file = new File(FOLDER_PATH);
 
 		try {
 			if (!file.exists()) {
-				// フォルダがない場合
 				if (!file.mkdirs()) {
 					LogUtil.log(Log.ERROR, "Make directory error");
 				}
@@ -361,11 +328,10 @@ public class ManageData {
 		}
 
 		try {
-			// ファイルパス
 			String filePath = FOLDER_PATH + File.separator + userName;
 			file = new File(filePath);
 
-			// ファイルを追記モードで書き込む
+			// Write data to file.
 			fos = new FileOutputStream(file, false);
 			osw = new OutputStreamWriter(fos, "UTF-8");
 			bw = new BufferedWriter(osw);
@@ -411,101 +377,16 @@ public class ManageData {
 		}
 	}
 
-	// 実験用．新規登録モードにおける登録データをSDカードに保存する
-	public void writeRegistedDataToSd(String folderName, String userName, double[][] averageDistance, double[][] averageAngle) {
+
+	public void writeR(String folderName, String userName, double data) {
 		LogUtil.log(Log.INFO);
 
-		// SDカードのマウント確認
 		String status = Environment.getExternalStorageState();
 		if (!status.equals(Environment.MEDIA_MOUNTED)) {
 			LogUtil.log(Log.ERROR, "SDCard not mounted");
 		}
 
 		String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-
-		String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + folderName;
-
-		File file = new File(FOLDER_PATH);
-
-		try {
-			if (!file.exists()) {
-				if (!file.mkdirs()) {
-					LogUtil.log(Log.ERROR, "Make directory error");
-				}
-			}
-		} catch (Exception e) {
-			LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
-		}
-
-		try {
-			String filePath = FOLDER_PATH + File.separator + userName;
-			file = new File(filePath);
-
-			fos = new FileOutputStream(file, false);
-			osw = new OutputStreamWriter(fos, "UTF-8");
-			bw = new BufferedWriter(osw);
-
-			// 距離データ書き込み
-			for (int i = 0; i < averageDistance.length; i++) {
-				for (int j = 0; j < averageDistance[i].length; j++) {
-					switch (i) {
-						case 0:
-							// dimention x
-							bw.write(String.valueOf(averageDistance[i][j]) + "\n");
-							break;
-						case 1:
-							// dimention y
-							bw.write(String.valueOf(averageDistance[i][j]) + "\n");
-							break;
-						case 2:
-							// dimention z
-							bw.write(String.valueOf(averageDistance[i][j]) + "\n");
-							break;
-					}
-				}
-			}
-
-
-			// 角度データ書き込み
-			for (int i = 0; i < averageAngle.length; i++) {
-				for (int j = 0; j < averageAngle[i].length; j++) {
-					switch (i) {
-						case 0:
-							// dimention x
-							bw.write(String.valueOf(averageAngle[i][j]) + "\n");
-							break;
-						case 1:
-							// dimention y
-							bw.write(String.valueOf(averageAngle[i][j]) + "\n");
-							break;
-						case 2:
-							// dimention z
-							bw.write(String.valueOf(averageAngle[i][j]) + "\n");
-							break;
-					}
-				}
-			}
-
-			bw.close();
-			osw.close();
-			fos.close();
-		} catch (Exception e) {
-			LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
-		}
-	}
-
-
-	public void writeRpoint(String folderName, String userName, double data) {
-		LogUtil.log(Log.INFO);
-
-		// SDカードのマウント確認
-		String status = Environment.getExternalStorageState();
-		if (!status.equals(Environment.MEDIA_MOUNTED)) {
-			LogUtil.log(Log.ERROR, "SDCard not mounted");
-		}
-
-		String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-
 		String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + folderName;
 
 		File file = new File(FOLDER_PATH);
@@ -540,28 +421,23 @@ public class ManageData {
 
 
 	/**
-	 * RegistMotionより渡された，認証のキーとなるデータをアウトプットする
+	 * Save authentication key data which is collected from Registration.
 	 *
-	 * @param userName        保存するユーザ名
-	 * @param averageDistance 保存する距離データ
-	 * @param averageAngle    保存する角度データ
-	 * @param ampValue        データ増幅値
-	 * @param context         呼び出し元のコンテキスト
+	 * @param userName        User name.
+	 * @param averageDistance Double type 2-array average distance data.
+	 * @param averageAngle    Double type 2-array average angle data.
+	 * @param ampValue        Amplifier value.
+	 * @param context         Caller context.
 	 */
-	// 受け取ったデータをCipherクラスに渡し，暗号化されたデータを保存する
-	//public void writeRegistedData (String userName, double[][] averageDistance, double[][] averageAngle, boolean isAmplify, Context context) {
-	public void writeRegistedData(String userName, double[][] averageDistance, double[][] averageAngle, double ampValue, Context context) {
+	public void writeRegisterData(String userName, double[][] averageDistance, double[][] averageAngle, double ampValue, Context context) {
 
 		LogUtil.log(Log.INFO);
 
-		// 暗号処理を担うオブジェクトを生成
 		CipherCrypt mCipherCrypt = new CipherCrypt(context);
 
 		String[][] averageDistanceStr = new String[averageDistance.length][averageDistance[0].length];
 		String[][] averageAngleStr = new String[averageAngle.length][averageAngle[0].length];
 
-		// 暗号化処理
-		// double型二次元配列で受け取ったデータをString型二次元配列に変換する
 		for (int i = 0; i < averageDistance.length; i++) {
 			for (int j = 0; j < averageDistance[i].length; j++) {
 				averageDistanceStr[i][j] = String.valueOf(averageDistance[i][j]);
@@ -570,13 +446,13 @@ public class ManageData {
 		}
 
 		// 暗号化
-		String[][] encryptedAvarageDistanceStr = mCipherCrypt.encrypt(averageDistanceStr);
+		String[][] encryptedAverageDistanceStr = mCipherCrypt.encrypt(averageDistanceStr);
 		String[][] encryptedAverageAngleStr = mCipherCrypt.encrypt(averageAngleStr);
 
 		// 配列データを特定文字列を挟んで連結する
 		ConvertArrayAndString mConvertArrayAndString = new ConvertArrayAndString();
-		String registDistanceData = mConvertArrayAndString.arrayToString(encryptedAvarageDistanceStr);
-		String registAngleData = mConvertArrayAndString.arrayToString(encryptedAverageAngleStr);
+		String registerDistanceData = mConvertArrayAndString.arrayToString(encryptedAverageDistanceStr);
+		String registerAngleData = mConvertArrayAndString.arrayToString(encryptedAverageAngleStr);
 
 		Context mContext = context.getApplicationContext();
 		SharedPreferences userPref = mContext.getSharedPreferences("UserList", Context.MODE_PRIVATE);
@@ -588,36 +464,36 @@ public class ManageData {
 		SharedPreferences preferences = mContext.getSharedPreferences(APP_NAME, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = preferences.edit();
 
-		editor.putString(userName + "distance", registDistanceData);
-		editor.putString(userName + "angle", registAngleData);
+		editor.putString(userName + "distance", registerDistanceData);
+		editor.putString(userName + "angle", registerAngleData);
 		editor.putString(userName + "amplify", String.valueOf(ampValue));
 		editor.apply();
 	}
 
 
 	/**
-	 * SharedPreferencesに保存されたデータを読み取るクラス
+	 * Read registered data from SharedPreferences
 	 *
-	 * @param context  アプリケーション固有のプリファレンスを取得する際に必要となるコンテキスト
-	 * @param userName 読み取るユーザ名
-	 * @return 読み取ったdouble型二次元配列データ
+	 * @param context Context use to get Application unique SharedPreferences.
+	 * @param userName User name.
+	 * @return Double type 2-array registered data list.
 	 */
-	public ArrayList<double[][]> readRegistedData(Context context, String userName) {
+	public ArrayList<double[][]> readRegisteredData(Context context, String userName) {
 		LogUtil.log(Log.INFO);
 		Context mContext = context.getApplicationContext();
 
 		SharedPreferences preferences = mContext.getSharedPreferences(APP_NAME, Context.MODE_PRIVATE);
 
-		String registedDistanceData = preferences.getString(userName + "distance", "");
-		String registedAngleData = preferences.getString(userName + "angle", "");
+		String registeredDistanceData = preferences.getString(userName + "distance", "");
+		String registeredAngleData = preferences.getString(userName + "angle", "");
 
-		if ("".equals(registedDistanceData)) throw new RuntimeException();
+		if ("".equals(registeredDistanceData)) throw new RuntimeException();
 
 		ConvertArrayAndString mConvertArrayAndString = new ConvertArrayAndString();
 		CipherCrypt mCipherCrypt = new CipherCrypt(context);
 
-		String[][] decryptedDistance = mCipherCrypt.decrypt(mConvertArrayAndString.stringToArray(registedDistanceData));
-		String[][] decryptedAngle = mCipherCrypt.decrypt(mConvertArrayAndString.stringToArray(registedAngleData));
+		String[][] decryptedDistance = mCipherCrypt.decrypt(mConvertArrayAndString.stringToArray(registeredDistanceData));
+		String[][] decryptedAngle = mCipherCrypt.decrypt(mConvertArrayAndString.stringToArray(registeredAngleData));
 
 		double[][] distance = new double[3][100], angle = new double[3][100];
 
@@ -637,32 +513,27 @@ public class ManageData {
 
 
 	/**
-	 * Float型3次元リストデータをSD_PATH/MotionAuth/dir/user/type+回数+次元で保存する
+	 * Write float type 3-array list data. Write destination is SD Card directory/MotionAuth/dir/user/type+times+dimension
 	 *
-	 * @param dir  任意のディレクトリ名
-	 * @param user ユーザ名
-	 * @param type 取得元のセンサ名
-	 * @param data Float型3次元リストデータ
+	 * @param dir  Directory name.
+	 * @param user User name.
+	 * @param type Sensor name.
+	 * @param data Float type 3-array list data.
 	 */
 	public void writeThreeDimenList(String dir, String user, String type, ArrayList<ArrayList<ArrayList<Float>>> data) {
 		LogUtil.log(Log.INFO);
-
-		// SDカードのマウント確認
 
 		if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 			LogUtil.log(Log.ERROR, "SD-Card not mounted");
 			return;
 		}
 
-		// SDカードのディレクトリパスを取得
 		String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-
-		// SDカードにディレクトリを作成
 		String DIR_PATH = SD_PATH + File.separator + APP_NAME + File.separator + dir + File.separator + user;
+
 		File file = new File(DIR_PATH);
 		try {
 			if (!file.exists()) {
-				// ディレクトリが存在しない場合
 				if (!file.mkdirs()) {
 					LogUtil.log(Log.DEBUG, "Make directory Error");
 				}
@@ -686,11 +557,10 @@ public class ManageData {
 						dimension = "";
 					}
 
-					// ファイルパスを指定
 					String filePath = DIR_PATH + File.separator + type + String.valueOf(time) + dimension;
 					file = new File(filePath);
 
-					// ファイルを書き込む
+					// Write data to file.
 					fos = new FileOutputStream(file, false);
 					osw = new OutputStreamWriter(fos, "UTF-8");
 					bw = new BufferedWriter(osw);

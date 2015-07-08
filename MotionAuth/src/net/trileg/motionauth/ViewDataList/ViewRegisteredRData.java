@@ -18,11 +18,11 @@ import java.util.ArrayList;
 
 
 /**
- * モーション登録時の相関係数の結果を表示する
+ * Show registration R data.
  *
- * @author Kensuke Kousaka
+ * @author Kensuke Kosaka
  */
-public class ViewRegistedRData extends Activity {
+public class ViewRegisteredRData extends Activity {
 	String item = null;
 	int flgCount;
 
@@ -41,11 +41,11 @@ public class ViewRegistedRData extends Activity {
 		}
 		flgCount = 0;
 
-		viewRegistedData();
+		viewRegisteredData();
 	}
 
 
-	private void viewRegistedData() {
+	private void viewRegisteredData() {
 		LogUtil.log(Log.INFO);
 
 		Intent intent = getIntent();
@@ -129,6 +129,6 @@ public class ViewRegistedRData extends Activity {
 
 		if (flg) intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
-		startActivityForResult(intent, 0);
+		startActivity(intent);
 	}
 }

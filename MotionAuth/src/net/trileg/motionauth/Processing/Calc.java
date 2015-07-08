@@ -4,18 +4,18 @@ import android.util.Log;
 import net.trileg.motionauth.Utility.LogUtil;
 
 /**
- * 加速度や角速度から，速度や角度を求める
+ * Calculate distance or angle from acceleration or gyroscope.
  *
- * @author Kensuke Kousaka
+ * @author Kensuke Kosaka
  */
 public class Calc {
 
 	/**
-	 * 加速度データを距離データに変換する
+	 * Convert acceleration data to distance data.
 	 *
-	 * @param inputVal 変換対象の，三次元加速度データ
-	 * @param t        時間
-	 * @return 変換後の三次元距離データ
+	 * @param inputVal 3-array acceleration data for target of conversion.
+	 * @param t        time
+	 * @return After converted 3-array distance data.
 	 */
 	public double[][][] accelToDistance(double[][][] inputVal, double t) {
 		LogUtil.log(Log.INFO);
@@ -35,11 +35,11 @@ public class Calc {
 
 
 	/**
-	 * 角速度データを角度データに変換する
+	 * Convert gyroscope data to angle data.
 	 *
-	 * @param inputVal 変換対象の，三次元角速度データ
-	 * @param t        時間
-	 * @return 変換後の三次元角度データ
+	 * @param inputVal 3-array gyroscope data for target of conversion.
+	 * @param t        time
+	 * @return After converted 3-array angle data.
 	 */
 	public double[][][] gyroToAngle(double[][][] inputVal, double t) {
 		LogUtil.log(Log.INFO);
@@ -59,11 +59,11 @@ public class Calc {
 
 
 	/**
-	 * 加速度データを距離データに変換する
+	 * Convert acceleration data to distance data.
 	 *
-	 * @param inputVal 変換対象の，三次元加速度データ
-	 * @param t        時間
-	 * @return 変換後の三次元距離データ
+	 * @param inputVal 2-array acceleration data for target of conversion.
+	 * @param t        time
+	 * @return After converted 2-array distance data.
 	 */
 	public double[][] accelToDistance(double[][] inputVal, double t) {
 		LogUtil.log(Log.INFO);
@@ -81,11 +81,11 @@ public class Calc {
 
 
 	/**
-	 * 角速度データを角度データに変換する
+	 * Convert gyroscope data to angle data.
 	 *
-	 * @param inputVal 変換対象の，三次元角速度データ
-	 * @param t        時間
-	 * @return 変換後の三次元角度データ
+	 * @param inputVal 2-array gyroscope data for target of conversion.
+	 * @param t        time
+	 * @return After converted 2-array angle data.
 	 */
 	public double[][] gyroToAngle(double[][] inputVal, double t) {
 		LogUtil.log(Log.INFO);

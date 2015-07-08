@@ -16,9 +16,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * ユーザ認証を行う
+ * Authentication.
  *
- * @author Kensuke Kousaka
+ * @author Kensuke Kosaka
  */
 public class Authentication extends Activity {
 	private TextView secondTv;
@@ -26,7 +26,6 @@ public class Authentication extends Activity {
 	private Button getMotionBtn;
 
 	private GetData mGetData;
-	private Authentication mAuthentication;
 
 
 	@Override
@@ -36,15 +35,15 @@ public class Authentication extends Activity {
 		LogUtil.log(Log.INFO);
 
 		setContentView(R.layout.activity_auth_motion);
-		mAuthentication = this;
 
-		authMotion();
+		authentication();
 	}
 
+
 	/**
-	 * 認証画面にイベントリスナ等を設定する
+	 * Registration event lister and call GetData using ExecutorService to collect data.
 	 */
-	private void authMotion() {
+	private void authentication() {
 		LogUtil.log(Log.INFO);
 
 		Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
@@ -53,8 +52,8 @@ public class Authentication extends Activity {
 		countSecondTv = (TextView) findViewById(R.id.textView4);
 		getMotionBtn = (Button) findViewById(R.id.button1);
 
-		nameTv.setText(InputName.name + "さん読んでね！");
-		mGetData = new GetData(mAuthentication, getMotionBtn, secondTv, vibrator, this);
+		nameTv.setText(InputName.userName + "さん読んでね！");
+		mGetData = new GetData(this, getMotionBtn, secondTv, vibrator);
 
 		getMotionBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -73,6 +72,13 @@ public class Authentication extends Activity {
 	}
 
 
+	/**
+	 * Call when data collecting is finished.
+	 * Call Result using ExecutorService to authenticate and show result.
+	 *
+	 * @param accel Original acceleration data collecting from GetData.
+	 * @param gyro  Original gyroscope data collecting from GetData.
+	 */
 	public void finishGetMotion(float[][] accel, float[][] gyro) {
 		LogUtil.log(Log.INFO);
 		if (getMotionBtn.isClickable()) getMotionBtn.setClickable(false);
@@ -92,19 +98,22 @@ public class Authentication extends Activity {
 
 		progressDialog.show();
 
-		Result mResult = new Result(mAuthentication, accel, gyro, getMotionBtn, progressDialog, this, mGetData);
+		Result mResult = new Result(this, accel, gyro, getMotionBtn, progressDialog, mGetData);
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
 		executorService.execute(mResult);
 	}
 
 
-	public void finishAuth() {
+	/**
+	 * Move to Start activity.
+	 */
+	public void finishAuthentication() {
 		LogUtil.log(Log.INFO);
 		Intent intent = new Intent();
 		intent.setClassName(getPackageName(), getPackageName() + ".Start");
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
-		startActivityForResult(intent, 0);
+		startActivity(intent);
 		finish();
 	}
 

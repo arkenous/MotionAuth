@@ -14,9 +14,9 @@ import java.io.*;
 import java.util.ArrayList;
 
 /**
- * 認証試験モードにおいて出た相関係数の結果を表示する
+ * Show authentication R data.
  *
- * @author Kensuke Kousaka
+ * @author Kensuke Kosaka
  */
 public class ViewAuthRData extends Activity {
 	String item = null;

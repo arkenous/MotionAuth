@@ -1,10 +1,10 @@
 package net.trileg.motionauth.Processing;
 
 /**
- * データの時間的長さを揃える．
- * 調整する際は，最も長いものに合わせる．
+ * Adjustment data length.
+ * Set adjustment base to longest data.
  *
- * @author Kensuke Kousaka
+ * @author Kensuke Kosaka
  */
 public class Adjuster {
 	public double[][][][] adjust(double[][][] accel, double[][][] gyro) {

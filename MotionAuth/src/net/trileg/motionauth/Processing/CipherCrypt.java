@@ -13,9 +13,9 @@ import java.security.*;
 
 
 /**
- * 暗号化に関係する処理
+ * Encrypt or Decrypt data.
  *
- * @author Kensuke Kousaka
+ * @author Kensuke Kosaka
  */
 public class CipherCrypt {
 	private static final int ENCRYPT_KEY_LENGTH = 128;
@@ -28,9 +28,9 @@ public class CipherCrypt {
 
 
 	/**
-	 * 暗号化・復号に必要なSecret Key，IV（Initialization Vector）の準備を行う
+	 * Prepare Secret key and IV (Initialization Vector) using Encrypt and Decrypt data.
 	 *
-	 * @param context アプリケーション固有のSharedPreferencesを取得する際に用いるContext
+	 * @param context Context use to get Application unique SharedPreferences.
 	 */
 	public CipherCrypt(Context context) {
 		LogUtil.log(Log.INFO);
@@ -92,7 +92,7 @@ public class CipherCrypt {
 
 
 	/**
-	 * 暗号化・復号に使用するSecret Keyを生成する
+	 * Generate Secret key using Encrypt and Decrypt.
 	 *
 	 * @return Secret Key
 	 */
@@ -112,9 +112,9 @@ public class CipherCrypt {
 
 
 	/**
-	 * 暗号化・復号に使用するIVを生成する
+	 * Generate IV (Initialization Vector) using Encrypt and Decrypt.
 	 *
-	 * @return byte配列型のIV
+	 * @return byte-array IV.
 	 */
 	private byte[] generateIv() {
 		LogUtil.log(Log.INFO);
@@ -135,10 +135,10 @@ public class CipherCrypt {
 
 
 	/**
-	 * 入力されたString型二次元配列データを暗号化したものを返す
+	 * Encrypt String type 2-array data.
 	 *
-	 * @param input String型二次元配列データ
-	 * @return 暗号化されたString型二次元配列データ
+	 * @param input String type 2-array data.
+	 * @return Encrypted String type 2-array data.
 	 */
 	public String[][] encrypt(String[][] input) {
 		LogUtil.log(Log.INFO);
@@ -179,10 +179,10 @@ public class CipherCrypt {
 
 
 	/**
-	 * 入力された暗号化済みString型二次元配列データを復号したものを返す
+	 * Decrypt String type 2-array data.
 	 *
-	 * @param input 暗号化されたString型二次元配列データ
-	 * @return 復号されたString型二次元配列データ
+	 * @param input String type encrypted 2-array data
+	 * @return Decrypted String type 2-array data.
 	 */
 	public String[][] decrypt(String[][] input) {
 		LogUtil.log(Log.INFO);

@@ -12,6 +12,12 @@ import android.support.annotation.NonNull;
 import android.widget.Button;
 import android.widget.TextView;
 
+/**
+ * Collecting data and return it.
+ * Data collecting is running on the ExecutorService thread.
+ *
+ * @author Kensuke Kosaka
+ */
 public class GetData extends Handler implements Runnable, SensorEventListener {
 	private static final int PREPARATION = 1;
 	private static final int GET_MOTION = 0;
@@ -38,14 +44,14 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 	private float[][] mAcceleration = new float[3][100];
 	private float[][] mGyro = new float[3][100];
 
-	public GetData(Authentication authentication, Button getMotion, TextView second, Vibrator vibrator,
-	               Context context) {
+
+	public GetData(Authentication authentication, Button getMotion, TextView second, Vibrator vibrator) {
 		mAuthentication = authentication;
 		mGetMotion = getMotion;
 		mSecond = second;
 		mVibrator = vibrator;
 
-		mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+		mSensorManager = (SensorManager) mAuthentication.getSystemService(Context.SENSOR_SERVICE);
 		mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		mGyroscopeSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 	}
@@ -53,17 +59,23 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 
 	@Override
 	public void run() {
-		get(PREPARATION);
+		collect(PREPARATION);
 	}
 
-	private void get(int status) {
+
+	/**
+	 * Collecting data from sensor.
+	 *
+	 * @param status Stage of PREPARATION or GET_MOTION
+	 */
+	private void collect(int status) {
 		switch (status) {
 			case PREPARATION:
 				countdown--;
 				switch (countdown) {
 					case 0:
 						super.sendEmptyMessage(1);
-						get(GET_MOTION);
+						collect(GET_MOTION);
 						break;
 					default:
 						super.sendEmptyMessage(0);
@@ -72,7 +84,7 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-						get(PREPARATION);
+						collect(PREPARATION);
 						break;
 				}
 				break;
@@ -101,9 +113,9 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-					get(GET_MOTION);
+					collect(GET_MOTION);
 				} else {
-					sendEmptyMessage(5); // Complete getting data.
+					sendEmptyMessage(5); // Completed collecting data.
 				}
 				break;
 		}
@@ -146,25 +158,39 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 		}
 	}
 
+
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) mOriginAcceleration = event.values.clone();
 		if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) mOriginGyro = event.values.clone();
 	}
 
+
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 	}
 
+
+	/**
+	 * Register sensor listener.
+	 */
 	public void registrationSensor() {
 		mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
 		mSensorManager.registerListener(this, mGyroscopeSensor, SensorManager.SENSOR_DELAY_GAME);
 	}
 
+
+	/**
+	 * Un-Register sensor listener.
+	 */
 	public void unRegistrationSensor() {
 		mSensorManager.unregisterListener(this);
 	}
 
+
+	/**
+	 * Reset value using count of collecting data.
+	 */
 	public void reset() {
 		countdown = 4;
 		countData = 0;

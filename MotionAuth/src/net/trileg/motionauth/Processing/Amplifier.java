@@ -4,19 +4,19 @@ import android.util.Log;
 import net.trileg.motionauth.Utility.LogUtil;
 
 /**
- * データの値を増幅させる
+ * Amplify data.
  *
- * @author Kensuke Kousaka
+ * @author Kensuke Kosaka
  */
 public class Amplifier {
 	private boolean isRangeCheck = false;
 
 
 	/**
-	 * 全試行回数中，一回でもデータの幅が閾値よりも小さければtrueを返す
+	 * Check weather data is less than threshold.
 	 *
-	 * @param data チェックするdouble型三次元配列データ
-	 * @return 全試行回数中，一回でもデータの幅が閾値よりも小さければtrue，そうでなければfalse
+	 * @param data Double type 3-array data to check.
+	 * @return true if data is less than threshold even once during the entire number of trials, otherwise false.
 	 */
 	public boolean CheckValueRange(double[][][] data, double checkRangeValue) {
 		LogUtil.log(Log.INFO);
@@ -59,11 +59,11 @@ public class Amplifier {
 
 
 	/**
-	 * 与えられたデータを増幅させる
+	 * Amplify data.
 	 *
-	 * @param data     増幅させるdouble型三次元配列データ
-	 * @param ampValue どれだけデータを増幅させるか
-	 * @return 増幅後のdouble型三次元配列データ
+	 * @param data     Double type 3-array data to amplify.
+	 * @param ampValue How much amplify data.
+	 * @return Amplified double type 3-array data
 	 */
 	public double[][][] Amplify(double[][][] data, double ampValue) {
 		LogUtil.log(Log.INFO);
@@ -82,11 +82,11 @@ public class Amplifier {
 
 
 	/**
-	 * 与えられたデータを増幅させる
+	 * Amplify data.
 	 *
-	 * @param data     増幅させるdouble型二次元配列データ
-	 * @param ampValue どれだけデータを増幅させるか
-	 * @return 増幅後のdouble型二次元配列データ
+	 * @param data     Double type 2-array data to amplify.
+	 * @param ampValue How much amplify data.
+	 * @return Amplified double type 2-array data
 	 */
 	public double[][] Amplify(double[][] data, double ampValue) {
 		LogUtil.log(Log.INFO);

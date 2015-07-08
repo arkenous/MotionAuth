@@ -3,7 +3,7 @@ package net.trileg.motionauth.Utility;
 import android.util.Log;
 
 /**
- * @author Kensuke Kousaka
+ * @author Kensuke Kosaka
  */
 public class LogUtil {
 	private static final String TAG = "Logging";
@@ -88,13 +88,12 @@ public class LogUtil {
 	}
 
 	/**
-	 * スタックトレースから呼び出し元の基本情報を取得
+	 * Get basic information of caller from stacktrace.
 	 *
 	 * @return <<className#methodName:lineNumber>>
 	 */
 	private static String getStackTraceInfo() {
-		// 現在のスタックトレースを取得
-		// 0:VM 1:スレッド 2:getStackTraceInfo() 3:outputLog() 4:logDebug()等 5:呼び出し元
+		// 0:VM 1:thread 2:getStackTraceInfo() 3:outputLog() 4:logDebug(), etc. 5:caller
 		StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[5];
 
 		String fullName = stackTraceElement.getClassName();

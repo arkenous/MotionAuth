@@ -21,76 +21,6 @@ public class ManageData {
 	private OutputStreamWriter osw;
 	private BufferedWriter bw;
 
-	/**
-	 * Write float type 3-array data. Write destination is SD Card directory/folderName/userName/fileName+times+dimension
-	 *
-	 * @param folderName Directory name.
-	 * @param dataName   Data name.
-	 * @param userName   User name.
-	 * @param data       Float type 3-array data to write.
-	 */
-	public void writeFloatThreeArrayData(String folderName, String dataName, String userName, float[][][] data) {
-		LogUtil.log(Log.INFO);
-
-		// Get status of SD Card mounting.
-		String status = Environment.getExternalStorageState();
-
-		// SD Card is not mounted.
-		if (!status.equals(Environment.MEDIA_MOUNTED)) {
-			LogUtil.log(Log.ERROR, "SDCard not mounted");
-			return;
-		}
-
-		String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-		String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + folderName + File.separator + userName;
-
-		File file = new File(FOLDER_PATH);
-
-		try {
-			if (!file.exists()) {
-				if (!file.mkdirs()) {
-					LogUtil.log(Log.DEBUG, "Make directory error");
-				}
-			}
-		} catch (Exception e) {
-			LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
-		}
-
-		try {
-			String dimension = null;
-
-			for (int i = 0; i < data.length; i++) {
-				// X,Y,Z loop.
-				for (int j = 0; j < data[i].length; j++) {
-					if (j == 0) {
-						dimension = "x";
-					} else if (j == 1) {
-						dimension = "y";
-					} else if (j == 2) {
-						dimension = "z";
-					}
-
-					String filePath = FOLDER_PATH + File.separator + dataName + String.valueOf(i) + dimension;
-					file = new File(filePath);
-
-					// Write data to file.
-					fos = new FileOutputStream(file, false);
-					osw = new OutputStreamWriter(fos, "UTF-8");
-					bw = new BufferedWriter(osw);
-
-					for (int k = 0; k < data[i][j].length; k++) {
-						bw.write(dataName + "_" + dimension + "_" + String.valueOf(i + 1) + "@" + data[i][j][k] + "\n");
-					}
-					bw.close();
-					osw.close();
-					fos.close();
-				}
-			}
-		} catch (Exception e) {
-			LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
-		}
-	}
-
 
 	/**
 	 * Write double type 2-array data. Write destination is SD Card directory/folderName/userName/fileName+dimension
@@ -215,7 +145,7 @@ public class ManageData {
 					osw = new OutputStreamWriter(fos, "UTF-8");
 					bw = new BufferedWriter(osw);
 
-					for (int k = 0; k < data[0][0].length; k++) {
+					for (int k = 0; k < data[i][j].length; k++) {
 						bw.write(data[i][j][k] + "\n");
 						bw.flush();
 					}
@@ -495,7 +425,8 @@ public class ManageData {
 		String[][] decryptedDistance = mCipherCrypt.decrypt(mConvertArrayAndString.stringToArray(registeredDistanceData));
 		String[][] decryptedAngle = mCipherCrypt.decrypt(mConvertArrayAndString.stringToArray(registeredAngleData));
 
-		double[][] distance = new double[3][100], angle = new double[3][100];
+		double[][] distance = new double[decryptedDistance.length][decryptedDistance[0].length];
+		double[][] angle = new double[decryptedAngle.length][decryptedAngle[0].length];
 
 		for (int i = 0; i < decryptedDistance.length; i++) {
 			for (int j = 0; j < decryptedDistance[i].length; j++) {
@@ -520,7 +451,7 @@ public class ManageData {
 	 * @param type Sensor name.
 	 * @param data Float type 3-array list data.
 	 */
-	public void writeThreeDimenList(String dir, String user, String type, ArrayList<ArrayList<ArrayList<Float>>> data) {
+	public void writeFloatData(String dir, String user, String type, ArrayList<ArrayList<ArrayList<Float>>> data) {
 		LogUtil.log(Log.INFO);
 
 		if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {

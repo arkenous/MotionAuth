@@ -13,8 +13,10 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import net.trileg.motionauth.R;
+import net.trileg.motionauth.Utility.Enum.STATUS;
 import net.trileg.motionauth.Utility.LogUtil;
 
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -59,20 +61,31 @@ public class Registration extends Activity {
 		getMotionBtn = (Button) findViewById(R.id.button1);
 
 		nameTv.setText(InputName.name + "さん読んでね！");
-		mGetData = new GetData(mRegistration, getMotionBtn, secondTv, countSecondTv, mVibrator, this);
+		mGetData = new GetData(mRegistration, getMotionBtn, secondTv, countSecondTv, mVibrator, STATUS.UP, this);
 
-		getMotionBtn.setOnClickListener(new View.OnClickListener() {
+		getMotionBtn.setOnTouchListener(new View.OnTouchListener() {
 			@Override
-			public void onClick(View v) {
-				LogUtil.log(Log.VERBOSE, "Click get motion button");
-				if (v.isClickable()) {
-					v.setClickable(false);
-					getMotionBtn.setText("インターバル中");
-					countSecondTv.setText("秒");
-
-					ExecutorService executorService = Executors.newSingleThreadExecutor();
-					executorService.execute(mGetData);
+			public boolean onTouch(View v, MotionEvent event) {
+				switch (event.getAction()) {
+					case MotionEvent.ACTION_DOWN:
+						LogUtil.log(Log.VERBOSE, "Action down getMotionBtn");
+						getMotionBtn.setText("Interval");
+						countSecondTv.setText("秒");
+						mGetData.changeStatus(STATUS.DOWN);
+						ExecutorService executorService = Executors.newSingleThreadExecutor();
+						executorService.execute(mGetData);
+						executorService.shutdown();
+						break;
+					case MotionEvent.ACTION_UP:
+						LogUtil.log(Log.VERBOSE, "Action up getMotionBtn");
+						mGetData.changeStatus(STATUS.UP);
+						break;
+					case MotionEvent.ACTION_CANCEL:
+						LogUtil.log(Log.VERBOSE, "Action cancel getMotionBtn");
+						mGetData.changeStatus(STATUS.UP);
+						break;
 				}
+				return true;
 			}
 		});
 	}
@@ -85,7 +98,7 @@ public class Registration extends Activity {
 	 * @param accel Original acceleration data collecting from GetData.
 	 * @param gyro Original gyroscope data collecting from GetData.
 	 */
-	public void finishGetMotion(float[][][] accel, float[][][] gyro) {
+	public void finishGetMotion(ArrayList<ArrayList<ArrayList<Float>>> accel, ArrayList<ArrayList<ArrayList<Float>>> gyro) {
 		LogUtil.log(Log.INFO);
 		if (getMotionBtn.isClickable()) getMotionBtn.setClickable(false);
 		secondTv.setText("0");
@@ -108,6 +121,7 @@ public class Registration extends Activity {
 				ampValue, this, mGetData);
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
 		executorService.submit(mResult);
+		executorService.shutdown();
 	}
 
 

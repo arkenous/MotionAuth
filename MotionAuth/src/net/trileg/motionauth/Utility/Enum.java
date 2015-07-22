@@ -6,6 +6,10 @@ package net.trileg.motionauth.Utility;
  * @author Kensuke Kosaka
  */
 public class Enum {
+	public enum STATUS {
+		DOWN, UP
+	}
+
 	public enum MEASURE {
 		BAD, INCORRECT, CORRECT, PERFECT
 	}

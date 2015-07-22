@@ -1,5 +1,7 @@
 package net.trileg.motionauth.Processing;
 
+import java.util.ArrayList;
+
 /**
  * Adjustment data length.
  * Set adjustment base to longest data.
@@ -7,74 +9,105 @@ package net.trileg.motionauth.Processing;
  * @author Kensuke Kosaka
  */
 public class Adjuster {
-	public double[][][][] adjust(double[][][] accel, double[][][] gyro) {
-		int first = accel[0][0].length;
-		int second = accel[1][0].length;
-		int third = accel[2][0].length;
+	public ArrayList<float[][][]> adjust(ArrayList<ArrayList<ArrayList<Float>>> acceleration,
+	                                     ArrayList<ArrayList<ArrayList<Float>>> gyroscope) {
+		// Get max length of each time data.
+		int firstLength = acceleration.get(0).get(0).size();
+		int secondLength = acceleration.get(1).get(0).size();
+		int thirdLength = acceleration.get(2).get(0).size();
 
-		int maxTime = 0;
-		int maxLength = 0;
+		int maxTime;
+		int maxLength;
 
-		if (first >= second && first >= third) {
+		if (firstLength >= secondLength && firstLength >= thirdLength) {
 			maxTime = 0;
-			maxLength = first;
-		} else if (second >= first && second >= third) {
+			maxLength = firstLength;
+		} else if (secondLength >= firstLength && secondLength >= thirdLength) {
 			maxTime = 1;
-			maxLength = second;
-		} else if (third >= first && third >= second) {
+			maxLength = secondLength;
+		} else {
 			maxTime = 2;
-			maxLength = third;
+			maxLength = thirdLength;
 		}
 
-		double[][][][] result = new double[2][3][3][maxLength];
+		// Adjust data length to even number for low pass filtering
+		if (maxLength % 2 != 0) maxLength -= 1;
 
-		for (int kind = 0; kind < 2; kind++) {
-			if (kind == 0) {
-				for (int time = 0; time < 3; time++) {
-					if (time == maxTime) {
-						for (int axis = 0; axis < 3; axis++) {
-							for (int length = 0; length < maxLength; length++) {
-								result[kind][time][axis][length] = accel[time][axis][length];
-							}
-						}
-					} else {
-						// 1回目が5，2回目が3，diffが2
-						int diff = maxLength - accel[time][0].length;
+		float[][][] accelerationArray = new float[acceleration.size()][acceleration.get(0).size()][maxLength];
+		float[][][] gyroscopeArray = new float[gyroscope.size()][gyroscope.get(0).size()][maxLength];
 
-						for (int axis = 0; axis < 3; axis++) {
-							for (int length = 0; length < maxLength - diff; length++) {
-								result[kind][time][axis][length] = accel[time][axis][length];
-							}
-							for (int length = diff; length < maxLength; length++) {
-								result[kind][time][axis][length] = 0;
-							}
-						}
+		for (int time = 0; time < 3; time++) {
+			if (time == maxTime) {
+				for (int axis = 0; axis < 3; axis++) {
+					for (int length = 0; length < maxLength; length++) {
+						accelerationArray[time][axis][length] = acceleration.get(time).get(axis).get(length);
+						gyroscopeArray[time][axis][length] = gyroscope.get(time).get(axis).get(length);
 					}
 				}
 			} else {
-				for (int time = 0; time < 3; time++) {
-					if (time == maxTime) {
-						for (int axis = 0; axis < 3; axis++) {
-							for (int length = 0; length < maxLength; length++) {
-								result[kind][time][axis][length] = gyro[time][axis][length];
-							}
-						}
-					} else {
-						int diff = maxLength - gyro[time][0].length;
+				int diff = maxLength - acceleration.get(time).get(0).size();
 
-						for (int axis = 0; axis < 3; axis++) {
-							for (int length = 0; length < maxLength - diff; length++) {
-								result[kind][time][axis][length] = gyro[time][axis][length];
-							}
-							for (int length = diff; length < maxLength; length++) {
-								result[kind][time][axis][length] = 0;
-							}
+				for (int axis = 0; axis < 3; axis++) {
+					for (int length = 0; length < maxLength; length++) {
+						if (length < maxLength - diff) {
+							accelerationArray[time][axis][length] = acceleration.get(time).get(axis).get(length);
+							gyroscopeArray[time][axis][length] = gyroscope.get(time).get(axis).get(length);
+						} else {
+							accelerationArray[time][axis][length] = 0;
+							gyroscopeArray[time][axis][length] = 0;
 						}
 					}
 				}
 			}
 		}
 
+		ArrayList<float[][][]> result = new ArrayList<>();
+		result.add(accelerationArray);
+		result.add(gyroscopeArray);
+		return result;
+	}
+
+
+	public ArrayList<float[][]> adjust(ArrayList<ArrayList<Float>> acceleration, ArrayList<ArrayList<Float>> gyroscope,
+	                                   int registeredDataLength) {
+		float[][] accelerationArray = new float[acceleration.size()][registeredDataLength];
+		float[][] gyroscopeArray = new float[gyroscope.size()][registeredDataLength];
+
+		if (registeredDataLength < acceleration.get(0).size()) {
+			// New data is longer than registered data.
+			for (int axis = 0; axis < 3; axis++) {
+				for (int length = 0; length < registeredDataLength; length++) {
+					accelerationArray[axis][length] = acceleration.get(axis).get(length);
+					gyroscopeArray[axis][length] = gyroscope.get(axis).get(length);
+				}
+			}
+		} else if (registeredDataLength > acceleration.get(0).size()) {
+			// New data is shorter than registered data.
+			int diff = registeredDataLength - acceleration.get(0).size();
+
+			for (int axis = 0; axis < 3; axis++) {
+				for (int length = 0; length < registeredDataLength; length++) {
+					if (length < registeredDataLength - diff) {
+						accelerationArray[axis][length] = acceleration.get(axis).get(length);
+						gyroscopeArray[axis][length] = gyroscope.get(axis).get(length);
+					} else {
+						accelerationArray[axis][length] = 0;
+						gyroscopeArray[axis][length] = 0;
+					}
+				}
+			}
+		} else {
+			for (int axis = 0; axis < 3; axis++) {
+				for (int length = 0; length < registeredDataLength; length++) {
+					accelerationArray[axis][length] = acceleration.get(axis).get(length);
+					gyroscopeArray[axis][length] = gyroscope.get(axis).get(length);
+				}
+			}
+		}
+
+		ArrayList<float[][]> result = new ArrayList<>();
+		result.add(accelerationArray);
+		result.add(gyroscopeArray);
 		return result;
 	}
 }

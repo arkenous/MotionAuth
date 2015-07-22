@@ -82,7 +82,8 @@ public class ViewRegisteredData extends Activity {
 		double[][] readDistance = readData.get(0);
 		double[][] readAngle = readData.get(1);
 
-		String[][] registeredDistance = new String[3][100], registeredAngle = new String[3][100];
+		String[][] registeredDistance = new String[readDistance.length][readDistance[0].length];
+		String[][] registeredAngle = new String[readAngle.length][readAngle[0].length];
 		for (int i = 0; i < readDistance.length; i++) {
 			for (int j = 0; j < readDistance[i].length; j++) {
 				registeredDistance[i][j] = String.valueOf(readDistance[i][j]);

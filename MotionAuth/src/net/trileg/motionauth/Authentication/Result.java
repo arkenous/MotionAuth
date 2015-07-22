@@ -11,10 +11,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Button;
 import net.trileg.motionauth.Lowpass.Fourier;
-import net.trileg.motionauth.Processing.Amplifier;
-import net.trileg.motionauth.Processing.Calc;
-import net.trileg.motionauth.Processing.Correlation;
-import net.trileg.motionauth.Processing.Formatter;
+import net.trileg.motionauth.Processing.*;
 import net.trileg.motionauth.Utility.Enum;
 import net.trileg.motionauth.Utility.LogUtil;
 import net.trileg.motionauth.Utility.ManageData;
@@ -41,21 +38,22 @@ public class Result extends Handler implements Runnable {
 	private Fourier mFourier = new Fourier();
 	private Calc mCalc = new Calc();
 	private Correlation mCorrelation = new Correlation();
+	private Adjuster mAdjuster = new Adjuster();
 
 	private Authentication mAuthentication;
 	private Button mGetMotion;
 	private GetData mGetData;
 	private ProgressDialog mProgressDialog;
 	private double mAmp;
-	private float[][] mAccel;
-	private float[][] mGyro;
-	private double[][] registeredDistance = new double[3][100];
-	private double[][] registeredAngle = new double[3][100];
+	private ArrayList<ArrayList<Float>> mAccel;
+	private ArrayList<ArrayList<Float>> mGyro;
+	private double[][] registeredDistance;
+	private double[][] registeredAngle;
 	private boolean result = false;
 
 
-	public Result(Authentication authentication, float[][] accel, float[][] gyro, Button getMotion,
-	              ProgressDialog progressDialog, GetData getData) {
+	public Result(Authentication authentication, ArrayList<ArrayList<Float>> accel, ArrayList<ArrayList<Float>> gyro,
+	              Button getMotion, ProgressDialog progressDialog, GetData getData) {
 		mAuthentication = authentication;
 		mAccel = accel;
 		mGyro = gyro;
@@ -149,26 +147,30 @@ public class Result extends Handler implements Runnable {
 	/**
 	 * Calculate data and authenticate.
 	 *
-	 * @param accel Acceleration data which collect in Authentication.GetData.
-	 * @param gyro  Gyroscope data which collect in Authentication.GetData.
+	 * @param accelList Acceleration data which collect in Authentication.GetData.
+	 * @param gyroList  Gyroscope data which collect in Authentication.GetData.
 	 * @return true if authentication is succeed, otherwise false.
 	 */
-	private boolean calculate(float[][] accel, float[][] gyro) {
+	private boolean calculate(ArrayList<ArrayList<Float>> accelList, ArrayList<ArrayList<Float>> gyroList) {
+		ArrayList<float[][]> adjusted = mAdjuster.adjust(accelList, gyroList, registeredDistance[0].length);
+		float[][] accel = adjusted.get(0);
+		float[][] gyro = adjusted.get(1);
+
 		this.sendEmptyMessage(FORMAT);
-		double[][] accelDouble = mFormatter.floatToDoubleFormatter(accel);
-		double[][] gyroDouble = mFormatter.floatToDoubleFormatter(gyro);
+		double[][] acceleration = mFormatter.floatToDoubleFormatter(accel);
+		double[][] gyroscope = mFormatter.floatToDoubleFormatter(gyro);
 
 		this.sendEmptyMessage(AMPLIFY);
-		accelDouble = mAmplifier.Amplify(accelDouble, mAmp);
-		gyroDouble = mAmplifier.Amplify(gyroDouble, mAmp);
+		acceleration = mAmplifier.Amplify(acceleration, mAmp);
+		gyroscope = mAmplifier.Amplify(gyroscope, mAmp);
 
 		this.sendEmptyMessage(FOURIER);
-		accelDouble = mFourier.LowpassFilter(accelDouble, "accel");
-		gyroDouble = mFourier.LowpassFilter(gyroDouble, "gyro");
+		acceleration = mFourier.LowpassFilter(acceleration, "accel");
+		gyroscope = mFourier.LowpassFilter(gyroscope, "gyro");
 
 		this.sendEmptyMessage(CONVERT);
-		double[][] distance = mCalc.accelToDistance(accelDouble, 0.03);
-		double[][] angle = mCalc.gyroToAngle(gyroDouble, 0.03);
+		double[][] distance = mCalc.accelToDistance(acceleration, 0.03);
+		double[][] angle = mCalc.gyroToAngle(gyroscope, 0.03);
 
 		this.sendEmptyMessage(FORMAT);
 		distance = mFormatter.doubleToDoubleFormatter(distance);

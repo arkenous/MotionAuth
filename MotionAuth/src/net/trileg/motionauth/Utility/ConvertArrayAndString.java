@@ -61,9 +61,13 @@ public class ConvertArrayAndString {
 	public String[][] stringToArray(String input) {
 		LogUtil.log(Log.INFO);
 		String[] splitDimension = input.split("'");
-		String[][] result = new String[3][100];
-
-		for (int i = 0; i < splitDimension.length; i++) result[i] = splitDimension[i].split(",");
+		String[] dimenX = splitDimension[0].split(",");
+		String[] dimenY = splitDimension[1].split(",");
+		String[] dimenZ = splitDimension[2].split(",");
+		String[][] result = new String[3][dimenX.length];
+		result[0] = dimenX;
+		result[1] = dimenY;
+		result[2] = dimenZ;
 
 		return result;
 	}

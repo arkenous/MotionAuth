@@ -11,6 +11,9 @@ import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.widget.Button;
 import android.widget.TextView;
+import net.trileg.motionauth.Utility.Enum.STATUS;
+
+import java.util.ArrayList;
 
 /**
  * Collecting data and return it.
@@ -38,18 +41,28 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 	private Authentication mAuthentication;
 
 	private int countdown = 4;
-	private int countData = 0;
+
+	private STATUS mStatus;
+
 	private float[] mOriginAcceleration = new float[3];
 	private float[] mOriginGyro = new float[3];
-	private float[][] mAcceleration = new float[3][100];
-	private float[][] mGyro = new float[3][100];
+	private ArrayList<ArrayList<Float>> mAcceleration = new ArrayList<>();
+	private ArrayList<ArrayList<Float>> mGyroscope = new ArrayList<>();
 
 
-	public GetData(Authentication authentication, Button getMotion, TextView second, Vibrator vibrator) {
+	/**
+	 * @param authentication Authentication class context.
+	 * @param getMotion      Get motion button.
+	 * @param second         Second TextView.
+	 * @param vibrator       Vibrator.
+	 * @param status         Status of touch event.
+	 */
+	public GetData(Authentication authentication, Button getMotion, TextView second, Vibrator vibrator, STATUS status) {
 		mAuthentication = authentication;
 		mGetMotion = getMotion;
 		mSecond = second;
 		mVibrator = vibrator;
+		mStatus = status;
 
 		mSensorManager = (SensorManager) mAuthentication.getSystemService(Context.SENSOR_SERVICE);
 		mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -57,8 +70,19 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 	}
 
 
+	public void changeStatus(STATUS status) {
+		mStatus = status;
+	}
+
+
 	@Override
 	public void run() {
+		mAcceleration.clear();
+		mGyroscope.clear();
+		for (int i = 0; i < 3; i++) {
+			mAcceleration.add(new ArrayList<Float>());
+			mGyroscope.add(new ArrayList<Float>());
+		}
 		collect(PREPARATION);
 	}
 
@@ -66,10 +90,10 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 	/**
 	 * Collecting data from sensor.
 	 *
-	 * @param status Stage of PREPARATION or GET_MOTION
+	 * @param stage Stage of PREPARATION or GET_MOTION
 	 */
-	private void collect(int status) {
-		switch (status) {
+	private void collect(int stage) {
+		switch (stage) {
 			case PREPARATION:
 				countdown--;
 				switch (countdown) {
@@ -89,25 +113,12 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 				}
 				break;
 			case GET_MOTION:
-				if (countData < 100) {
+				if (mStatus == STATUS.DOWN) {
 					for (int i = 0; i < 3; i++) {
-						mAcceleration[i][countData] = mOriginAcceleration[i];
-						mGyro[i][countData] = mOriginGyro[i];
+						mAcceleration.get(i).add(mOriginAcceleration[i]);
+						mGyroscope.get(i).add(mOriginGyro[i]);
 					}
 
-					countData++;
-
-					switch (countData) {
-						case 1:
-							super.sendEmptyMessage(2);
-							break;
-						case 33:
-							super.sendEmptyMessage(3);
-							break;
-						case 66:
-							super.sendEmptyMessage(4);
-							break;
-					}
 					try {
 						Thread.sleep(GET_INTERVAL);
 					} catch (InterruptedException e) {
@@ -148,10 +159,9 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 				break;
 			case 5:
 				mVibrator.vibrate(VIBRATOR_LONG);
-				mAuthentication.finishGetMotion(mAcceleration, mGyro);
+				mAuthentication.finishGetMotion(mAcceleration, mGyroscope);
 				break;
 			case 10:
-				mGetMotion.setClickable(true);
 				mSecond.setText("3");
 				mGetMotion.setText("モーションデータ取得");
 				break;
@@ -193,7 +203,6 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 	 */
 	public void reset() {
 		countdown = 4;
-		countData = 0;
 		sendEmptyMessage(10);
 	}
 }

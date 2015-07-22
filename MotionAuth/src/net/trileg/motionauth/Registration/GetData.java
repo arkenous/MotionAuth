@@ -11,6 +11,9 @@ import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.widget.Button;
 import android.widget.TextView;
+import net.trileg.motionauth.Utility.Enum.STATUS;
+
+import java.util.ArrayList;
 
 /**
  * Collecting data and return it.
@@ -39,21 +42,27 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 	private Registration mRegistration;
 
 	private int countdown = 4;
-	private int countData = 0;
 	private int countTime = 0;
+
+	private STATUS mStatus;
+
 	private float[] mOriginAcceleration = new float[3];
 	private float[] mOriginGyro = new float[3];
-	private float[][][] mAcceleration = new float[3][3][100];
-	private float[][][] mGyro = new float[3][3][100];
+
+	private ArrayList<ArrayList<Float>> mAccelerationPerTime = new ArrayList<>();
+	private ArrayList<ArrayList<Float>> mGyroPerTime = new ArrayList<>();
+	private ArrayList<ArrayList<ArrayList<Float>>> mAcceleration = new ArrayList<>();
+	private ArrayList<ArrayList<ArrayList<Float>>> mGyro = new ArrayList<>();
 
 
 	public GetData(Registration registration, Button getMotion, TextView second, TextView count, Vibrator vibrator,
-	               Context context) {
+	               STATUS status, Context context) {
 		mRegistration = registration;
 		mGetMotion = getMotion;
 		mSecond = second;
 		mCount = count;
 		mVibrator = vibrator;
+		mStatus = status;
 
 		mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
 		mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -61,8 +70,19 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 	}
 
 
+	public void changeStatus(STATUS status) {
+		mStatus = status;
+	}
+
+
 	@Override
 	public void run() {
+		mAccelerationPerTime.clear();
+		mGyroPerTime.clear();
+		for (int i = 0; i < 3; i++) {
+			mAccelerationPerTime.add(new ArrayList<Float>());
+			mGyroPerTime.add(new ArrayList<Float>());
+		}
 		collect(PREPARATION);
 	}
 
@@ -98,17 +118,14 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 				break;
 			case 6:
 				mSecond.setText("2");
-				mGetMotion.setClickable(true);
 				break;
 			case 7:
 				mSecond.setText("1");
-				mGetMotion.setClickable(true);
 				break;
 			case 8:
 				mRegistration.finishGetMotion(mAcceleration, mGyro);
 				break;
 			case 10:
-				mGetMotion.setClickable(true);
 				mSecond.setText("3");
 				mGetMotion.setText("モーションデータ取得");
 				break;
@@ -119,10 +136,10 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 	/**
 	 * Collecting data from sensor.
 	 *
-	 * @param status Stage of PREPARATION or GET_MOTION
+	 * @param stage Stage of PREPARATION or GET_MOTION
 	 */
-	private void collect(int status) {
-		switch (status) {
+	private void collect(int stage) {
+		switch (stage) {
 			case PREPARATION:
 				countdown--;
 				switch (countdown) {
@@ -142,25 +159,12 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 				}
 				break;
 			case GET_MOTION:
-				if (countData < 100) {
+				if (mStatus == STATUS.DOWN) {
 					for (int i = 0; i < 3; i++) {
-						mAcceleration[countTime][i][countData] = mOriginAcceleration[i];
-						mGyro[countTime][i][countData] = mOriginGyro[i];
+						mAccelerationPerTime.get(i).add(mOriginAcceleration[i]);
+						mGyroPerTime.get(i).add(mOriginGyro[i]);
 					}
 
-					countData++;
-
-					switch (countData) {
-						case 1:
-							super.sendEmptyMessage(2);
-							break;
-						case 33:
-							super.sendEmptyMessage(3);
-							break;
-						case 66:
-							super.sendEmptyMessage(4);
-							break;
-					}
 					try {
 						Thread.sleep(GET_INTERVAL);
 					} catch (InterruptedException e) {
@@ -168,8 +172,11 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 					}
 					collect(GET_MOTION);
 				} else {
+					// Correct data per time finished
+
+					mAcceleration.add(new ArrayList<>(mAccelerationPerTime));
+					mGyro.add(new ArrayList<>(mGyroPerTime));
 					countTime++;
-					countData = 0;
 					countdown = 4;
 					super.sendEmptyMessage(5);
 
@@ -224,7 +231,6 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 	 */
 	public void reset() {
 		countdown = 4;
-		countData = 0;
 		countTime = 0;
 		sendEmptyMessage(10);
 	}

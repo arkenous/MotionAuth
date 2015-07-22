@@ -6,12 +6,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import net.trileg.motionauth.R;
+import net.trileg.motionauth.Utility.Enum.STATUS;
 import net.trileg.motionauth.Utility.LogUtil;
 
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -31,11 +34,9 @@ public class Authentication extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		LogUtil.log(Log.INFO);
 
 		setContentView(R.layout.activity_auth_motion);
-
 		authentication();
 	}
 
@@ -53,20 +54,31 @@ public class Authentication extends Activity {
 		getMotionBtn = (Button) findViewById(R.id.button1);
 
 		nameTv.setText(InputName.userName + "さん読んでね！");
-		mGetData = new GetData(this, getMotionBtn, secondTv, vibrator);
+		mGetData = new GetData(this, getMotionBtn, secondTv, vibrator, STATUS.UP);
 
-		getMotionBtn.setOnClickListener(new View.OnClickListener() {
+		getMotionBtn.setOnTouchListener(new View.OnTouchListener() {
 			@Override
-			public void onClick(View v) {
-				LogUtil.log(Log.VERBOSE, "Click get motion button");
-				if (v.isClickable()) {
-					v.setClickable(false);
-					getMotionBtn.setText("インターバル中");
-					countSecondTv.setText("秒");
-
-					ExecutorService executorService = Executors.newSingleThreadExecutor();
-					executorService.execute(mGetData);
+			public boolean onTouch(View v, MotionEvent event) {
+				switch (event.getAction()) {
+					case MotionEvent.ACTION_DOWN:
+						LogUtil.log(Log.VERBOSE, "Action down getMotionBtn");
+						getMotionBtn.setText("Interval");
+						countSecondTv.setText("秒");
+						mGetData.changeStatus(STATUS.DOWN);
+						ExecutorService executorService = Executors.newSingleThreadExecutor();
+						executorService.execute(mGetData);
+						executorService.shutdown();
+						break;
+					case MotionEvent.ACTION_UP:
+						LogUtil.log(Log.VERBOSE, "Action up getMotionBtn");
+						mGetData.changeStatus(STATUS.UP);
+						break;
+					case MotionEvent.ACTION_CANCEL:
+						LogUtil.log(Log.VERBOSE, "Action cancel getMotionBtn");
+						mGetData.changeStatus(STATUS.UP);
+						break;
 				}
+				return true;
 			}
 		});
 	}
@@ -79,7 +91,7 @@ public class Authentication extends Activity {
 	 * @param accel Original acceleration data collecting from GetData.
 	 * @param gyro  Original gyroscope data collecting from GetData.
 	 */
-	public void finishGetMotion(float[][] accel, float[][] gyro) {
+	public void finishGetMotion(ArrayList<ArrayList<Float>> accel, ArrayList<ArrayList<Float>> gyro) {
 		LogUtil.log(Log.INFO);
 		if (getMotionBtn.isClickable()) getMotionBtn.setClickable(false);
 		secondTv.setText("0");
@@ -101,6 +113,7 @@ public class Authentication extends Activity {
 		Result mResult = new Result(this, accel, gyro, getMotionBtn, progressDialog, mGetData);
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
 		executorService.execute(mResult);
+		executorService.shutdown();
 	}
 
 

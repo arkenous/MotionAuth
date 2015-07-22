@@ -29,7 +29,7 @@ public class CorrectDeviation {
 		LogUtil.log(Log.INFO);
 
 		// ずらしたデータを格納する配列
-		double[][][][] newData = new double[2][3][3][100];
+		double[][][][] newData = new double[2][distance.length][distance[0].length][distance[0][0].length];
 
 		// 試行回ごとの代表値の出ている時間を抽出
 		// 変数は，桁揃え，計算後のdistance，angleを利用する
@@ -69,7 +69,7 @@ public class CorrectDeviation {
 						LogUtil.log(Log.DEBUG, "MAX");
 						for (int i = 0; i < 3; i++) {
 							for (int j = 0; j < 3; j++) {
-								for (int k = 0; k < 100; k++) {
+								for (int k = 0; k < distance[i][j].length; k++) {
 									if (tmpValue[i][j] < distance[i][j][k]) {
 										tmpValue[i][j] = distance[i][j][k];
 										count[i][j] = k;
@@ -82,7 +82,7 @@ public class CorrectDeviation {
 						LogUtil.log(Log.DEBUG, "MIN");
 						for (int i = 0; i < 3; i++) {
 							for (int j = 0; j < 3; j++) {
-								for (int k = 0; k < 100; k++) {
+								for (int k = 0; k < distance[i][j].length; k++) {
 									if (tmpValue[i][j] > distance[i][j][k]) {
 										tmpValue[i][j] = distance[i][j][k];
 										count[i][j] = k;
@@ -98,13 +98,13 @@ public class CorrectDeviation {
 							for (int j = 0; j < 3; j++) {
 								TreeMap<Double, Integer> treeMap = new TreeMap<>();
 
-								for (int k = 0; k < 100; k++) {
+								for (int k = 0; k < distance[i][j].length; k++) {
 									treeMap.put(distance[i][j][k], k);
 								}
 
 								int loopCount = 0;
 								for (Integer initCount : treeMap.values()) {
-									if (loopCount == 49) {
+									if (loopCount == distance[i][j].length / 2) {
 										count[i][j] = initCount;
 									}
 
@@ -122,7 +122,7 @@ public class CorrectDeviation {
 						LogUtil.log(Log.DEBUG, "MAX");
 						for (int i = 0; i < 3; i++) {
 							for (int j = 0; j < 3; j++) {
-								for (int k = 0; k < 100; k++) {
+								for (int k = 0; k < angle[i][j].length; k++) {
 									if (tmpValue[i][j] < angle[i][j][k]) {
 										tmpValue[i][j] = angle[i][j][k];
 										count[i][j] = k;
@@ -135,7 +135,7 @@ public class CorrectDeviation {
 						LogUtil.log(Log.DEBUG, "MIN");
 						for (int i = 0; i < 3; i++) {
 							for (int j = 0; j < 3; j++) {
-								for (int k = 0; k < 100; k++) {
+								for (int k = 0; k < angle[i][j].length; k++) {
 									if (tmpValue[i][j] > angle[i][j][k]) {
 										tmpValue[i][j] = angle[i][j][k];
 										count[i][j] = k;
@@ -151,13 +151,13 @@ public class CorrectDeviation {
 							for (int j = 0; j < 3; j++) {
 								TreeMap<Double, Integer> treeMap = new TreeMap<>();
 
-								for (int k = 0; k < 100; k++) {
+								for (int k = 0; k < angle[i][j].length; k++) {
 									treeMap.put(angle[i][j][k], k);
 								}
 
 								int loopCount = 0;
 								for (Integer initCount : treeMap.values()) {
-									if (loopCount == 49) {
+									if (loopCount == angle[i][j].length / 2) {
 										count[i][j] = initCount;
 									}
 
@@ -187,7 +187,7 @@ public class CorrectDeviation {
 
 		// 1回目のデータに関しては基準となるデータなのでそのまま入れる
 		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 100; j++) {
+			for (int j = 0; j < distance[0][i].length; j++) {
 				newData[0][0][i][j] = distance[0][i][j];
 				newData[1][0][i][j] = angle[0][i][j];
 			}
@@ -199,13 +199,13 @@ public class CorrectDeviation {
 				ArrayList<Double> distanceTemp = new ArrayList<>();
 				ArrayList<Double> angleTemp = new ArrayList<>();
 
-				for (int k = 0; k < 100; k++) {
+				for (int k = 0; k < distance[i][j].length; k++) {
 					distanceTemp.add(distance[i][j][k]);
 					angleTemp.add(angle[i][j][k]);
 				}
 				Collections.rotate(distanceTemp, lagData[i - 1][j]);
 				Collections.rotate(angleTemp, lagData[i - 1][j]);
-				for (int k = 0; k < 100; k++) {
+				for (int k = 0; k < distance[i][j].length; k++) {
 					newData[0][i][j][k] = distanceTemp.get(k);
 					newData[1][i][j][k] = angleTemp.get(k);
 				}

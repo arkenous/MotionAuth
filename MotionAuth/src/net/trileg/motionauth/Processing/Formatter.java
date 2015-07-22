@@ -3,7 +3,6 @@ package net.trileg.motionauth.Processing;
 import android.util.Log;
 import net.trileg.motionauth.Utility.LogUtil;
 
-import java.util.ArrayList;
 import java.util.Locale;
 
 
@@ -57,33 +56,6 @@ public class Formatter {
 		}
 
 		return returnVal;
-	}
-
-
-	/**
-	 * Convert float type 3-array list data to double type.
-	 *
-	 * @param input  Float type 3-array list data.
-	 * @return Double type 3-array list data.
-	 */
-	public ArrayList<ArrayList<ArrayList<Double>>> floatToDoubleFormatter(ArrayList<ArrayList<ArrayList<Float>>> input) {
-		LogUtil.log(Log.INFO);
-
-		ArrayList<ArrayList<ArrayList<Double>>> output = new ArrayList<>();
-		ArrayList<ArrayList<Double>> period = new ArrayList<>();
-		ArrayList<Double> data = new ArrayList<>();
-
-		for (ArrayList<ArrayList<Float>> anInput : input) {
-			for (ArrayList<Float> anAnInput : anInput) {
-				for (Float anAnAnInput : anAnInput) {
-					data.add(Double.valueOf(anAnAnInput));
-				}
-				period.add(data);
-			}
-			output.add(period);
-		}
-
-		return output;
 	}
 
 

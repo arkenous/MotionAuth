@@ -16,6 +16,8 @@ import net.trileg.motionauth.Utility.Enum;
 import net.trileg.motionauth.Utility.LogUtil;
 import net.trileg.motionauth.Utility.ManageData;
 
+import java.util.ArrayList;
+
 /**
  * Register and show result to user.
  *
@@ -37,6 +39,7 @@ public class Result extends Handler implements Runnable {
 	private Calc mCalc = new Calc();
 	private Correlation mCorrelation = new Correlation();
 	private CorrectDeviation mCorrectDeviation = new CorrectDeviation();
+	private Adjuster mAdjuster = new Adjuster();
 
 	private Registration mRegistration;
 	private Button mGetMotion;
@@ -45,15 +48,17 @@ public class Result extends Handler implements Runnable {
 	private ProgressDialog mProgressDialog;
 	private double mCheckRange;
 	private double mAmp;
-	private float[][][] mAccel;
-	private float[][][] mGyro;
-	private double[][] averageDistance = new double[3][100];
-	private double[][] averageAngle = new double[3][100];
+
+	private ArrayList<ArrayList<ArrayList<Float>>> mAccel;
+	private ArrayList<ArrayList<ArrayList<Float>>> mGyro;
+	private double[][] averageDistance;
+	private double[][] averageAngle;
 	private boolean result = false;
 
 
-	public Result(Registration registration, float[][][] accel, float[][][] gyro, Button getMotion,
-	              ProgressDialog progressDialog, double checkRange, double amp, Context context, GetData getData) {
+	public Result(Registration registration, ArrayList<ArrayList<ArrayList<Float>>> accel,
+	              ArrayList<ArrayList<ArrayList<Float>>> gyro, Button getMotion, ProgressDialog progressDialog,
+	              double checkRange, double amp, Context context, GetData getData) {
 		mRegistration = registration;
 		mAccel = accel;
 		mGyro = gyro;
@@ -68,10 +73,10 @@ public class Result extends Handler implements Runnable {
 
 	@Override
 	public void run() {
-		mManageData.writeFloatThreeArrayData("RegistrationRaw", "Acceleration", InputName.name, mAccel);
-		mManageData.writeFloatThreeArrayData("RegistrationRaw", "Gyroscope", InputName.name, mGyro);
+		mManageData.writeFloatData("RegistrationRaw", InputName.name, "Acceleration", mAccel);
+		mManageData.writeFloatData("RegistrationRaw", "Gyroscope", InputName.name, mGyro);
 
-		result = calc(mAccel, mGyro);
+		result = calculate(mAccel, mGyro);
 		this.sendEmptyMessage(FINISH);
 	}
 
@@ -161,43 +166,46 @@ public class Result extends Handler implements Runnable {
 	/**
 	 * データ加工，計算処理を行う
 	 */
-	public boolean calc(float[][][] accel, float[][][] gyro) {
+	public boolean calculate(ArrayList<ArrayList<ArrayList<Float>>> accelList, ArrayList<ArrayList<ArrayList<Float>>> gyroList) {
 		LogUtil.log(Log.INFO);
+
+		ArrayList<float[][][]> adjusted = mAdjuster.adjust(accelList, gyroList);
+		float[][][] accel = adjusted.get(0);
+		float[][][] gyro = adjusted.get(1);
 
 		// データの桁揃え
 		this.sendEmptyMessage(FORMAT);
-		double[][][] accel_double = mFormatter.floatToDoubleFormatter(accel);
-		double[][][] gyro_double = mFormatter.floatToDoubleFormatter(gyro);
 
-		//TODO 回数ごとのデータの時間的長さを揃える
+		double[][][] acceleration = mFormatter.floatToDoubleFormatter(accel);
+		double[][][] gyroscope = mFormatter.floatToDoubleFormatter(gyro);
 
-		mManageData.writeDoubleThreeArrayData("BeforeAMP", "accel", InputName.name, accel_double);
-		mManageData.writeDoubleThreeArrayData("BeforeAMP", "gyro", InputName.name, gyro_double);
+		mManageData.writeDoubleThreeArrayData("BeforeAMP", "Acceleration", InputName.name, acceleration);
+		mManageData.writeDoubleThreeArrayData("BeforeAMP", "Gyroscope", InputName.name, gyroscope);
 
 		// データの増幅処理
-		if (mAmplifier.CheckValueRange(accel_double, mCheckRange) || mAmplifier.CheckValueRange(gyro_double, mCheckRange)) {
+		if (mAmplifier.CheckValueRange(acceleration, mCheckRange) || mAmplifier.CheckValueRange(gyroscope, mCheckRange)) {
 			this.sendEmptyMessage(AMPLIFY);
-			accel_double = mAmplifier.Amplify(accel_double, mAmp);
-			gyro_double = mAmplifier.Amplify(gyro_double, mAmp);
+			acceleration = mAmplifier.Amplify(acceleration, mAmp);
+			gyroscope = mAmplifier.Amplify(gyroscope, mAmp);
 		}
 
-		mManageData.writeDoubleThreeArrayData("AfterAMP", "accel", InputName.name, accel_double);
-		mManageData.writeDoubleThreeArrayData("AfterAMP", "gyro", InputName.name, gyro_double);
+		mManageData.writeDoubleThreeArrayData("AfterAMP", "Acceleration", InputName.name, acceleration);
+		mManageData.writeDoubleThreeArrayData("AfterAMP", "Gyroscope", InputName.name, gyroscope);
 
 		// フーリエ変換によるローパスフィルタ
 		this.sendEmptyMessage(FOURIER);
-		accel_double = mFourier.LowpassFilter(accel_double, "accel");
-		gyro_double = mFourier.LowpassFilter(gyro_double, "gyro");
+		acceleration = mFourier.LowpassFilter(acceleration, "Acceleration");
+		gyroscope = mFourier.LowpassFilter(gyroscope, "Gyroscope");
 
-		mManageData.writeDoubleThreeArrayData("AfterLowpass", "accel", InputName.name, accel_double);
-		mManageData.writeDoubleThreeArrayData("AfterLowpass", "gyro", InputName.name, gyro_double);
+		mManageData.writeDoubleThreeArrayData("AfterLowpass", "Acceleration", InputName.name, acceleration);
+		mManageData.writeDoubleThreeArrayData("AfterLowpass", "Gyroscope", InputName.name, gyroscope);
 
 		LogUtil.log(Log.DEBUG, "Finish fourier");
 
 		// 加速度から距離，角速度から角度へ変換
 		this.sendEmptyMessage(CONVERT);
-		double[][][] distance = mCalc.accelToDistance(accel_double, 0.03);
-		double[][][] angle = mCalc.gyroToAngle(gyro_double, 0.03);
+		double[][][] distance = mCalc.accelToDistance(acceleration, 0.03);
+		double[][][] angle = mCalc.gyroToAngle(gyroscope, 0.03);
 
 		this.sendEmptyMessage(FORMAT);
 		distance = mFormatter.doubleToDoubleFormatter(distance);
@@ -210,8 +218,10 @@ public class Result extends Handler implements Runnable {
 
 		this.sendEmptyMessage(DEVIATION);
 		// measureCorrelation用の平均値データを作成
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 100; j++) {
+		averageDistance = new double[distance[0].length][distance[0][0].length];
+		averageAngle = new double[angle[0].length][angle[0][0].length];
+		for (int i = 0; i < averageDistance.length; i++) {
+			for (int j = 0; j < averageDistance[i].length; j++) {
 				averageDistance[i][j] = (distance[0][i][j] + distance[1][i][j] + distance[2][i][j]) / 3;
 				averageAngle[i][j] = (angle[0][i][j] + angle[1][i][j] + angle[2][i][j]) / 3;
 				LogUtil.log(Log.DEBUG, "averageDistance: " + averageDistance[i][j]);
@@ -269,17 +279,17 @@ public class Result extends Handler implements Runnable {
 
 				double[][][][] deviatedValue = mCorrectDeviation.correctDeviation(originalDistance, originalAngle, mode, target);
 
-				for (int i = 0; i < 3; i++) {
-					for (int j = 0; j < 3; j++) {
-						for (int k = 0; k < 100; k++) {
+				for (int i = 0; i < distance.length; i++) {
+					for (int j = 0; j < distance[i].length; j++) {
+						for (int k = 0; k < distance[i][j].length; k++) {
 							distance[i][j][k] = deviatedValue[0][i][j][k];
 							angle[i][j][k] = deviatedValue[1][i][j][k];
 						}
 					}
 				}
 
-				for (int i = 0; i < 3; i++) {
-					for (int j = 0; j < 100; j++) {
+				for (int i = 0; i < averageDistance.length; i++) {
+					for (int j = 0; j < averageDistance[i].length; j++) {
 						averageDistance[i][j] = (distance[0][i][j] + distance[1][i][j] + distance[2][i][j]) / 3;
 						averageAngle[i][j] = (angle[0][i][j] + angle[1][i][j] + angle[2][i][j]) / 3;
 					}
@@ -315,8 +325,8 @@ public class Result extends Handler implements Runnable {
 
 		this.sendEmptyMessage(CORRELATION);
 		// Calculate average data.
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 100; j++) {
+		for (int i = 0; i < averageDistance.length; i++) {
+			for (int j = 0; j < averageDistance[i].length; j++) {
 				averageDistance[i][j] = (distance[0][i][j] + distance[1][i][j] + distance[2][i][j]) / 3;
 				averageAngle[i][j] = (angle[0][i][j] + angle[1][i][j] + angle[2][i][j]) / 3;
 			}

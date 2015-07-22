@@ -35,25 +35,24 @@ public class Fourier {
 			}
 		}
 
+		double[][][] real = new double[data.length][data[0].length][data[0][0].length / 2];
+		double[][][] imaginary = new double[data.length][data[0].length][data[0][0].length / 2];
 
-		double[][][] real = new double[data.length][data[0].length][data[0][0].length];
-		double[][][] imaginary = new double[data.length][data[0].length][data[0][0].length];
-
-		int countReal = 0;
-		int countImaginary = 0;
+		int countReal;
+		int countImaginary;
 
 		// Decompose real-part and imaginary-part
 		for (int i = 0; i < data.length; i++) {
 			for (int j = 0; j < data[i].length; j++) {
+				countReal = 0;
+				countImaginary = 0;
 				for (int k = 0; k < data[i][j].length; k++) {
 					if (k % 2 == 0) {
 						real[i][j][countReal] = data[i][j][k];
 						countReal++;
-						if (countReal == 99) countReal = 0;
 					} else {
 						imaginary[i][j][countImaginary] = data[i][j][k];
 						countImaginary++;
-						if (countImaginary == 99) countImaginary = 0;
 					}
 				}
 			}
@@ -110,23 +109,23 @@ public class Fourier {
 		// Execute forward fourier transform
 		for (double[] i : data) realfft.realForward(i);
 
-		double[][] real = new double[data.length][data[0].length];
-		double[][] imaginary = new double[data.length][data[0].length];
+		double[][] real = new double[data.length][data[0].length / 2];
+		double[][] imaginary = new double[data.length][data[0].length / 2];
 
-		int countReal = 0;
-		int countImaginary = 0;
+		int countReal;
+		int countImaginary;
 
 		// Decompose real-part and imaginary-part
 		for (int i = 0; i < data.length; i++) {
+			countReal = 0;
+			countImaginary = 0;
 			for (int j = 0; j < data[i].length; j++) {
 				if (j % 2 == 0) {
 					real[i][countReal] = data[i][j];
 					countReal++;
-					if (countReal == 99) countReal = 0;
 				} else {
 					imaginary[i][countImaginary] = data[i][j];
 					countImaginary++;
-					if (countImaginary == 99) countImaginary = 0;
 				}
 
 			}

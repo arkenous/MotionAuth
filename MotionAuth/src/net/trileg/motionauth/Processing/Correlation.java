@@ -38,7 +38,7 @@ public class Correlation {
 		for (int i = 0; i < 3; i++) {
 			// jはXYZ
 			for (int j = 0; j < 3; j++) {
-				for (int k = 0; k < 100; k++) {
+				for (int k = 0; k < distance[i][j].length; k++) {
 					sample_accel[i][j] += distance[i][j][k];
 					sample_gyro[i][j] += angle[i][j][k];
 				}
@@ -47,8 +47,8 @@ public class Correlation {
 
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				sample_accel[i][j] /= 99;
-				sample_gyro[i][j] /= 99;
+				sample_accel[i][j] /= distance[i][j].length;
+				sample_gyro[i][j] /= angle[i][j].length;
 			}
 		}
 
@@ -57,15 +57,15 @@ public class Correlation {
 		float ave_gyro[] = new float[3];
 
 		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 100; j++) {
+			for (int j = 0; j < ave_distance[i].length; j++) {
 				ave_accel[i] += ave_distance[i][j];
 				ave_gyro[i] += ave_angle[i][j];
 			}
 		}
 
 		for (int i = 0; i < 3; i++) {
-			ave_accel[i] /= 99;
-			ave_gyro[i] /= 99;
+			ave_accel[i] /= ave_distance[i].length;
+			ave_gyro[i] /= ave_angle[i].length;
 		}
 
 		// Calculate of Sxx
@@ -74,7 +74,7 @@ public class Correlation {
 
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				for (int k = 0; k < 100; k++) {
+				for (int k = 0; k < distance[i][j].length; k++) {
 					Sxx_accel[i][j] += Math.pow((distance[i][j][k] - sample_accel[i][j]), 2);
 					Sxx_gyro[i][j] += Math.pow((angle[i][j][k] - sample_gyro[i][j]), 2);
 				}
@@ -86,7 +86,7 @@ public class Correlation {
 		float Syy_gyro[] = new float[3];
 
 		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 100; j++) {
+			for (int j = 0; j < ave_distance[i].length; j++) {
 				Syy_accel[i] += Math.pow((ave_distance[i][j] - ave_accel[i]), 2);
 				Syy_gyro[i] += Math.pow((ave_angle[i][j] - ave_gyro[i]), 2);
 			}
@@ -98,7 +98,7 @@ public class Correlation {
 
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				for (int k = 0; k < 100; k++) {
+				for (int k = 0; k < distance[i][j].length; k++) {
 					Sxy_accel[i][j] += (distance[i][j][k] - sample_accel[i][j]) * (ave_distance[j][k] - ave_accel[j]);
 					Sxy_gyro[i][j] += (angle[i][j][k] - sample_gyro[i][j]) * (ave_angle[j][k] - ave_gyro[j]);
 				}
@@ -276,15 +276,15 @@ public class Correlation {
 		float[] sample_gyro = new float[3];
 
 		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 100; j++) {
+			for (int j = 0; j < distance[i].length; j++) {
 				sample_accel[i] += distance[i][j];
 				sample_gyro[i] += angle[i][j];
 			}
 		}
 
 		for (int i = 0; i < 3; i++) {
-			sample_accel[i] /= 99;
-			sample_gyro[i] /= 99;
+			sample_accel[i] /= distance[i].length;
+			sample_gyro[i] /= angle[i].length;
 		}
 		//endregion
 
@@ -293,15 +293,15 @@ public class Correlation {
 		float ave_gyro[] = new float[3];
 
 		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 100; j++) {
+			for (int j = 0; j < ave_distance[i].length; j++) {
 				ave_accel[i] += ave_distance[i][j];
 				ave_gyro[i] += ave_angle[i][j];
 			}
 		}
 
 		for (int i = 0; i < 3; i++) {
-			ave_accel[i] /= 99;
-			ave_gyro[i] /= 99;
+			ave_accel[i] /= ave_distance[i].length;
+			ave_gyro[i] /= ave_angle[i].length;
 		}
 		//endregion
 
@@ -310,7 +310,7 @@ public class Correlation {
 		float Sxx_gyro[] = new float[3];
 
 		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 100; j++) {
+			for (int j = 0; j < distance[i].length; j++) {
 				Sxx_accel[i] += Math.pow((distance[i][j] - sample_accel[i]), 2);
 				Sxx_gyro[i] += Math.pow((angle[i][j] - sample_gyro[i]), 2);
 			}
@@ -322,7 +322,7 @@ public class Correlation {
 		float Syy_gyro[] = new float[3];
 
 		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 100; j++) {
+			for (int j = 0; j < ave_distance[i].length; j++) {
 				Syy_accel[i] += Math.pow((ave_distance[i][j] - ave_accel[i]), 2);
 				Syy_gyro[i] += Math.pow((ave_angle[i][j] - ave_gyro[i]), 2);
 			}
@@ -334,7 +334,7 @@ public class Correlation {
 		float Sxy_gyro[] = new float[3];
 
 		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 100; j++) {
+			for (int j = 0; j < distance[i].length; j++) {
 				Sxy_accel[i] += (distance[i][j] - sample_accel[i]) * (ave_distance[i][j] - ave_accel[i]);
 				Sxy_gyro[i] += (angle[i][j] - sample_gyro[i]) * (ave_angle[i][j] - ave_gyro[i]);
 			}

@@ -232,6 +232,8 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 	public void reset() {
 		countdown = 4;
 		countTime = 0;
+		mAcceleration.clear();
+		mGyro.clear();
 		sendEmptyMessage(10);
 	}
 }

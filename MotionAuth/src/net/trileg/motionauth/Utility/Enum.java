@@ -19,7 +19,7 @@ public class Enum {
   }
 
   public enum TARGET {
-    DISTANCE, ANGLE
+    DISTANCE, LINEAR_DISTANCE, ANGLE
   }
 
   public final double LOOSE = 0.4;

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 public class Adjuster {
 
   public ArrayList<float[][][]> adjust(ArrayList<ArrayList<ArrayList<Float>>> acceleration,
+                                       ArrayList<ArrayList<ArrayList<Float>>> linearAcceleration,
                                        ArrayList<ArrayList<ArrayList<Float>>> gyroscope) {
     // Get max length of each time data.
     int firstLength = acceleration.get(0).get(0).size();
@@ -37,6 +38,7 @@ public class Adjuster {
     if (maxLength % 2 != 0) maxLength -= 1;
 
     float[][][] accelerationArray = new float[acceleration.size()][acceleration.get(0).size()][maxLength];
+    float[][][] linearAccelerationArray = new float[linearAcceleration.size()][linearAcceleration.get(0).size()][maxLength];
     float[][][] gyroscopeArray = new float[gyroscope.size()][gyroscope.get(0).size()][maxLength];
 
     for (int time = 0; time < Enum.NUM_TIME; time++) {
@@ -44,6 +46,7 @@ public class Adjuster {
         for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
           for (int length = 0; length < maxLength; length++) {
             accelerationArray[time][axis][length] = acceleration.get(time).get(axis).get(length);
+            linearAccelerationArray[time][axis][length] = linearAcceleration.get(time).get(axis).get(length);
             gyroscopeArray[time][axis][length] = gyroscope.get(time).get(axis).get(length);
           }
         }
@@ -54,9 +57,11 @@ public class Adjuster {
           for (int length = 0; length < maxLength; length++) {
             if (length < maxLength - diff) {
               accelerationArray[time][axis][length] = acceleration.get(time).get(axis).get(length);
+              linearAccelerationArray[time][axis][length] = linearAcceleration.get(time).get(axis).get(length);
               gyroscopeArray[time][axis][length] = gyroscope.get(time).get(axis).get(length);
             } else {
               accelerationArray[time][axis][length] = 0;
+              linearAccelerationArray[time][axis][length] = 0;
               gyroscopeArray[time][axis][length] = 0;
             }
           }
@@ -66,14 +71,17 @@ public class Adjuster {
 
     ArrayList<float[][][]> result = new ArrayList<>();
     result.add(accelerationArray);
+    result.add(linearAccelerationArray);
     result.add(gyroscopeArray);
     return result;
   }
 
 
-  public ArrayList<float[][]> adjust(ArrayList<ArrayList<Float>> acceleration, ArrayList<ArrayList<Float>> gyroscope,
-                                     int registeredDataLength) {
+  public ArrayList<float[][]> adjust(ArrayList<ArrayList<Float>> acceleration,
+                                     ArrayList<ArrayList<Float>> linearAcceleration,
+                                     ArrayList<ArrayList<Float>> gyroscope, int registeredDataLength) {
     float[][] accelerationArray = new float[acceleration.size()][registeredDataLength];
+    float[][] linearAccelerationArray = new float[linearAcceleration.size()][registeredDataLength];
     float[][] gyroscopeArray = new float[gyroscope.size()][registeredDataLength];
 
     if (registeredDataLength < acceleration.get(0).size()) {
@@ -81,6 +89,7 @@ public class Adjuster {
       for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
         for (int length = 0; length < registeredDataLength; length++) {
           accelerationArray[axis][length] = acceleration.get(axis).get(length);
+          linearAccelerationArray[axis][length] = linearAcceleration.get(axis).get(length);
           gyroscopeArray[axis][length] = gyroscope.get(axis).get(length);
         }
       }
@@ -92,9 +101,11 @@ public class Adjuster {
         for (int length = 0; length < registeredDataLength; length++) {
           if (length < registeredDataLength - diff) {
             accelerationArray[axis][length] = acceleration.get(axis).get(length);
+            linearAccelerationArray[axis][length] = linearAcceleration.get(axis).get(length);
             gyroscopeArray[axis][length] = gyroscope.get(axis).get(length);
           } else {
             accelerationArray[axis][length] = 0;
+            linearAccelerationArray[axis][length] = 0;
             gyroscopeArray[axis][length] = 0;
           }
         }
@@ -103,6 +114,7 @@ public class Adjuster {
       for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
         for (int length = 0; length < registeredDataLength; length++) {
           accelerationArray[axis][length] = acceleration.get(axis).get(length);
+          linearAccelerationArray[axis][length] = linearAcceleration.get(axis).get(length);
           gyroscopeArray[axis][length] = gyroscope.get(axis).get(length);
         }
       }
@@ -110,6 +122,7 @@ public class Adjuster {
 
     ArrayList<float[][]> result = new ArrayList<>();
     result.add(accelerationArray);
+    result.add(linearAccelerationArray);
     result.add(gyroscopeArray);
     return result;
   }

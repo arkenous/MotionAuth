@@ -96,9 +96,12 @@ public class Registration extends Activity {
    * Call Result using ExecutorService to register and show result.
    *
    * @param accel Original acceleration data collecting from GetData.
+   * @param linearAcceleration Original linear acceleration data collecting from GetData.
    * @param gyro  Original gyroscope data collecting from GetData.
    */
-  public void finishGetMotion(ArrayList<ArrayList<ArrayList<Float>>> accel, ArrayList<ArrayList<ArrayList<Float>>> gyro) {
+  public void finishGetMotion(ArrayList<ArrayList<ArrayList<Float>>> accel,
+                              ArrayList<ArrayList<ArrayList<Float>>> linearAcceleration,
+                              ArrayList<ArrayList<ArrayList<Float>>> gyro) {
     LogUtil.log(Log.INFO);
     if (getMotionBtn.isClickable()) getMotionBtn.setClickable(false);
     secondTv.setText("0");
@@ -117,7 +120,7 @@ public class Registration extends Activity {
 
     progressDialog.show();
 
-    mResult = new Result(mRegistration, accel, gyro, getMotionBtn, progressDialog, checkRangeValue,
+    mResult = new Result(mRegistration, accel, linearAcceleration, gyro, getMotionBtn, progressDialog, checkRangeValue,
         ampValue, this, mGetData);
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     executorService.submit(mResult);

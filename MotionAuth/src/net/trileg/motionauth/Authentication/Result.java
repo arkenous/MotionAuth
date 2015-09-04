@@ -46,16 +46,20 @@ public class Result extends Handler implements Runnable {
   private ProgressDialog mProgressDialog;
   private double mAmp;
   private ArrayList<ArrayList<Float>> mAccel;
+  private ArrayList<ArrayList<Float>> mLinearAccel;
   private ArrayList<ArrayList<Float>> mGyro;
   private double[][] registeredDistance;
+  private double[][] registeredLinearDistance;
   private double[][] registeredAngle;
   private boolean result = false;
 
 
-  public Result(Authentication authentication, ArrayList<ArrayList<Float>> accel, ArrayList<ArrayList<Float>> gyro,
+  public Result(Authentication authentication, ArrayList<ArrayList<Float>> accel,
+                ArrayList<ArrayList<Float>> linearAccel, ArrayList<ArrayList<Float>> gyro,
                 Button getMotion, ProgressDialog progressDialog, GetData getData) {
     mAuthentication = authentication;
     mAccel = accel;
+    mLinearAccel = linearAccel;
     mGyro = gyro;
     mGetMotion = getMotion;
     mProgressDialog = progressDialog;
@@ -66,7 +70,7 @@ public class Result extends Handler implements Runnable {
   @Override
   public void run() {
     readRegisteredData();
-    result = calculate(mAccel, mGyro);
+    result = calculate(mAccel, mLinearAccel, mGyro);
 
     this.sendEmptyMessage(FINISH);
   }
@@ -135,7 +139,8 @@ public class Result extends Handler implements Runnable {
     this.sendEmptyMessage(READ_DATA);
     ArrayList<double[][]> readDataList = mManageData.readRegisteredData(mAuthentication, InputName.userName);
     registeredDistance = readDataList.get(0);
-    registeredAngle = readDataList.get(1);
+    registeredLinearDistance = readDataList.get(1);
+    registeredAngle = readDataList.get(2);
 
     SharedPreferences preferences = mAuthentication.getApplicationContext().getSharedPreferences("MotionAuth", Context.MODE_PRIVATE);
     String registeredAmplify = preferences.getString(InputName.userName + "amplify", "");
@@ -148,36 +153,44 @@ public class Result extends Handler implements Runnable {
    * Calculate data and authenticate.
    *
    * @param accelList Acceleration data which collect in Authentication.GetData.
+   * @param linearAccelList Linear acceleration data which collect in Authentication.GetData.
    * @param gyroList  Gyroscope data which collect in Authentication.GetData.
    * @return true if authentication is succeed, otherwise false.
    */
-  private boolean calculate(ArrayList<ArrayList<Float>> accelList, ArrayList<ArrayList<Float>> gyroList) {
-    ArrayList<float[][]> adjusted = mAdjuster.adjust(accelList, gyroList, registeredDistance[0].length);
+  private boolean calculate(ArrayList<ArrayList<Float>> accelList, ArrayList<ArrayList<Float>> linearAccelList,
+                            ArrayList<ArrayList<Float>> gyroList) {
+    ArrayList<float[][]> adjusted = mAdjuster.adjust(accelList, linearAccelList, gyroList, registeredDistance[0].length);
     float[][] accel = adjusted.get(0);
-    float[][] gyro = adjusted.get(1);
+    float[][] linearAccel = adjusted.get(1);
+    float[][] gyro = adjusted.get(2);
 
     this.sendEmptyMessage(FORMAT);
     double[][] acceleration = mFormatter.floatToDoubleFormatter(accel);
+    double[][] linearAcceleration = mFormatter.floatToDoubleFormatter(linearAccel);
     double[][] gyroscope = mFormatter.floatToDoubleFormatter(gyro);
 
     this.sendEmptyMessage(AMPLIFY);
     acceleration = mAmplifier.Amplify(acceleration, mAmp);
+    linearAcceleration = mAmplifier.Amplify(linearAcceleration, mAmp);
     gyroscope = mAmplifier.Amplify(gyroscope, mAmp);
 
     this.sendEmptyMessage(FOURIER);
     acceleration = mFourier.LowpassFilter(acceleration, "accel");
+    linearAcceleration = mFourier.LowpassFilter(linearAcceleration, "linearAccel");
     gyroscope = mFourier.LowpassFilter(gyroscope, "gyro");
 
     this.sendEmptyMessage(CONVERT);
     double[][] distance = mCalc.accelToDistance(acceleration, 0.03);
+    double[][] linearDistance = mCalc.accelToDistance(linearAcceleration, 0.03);
     double[][] angle = mCalc.gyroToAngle(gyroscope, 0.03);
 
     this.sendEmptyMessage(FORMAT);
     distance = mFormatter.doubleToDoubleFormatter(distance);
+    linearDistance = mFormatter.doubleToDoubleFormatter(linearDistance);
     angle = mFormatter.doubleToDoubleFormatter(angle);
 
     this.sendEmptyMessage(CORRELATION);
-    Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, angle, registeredDistance, registeredAngle);
+    Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, linearDistance, angle, registeredDistance, registeredLinearDistance, registeredAngle);
     return measure == Enum.MEASURE.CORRECT;
   }
 }

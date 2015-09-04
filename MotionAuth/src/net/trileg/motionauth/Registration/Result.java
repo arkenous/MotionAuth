@@ -50,17 +50,21 @@ public class Result extends Handler implements Runnable {
   private double mAmp;
 
   private ArrayList<ArrayList<ArrayList<Float>>> mAccel;
+  private ArrayList<ArrayList<ArrayList<Float>>> mLinearAccel;
   private ArrayList<ArrayList<ArrayList<Float>>> mGyro;
   private double[][] averageDistance;
+  private double[][] averageLinearDistance;
   private double[][] averageAngle;
   private boolean result = false;
 
 
   public Result(Registration registration, ArrayList<ArrayList<ArrayList<Float>>> accel,
-                ArrayList<ArrayList<ArrayList<Float>>> gyro, Button getMotion, ProgressDialog progressDialog,
-                double checkRange, double amp, Context context, GetData getData) {
+                ArrayList<ArrayList<ArrayList<Float>>> linearAccel, ArrayList<ArrayList<ArrayList<Float>>> gyro,
+                Button getMotion, ProgressDialog progressDialog, double checkRange, double amp, Context context,
+                GetData getData) {
     mRegistration = registration;
     mAccel = accel;
+    mLinearAccel = linearAccel;
     mGyro = gyro;
     mGetMotion = getMotion;
     mProgressDialog = progressDialog;
@@ -74,9 +78,10 @@ public class Result extends Handler implements Runnable {
   @Override
   public void run() {
     mManageData.writeFloatData("RegistrationRaw", InputName.name, "Acceleration", mAccel);
-    mManageData.writeFloatData("RegistrationRaw", "Gyroscope", InputName.name, mGyro);
+    mManageData.writeFloatData("RegistrationRaw", InputName.name, "LinearAcceleration", mLinearAccel);
+    mManageData.writeFloatData("RegistrationRaw", InputName.name, "Gyroscope", mGyro);
 
-    result = calculate(mAccel, mGyro);
+    result = calculate(mAccel, mLinearAccel, mGyro);
     this.sendEmptyMessage(FINISH);
   }
 
@@ -128,7 +133,7 @@ public class Result extends Handler implements Runnable {
           alert.show();
         } else {
           // 3回のモーションの平均値をファイルに書き出す
-          mManageData.writeRegisterData(InputName.name, averageDistance, averageAngle, mAmp, mContext);
+          mManageData.writeRegisterData(InputName.name, averageDistance, averageLinearDistance, averageAngle, mAmp, mContext);
 
           AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
           alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
@@ -166,38 +171,49 @@ public class Result extends Handler implements Runnable {
   /**
    * データ加工，計算処理を行う
    */
-  public boolean calculate(ArrayList<ArrayList<ArrayList<Float>>> accelList, ArrayList<ArrayList<ArrayList<Float>>> gyroList) {
+  public boolean calculate(ArrayList<ArrayList<ArrayList<Float>>> accelList,
+                           ArrayList<ArrayList<ArrayList<Float>>> linearAccelList,
+                           ArrayList<ArrayList<ArrayList<Float>>> gyroList) {
     LogUtil.log(Log.INFO);
 
-    ArrayList<float[][][]> adjusted = mAdjuster.adjust(accelList, gyroList);
+    ArrayList<float[][][]> adjusted = mAdjuster.adjust(accelList, linearAccelList, gyroList);
     float[][][] accel = adjusted.get(0);
-    float[][][] gyro = adjusted.get(1);
+    float[][][] linearAccel = adjusted.get(1);
+    float[][][] gyro = adjusted.get(2);
 
     // データの桁揃え
     this.sendEmptyMessage(FORMAT);
 
     double[][][] acceleration = mFormatter.floatToDoubleFormatter(accel);
+    double[][][] linearAcceleration = mFormatter.floatToDoubleFormatter(linearAccel);
     double[][][] gyroscope = mFormatter.floatToDoubleFormatter(gyro);
 
     mManageData.writeDoubleThreeArrayData("BeforeAMP", "Acceleration", InputName.name, acceleration);
+    mManageData.writeDoubleThreeArrayData("BeforeAMP", "LinearAcceleration", InputName.name, linearAcceleration);
     mManageData.writeDoubleThreeArrayData("BeforeAMP", "Gyroscope", InputName.name, gyroscope);
 
     // データの増幅処理
-    if (mAmplifier.CheckValueRange(acceleration, mCheckRange) || mAmplifier.CheckValueRange(gyroscope, mCheckRange)) {
+    if (mAmplifier.CheckValueRange(acceleration, mCheckRange)
+        || mAmplifier.CheckValueRange(linearAcceleration, mCheckRange)
+        || mAmplifier.CheckValueRange(gyroscope, mCheckRange)) {
       this.sendEmptyMessage(AMPLIFY);
       acceleration = mAmplifier.Amplify(acceleration, mAmp);
+      linearAcceleration = mAmplifier.Amplify(linearAcceleration, mAmp);
       gyroscope = mAmplifier.Amplify(gyroscope, mAmp);
     }
 
     mManageData.writeDoubleThreeArrayData("AfterAMP", "Acceleration", InputName.name, acceleration);
+    mManageData.writeDoubleThreeArrayData("AfterAMP", "LinearAcceleration", InputName.name, linearAcceleration);
     mManageData.writeDoubleThreeArrayData("AfterAMP", "Gyroscope", InputName.name, gyroscope);
 
     // フーリエ変換によるローパスフィルタ
     this.sendEmptyMessage(FOURIER);
     acceleration = mFourier.LowpassFilter(acceleration, "Acceleration");
+    linearAcceleration = mFourier.LowpassFilter(linearAcceleration, "LinearAcceleration");
     gyroscope = mFourier.LowpassFilter(gyroscope, "Gyroscope");
 
     mManageData.writeDoubleThreeArrayData("AfterLowpass", "Acceleration", InputName.name, acceleration);
+    mManageData.writeDoubleThreeArrayData("AfterLowpass", "LinearAcceleration", InputName.name, linearAcceleration);
     mManageData.writeDoubleThreeArrayData("AfterLowpass", "Gyroscope", InputName.name, gyroscope);
 
     LogUtil.log(Log.DEBUG, "Finish fourier");
@@ -205,13 +221,16 @@ public class Result extends Handler implements Runnable {
     // 加速度から距離，角速度から角度へ変換
     this.sendEmptyMessage(CONVERT);
     double[][][] distance = mCalc.accelToDistance(acceleration, 0.03);
+    double[][][] linearDistance = mCalc.accelToDistance(linearAcceleration, 0.03);
     double[][][] angle = mCalc.gyroToAngle(gyroscope, 0.03);
 
     this.sendEmptyMessage(FORMAT);
     distance = mFormatter.doubleToDoubleFormatter(distance);
+    linearDistance = mFormatter.doubleToDoubleFormatter(linearDistance);
     angle = mFormatter.doubleToDoubleFormatter(angle);
 
     mManageData.writeDoubleThreeArrayData("convertData", "distance", InputName.name, distance);
+    mManageData.writeDoubleThreeArrayData("convertData", "linearDistance", InputName.name, linearDistance);
     mManageData.writeDoubleThreeArrayData("convertData", "angle", InputName.name, angle);
 
     LogUtil.log(Log.DEBUG, "After write data");
@@ -219,17 +238,21 @@ public class Result extends Handler implements Runnable {
     this.sendEmptyMessage(DEVIATION);
     // measureCorrelation用の平均値データを作成
     averageDistance = new double[Enum.NUM_AXIS][distance[0][0].length];
+    averageLinearDistance = new double[Enum.NUM_AXIS][linearDistance[0][0].length];
     averageAngle = new double[Enum.NUM_AXIS][angle[0][0].length];
     for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
       for (int item = 0; item < averageDistance[axis].length; item++) {
         averageDistance[axis][item] = (distance[0][axis][item] + distance[1][axis][item] + distance[2][axis][item]) / 3;
+        averageLinearDistance[axis][item] = (linearDistance[0][axis][item] + linearDistance[1][axis][item]
+            + linearDistance[2][axis][item]) / 3;
         averageAngle[axis][item] = (angle[0][axis][item] + angle[1][axis][item] + angle[2][axis][item]) / 3;
         LogUtil.log(Log.DEBUG, "averageDistance: " + averageDistance[axis][item]);
       }
     }
 
     //region 同一のモーションであるかの確認をし，必要に応じてズレ修正を行う
-    Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, angle, averageDistance, averageAngle);
+    Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, linearDistance, angle, averageDistance,
+        averageLinearDistance, averageAngle);
 
     LogUtil.log(Log.INFO, "After measure correlation");
     LogUtil.log(Log.INFO, "measure = " + String.valueOf(measure));
@@ -246,9 +269,10 @@ public class Result extends Handler implements Runnable {
       Enum.TARGET target = Enum.TARGET.DISTANCE;
 
       double[][][] originalDistance = distance;
+      double[][][] originalLinearDistance = linearDistance;
       double[][][] originalAngle = angle;
 
-      // ズレ修正は基準値を最大値，最小値，中央値の順に置き，さらに距離，角度の順にベースを置く．
+      // ズレ修正は基準値を最大値，最小値，中央値の順に置き，さらにdistance, linearDistance, angleの順にベースを置く．
       while (true) {
         switch (count) {
           case 0:
@@ -257,33 +281,47 @@ public class Result extends Handler implements Runnable {
             break;
           case 1:
             mode = Enum.MODE.MAX;
-            target = Enum.TARGET.ANGLE;
+            target = Enum.TARGET.LINEAR_DISTANCE;
             break;
           case 2:
-            mode = Enum.MODE.MIN;
-            target = Enum.TARGET.DISTANCE;
+            mode = Enum.MODE.MAX;
+            target = Enum.TARGET.ANGLE;
             break;
           case 3:
             mode = Enum.MODE.MIN;
-            target = Enum.TARGET.ANGLE;
+            target = Enum.TARGET.DISTANCE;
             break;
           case 4:
+            mode = Enum.MODE.MIN;
+            target = Enum.TARGET.LINEAR_DISTANCE;
+            break;
+          case 5:
+            mode = Enum.MODE.MIN;
+            target = Enum.TARGET.ANGLE;
+            break;
+          case 6:
             mode = Enum.MODE.MEDIAN;
             target = Enum.TARGET.DISTANCE;
             break;
-          case 5:
+          case 7:
+            mode = Enum.MODE.MEDIAN;
+            target = Enum.TARGET.LINEAR_DISTANCE;
+            break;
+          case 8:
             mode = Enum.MODE.MEDIAN;
             target = Enum.TARGET.ANGLE;
             break;
         }
 
-        double[][][][] deviatedValue = mCorrectDeviation.correctDeviation(originalDistance, originalAngle, mode, target);
+        double[][][][] deviatedValue = mCorrectDeviation.correctDeviation(originalDistance, originalLinearDistance,
+            originalAngle, mode, target);
 
         for (int time = 0; time < Enum.NUM_TIME; time++) {
           for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
             for (int item = 0; item < distance[time][axis].length; item++) {
               distance[time][axis][item] = deviatedValue[0][time][axis][item];
-              angle[time][axis][item] = deviatedValue[1][time][axis][item];
+              linearDistance[time][axis][item] = deviatedValue[1][time][axis][item];
+              angle[time][axis][item] = deviatedValue[2][time][axis][item];
             }
           }
         }
@@ -291,15 +329,19 @@ public class Result extends Handler implements Runnable {
         for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
           for (int item = 0; item < averageDistance[axis].length; item++) {
             averageDistance[axis][item] = (distance[0][axis][item] + distance[1][axis][item] + distance[2][axis][item]) / 3;
+            averageLinearDistance[axis][item] = (linearDistance[0][axis][item] + linearDistance[1][axis][item] +
+                linearDistance[2][axis][item]) / 3;
             averageAngle[axis][item] = (angle[0][axis][item] + angle[1][axis][item] + angle[2][axis][item]) / 3;
           }
         }
 
-        Enum.MEASURE tmp = mCorrelation.measureCorrelation(distance, angle, averageDistance, averageAngle);
+        Enum.MEASURE tmp = mCorrelation.measureCorrelation(distance, linearDistance, angle, averageDistance,
+            averageLinearDistance, averageAngle);
 
         LogUtil.log(Log.INFO, "MEASURE: " + String.valueOf(tmp));
 
         mManageData.writeDoubleThreeArrayData("deviatedData" + String.valueOf(mode), "distance", InputName.name, distance);
+        mManageData.writeDoubleThreeArrayData("deviatedData" + String.valueOf(mode), "linearDistance", InputName.name, linearDistance);
         mManageData.writeDoubleThreeArrayData("deviatedData" + String.valueOf(mode), "angle", InputName.name, angle);
 
 
@@ -308,6 +350,7 @@ public class Result extends Handler implements Runnable {
         }
 
         distance = originalDistance;
+        linearDistance = originalLinearDistance;
         angle = originalAngle;
 
         if (count == 5) {
@@ -325,6 +368,7 @@ public class Result extends Handler implements Runnable {
     //endregion
 
     mManageData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatDistance", InputName.name, distance);
+    mManageData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatLinearDistance", InputName.name, linearDistance);
     mManageData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatAngle", InputName.name, angle);
 
     this.sendEmptyMessage(CORRELATION);
@@ -332,11 +376,13 @@ public class Result extends Handler implements Runnable {
     for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
       for (int item = 0; item < averageDistance[axis].length; item++) {
         averageDistance[axis][item] = (distance[0][axis][item] + distance[1][axis][item] + distance[2][axis][item]) / 3;
+        averageLinearDistance[axis][item] = (linearDistance[0][axis][item] + linearDistance[1][axis][item]
+            + linearDistance[2][axis][item]) / 3;
         averageAngle[axis][item] = (angle[0][axis][item] + angle[1][axis][item] + angle[2][axis][item]) / 3;
       }
     }
 
-    measure = mCorrelation.measureCorrelation(distance, angle, averageDistance, averageAngle);
+    measure = mCorrelation.measureCorrelation(distance, linearDistance, angle, averageDistance, averageLinearDistance, averageAngle);
     LogUtil.log(Log.INFO, "measure = " + measure);
     return measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT;
   }

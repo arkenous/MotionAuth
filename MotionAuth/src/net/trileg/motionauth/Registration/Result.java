@@ -310,6 +310,11 @@ public class Result extends Handler implements Runnable {
         distance = originalDistance;
         angle = originalAngle;
 
+        if (count == 5) {
+          // Break this loop if all pattern attempts were failed
+          break;
+        }
+
         count++;
       }
     } else if (measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT) {

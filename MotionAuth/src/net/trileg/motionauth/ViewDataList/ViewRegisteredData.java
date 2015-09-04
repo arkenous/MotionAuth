@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import net.trileg.motionauth.R;
+import net.trileg.motionauth.Utility.Enum;
 import net.trileg.motionauth.Utility.LogUtil;
 import net.trileg.motionauth.Utility.ManageData;
 
@@ -24,146 +25,146 @@ import java.util.ArrayList;
  * @author Kensuke Kosaka
  */
 public class ViewRegisteredData extends Activity {
-	String item = null;
-	int flgCount;
+  String item = null;
+  int flgCount;
 
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
 
-		LogUtil.log(Log.INFO);
+    LogUtil.log(Log.INFO);
 
-		setContentView(R.layout.activity_view_registed_data);
+    setContentView(R.layout.activity_view_registed_data);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-			ActionBar actionBar = getActionBar();
-			if (actionBar != null) actionBar.setHomeButtonEnabled(true);
-		}
-		flgCount = 0;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+      ActionBar actionBar = getActionBar();
+      if (actionBar != null) actionBar.setHomeButtonEnabled(true);
+    }
+    flgCount = 0;
 
-		viewRegisteredData();
-	}
-
-
-	/**
-	 * Show user data.
-	 */
-	private void viewRegisteredData() {
-		LogUtil.log(Log.INFO);
-
-		// Receive user name sent from RegistrantList
-		Intent intent = getIntent();
-		item = intent.getStringExtra("item");
-
-		ListView lv = (ListView) findViewById(R.id.listView1);
-
-		ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
-
-		ArrayList<String> dataList = readData();
-
-		for (String i : dataList) adapter.add(i);
-
-		lv.setAdapter(adapter);
-	}
+    viewRegisteredData();
+  }
 
 
-	/**
-	 * Read data.
-	 *
-	 * @return String type list.
-	 */
-	private ArrayList<String> readData() {
-		LogUtil.log(Log.INFO);
-		ArrayList<String> dataList = new ArrayList<>();
+  /**
+   * Show user data.
+   */
+  private void viewRegisteredData() {
+    LogUtil.log(Log.INFO);
 
-		ManageData mManageData = new ManageData();
-		ArrayList<double[][]> readData = mManageData.readRegisteredData(ViewRegisteredData.this, item);
-		double[][] readDistance = readData.get(0);
-		double[][] readAngle = readData.get(1);
+    // Receive user name sent from RegistrantList
+    Intent intent = getIntent();
+    item = intent.getStringExtra("item");
 
-		String[][] registeredDistance = new String[readDistance.length][readDistance[0].length];
-		String[][] registeredAngle = new String[readAngle.length][readAngle[0].length];
-		for (int i = 0; i < readDistance.length; i++) {
-			for (int j = 0; j < readDistance[i].length; j++) {
-				registeredDistance[i][j] = String.valueOf(readDistance[i][j]);
-				registeredAngle[i][j] = String.valueOf(readAngle[i][j]);
-			}
-		}
+    ListView lv = (ListView) findViewById(R.id.listView1);
 
-		Context mContext = ViewRegisteredData.this.getApplicationContext();
-		SharedPreferences preferences = mContext.getSharedPreferences("MotionAuth", Context.MODE_PRIVATE);
+    ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
 
-		String ampValue = preferences.getString(item + "amplify", "");
+    ArrayList<String> dataList = readData();
 
-		if ("".equals(ampValue)) throw new RuntimeException();
+    for (String i : dataList) adapter.add(i);
 
-		String index = "";
-
-		for (int i = 0; i < registeredDistance.length; i++) {
-			switch (i) {
-				case 0:
-					index = "DistanceX";
-					break;
-				case 1:
-					index = "DistanceY";
-					break;
-				case 2:
-					index = "DistanceZ";
-					break;
-			}
-			for (int j = 0; j < registeredDistance[i].length; j++) {
-				dataList.add(index + " : " + registeredDistance[i][j] + " : " + ampValue);
-			}
-		}
-
-		for (int i = 0; i < registeredAngle.length; i++) {
-			switch (i) {
-				case 0:
-					index = "AngleX";
-					break;
-				case 1:
-					index = "AngleY";
-					break;
-				case 2:
-					index = "AngleZ";
-					break;
-			}
-			for (int j = 0; j < registeredAngle[i].length; j++) {
-				dataList.add(index + " : " + registeredAngle[i][j] + " : " + ampValue);
-			}
-		}
-
-		return dataList;
-	}
+    lv.setAdapter(adapter);
+  }
 
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				if (flgCount == 9) {
-					flgCount = 0;
-					moveActivity(getPackageName(), getPackageName() + ".ViewDataList.ViewRegisteredRData", true);
-				} else {
-					flgCount++;
-				}
-				return true;
-		}
-		return false;
-	}
+  /**
+   * Read data.
+   *
+   * @return String type list.
+   */
+  private ArrayList<String> readData() {
+    LogUtil.log(Log.INFO);
+    ArrayList<String> dataList = new ArrayList<>();
+
+    ManageData mManageData = new ManageData();
+    ArrayList<double[][]> readData = mManageData.readRegisteredData(ViewRegisteredData.this, item);
+    double[][] readDistance = readData.get(0);
+    double[][] readAngle = readData.get(1);
+
+    String[][] registeredDistance = new String[readDistance.length][readDistance[0].length];
+    String[][] registeredAngle = new String[readAngle.length][readAngle[0].length];
+    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+      for (int item = 0; item < readDistance[axis].length; item++) {
+        registeredDistance[axis][item] = String.valueOf(readDistance[axis][item]);
+        registeredAngle[axis][item] = String.valueOf(readAngle[axis][item]);
+      }
+    }
+
+    Context mContext = ViewRegisteredData.this.getApplicationContext();
+    SharedPreferences preferences = mContext.getSharedPreferences("MotionAuth", Context.MODE_PRIVATE);
+
+    String ampValue = preferences.getString(item + "amplify", "");
+
+    if ("".equals(ampValue)) throw new RuntimeException();
+
+    String index = "";
+
+    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+      switch (axis) {
+        case 0:
+          index = "DistanceX";
+          break;
+        case 1:
+          index = "DistanceY";
+          break;
+        case 2:
+          index = "DistanceZ";
+          break;
+      }
+      for (int item = 0; item < registeredDistance[axis].length; item++) {
+        dataList.add(index + " : " + registeredDistance[axis][item] + " : " + ampValue);
+      }
+    }
+
+    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+      switch (axis) {
+        case 0:
+          index = "AngleX";
+          break;
+        case 1:
+          index = "AngleY";
+          break;
+        case 2:
+          index = "AngleZ";
+          break;
+      }
+      for (int item = 0; item < registeredAngle[axis].length; item++) {
+        dataList.add(index + " : " + registeredAngle[axis][item] + " : " + ampValue);
+      }
+    }
+
+    return dataList;
+  }
 
 
-	private void moveActivity(String pkgName, String actName, boolean flg) {
-		LogUtil.log(Log.INFO);
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        if (flgCount == 9) {
+          flgCount = 0;
+          moveActivity(getPackageName(), getPackageName() + ".ViewDataList.ViewRegisteredRData", true);
+        } else {
+          flgCount++;
+        }
+        return true;
+    }
+    return false;
+  }
 
-		Intent intent = new Intent();
-		intent.setClassName(pkgName, actName);
 
-		intent.putExtra("item", item);
+  private void moveActivity(String pkgName, String actName, boolean flg) {
+    LogUtil.log(Log.INFO);
 
-		if (flg) intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+    Intent intent = new Intent();
+    intent.setClassName(pkgName, actName);
 
-		startActivity(intent);
-	}
+    intent.putExtra("item", item);
+
+    if (flg) intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+
+    startActivity(intent);
+  }
 }

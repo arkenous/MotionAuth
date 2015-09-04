@@ -1,6 +1,7 @@
 package net.trileg.motionauth.Processing;
 
 import android.util.Log;
+import net.trileg.motionauth.Utility.Enum;
 import net.trileg.motionauth.Utility.LogUtil;
 
 /**
@@ -10,94 +11,94 @@ import net.trileg.motionauth.Utility.LogUtil;
  */
 public class Calc {
 
-	/**
-	 * Convert acceleration data to distance data.
-	 *
-	 * @param inputVal 3-array acceleration data for target of conversion.
-	 * @param t        time
-	 * @return After converted 3-array distance data.
-	 */
-	public double[][][] accelToDistance(double[][][] inputVal, double t) {
-		LogUtil.log(Log.INFO);
+  /**
+   * Convert acceleration data to distance data.
+   *
+   * @param inputVal 3-array acceleration data for target of conversion.
+   * @param t        time
+   * @return After converted 3-array distance data.
+   */
+  public double[][][] accelToDistance(double[][][] inputVal, double t) {
+    LogUtil.log(Log.INFO);
 
-		double[][][] returnVal = new double[inputVal.length][inputVal[0].length][inputVal[0][0].length];
+    double[][][] returnVal = new double[Enum.NUM_TIME][Enum.NUM_AXIS][inputVal[0][0].length];
 
-		for (int i = 0; i < inputVal.length; i++) {
-			for (int j = 0; j < inputVal[i].length; j++) {
-				for (int k = 0; k < inputVal[i][j].length; k++) {
-					returnVal[i][j][k] = (inputVal[i][j][k] * t * t) / 2 * 1000;
-				}
-			}
-		}
+    for (int time = 0; time < Enum.NUM_TIME; time++) {
+      for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+        for (int item = 0; item < inputVal[time][axis].length; item++) {
+          returnVal[time][axis][item] = (inputVal[time][axis][item] * t * t) / 2 * 1000;
+        }
+      }
+    }
 
-		return returnVal;
-	}
-
-
-	/**
-	 * Convert gyroscope data to angle data.
-	 *
-	 * @param inputVal 3-array gyroscope data for target of conversion.
-	 * @param t        time
-	 * @return After converted 3-array angle data.
-	 */
-	public double[][][] gyroToAngle(double[][][] inputVal, double t) {
-		LogUtil.log(Log.INFO);
-
-		double[][][] returnVal = new double[inputVal.length][inputVal[0].length][inputVal[0][0].length];
-
-		for (int i = 0; i < inputVal.length; i++) {
-			for (int j = 0; j < inputVal[i].length; j++) {
-				for (int k = 0; k < inputVal[i][j].length; k++) {
-					returnVal[i][j][k] = (inputVal[i][j][k] * t) * 1000;
-				}
-			}
-		}
-
-		return returnVal;
-	}
+    return returnVal;
+  }
 
 
-	/**
-	 * Convert acceleration data to distance data.
-	 *
-	 * @param inputVal 2-array acceleration data for target of conversion.
-	 * @param t        time
-	 * @return After converted 2-array distance data.
-	 */
-	public double[][] accelToDistance(double[][] inputVal, double t) {
-		LogUtil.log(Log.INFO);
+  /**
+   * Convert gyroscope data to angle data.
+   *
+   * @param inputVal 3-array gyroscope data for target of conversion.
+   * @param t        time
+   * @return After converted 3-array angle data.
+   */
+  public double[][][] gyroToAngle(double[][][] inputVal, double t) {
+    LogUtil.log(Log.INFO);
 
-		double[][] returnVal = new double[inputVal.length][inputVal[0].length];
+    double[][][] returnVal = new double[Enum.NUM_TIME][Enum.NUM_AXIS][inputVal[0][0].length];
 
-		for (int i = 0; i < inputVal.length; i++) {
-			for (int j = 0; j < inputVal[i].length; j++) {
-				returnVal[i][j] = (inputVal[i][j] * t * t) / 2 * 1000;
-			}
-		}
+    for (int time = 0; time < Enum.NUM_TIME; time++) {
+      for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+        for (int item = 0; item < inputVal[time][axis].length; item++) {
+          returnVal[time][axis][item] = (inputVal[time][axis][item] * t) * 1000;
+        }
+      }
+    }
 
-		return returnVal;
-	}
+    return returnVal;
+  }
 
 
-	/**
-	 * Convert gyroscope data to angle data.
-	 *
-	 * @param inputVal 2-array gyroscope data for target of conversion.
-	 * @param t        time
-	 * @return After converted 2-array angle data.
-	 */
-	public double[][] gyroToAngle(double[][] inputVal, double t) {
-		LogUtil.log(Log.INFO);
+  /**
+   * Convert acceleration data to distance data.
+   *
+   * @param inputVal 2-array acceleration data for target of conversion.
+   * @param t        time
+   * @return After converted 2-array distance data.
+   */
+  public double[][] accelToDistance(double[][] inputVal, double t) {
+    LogUtil.log(Log.INFO);
 
-		double[][] returnVal = new double[inputVal.length][inputVal[0].length];
+    double[][] returnVal = new double[Enum.NUM_AXIS][inputVal[0].length];
 
-		for (int i = 0; i < inputVal.length; i++) {
-			for (int j = 0; j < inputVal[i].length; j++) {
-				returnVal[i][j] = (inputVal[i][j] * t) * 1000;
-			}
-		}
+    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+      for (int item = 0; item < inputVal[axis].length; item++) {
+        returnVal[axis][item] = (inputVal[axis][item] * t * t) / 2 * 1000;
+      }
+    }
 
-		return returnVal;
-	}
+    return returnVal;
+  }
+
+
+  /**
+   * Convert gyroscope data to angle data.
+   *
+   * @param inputVal 2-array gyroscope data for target of conversion.
+   * @param t        time
+   * @return After converted 2-array angle data.
+   */
+  public double[][] gyroToAngle(double[][] inputVal, double t) {
+    LogUtil.log(Log.INFO);
+
+    double[][] returnVal = new double[Enum.NUM_AXIS][inputVal[0].length];
+
+    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+      for (int item = 0; item < inputVal[axis].length; item++) {
+        returnVal[axis][item] = (inputVal[axis][item] * t) * 1000;
+      }
+    }
+
+    return returnVal;
+  }
 }

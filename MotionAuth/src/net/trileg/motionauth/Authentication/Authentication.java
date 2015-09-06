@@ -42,7 +42,7 @@ public class Authentication extends Activity {
 
 
   /**
-   * Registration event lister and call GetData using ExecutorService to collect data.
+   * Registration event listener and call GetData using ExecutorService to collect data.
    */
   private void authentication() {
     LogUtil.log(Log.INFO);
@@ -89,6 +89,7 @@ public class Authentication extends Activity {
    * Call Result using ExecutorService to authenticate and show result.
    *
    * @param accel Original acceleration data collecting from GetData.
+   * @param linearAccel Original linear acceleration data collecting from GetData.
    * @param gyro  Original gyroscope data collecting from GetData.
    */
   public void finishGetMotion(ArrayList<ArrayList<Float>> accel, ArrayList<ArrayList<Float>> linearAccel,

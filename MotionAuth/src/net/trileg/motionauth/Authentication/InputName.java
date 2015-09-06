@@ -35,7 +35,6 @@ public class InputName extends Activity {
 
     LogUtil.log(Log.INFO);
 
-    // Disable title bar.
     requestWindowFeature(Window.FEATURE_NO_TITLE);
     setContentView(R.layout.activity_auth_name_input);
     mContext = this;

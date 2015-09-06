@@ -232,6 +232,7 @@ public class ManageData {
    * @param folderName Directory name.
    * @param userName   User name.
    * @param R_accel    Double type 1-array distance-R data.
+   * @param R_linearAccel Double type 1-array linear distance R data.
    * @param R_gyro     Double type 1-array angle-R data.
    */
   public void writeRData(String folderName, String userName, double[] R_accel, double[] R_linearAccel, double[] R_gyro) {

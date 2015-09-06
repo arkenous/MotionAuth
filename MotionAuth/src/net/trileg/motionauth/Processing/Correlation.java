@@ -23,6 +23,7 @@ public class Correlation {
    * @param linearDistance Double type 3-array linear distance data.
    * @param angle        Double type 3-array angle data.
    * @param ave_distance Double type 2-array distance average data.
+   * @param ave_linearDistance Double type 2-array linear distance average data.
    * @param ave_angle    Double type 2-array angle average data.
    * @return Result of correlation (Enum.MEASURE value).
    */

@@ -202,9 +202,9 @@ public class Result extends Handler implements Runnable {
       gyroscope = mAmplifier.Amplify(gyroscope, mAmp);
     }
 
-    mManageData.writeDoubleThreeArrayData("AfterAMP", "Acceleration", InputName.name, acceleration);
-    mManageData.writeDoubleThreeArrayData("AfterAMP", "LinearAcceleration", InputName.name, linearAcceleration);
-    mManageData.writeDoubleThreeArrayData("AfterAMP", "Gyroscope", InputName.name, gyroscope);
+    mManageData.writeDoubleThreeArrayData("BeforeLowpass", "Acceleration", InputName.name, acceleration);
+    mManageData.writeDoubleThreeArrayData("BeforeLowpass", "LinearAcceleration", InputName.name, linearAcceleration);
+    mManageData.writeDoubleThreeArrayData("BeforeLowpass", "Gyroscope", InputName.name, gyroscope);
 
     // フーリエ変換によるローパスフィルタ
     this.sendEmptyMessage(FOURIER);
@@ -212,13 +212,14 @@ public class Result extends Handler implements Runnable {
     linearAcceleration = mFourier.LowpassFilter(linearAcceleration, "LinearAcceleration");
     gyroscope = mFourier.LowpassFilter(gyroscope, "Gyroscope");
 
-    mManageData.writeDoubleThreeArrayData("AfterLowpass", "Acceleration", InputName.name, acceleration);
-    mManageData.writeDoubleThreeArrayData("AfterLowpass", "LinearAcceleration", InputName.name, linearAcceleration);
-    mManageData.writeDoubleThreeArrayData("AfterLowpass", "Gyroscope", InputName.name, gyroscope);
+    mManageData.writeDoubleThreeArrayData("BeforeConvert", "Acceleration", InputName.name, acceleration);
+    mManageData.writeDoubleThreeArrayData("BeforeConvert", "LinearAcceleration", InputName.name, linearAcceleration);
+    mManageData.writeDoubleThreeArrayData("BeforeConvert", "Gyroscope", InputName.name, gyroscope);
 
     LogUtil.log(Log.DEBUG, "Finish fourier");
 
     // 加速度から距離，角速度から角度へ変換
+    //TODO モーションの取得時間で第二引数を変更する，あるいは変換自体を行わないか…
     this.sendEmptyMessage(CONVERT);
     double[][][] distance = mCalc.accelToDistance(acceleration, 0.03);
     double[][][] linearDistance = mCalc.accelToDistance(linearAcceleration, 0.03);
@@ -229,9 +230,9 @@ public class Result extends Handler implements Runnable {
     linearDistance = mFormatter.doubleToDoubleFormatter(linearDistance);
     angle = mFormatter.doubleToDoubleFormatter(angle);
 
-    mManageData.writeDoubleThreeArrayData("convertData", "distance", InputName.name, distance);
-    mManageData.writeDoubleThreeArrayData("convertData", "linearDistance", InputName.name, linearDistance);
-    mManageData.writeDoubleThreeArrayData("convertData", "angle", InputName.name, angle);
+    mManageData.writeDoubleThreeArrayData("BeforeDeviation", "distance", InputName.name, distance);
+    mManageData.writeDoubleThreeArrayData("BeforeDeviation", "linearDistance", InputName.name, linearDistance);
+    mManageData.writeDoubleThreeArrayData("BeforeDeviation", "angle", InputName.name, angle);
 
     LogUtil.log(Log.DEBUG, "After write data");
 
@@ -340,9 +341,9 @@ public class Result extends Handler implements Runnable {
 
         LogUtil.log(Log.INFO, "MEASURE: " + String.valueOf(tmp));
 
-        mManageData.writeDoubleThreeArrayData("deviatedData" + String.valueOf(mode), "distance", InputName.name, distance);
-        mManageData.writeDoubleThreeArrayData("deviatedData" + String.valueOf(mode), "linearDistance", InputName.name, linearDistance);
-        mManageData.writeDoubleThreeArrayData("deviatedData" + String.valueOf(mode), "angle", InputName.name, angle);
+        mManageData.writeDoubleThreeArrayData("DeviatedData" + String.valueOf(mode), "distance", InputName.name, distance);
+        mManageData.writeDoubleThreeArrayData("DeviatedData" + String.valueOf(mode), "linearDistance", InputName.name, linearDistance);
+        mManageData.writeDoubleThreeArrayData("DeviatedData" + String.valueOf(mode), "angle", InputName.name, angle);
 
 
         if (tmp == Enum.MEASURE.PERFECT || tmp == Enum.MEASURE.CORRECT) {

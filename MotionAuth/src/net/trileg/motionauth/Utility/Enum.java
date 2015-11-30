@@ -22,10 +22,12 @@ public class Enum {
     DISTANCE, LINEAR_DISTANCE, ANGLE
   }
 
-  public final double LOOSE = 0.4;
-  public final double NORMAL = 0.6;
-  public final double STRICT = 0.8;
+  public static final double LOOSE = 0.4;
+  public static final double NORMAL = 0.6;
+  public static final double STRICT = 0.8;
 
   public static final int NUM_AXIS = 3;
   public static final int NUM_TIME = 3;
+
+  public static final double SENSOR_DELAY_TIME = 0.02;
 }

@@ -40,6 +40,7 @@ public class Result extends Handler implements Runnable {
   private Correlation mCorrelation = new Correlation();
   private CorrectDeviation mCorrectDeviation = new CorrectDeviation();
   private Adjuster mAdjuster = new Adjuster();
+  private CosSimilarity mCosSimilarity = new CosSimilarity();
 
   private Registration mRegistration;
   private Button mGetMotion;
@@ -176,17 +177,17 @@ public class Result extends Handler implements Runnable {
                            ArrayList<ArrayList<ArrayList<Float>>> gyroList) {
     LogUtil.log(Log.INFO);
 
+    // 複数回のデータ取得について，データ数を揃える
     ArrayList<float[][][]> adjusted = mAdjuster.adjust(accelList, linearAccelList, gyroList);
     float[][][] accel = adjusted.get(0);
     float[][][] linearAccel = adjusted.get(1);
     float[][][] gyro = adjusted.get(2);
 
-    // データの桁揃え
+    // データのフォーマット
     this.sendEmptyMessage(FORMAT);
-
-    double[][][] acceleration = mFormatter.floatToDoubleFormatter(accel);
-    double[][][] linearAcceleration = mFormatter.floatToDoubleFormatter(linearAccel);
-    double[][][] gyroscope = mFormatter.floatToDoubleFormatter(gyro);
+    double[][][] acceleration = mFormatter.convertFloatToDouble(accel);
+    double[][][] linearAcceleration = mFormatter.convertFloatToDouble(linearAccel);
+    double[][][] gyroscope = mFormatter.convertFloatToDouble(gyro);
 
     mManageData.writeDoubleThreeArrayData("BeforeAMP", "Acceleration", InputName.name, acceleration);
     mManageData.writeDoubleThreeArrayData("BeforeAMP", "LinearAcceleration", InputName.name, linearAcceleration);
@@ -218,23 +219,27 @@ public class Result extends Handler implements Runnable {
 
     LogUtil.log(Log.DEBUG, "Finish fourier");
 
-    // 加速度から距離，角速度から角度へ変換
-    //TODO モーションの取得時間で第二引数を変更する，あるいは変換自体を行わないか…
+    // 加速度から距離，角速度から角度へ変換（第二引数はセンサの取得間隔）
     this.sendEmptyMessage(CONVERT);
-    double[][][] distance = mCalc.accelToDistance(acceleration, 0.03);
-    double[][][] linearDistance = mCalc.accelToDistance(linearAcceleration, 0.03);
-    double[][][] angle = mCalc.gyroToAngle(gyroscope, 0.03);
-
-    this.sendEmptyMessage(FORMAT);
-    distance = mFormatter.doubleToDoubleFormatter(distance);
-    linearDistance = mFormatter.doubleToDoubleFormatter(linearDistance);
-    angle = mFormatter.doubleToDoubleFormatter(angle);
+    double[][][] distance = mCalc.accelToDistance(acceleration, Enum.SENSOR_DELAY_TIME);
+    double[][][] linearDistance = mCalc.accelToDistance(linearAcceleration, Enum.SENSOR_DELAY_TIME);
+    double[][][] angle = mCalc.gyroToAngle(gyroscope, Enum.SENSOR_DELAY_TIME);
 
     mManageData.writeDoubleThreeArrayData("BeforeDeviation", "distance", InputName.name, distance);
     mManageData.writeDoubleThreeArrayData("BeforeDeviation", "linearDistance", InputName.name, linearDistance);
     mManageData.writeDoubleThreeArrayData("BeforeDeviation", "angle", InputName.name, angle);
 
     LogUtil.log(Log.DEBUG, "After write data");
+
+
+    //TODO この段階でコサイン類似度の測定を行い，データをアウトプットする
+    // コサイン類似度を測る
+    LogUtil.log(Log.DEBUG, "Before CosSimilarity");
+    mCosSimilarity.cosSimilarity(distance);
+    mCosSimilarity.cosSimilarity(linearAcceleration);
+    mCosSimilarity.cosSimilarity(angle);
+    LogUtil.log(Log.DEBUG, "After CosSimilarity");
+
 
     this.sendEmptyMessage(DEVIATION);
     // measureCorrelation用の平均値データを作成
@@ -251,7 +256,9 @@ public class Result extends Handler implements Runnable {
       }
     }
 
+    //TODO 相関係数を出力させ，コサイン類似度のものと比較する
     //region 同一のモーションであるかの確認をし，必要に応じてズレ修正を行う
+    LogUtil.log(Log.DEBUG, "Before measure correlation");
     Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, linearDistance, angle, averageDistance,
         averageLinearDistance, averageAngle);
 

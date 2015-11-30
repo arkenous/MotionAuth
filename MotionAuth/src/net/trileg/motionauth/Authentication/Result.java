@@ -39,6 +39,7 @@ public class Result extends Handler implements Runnable {
   private Calc mCalc = new Calc();
   private Correlation mCorrelation = new Correlation();
   private Adjuster mAdjuster = new Adjuster();
+  private CosSimilarity mCosSimilarity = new CosSimilarity();
 
   private Authentication mAuthentication;
   private Button mGetMotion;
@@ -165,9 +166,9 @@ public class Result extends Handler implements Runnable {
     float[][] gyro = adjusted.get(2);
 
     this.sendEmptyMessage(FORMAT);
-    double[][] acceleration = mFormatter.floatToDoubleFormatter(accel);
-    double[][] linearAcceleration = mFormatter.floatToDoubleFormatter(linearAccel);
-    double[][] gyroscope = mFormatter.floatToDoubleFormatter(gyro);
+    double[][] acceleration = mFormatter.convertFloatToDouble(accel);
+    double[][] linearAcceleration = mFormatter.convertFloatToDouble(linearAccel);
+    double[][] gyroscope = mFormatter.convertFloatToDouble(gyro);
 
     this.sendEmptyMessage(AMPLIFY);
     acceleration = mAmplifier.Amplify(acceleration, mAmp);
@@ -180,15 +181,19 @@ public class Result extends Handler implements Runnable {
     gyroscope = mFourier.LowpassFilter(gyroscope, "gyro");
 
     this.sendEmptyMessage(CONVERT);
-    double[][] distance = mCalc.accelToDistance(acceleration, 0.03);
-    double[][] linearDistance = mCalc.accelToDistance(linearAcceleration, 0.03);
-    double[][] angle = mCalc.gyroToAngle(gyroscope, 0.03);
+    double[][] distance = mCalc.accelToDistance(acceleration, Enum.SENSOR_DELAY_TIME);
+    double[][] linearDistance = mCalc.accelToDistance(linearAcceleration, Enum.SENSOR_DELAY_TIME);
+    double[][] angle = mCalc.gyroToAngle(gyroscope, Enum.SENSOR_DELAY_TIME);
 
-    this.sendEmptyMessage(FORMAT);
-    distance = mFormatter.doubleToDoubleFormatter(distance);
-    linearDistance = mFormatter.doubleToDoubleFormatter(linearDistance);
-    angle = mFormatter.doubleToDoubleFormatter(angle);
+    //TODO この段階でコサイン類似度の測定を行い，データをアウトプットする
+    // コサイン類似度を測る
+    LogUtil.log(Log.INFO, "Before CosSimilarity");
+    mCosSimilarity.cosSimilarity(distance, registeredDistance);
+    mCosSimilarity.cosSimilarity(linearDistance, registeredLinearDistance);
+    mCosSimilarity.cosSimilarity(angle, registeredAngle);
+    LogUtil.log(Log.INFO, "After CosSimilarity");
 
+    //TODO 相関係数を出力させ，コサイン類似度のものと比較する
     this.sendEmptyMessage(CORRELATION);
     Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, linearDistance, angle, registeredDistance, registeredLinearDistance, registeredAngle);
     return measure == Enum.MEASURE.CORRECT;

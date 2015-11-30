@@ -26,7 +26,7 @@ public class Calc {
     for (int time = 0; time < Enum.NUM_TIME; time++) {
       for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
         for (int item = 0; item < inputVal[time][axis].length; item++) {
-          returnVal[time][axis][item] = (inputVal[time][axis][item] * t * t) / 2 * 1000;
+          returnVal[time][axis][item] = (inputVal[time][axis][item] * t * t) / 2;
         }
       }
     }
@@ -50,7 +50,7 @@ public class Calc {
     for (int time = 0; time < Enum.NUM_TIME; time++) {
       for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
         for (int item = 0; item < inputVal[time][axis].length; item++) {
-          returnVal[time][axis][item] = (inputVal[time][axis][item] * t) * 1000;
+          returnVal[time][axis][item] = (inputVal[time][axis][item] * t);
         }
       }
     }
@@ -73,7 +73,7 @@ public class Calc {
 
     for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
       for (int item = 0; item < inputVal[axis].length; item++) {
-        returnVal[axis][item] = (inputVal[axis][item] * t * t) / 2 * 1000;
+        returnVal[axis][item] = (inputVal[axis][item] * t * t) / 2;
       }
     }
 
@@ -95,7 +95,7 @@ public class Calc {
 
     for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
       for (int item = 0; item < inputVal[axis].length; item++) {
-        returnVal[axis][item] = (inputVal[axis][item] * t) * 1000;
+        returnVal[axis][item] = (inputVal[axis][item] * t);
       }
     }
 

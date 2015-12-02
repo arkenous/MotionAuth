@@ -27,7 +27,7 @@ public class CosSimilarity {
     // 取得回数AB, AC, BCそれぞれの類似度が出るはずなので，これから判断する
     LogUtil.log(Log.INFO, "---   CosSimilarity data begin here   ---");
     for (double data : similarity) {
-      LogUtil.log(Log.INFO, String.valueOf(data));
+      LogUtil.log(Log.INFO, String.valueOf("similarity: " + data));
     }
     LogUtil.log(Log.INFO, "---   CosSimilarity data end here   ---");
   }
@@ -47,7 +47,7 @@ public class CosSimilarity {
     similarity /= A[0].length;
 
     LogUtil.log(Log.INFO, "---   CosSimilarity data begin here ---");
-    LogUtil.log(Log.INFO, String.valueOf(similarity));
+    LogUtil.log(Log.INFO, String.valueOf("similarity: " + similarity));
     LogUtil.log(Log.INFO, "---   CosSimilarity data end here ---");
   }
 }

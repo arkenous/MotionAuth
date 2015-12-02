@@ -246,15 +246,11 @@ public class Result extends Handler implements Runnable {
     averageDistance = new double[Enum.NUM_AXIS][distance[0][0].length];
     averageLinearDistance = new double[Enum.NUM_AXIS][linearDistance[0][0].length];
     averageAngle = new double[Enum.NUM_AXIS][angle[0][0].length];
-    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-      for (int item = 0; item < averageDistance[axis].length; item++) {
-        averageDistance[axis][item] = (distance[0][axis][item] + distance[1][axis][item] + distance[2][axis][item]) / 3;
-        averageLinearDistance[axis][item] = (linearDistance[0][axis][item] + linearDistance[1][axis][item]
-            + linearDistance[2][axis][item]) / 3;
-        averageAngle[axis][item] = (angle[0][axis][item] + angle[1][axis][item] + angle[2][axis][item]) / 3;
-        LogUtil.log(Log.DEBUG, "averageDistance: " + averageDistance[axis][item]);
-      }
-    }
+
+    averageDistance = calculateAverage(distance);
+    averageLinearDistance = calculateAverage(linearDistance);
+    averageAngle = calculateAverage(angle);
+
 
     //TODO 相関係数を出力させ，コサイン類似度のものと比較する
     //region 同一のモーションであるかの確認をし，必要に応じてズレ修正を行う
@@ -334,14 +330,9 @@ public class Result extends Handler implements Runnable {
           }
         }
 
-        for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-          for (int item = 0; item < averageDistance[axis].length; item++) {
-            averageDistance[axis][item] = (distance[0][axis][item] + distance[1][axis][item] + distance[2][axis][item]) / 3;
-            averageLinearDistance[axis][item] = (linearDistance[0][axis][item] + linearDistance[1][axis][item] +
-                linearDistance[2][axis][item]) / 3;
-            averageAngle[axis][item] = (angle[0][axis][item] + angle[1][axis][item] + angle[2][axis][item]) / 3;
-          }
-        }
+        averageDistance = calculateAverage(distance);
+        averageLinearDistance = calculateAverage(linearDistance);
+        averageAngle = calculateAverage(angle);
 
         Enum.MEASURE tmp = mCorrelation.measureCorrelation(distance, linearDistance, angle, averageDistance,
             averageLinearDistance, averageAngle);
@@ -380,18 +371,26 @@ public class Result extends Handler implements Runnable {
     mManageData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatAngle", InputName.name, angle);
 
     this.sendEmptyMessage(CORRELATION);
+
     // Calculate average data.
-    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-      for (int item = 0; item < averageDistance[axis].length; item++) {
-        averageDistance[axis][item] = (distance[0][axis][item] + distance[1][axis][item] + distance[2][axis][item]) / 3;
-        averageLinearDistance[axis][item] = (linearDistance[0][axis][item] + linearDistance[1][axis][item]
-            + linearDistance[2][axis][item]) / 3;
-        averageAngle[axis][item] = (angle[0][axis][item] + angle[1][axis][item] + angle[2][axis][item]) / 3;
-      }
-    }
+    averageDistance = calculateAverage(distance);
+    averageLinearDistance = calculateAverage(linearDistance);
+    averageAngle = calculateAverage(angle);
 
     measure = mCorrelation.measureCorrelation(distance, linearDistance, angle, averageDistance, averageLinearDistance, averageAngle);
     LogUtil.log(Log.INFO, "measure = " + measure);
     return measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT;
+  }
+
+
+  private double[][] calculateAverage(double[][][] input) {
+    double[][] output = new double[Enum.NUM_AXIS][input[0][0].length];
+    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+      for (int item = 0; item < output[axis].length; item++) {
+        output[axis][item] = (input[0][axis][item] + input[1][axis][item] + input[2][axis][item]) / 3;
+      }
+    }
+
+    return output;
   }
 }

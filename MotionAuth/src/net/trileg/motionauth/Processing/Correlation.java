@@ -14,7 +14,6 @@ import net.trileg.motionauth.Utility.ManageData;
  */
 public class Correlation {
   private ManageData mManageData = new ManageData();
-  private Enum mEnum = new Enum();
 
   /**
    * Calculate correlation to check whether each motion data is same motion or not.
@@ -175,61 +174,61 @@ public class Correlation {
     mManageData.writeR("R", net.trileg.motionauth.Registration.InputName.name, R_point);
 
     // Accel X
-    if ((R_accel[0][0] > mEnum.LOOSE && R_accel[1][0] > mEnum.LOOSE) || (R_accel[1][0] > mEnum.LOOSE && R_accel[2][0] > mEnum.LOOSE) || (R_accel[0][0] > mEnum.LOOSE && R_accel[2][0] > mEnum.LOOSE)) {
+    if ((R_accel[0][0] > Enum.LOOSE && R_accel[1][0] > Enum.LOOSE) || (R_accel[1][0] > Enum.LOOSE && R_accel[2][0] > Enum.LOOSE) || (R_accel[0][0] > Enum.LOOSE && R_accel[2][0] > Enum.LOOSE)) {
       // Y
-      if ((R_accel[0][1] > mEnum.LOOSE && R_accel[1][1] > mEnum.LOOSE) || (R_accel[1][1] > mEnum.LOOSE && R_accel[2][1] > mEnum.LOOSE) || (R_accel[0][1] > mEnum.LOOSE && R_accel[2][1] > mEnum.LOOSE)) {
+      if ((R_accel[0][1] > Enum.LOOSE && R_accel[1][1] > Enum.LOOSE) || (R_accel[1][1] > Enum.LOOSE && R_accel[2][1] > Enum.LOOSE) || (R_accel[0][1] > Enum.LOOSE && R_accel[2][1] > Enum.LOOSE)) {
         // Z
-        if ((R_accel[0][2] > mEnum.LOOSE && R_accel[1][2] > mEnum.LOOSE) || (R_accel[1][2] > mEnum.LOOSE && R_accel[2][2] > mEnum.LOOSE) || (R_accel[0][2] > mEnum.LOOSE && R_accel[2][2] > mEnum.LOOSE)) {
+        if ((R_accel[0][2] > Enum.LOOSE && R_accel[1][2] > Enum.LOOSE) || (R_accel[1][2] > Enum.LOOSE && R_accel[2][2] > Enum.LOOSE) || (R_accel[0][2] > Enum.LOOSE && R_accel[2][2] > Enum.LOOSE)) {
           // LinearAccel X
-          if ((R_linearAccel[0][0] > mEnum.LOOSE && R_linearAccel[1][0] > mEnum.LOOSE) || (R_linearAccel[1][0] > mEnum.LOOSE && R_linearAccel[2][0] > mEnum.LOOSE) || (R_linearAccel[0][0] > mEnum.LOOSE && R_linearAccel[2][0] > mEnum.LOOSE)) {
+          if ((R_linearAccel[0][0] > Enum.LOOSE && R_linearAccel[1][0] > Enum.LOOSE) || (R_linearAccel[1][0] > Enum.LOOSE && R_linearAccel[2][0] > Enum.LOOSE) || (R_linearAccel[0][0] > Enum.LOOSE && R_linearAccel[2][0] > Enum.LOOSE)) {
             // Y
-            if ((R_linearAccel[0][1] > mEnum.LOOSE && R_linearAccel[1][1] > mEnum.LOOSE) || (R_linearAccel[1][1] > mEnum.LOOSE && R_linearAccel[2][1] > mEnum.LOOSE) || (R_linearAccel[0][1] > mEnum.LOOSE && R_linearAccel[2][1] > mEnum.LOOSE)) {
+            if ((R_linearAccel[0][1] > Enum.LOOSE && R_linearAccel[1][1] > Enum.LOOSE) || (R_linearAccel[1][1] > Enum.LOOSE && R_linearAccel[2][1] > Enum.LOOSE) || (R_linearAccel[0][1] > Enum.LOOSE && R_linearAccel[2][1] > Enum.LOOSE)) {
               // Z
-              if ((R_linearAccel[0][2] > mEnum.LOOSE && R_linearAccel[1][2] > mEnum.LOOSE) || (R_linearAccel[1][2] > mEnum.LOOSE && R_linearAccel[2][2] > mEnum.LOOSE) || (R_linearAccel[0][2] > mEnum.LOOSE && R_linearAccel[2][2] > mEnum.LOOSE)) {
+              if ((R_linearAccel[0][2] > Enum.LOOSE && R_linearAccel[1][2] > Enum.LOOSE) || (R_linearAccel[1][2] > Enum.LOOSE && R_linearAccel[2][2] > Enum.LOOSE) || (R_linearAccel[0][2] > Enum.LOOSE && R_linearAccel[2][2] > Enum.LOOSE)) {
                 //  Gyro X
-                if ((R_gyro[0][0] > mEnum.LOOSE && R_gyro[1][0] > mEnum.LOOSE) || (R_gyro[1][0] > mEnum.LOOSE && R_gyro[2][0] > mEnum.LOOSE) || (R_gyro[0][0] > mEnum.LOOSE || R_gyro[2][0] > mEnum.LOOSE)) {
+                if ((R_gyro[0][0] > Enum.LOOSE && R_gyro[1][0] > Enum.LOOSE) || (R_gyro[1][0] > Enum.LOOSE && R_gyro[2][0] > Enum.LOOSE) || (R_gyro[0][0] > Enum.LOOSE || R_gyro[2][0] > Enum.LOOSE)) {
                   // Y
-                  if ((R_gyro[0][1] > mEnum.LOOSE && R_gyro[1][1] > mEnum.LOOSE) || (R_gyro[1][1] > mEnum.LOOSE && R_gyro[2][1] > mEnum.LOOSE) || (R_gyro[0][1] > mEnum.LOOSE || R_gyro[2][1] > mEnum.LOOSE)) {
+                  if ((R_gyro[0][1] > Enum.LOOSE && R_gyro[1][1] > Enum.LOOSE) || (R_gyro[1][1] > Enum.LOOSE && R_gyro[2][1] > Enum.LOOSE) || (R_gyro[0][1] > Enum.LOOSE || R_gyro[2][1] > Enum.LOOSE)) {
                     // Z
-                    if ((R_gyro[0][2] > mEnum.LOOSE && R_gyro[1][2] > mEnum.LOOSE) || (R_gyro[1][2] > mEnum.LOOSE && R_gyro[2][2] > mEnum.LOOSE) || (R_gyro[0][2] > mEnum.LOOSE && R_gyro[2][2] > mEnum.LOOSE)) {
+                    if ((R_gyro[0][2] > Enum.LOOSE && R_gyro[1][2] > Enum.LOOSE) || (R_gyro[1][2] > Enum.LOOSE && R_gyro[2][2] > Enum.LOOSE) || (R_gyro[0][2] > Enum.LOOSE && R_gyro[2][2] > Enum.LOOSE)) {
 
                       // Accel X
-                      if ((R_accel[0][0] > mEnum.NORMAL && R_accel[1][0] > mEnum.NORMAL) || (R_accel[1][0] > mEnum.NORMAL && R_accel[2][0] > mEnum.NORMAL) || (R_accel[0][0] > mEnum.NORMAL && R_accel[2][0] > mEnum.NORMAL)) {
+                      if ((R_accel[0][0] > Enum.NORMAL && R_accel[1][0] > Enum.NORMAL) || (R_accel[1][0] > Enum.NORMAL && R_accel[2][0] > Enum.NORMAL) || (R_accel[0][0] > Enum.NORMAL && R_accel[2][0] > Enum.NORMAL)) {
                         // Y
-                        if ((R_accel[0][1] > mEnum.NORMAL && R_accel[1][1] > mEnum.NORMAL) || (R_accel[1][1] > mEnum.NORMAL && R_accel[2][1] > mEnum.NORMAL) || (R_accel[0][1] > mEnum.NORMAL && R_accel[2][1] > mEnum.NORMAL)) {
+                        if ((R_accel[0][1] > Enum.NORMAL && R_accel[1][1] > Enum.NORMAL) || (R_accel[1][1] > Enum.NORMAL && R_accel[2][1] > Enum.NORMAL) || (R_accel[0][1] > Enum.NORMAL && R_accel[2][1] > Enum.NORMAL)) {
                           // Z
-                          if ((R_accel[0][2] > mEnum.NORMAL && R_accel[1][2] > mEnum.NORMAL) || (R_accel[1][2] > mEnum.NORMAL && R_accel[2][2] > mEnum.NORMAL) || (R_accel[0][2] > mEnum.NORMAL && R_accel[2][2] > mEnum.NORMAL)) {
+                          if ((R_accel[0][2] > Enum.NORMAL && R_accel[1][2] > Enum.NORMAL) || (R_accel[1][2] > Enum.NORMAL && R_accel[2][2] > Enum.NORMAL) || (R_accel[0][2] > Enum.NORMAL && R_accel[2][2] > Enum.NORMAL)) {
                             // LinearAccel X
-                            if ((R_linearAccel[0][0] > mEnum.NORMAL && R_linearAccel[1][0] > mEnum.NORMAL) || (R_linearAccel[1][0] > mEnum.NORMAL && R_linearAccel[2][0] > mEnum.NORMAL) || (R_linearAccel[0][0] > mEnum.NORMAL && R_linearAccel[2][0] > mEnum.NORMAL)) {
+                            if ((R_linearAccel[0][0] > Enum.NORMAL && R_linearAccel[1][0] > Enum.NORMAL) || (R_linearAccel[1][0] > Enum.NORMAL && R_linearAccel[2][0] > Enum.NORMAL) || (R_linearAccel[0][0] > Enum.NORMAL && R_linearAccel[2][0] > Enum.NORMAL)) {
                               // Y
-                              if ((R_linearAccel[0][1] > mEnum.NORMAL && R_linearAccel[1][1] > mEnum.NORMAL) || (R_linearAccel[1][1] > mEnum.NORMAL && R_linearAccel[2][1] > mEnum.NORMAL) || (R_linearAccel[0][1] > mEnum.NORMAL && R_linearAccel[2][1] > mEnum.NORMAL)) {
+                              if ((R_linearAccel[0][1] > Enum.NORMAL && R_linearAccel[1][1] > Enum.NORMAL) || (R_linearAccel[1][1] > Enum.NORMAL && R_linearAccel[2][1] > Enum.NORMAL) || (R_linearAccel[0][1] > Enum.NORMAL && R_linearAccel[2][1] > Enum.NORMAL)) {
                                 // Z
-                                if ((R_linearAccel[0][2] > mEnum.NORMAL && R_linearAccel[1][2] > mEnum.NORMAL) || (R_linearAccel[1][2] > mEnum.NORMAL && R_linearAccel[2][2] > mEnum.NORMAL) || (R_linearAccel[0][2] > mEnum.NORMAL && R_linearAccel[2][2] > mEnum.NORMAL)) {
+                                if ((R_linearAccel[0][2] > Enum.NORMAL && R_linearAccel[1][2] > Enum.NORMAL) || (R_linearAccel[1][2] > Enum.NORMAL && R_linearAccel[2][2] > Enum.NORMAL) || (R_linearAccel[0][2] > Enum.NORMAL && R_linearAccel[2][2] > Enum.NORMAL)) {
                                   // Gyro X
-                                  if ((R_gyro[0][0] > mEnum.NORMAL && R_gyro[1][0] > mEnum.NORMAL) || (R_gyro[1][0] > mEnum.NORMAL && R_gyro[2][0] > mEnum.NORMAL) || (R_gyro[0][0] > mEnum.NORMAL && R_gyro[2][0] > mEnum.NORMAL)) {
+                                  if ((R_gyro[0][0] > Enum.NORMAL && R_gyro[1][0] > Enum.NORMAL) || (R_gyro[1][0] > Enum.NORMAL && R_gyro[2][0] > Enum.NORMAL) || (R_gyro[0][0] > Enum.NORMAL && R_gyro[2][0] > Enum.NORMAL)) {
                                     // Y
-                                    if ((R_gyro[0][1] > mEnum.NORMAL && R_gyro[1][1] > mEnum.NORMAL) || (R_gyro[1][1] > mEnum.NORMAL && R_gyro[2][1] > mEnum.NORMAL) || (R_gyro[0][1] > mEnum.NORMAL && R_gyro[2][1] > mEnum.NORMAL)) {
+                                    if ((R_gyro[0][1] > Enum.NORMAL && R_gyro[1][1] > Enum.NORMAL) || (R_gyro[1][1] > Enum.NORMAL && R_gyro[2][1] > Enum.NORMAL) || (R_gyro[0][1] > Enum.NORMAL && R_gyro[2][1] > Enum.NORMAL)) {
                                       // Z
-                                      if ((R_gyro[0][2] > mEnum.NORMAL && R_gyro[1][2] > mEnum.NORMAL) || (R_gyro[1][2] > mEnum.NORMAL && R_gyro[2][2] > mEnum.NORMAL) || (R_gyro[0][2] > mEnum.NORMAL && R_gyro[2][2] > mEnum.NORMAL)) {
+                                      if ((R_gyro[0][2] > Enum.NORMAL && R_gyro[1][2] > Enum.NORMAL) || (R_gyro[1][2] > Enum.NORMAL && R_gyro[2][2] > Enum.NORMAL) || (R_gyro[0][2] > Enum.NORMAL && R_gyro[2][2] > Enum.NORMAL)) {
 
                                         // Accel X
-                                        if ((R_accel[0][0] > mEnum.STRICT && R_accel[1][0] > mEnum.STRICT) || (R_accel[1][0] > mEnum.STRICT && R_accel[2][0] > mEnum.STRICT) || (R_accel[0][0] > mEnum.STRICT && R_accel[2][0] > mEnum.STRICT)) {
+                                        if ((R_accel[0][0] > Enum.STRICT && R_accel[1][0] > Enum.STRICT) || (R_accel[1][0] > Enum.STRICT && R_accel[2][0] > Enum.STRICT) || (R_accel[0][0] > Enum.STRICT && R_accel[2][0] > Enum.STRICT)) {
                                           // Y
-                                          if ((R_accel[0][1] > mEnum.STRICT && R_accel[1][1] > mEnum.STRICT) || (R_accel[1][1] > mEnum.STRICT && R_accel[2][1] > mEnum.STRICT) || (R_accel[0][1] > mEnum.STRICT && R_accel[2][1] > mEnum.STRICT)) {
+                                          if ((R_accel[0][1] > Enum.STRICT && R_accel[1][1] > Enum.STRICT) || (R_accel[1][1] > Enum.STRICT && R_accel[2][1] > Enum.STRICT) || (R_accel[0][1] > Enum.STRICT && R_accel[2][1] > Enum.STRICT)) {
                                             // Z
-                                            if ((R_accel[0][2] > mEnum.STRICT && R_accel[1][2] > mEnum.STRICT) || (R_accel[1][2] > mEnum.STRICT && R_accel[2][2] > mEnum.STRICT) || (R_accel[0][2] > mEnum.STRICT && R_accel[2][2] > mEnum.STRICT)) {
+                                            if ((R_accel[0][2] > Enum.STRICT && R_accel[1][2] > Enum.STRICT) || (R_accel[1][2] > Enum.STRICT && R_accel[2][2] > Enum.STRICT) || (R_accel[0][2] > Enum.STRICT && R_accel[2][2] > Enum.STRICT)) {
                                               // LinearAccel X
-                                              if ((R_linearAccel[0][0] > mEnum.STRICT && R_linearAccel[1][0] > mEnum.STRICT) || (R_linearAccel[1][0] > mEnum.STRICT && R_linearAccel[2][0] > mEnum.STRICT) || (R_linearAccel[0][0] > mEnum.STRICT && R_linearAccel[2][0] > mEnum.STRICT)) {
+                                              if ((R_linearAccel[0][0] > Enum.STRICT && R_linearAccel[1][0] > Enum.STRICT) || (R_linearAccel[1][0] > Enum.STRICT && R_linearAccel[2][0] > Enum.STRICT) || (R_linearAccel[0][0] > Enum.STRICT && R_linearAccel[2][0] > Enum.STRICT)) {
                                                 // Y
-                                                if ((R_linearAccel[0][1] > mEnum.STRICT && R_linearAccel[1][1] > mEnum.STRICT) || (R_linearAccel[1][1] > mEnum.STRICT && R_linearAccel[2][1] > mEnum.STRICT) || (R_linearAccel[0][1] > mEnum.STRICT && R_linearAccel[2][1] > mEnum.STRICT)) {
+                                                if ((R_linearAccel[0][1] > Enum.STRICT && R_linearAccel[1][1] > Enum.STRICT) || (R_linearAccel[1][1] > Enum.STRICT && R_linearAccel[2][1] > Enum.STRICT) || (R_linearAccel[0][1] > Enum.STRICT && R_linearAccel[2][1] > Enum.STRICT)) {
                                                   // Z
-                                                  if ((R_linearAccel[0][2] > mEnum.STRICT && R_linearAccel[1][2] > mEnum.STRICT) || (R_linearAccel[1][2] > mEnum.STRICT && R_linearAccel[2][2] > mEnum.STRICT) || (R_linearAccel[0][2] > mEnum.STRICT && R_linearAccel[2][2] > mEnum.STRICT)) {
+                                                  if ((R_linearAccel[0][2] > Enum.STRICT && R_linearAccel[1][2] > Enum.STRICT) || (R_linearAccel[1][2] > Enum.STRICT && R_linearAccel[2][2] > Enum.STRICT) || (R_linearAccel[0][2] > Enum.STRICT && R_linearAccel[2][2] > Enum.STRICT)) {
                                                     // Gyro X
-                                                    if ((R_gyro[0][0] > mEnum.STRICT && R_gyro[1][0] > mEnum.STRICT) || (R_gyro[1][0] > mEnum.STRICT && R_gyro[2][0] > mEnum.STRICT) || (R_gyro[0][0] > mEnum.STRICT && R_gyro[2][0] > mEnum.STRICT)) {
+                                                    if ((R_gyro[0][0] > Enum.STRICT && R_gyro[1][0] > Enum.STRICT) || (R_gyro[1][0] > Enum.STRICT && R_gyro[2][0] > Enum.STRICT) || (R_gyro[0][0] > Enum.STRICT && R_gyro[2][0] > Enum.STRICT)) {
                                                       // Y
-                                                      if ((R_gyro[0][1] > mEnum.STRICT && R_gyro[1][1] > mEnum.STRICT) || (R_gyro[1][1] > mEnum.STRICT && R_gyro[2][1] > mEnum.STRICT) || (R_gyro[0][1] > mEnum.STRICT && R_gyro[2][1] > mEnum.STRICT)) {
+                                                      if ((R_gyro[0][1] > Enum.STRICT && R_gyro[1][1] > Enum.STRICT) || (R_gyro[1][1] > Enum.STRICT && R_gyro[2][1] > Enum.STRICT) || (R_gyro[0][1] > Enum.STRICT && R_gyro[2][1] > Enum.STRICT)) {
                                                         // Z
-                                                        if ((R_gyro[0][2] > mEnum.STRICT && R_gyro[1][2] > mEnum.STRICT) || (R_gyro[1][2] > mEnum.STRICT && R_gyro[2][2] > mEnum.STRICT) || (R_gyro[0][2] > mEnum.STRICT && R_gyro[2][2] > mEnum.STRICT)) {
+                                                        if ((R_gyro[0][2] > Enum.STRICT && R_gyro[1][2] > Enum.STRICT) || (R_gyro[1][2] > Enum.STRICT && R_gyro[2][2] > Enum.STRICT) || (R_gyro[0][2] > Enum.STRICT && R_gyro[2][2] > Enum.STRICT)) {
                                                           return Enum.MEASURE.PERFECT;
                                                         } else { // NORMALより大きくSTRICT以下 // Z
                                                           return Enum.MEASURE.CORRECT;

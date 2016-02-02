@@ -157,6 +157,8 @@ public class Result extends Handler implements Runnable {
    * @param linearAccelList Linear acceleration data which collect in Authentication.GetData.
    * @param gyroList  Gyroscope data which collect in Authentication.GetData.
    * @return true if authentication is succeed, otherwise false.
+   *
+   * //TODO すべてのデータをストレージにアウトプットする
    */
   private boolean calculate(ArrayList<ArrayList<Float>> accelList, ArrayList<ArrayList<Float>> linearAccelList,
                             ArrayList<ArrayList<Float>> gyroList) {
@@ -184,6 +186,10 @@ public class Result extends Handler implements Runnable {
     double[][] distance = mCalc.accelToDistance(acceleration, Enum.SENSOR_DELAY_TIME);
     double[][] linearDistance = mCalc.accelToDistance(linearAcceleration, Enum.SENSOR_DELAY_TIME);
     double[][] angle = mCalc.gyroToAngle(gyroscope, Enum.SENSOR_DELAY_TIME);
+
+    mManageData.writeDoubleTwoArrayData("AuthAfterCalcData", "afterCalcDistance", InputName.userName, distance);
+    mManageData.writeDoubleTwoArrayData("AuthAfterCalcData", "afterCalcLinearDistance", InputName.userName, linearDistance);
+    mManageData.writeDoubleTwoArrayData("AuthAfterCalcData", "afterCalcAngle", InputName.userName, angle);
 
     //TODO この段階でコサイン類似度の測定を行い，データをアウトプットする
     // コサイン類似度を測る

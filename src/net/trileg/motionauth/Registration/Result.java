@@ -171,6 +171,7 @@ public class Result extends Handler implements Runnable {
 
   /**
    * データ加工，計算処理を行う
+   * //TODO すべてのデータをきっちりストレージにアウトプットする
    */
   public boolean calculate(ArrayList<ArrayList<ArrayList<Float>>> accelList,
                            ArrayList<ArrayList<ArrayList<Float>>> linearAccelList,

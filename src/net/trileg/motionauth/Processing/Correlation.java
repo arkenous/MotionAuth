@@ -132,9 +132,7 @@ public class Correlation {
       }
     }
 
-    mManageData.writeRData("RegistLRdata", "R_accel", net.trileg.motionauth.Registration.InputName.name, R_accel);
-    mManageData.writeRData("RegistLRdata", "R_linearAccel", net.trileg.motionauth.Registration.InputName.name, R_linearAccel);
-    mManageData.writeRData("RegistLRdata", "R_gyro", net.trileg.motionauth.Registration.InputName.name, R_gyro);
+    mManageData.writeRData(net.trileg.motionauth.Registration.InputName.name, "RegistLRdata", R_accel, R_linearAccel, R_gyro);
 
     for (double[] i : R_accel) {
       for (double j : i) {
@@ -171,7 +169,7 @@ public class Correlation {
 
     R_point = R_point / 18;
 
-    mManageData.writeR("R", net.trileg.motionauth.Registration.InputName.name, R_point);
+    mManageData.writeR(net.trileg.motionauth.Registration.InputName.name, "R", R_point);
 
     // Accel X
     if ((R_accel[0][0] > Enum.LOOSE && R_accel[1][0] > Enum.LOOSE) || (R_accel[1][0] > Enum.LOOSE && R_accel[2][0] > Enum.LOOSE) || (R_accel[0][0] > Enum.LOOSE && R_accel[2][0] > Enum.LOOSE)) {
@@ -433,7 +431,7 @@ public class Correlation {
     }
     //endregion
 
-    mManageData.writeRData("AuthRData", InputName.userName, R_accel, R_linearAccel, R_gyro);
+    mManageData.writeRData(InputName.userName, "AuthRData", R_accel, R_linearAccel, R_gyro);
 
     //region 相関の判定
     //相関係数が一定以上あるなら認証成功

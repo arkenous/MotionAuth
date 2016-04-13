@@ -14,6 +14,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import net.trileg.motionauth.R;
 import net.trileg.motionauth.Utility.Enum.STATUS;
+import net.trileg.motionauth.Utility.ListToArray;
 import net.trileg.motionauth.Utility.LogUtil;
 
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ public class Registration extends Activity {
   private Button getMotionBtn;
   private GetData mGetData;
   private Result mResult;
+  private ListToArray mListToArray = new ListToArray();
   private Registration mRegistration;
 
   private double checkRangeValue = 2.0;
@@ -120,8 +122,9 @@ public class Registration extends Activity {
 
     progressDialog.show();
 
-    mResult = new Result(mRegistration, accel, linearAcceleration, gyro, getMotionBtn, progressDialog, checkRangeValue,
-        ampValue, this, mGetData);
+    mResult = new Result(mRegistration, mListToArray.listTo3DArray(accel),
+        mListToArray.listTo3DArray(linearAcceleration), mListToArray.listTo3DArray(gyro),
+        getMotionBtn, progressDialog, checkRangeValue, ampValue, this, mGetData);
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     executorService.submit(mResult);
     executorService.shutdown();

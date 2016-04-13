@@ -23,15 +23,13 @@ public class ManageData {
 
 
   /**
-   * Write double type 2-array data. Write destination is SD Card directory/folderName/userName/fileName+dimension
-   *
-   * @param folderName Directory name.
-   * @param dataName   Data name.
    * @param userName   User name.
+   * @param dataName Data name.
+   * @param sensorName   Sensor name.
    * @param data       Double type 2-array data to write.
    * @return Return true when write data complete, otherwise false.
    */
-  public boolean writeDoubleTwoArrayData(String folderName, String dataName, String userName, double[][] data) {
+  public boolean writeDoubleTwoArrayData(String userName, String dataName, String sensorName, double[][] data) {
     LogUtil.log(Log.INFO);
 
     String status = Environment.getExternalStorageState();
@@ -41,7 +39,7 @@ public class ManageData {
     }
 
     String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-    String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + folderName + File.separator + userName;
+    String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + userName + File.separator + dataName;
 
     File file = new File(FOLDER_PATH);
 
@@ -57,33 +55,21 @@ public class ManageData {
     }
 
     try {
-      String dimension = null;
+      String filePath = FOLDER_PATH + File.separator + sensorName + ".dat";
+      file = new File(filePath);
 
-      // X,Y,Z loop.
-      for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-        if (axis == 0) {
-          dimension = "x";
-        } else if (axis == 1) {
-          dimension = "y";
-        } else if (axis == 2) {
-          dimension = "z";
-        }
+      fos = new FileOutputStream(file, false);
+      osw = new OutputStreamWriter(fos, "UTF-8");
+      bw = new BufferedWriter(osw);
 
-        String filePath = FOLDER_PATH + File.separator + dataName + String.valueOf(axis) + dimension;
-        file = new File(filePath);
-
-        // Write data to file.
-        fos = new FileOutputStream(file, false);
-        osw = new OutputStreamWriter(fos, "UTF-8");
-        bw = new BufferedWriter(osw);
-
-        for (int item = 0; item < data[axis].length; item++) {
-          bw.write(dataName + "_" + dimension + "@" + data[axis][item] + "\n");
-        }
-        bw.close();
-        osw.close();
-        fos.close();
+      for (int item = 0; item < data[0].length; item++) {
+        bw.write(data[0][item] + " " + data[1][item] + " " + data[2][item] + "\n");
       }
+
+      bw.flush();
+      bw.close();
+      osw.close();
+      fos.close();
     } catch (Exception e) {
       LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
       return false;
@@ -93,14 +79,12 @@ public class ManageData {
 
 
   /**
-   * Write double type 3-array data. Write destination is SD Card directory/folderName/userName/fileName+times+dimension
-   *
-   * @param folderName Directory name.
-   * @param dataName   Data name.
    * @param userName   User name.
+   * @param dataName Data name.
+   * @param sensorName   Sensor name.
    * @param data       Double type 3-array data to write.
    */
-  public void writeDoubleThreeArrayData(String folderName, String dataName, String userName, double[][][] data) {
+  public void writeDoubleThreeArrayData(String userName, String dataName, String sensorName, double[][][] data) {
     LogUtil.log(Log.INFO);
 
     String status = Environment.getExternalStorageState();
@@ -109,7 +93,7 @@ public class ManageData {
     }
 
     String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-    String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + folderName + File.separator + userName;
+    String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + userName + File.separator + dataName;
 
     File file = new File(FOLDER_PATH);
 
@@ -124,35 +108,22 @@ public class ManageData {
     }
 
     try {
-      String dimension = null;
-
       for (int time = 0; time < Enum.NUM_TIME; time++) {
-        // X,Y,Z loop.
-        for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-          if (axis == 0) {
-            dimension = "x";
-          } else if (axis == 1) {
-            dimension = "y";
-          } else if (axis == 2) {
-            dimension = "z";
-          }
+        String filePath = FOLDER_PATH + File.separator + sensorName + String.valueOf(time) + ".dat";
+        file = new File(filePath);
 
-          String filePath = FOLDER_PATH + File.separator + dataName + String.valueOf(time) + dimension;
-          file = new File(filePath);
+        fos = new FileOutputStream(file, false);
+        osw = new OutputStreamWriter(fos, "UTF-8");
+        bw = new BufferedWriter(osw);
 
-          // Write data to file.
-          fos = new FileOutputStream(file, false);
-          osw = new OutputStreamWriter(fos, "UTF-8");
-          bw = new BufferedWriter(osw);
-
-          for (int item = 0; item < data[time][axis].length; item++) {
-            bw.write(data[time][axis][item] + "\n");
-            bw.flush();
-          }
-          bw.close();
-          osw.close();
-          fos.close();
+        for (int item = 0; item < data[time][0].length; item++) {
+          bw.write(data[time][0][item] + " " + data[time][1][item] + " " + data[time][2][item] + "\n");
         }
+
+        bw.flush();
+        bw.close();
+        osw.close();
+        fos.close();
       }
     } catch (Exception e) {
       LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
@@ -160,161 +131,49 @@ public class ManageData {
   }
 
 
-  /**
-   * Write double type 2-array data. Write destination is SD Card directory/folderName/userName/fileName+dimension
-   *
-   * @param folderName Directory name.
-   * @param dataName   Data name.
-   * @param userName   User name.
-   * @param data       Double type 2-array data to write.
-   */
-  public void writeRData(String folderName, String dataName, String userName, double[][] data) {
+  public void writeRData(String userName, String dataName, double[][] R_accel, double[][] R_linearAccel, double[][] R_gyro) {
     LogUtil.log(Log.INFO);
 
     String status = Environment.getExternalStorageState();
     if (!status.equals(Environment.MEDIA_MOUNTED)) {
-      LogUtil.log(Log.ERROR, "SDCard not mounted");
+      LogUtil.log(Log.ERROR, "SD card not mounted");
     }
 
     String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-    String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + folderName + File.separator + userName;
+    String DIRECTORY_PATH = SD_PATH + File.separator + APP_NAME + File.separator + userName;
 
-    File file = new File(FOLDER_PATH);
+    File file = new File(DIRECTORY_PATH);
 
     try {
-      if (!file.exists()) {
-        if (!file.mkdirs()) {
-          LogUtil.log(Log.ERROR, "Make directory error");
-        }
+      if (!file.exists() && !file.mkdirs()) {
+        LogUtil.log(Log.ERROR, "Make directory error");
       }
     } catch (Exception e) {
       LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
     }
 
     try {
-      String dimension = null;
-
-      for (int time = 0; time < Enum.NUM_TIME; time++) {
-
-        // X,Y,Z loop.
-        for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-          if (axis == 0) {
-            dimension = "x";
-          } else if (axis == 1) {
-            dimension = "y";
-          } else if (axis == 2) {
-            dimension = "z";
-          }
-
-          String filePath = FOLDER_PATH + File.separator + dataName + String.valueOf(time) + dimension;
-          file = new File(filePath);
-
-          // Write data to file.
-          fos = new FileOutputStream(file, false);
-          osw = new OutputStreamWriter(fos, "UTF-8");
-          bw = new BufferedWriter(osw);
-
-          bw.write(dataName + "_" + dimension + "_" + String.valueOf(time + 1) + "@" + data[time][axis] + "\n");
-          bw.close();
-          osw.close();
-          fos.close();
-        }
-      }
-    } catch (Exception e) {
-      LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
-    }
-  }
-
-
-  /**
-   * Write double type 2-array data. Write destination is SD Card directory/MotionAuth/folderName/userName
-   *
-   * @param folderName Directory name.
-   * @param userName   User name.
-   * @param R_accel    Double type 1-array distance-R data.
-   * @param R_linearAccel Double type 1-array linear distance R data.
-   * @param R_gyro     Double type 1-array angle-R data.
-   */
-  public void writeRData(String folderName, String userName, double[] R_accel, double[] R_linearAccel, double[] R_gyro) {
-    LogUtil.log(Log.INFO);
-
-    String status = Environment.getExternalStorageState();
-    if (!status.equals(Environment.MEDIA_MOUNTED)) {
-      LogUtil.log(Log.ERROR, "SDCard not mounted");
-    }
-
-    String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-    String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + folderName;
-
-    File file = new File(FOLDER_PATH);
-
-    try {
-      if (!file.exists()) {
-        if (!file.mkdirs()) {
-          LogUtil.log(Log.ERROR, "Make directory error");
-        }
-      }
-    } catch (Exception e) {
-      LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
-    }
-
-    try {
-      String filePath = FOLDER_PATH + File.separator + userName;
+      String filePath = DIRECTORY_PATH + File.separator + dataName + ".dat";
       file = new File(filePath);
 
-      // Write data to file.
       fos = new FileOutputStream(file, false);
       osw = new OutputStreamWriter(fos, "UTF-8");
       bw = new BufferedWriter(osw);
 
-      for (int sensor = 0; sensor < 3; sensor++) {
-        if (sensor == 0) {
-          for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-            if (axis == 0) {
-              bw.write("R_accel_x@" + R_accel[axis] + "\n");
-              bw.flush();
-            }
-            if (axis == 1) {
-              bw.write("R_accel_y@" + R_accel[axis] + "\n");
-              bw.flush();
-            }
-            if (axis == 2) {
-              bw.write("R_accel_z@" + R_accel[axis] + "\n");
-              bw.flush();
-            }
-          }
-        } else if (sensor == 1) {
-          for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-            if (axis == 0) {
-              bw.write("R_linearAccel_x@" + R_linearAccel[axis] + "\n");
-              bw.flush();
-            }
-            if (axis == 1) {
-              bw.write("R_linearAccel_y@" + R_linearAccel[axis] + "\n");
-              bw.flush();
-            }
-            if (axis == 2) {
-              bw.write("R_linearAccel_z@" + R_linearAccel[axis] + "\n");
-              bw.flush();
-            }
-          }
-        } else if (sensor == 2) {
-          for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-            if (axis == 0) {
-              bw.write("R_gyro_x@" + R_gyro[axis] + "\n");
-              bw.flush();
-            }
-            if (axis == 1) {
-              bw.write("R_gyro_y@" + R_gyro[axis] + "\n");
-              bw.flush();
-            }
-            if (axis == 2) {
-              bw.write("R_gyro_z@" + R_gyro[axis] + "\n");
-              bw.flush();
-            }
-          }
+      String[] dimension = {"x", "y", "z"};
+      for (int time = 0; time < Enum.NUM_TIME; time++) {
+        for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+          bw.write(String.valueOf(time + 1) + "_" + "R-accel" + "_" + dimension[axis] + " " + R_accel[time][axis] + "\n");
+        }
+        for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+          bw.write(String.valueOf(time + 1) + "_" + "R-linearAccel" + "_" + dimension[axis] + " " + R_linearAccel[time][axis] + "\n");
+        }
+        for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+          bw.write(String.valueOf(time + 1) + "_" + "R-gyro" + "_" + dimension[axis] + " " + R_gyro[time][axis] + "\n");
         }
       }
+
+      bw.flush();
       bw.close();
       osw.close();
       fos.close();
@@ -324,7 +183,14 @@ public class ManageData {
   }
 
 
-  public void writeR(String folderName, String userName, double data) {
+  /**
+   * @param userName   User name.
+   * @param dataName Data name.
+   * @param R_accel    Double type 1-array distance-R data.
+   * @param R_linearAccel Double type 1-array linear distance R data.
+   * @param R_gyro     Double type 1-array angle-R data.
+   */
+  public void writeRData(String userName, String dataName, double[] R_accel, double[] R_linearAccel, double[] R_gyro) {
     LogUtil.log(Log.INFO);
 
     String status = Environment.getExternalStorageState();
@@ -333,7 +199,7 @@ public class ManageData {
     }
 
     String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-    String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + folderName;
+    String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + userName;
 
     File file = new File(FOLDER_PATH);
 
@@ -348,7 +214,59 @@ public class ManageData {
     }
 
     try {
-      String filePath = FOLDER_PATH + File.separator + userName;
+      String filePath = FOLDER_PATH + File.separator + dataName + ".dat";
+      file = new File(filePath);
+
+      fos = new FileOutputStream(file, false);
+      osw = new OutputStreamWriter(fos, "UTF-8");
+      bw = new BufferedWriter(osw);
+
+      String[] dimension = {"x", "y", "z"};
+      for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+        bw.write("R_accel" + "_" + dimension[axis] + " " + R_accel[axis] + "\n");
+      }
+      for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+        bw.write("R_linearAccel" + "_" + dimension[axis] + " " + R_linearAccel[axis] + "\n");
+      }
+      for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+        bw.write("R_gyro" + "_" + dimension[axis] + " " + R_gyro[axis] + "\n");
+      }
+
+      bw.flush();
+      bw.close();
+      osw.close();
+      fos.close();
+    } catch (Exception e) {
+      LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
+    }
+  }
+
+
+  public void writeR(String userName, String dataName, double data) {
+    LogUtil.log(Log.INFO);
+
+    String status = Environment.getExternalStorageState();
+    if (!status.equals(Environment.MEDIA_MOUNTED)) {
+      LogUtil.log(Log.ERROR, "SDCard not mounted");
+    }
+
+    String SD_PATH = Environment.getExternalStorageDirectory().getPath();
+    String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + userName;
+
+    File file = new File(FOLDER_PATH);
+
+    try {
+      if (!file.exists()) {
+        if (!file.mkdirs()) {
+          LogUtil.log(Log.ERROR, "Make directory error");
+        }
+      }
+    } catch (Exception e) {
+      LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
+    }
+
+    try {
+      String filePath = FOLDER_PATH + File.separator + dataName + ".dat";
       file = new File(filePath);
 
       fos = new FileOutputStream(file, false);
@@ -357,6 +275,7 @@ public class ManageData {
 
       bw.write(String.valueOf(data));
 
+      bw.flush();
       bw.close();
       osw.close();
       fos.close();
@@ -472,14 +391,12 @@ public class ManageData {
 
 
   /**
-   * Write float type 3-array list data. Write destination is SD Card directory/MotionAuth/dir/user/type+times+dimension
-   *
-   * @param dir  Directory name.
-   * @param user User name.
-   * @param type Sensor name.
+   * @param userName  User name.
+   * @param dataName Data name.
+   * @param sensorName Sensor name.
    * @param data Float type 3-array list data.
    */
-  public void writeFloatData(String dir, String user, String type, ArrayList<ArrayList<ArrayList<Float>>> data) {
+  public void writeFloatData(String userName, String dataName, String sensorName, float[][][] data) {
     LogUtil.log(Log.INFO);
 
     if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
@@ -488,7 +405,7 @@ public class ManageData {
     }
 
     String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-    String DIR_PATH = SD_PATH + File.separator + APP_NAME + File.separator + dir + File.separator + user;
+    String DIR_PATH = SD_PATH + File.separator + APP_NAME + File.separator + userName + File.separator + dataName;
 
     File file = new File(DIR_PATH);
     try {
@@ -502,38 +419,67 @@ public class ManageData {
     }
 
     try {
-      String dimension;
-
       for (int time = 0; time < Enum.NUM_TIME; time++) {
-        for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-          if (axis == 0) {
-            dimension = "x";
-          } else if (axis == 1) {
-            dimension = "y";
-          } else if (axis == 2) {
-            dimension = "z";
-          } else {
-            dimension = "";
-          }
+        String filePath = DIR_PATH + File.separator + sensorName + String.valueOf(time) + ".dat";
+        file = new File(filePath);
 
-          String filePath = DIR_PATH + File.separator + type + String.valueOf(time) + dimension;
-          file = new File(filePath);
+        fos = new FileOutputStream(file, false);
+        osw = new OutputStreamWriter(fos, "UTF-8");
+        bw = new BufferedWriter(osw);
 
-          // Write data to file.
-          fos = new FileOutputStream(file, false);
-          osw = new OutputStreamWriter(fos, "UTF-8");
-          bw = new BufferedWriter(osw);
+        for (int item = 0; item < data[time][0].length; item++) {
+          bw.write(data[time][0][item] + " " + data[time][1][item] + " " + data[time][2][item] + "\n");
+        }
 
-          for (int item = 0; item < data.get(time).get(axis).size(); item++) {
-            bw.write(type + "_" + dimension + "_" + String.valueOf(time + 1)
-                + "@" + data.get(time).get(axis).get(item) + "\n");
-          }
+        bw.flush();
+        bw.close();
+        osw.close();
+        fos.close();
+      }
+    } catch (IOException e) {
+      LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
+    }
+  }
 
-          bw.close();
-          osw.close();
-          fos.close();
+
+  public void writeFloatData(String userName, String dataName, String sensorName, float[][] data) {
+    LogUtil.log(Log.INFO);
+
+    if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+      LogUtil.log(Log.ERROR, "SD-Card not mounted");
+      return;
+    }
+
+    String SD_PATH = Environment.getExternalStorageDirectory().getPath();
+    String DIR_PATH = SD_PATH + File.separator + APP_NAME + File.separator + userName + File.separator + dataName;
+
+    File file = new File(DIR_PATH);
+    try {
+      if (!file.exists()) {
+        if (!file.mkdirs()) {
+          LogUtil.log(Log.DEBUG, "Make directory Error");
         }
       }
+    } catch (Exception e) {
+      LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
+    }
+
+    try {
+      String filePath = DIR_PATH + File.separator + sensorName + ".dat";
+      file = new File(filePath);
+
+      fos = new FileOutputStream(file, false);
+      osw = new OutputStreamWriter(fos, "UTF-8");
+      bw = new BufferedWriter(osw);
+
+      for (int item = 0; item < data[0].length; item++) {
+        bw.write(data[0][item] + " " + data[1][item] + " " + data[2][item] + "\n");
+      }
+
+      bw.flush();
+      bw.close();
+      osw.close();
+      fos.close();
     } catch (IOException e) {
       LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
     }

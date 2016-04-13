@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import net.trileg.motionauth.R;
 import net.trileg.motionauth.Utility.Enum.STATUS;
+import net.trileg.motionauth.Utility.ListToArray;
 import net.trileg.motionauth.Utility.LogUtil;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class Authentication extends Activity {
   private Button getMotionBtn;
 
   private GetData mGetData;
+  private ListToArray mListToArray = new ListToArray();
 
 
   @Override
@@ -112,7 +114,10 @@ public class Authentication extends Activity {
 
     progressDialog.show();
 
-    Result mResult = new Result(this, accel, linearAccel, gyro, getMotionBtn, progressDialog, mGetData);
+
+    Result mResult = new Result(this, mListToArray.listTo2DArray(accel),
+        mListToArray.listTo2DArray(linearAccel), mListToArray.listTo2DArray(gyro),
+        getMotionBtn, progressDialog, mGetData);
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     executorService.execute(mResult);
     executorService.shutdown();

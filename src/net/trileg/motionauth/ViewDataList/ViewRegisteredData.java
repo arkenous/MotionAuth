@@ -165,7 +165,7 @@ public class ViewRegisteredData extends Activity {
       case android.R.id.home:
         if (flgCount == 9) {
           flgCount = 0;
-          moveActivity(getPackageName(), getPackageName() + ".ViewDataList.ViewRegisteredRData", true);
+          moveActivity(getPackageName(), getPackageName() + ".Start", true);
         } else {
           flgCount++;
         }
@@ -181,10 +181,9 @@ public class ViewRegisteredData extends Activity {
     Intent intent = new Intent();
     intent.setClassName(pkgName, actName);
 
-    intent.putExtra("item", item);
-
     if (flg) intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
     startActivity(intent);
+    finish();
   }
 }

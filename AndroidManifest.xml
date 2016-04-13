@@ -54,13 +54,5 @@
             android:name=".ViewDataList.ViewRegisteredData"
             android:label="@string/title_activity_view_registed_data"
             android:screenOrientation="portrait"></activity>
-        <activity
-            android:name=".ViewDataList.ViewRegisteredRData"
-            android:label="@string/title_activity_view_registed_rdata"
-            android:screenOrientation="portrait"></activity>
-        <activity
-            android:name=".ViewDataList.ViewAuthRData"
-            android:label="@string/title_activity_view_auth_rdata"
-            android:screenOrientation="portrait"></activity>
     </application>
 </manifest>

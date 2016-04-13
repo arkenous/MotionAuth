@@ -50,19 +50,19 @@ public class Result extends Handler implements Runnable {
   private double mCheckRange;
   private double mAmp;
 
-  private ArrayList<ArrayList<ArrayList<Float>>> mAccel;
-  private ArrayList<ArrayList<ArrayList<Float>>> mLinearAccel;
-  private ArrayList<ArrayList<ArrayList<Float>>> mGyro;
+  private float[][][] mAccel;
+  private float[][][] mLinearAccel;
+  private float[][][] mGyro;
   private double[][] averageDistance;
   private double[][] averageLinearDistance;
   private double[][] averageAngle;
   private boolean result = false;
 
 
-  public Result(Registration registration, ArrayList<ArrayList<ArrayList<Float>>> accel,
-                ArrayList<ArrayList<ArrayList<Float>>> linearAccel, ArrayList<ArrayList<ArrayList<Float>>> gyro,
-                Button getMotion, ProgressDialog progressDialog, double checkRange, double amp, Context context,
-                GetData getData) {
+  public Result(Registration registration, float[][][] accel,
+                float[][][] linearAccel, float[][][] gyro, Button getMotion,
+                ProgressDialog progressDialog, double checkRange, double amp,
+                Context context, GetData getData) {
     mRegistration = registration;
     mAccel = accel;
     mLinearAccel = linearAccel;
@@ -78,9 +78,9 @@ public class Result extends Handler implements Runnable {
 
   @Override
   public void run() {
-    mManageData.writeFloatData("RegistrationRaw", InputName.name, "Acceleration", mAccel);
-    mManageData.writeFloatData("RegistrationRaw", InputName.name, "LinearAcceleration", mLinearAccel);
-    mManageData.writeFloatData("RegistrationRaw", InputName.name, "Gyroscope", mGyro);
+    mManageData.writeFloatData(InputName.name, "RegRaw", "acceleration", mAccel);
+    mManageData.writeFloatData(InputName.name, "RegRaw", "linearAcceleration", mLinearAccel);
+    mManageData.writeFloatData(InputName.name, "RegRaw", "gyroscope", mGyro);
 
     result = calculate(mAccel, mLinearAccel, mGyro);
     this.sendEmptyMessage(FINISH);
@@ -134,6 +134,9 @@ public class Result extends Handler implements Runnable {
           alert.show();
         } else {
           // 3回のモーションの平均値をファイルに書き出す
+          mManageData.writeDoubleTwoArrayData(InputName.name, "RegRegistered", "distance", averageDistance);
+          mManageData.writeDoubleTwoArrayData(InputName.name, "RegRegistered", "linearDistance", averageLinearDistance);
+          mManageData.writeDoubleTwoArrayData(InputName.name, "RegRegistered", "angle", averageAngle);
           mManageData.writeRegisterData(InputName.name, averageDistance, averageLinearDistance, averageAngle, mAmp, mContext);
 
           AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
@@ -171,11 +174,9 @@ public class Result extends Handler implements Runnable {
 
   /**
    * データ加工，計算処理を行う
-   * //TODO すべてのデータをきっちりストレージにアウトプットする
    */
-  public boolean calculate(ArrayList<ArrayList<ArrayList<Float>>> accelList,
-                           ArrayList<ArrayList<ArrayList<Float>>> linearAccelList,
-                           ArrayList<ArrayList<ArrayList<Float>>> gyroList) {
+  public boolean calculate(float[][][] accelList, float[][][] linearAccelList,
+                           float[][][] gyroList) {
     LogUtil.log(Log.INFO);
 
     // 複数回のデータ取得について，データ数を揃える
@@ -184,15 +185,19 @@ public class Result extends Handler implements Runnable {
     float[][][] linearAccel = adjusted.get(1);
     float[][][] gyro = adjusted.get(2);
 
+    mManageData.writeFloatData(InputName.name, "RegAdjusted", "acceleration", accel);
+    mManageData.writeFloatData(InputName.name, "RegAdjusted", "linearAcceleration", linearAccel);
+    mManageData.writeFloatData(InputName.name, "RegAdjusted", "gyroscope", gyro);
+
     // データのフォーマット
     this.sendEmptyMessage(FORMAT);
     double[][][] acceleration = mFormatter.convertFloatToDouble(accel);
     double[][][] linearAcceleration = mFormatter.convertFloatToDouble(linearAccel);
     double[][][] gyroscope = mFormatter.convertFloatToDouble(gyro);
 
-    mManageData.writeDoubleThreeArrayData("BeforeAMP", "Acceleration", InputName.name, acceleration);
-    mManageData.writeDoubleThreeArrayData("BeforeAMP", "LinearAcceleration", InputName.name, linearAcceleration);
-    mManageData.writeDoubleThreeArrayData("BeforeAMP", "Gyroscope", InputName.name, gyroscope);
+    mManageData.writeDoubleThreeArrayData(InputName.name, "RegFormatted", "acceleration", acceleration);
+    mManageData.writeDoubleThreeArrayData(InputName.name, "RegFormatted", "linearAcceleration", linearAcceleration);
+    mManageData.writeDoubleThreeArrayData(InputName.name, "RegFormatted", "gyroscope", gyroscope);
 
     // データの増幅処理
     if (mAmplifier.CheckValueRange(acceleration, mCheckRange)
@@ -204,9 +209,9 @@ public class Result extends Handler implements Runnable {
       gyroscope = mAmplifier.Amplify(gyroscope, mAmp);
     }
 
-    mManageData.writeDoubleThreeArrayData("BeforeLowpass", "Acceleration", InputName.name, acceleration);
-    mManageData.writeDoubleThreeArrayData("BeforeLowpass", "LinearAcceleration", InputName.name, linearAcceleration);
-    mManageData.writeDoubleThreeArrayData("BeforeLowpass", "Gyroscope", InputName.name, gyroscope);
+    mManageData.writeDoubleThreeArrayData(InputName.name, "RegAmplified", "acceleration", acceleration);
+    mManageData.writeDoubleThreeArrayData(InputName.name, "RegAmplified", "linearAcceleration", linearAcceleration);
+    mManageData.writeDoubleThreeArrayData(InputName.name, "RegAmplified", "gyroscope", gyroscope);
 
     // フーリエ変換によるローパスフィルタ
     this.sendEmptyMessage(FOURIER);
@@ -214,9 +219,9 @@ public class Result extends Handler implements Runnable {
     linearAcceleration = mFourier.LowpassFilter(linearAcceleration, "LinearAcceleration");
     gyroscope = mFourier.LowpassFilter(gyroscope, "Gyroscope");
 
-    mManageData.writeDoubleThreeArrayData("BeforeConvert", "Acceleration", InputName.name, acceleration);
-    mManageData.writeDoubleThreeArrayData("BeforeConvert", "LinearAcceleration", InputName.name, linearAcceleration);
-    mManageData.writeDoubleThreeArrayData("BeforeConvert", "Gyroscope", InputName.name, gyroscope);
+    mManageData.writeDoubleThreeArrayData(InputName.name, "RegLowpasswd", "acceleration", acceleration);
+    mManageData.writeDoubleThreeArrayData(InputName.name, "RegLowpasswd", "linearAcceleration", linearAcceleration);
+    mManageData.writeDoubleThreeArrayData(InputName.name, "RegLowpasswd", "gyroscope", gyroscope);
 
     LogUtil.log(Log.DEBUG, "Finish fourier");
 
@@ -226,9 +231,9 @@ public class Result extends Handler implements Runnable {
     double[][][] linearDistance = mCalc.accelToDistance(linearAcceleration, Enum.SENSOR_DELAY_TIME);
     double[][][] angle = mCalc.gyroToAngle(gyroscope, Enum.SENSOR_DELAY_TIME);
 
-    mManageData.writeDoubleThreeArrayData("BeforeDeviation", "distance", InputName.name, distance);
-    mManageData.writeDoubleThreeArrayData("BeforeDeviation", "linearDistance", InputName.name, linearDistance);
-    mManageData.writeDoubleThreeArrayData("BeforeDeviation", "angle", InputName.name, angle);
+    mManageData.writeDoubleThreeArrayData(InputName.name, "RegConverted", "distance", distance);
+    mManageData.writeDoubleThreeArrayData(InputName.name, "RegConverted", "linearDistance", linearDistance);
+    mManageData.writeDoubleThreeArrayData(InputName.name, "RegConverted", "angle", angle);
 
     LogUtil.log(Log.DEBUG, "After write data");
 
@@ -340,9 +345,9 @@ public class Result extends Handler implements Runnable {
 
         LogUtil.log(Log.INFO, "MEASURE: " + String.valueOf(tmp));
 
-        mManageData.writeDoubleThreeArrayData("DeviatedData" + String.valueOf(mode), "distance", InputName.name, distance);
-        mManageData.writeDoubleThreeArrayData("DeviatedData" + String.valueOf(mode), "linearDistance", InputName.name, linearDistance);
-        mManageData.writeDoubleThreeArrayData("DeviatedData" + String.valueOf(mode), "angle", InputName.name, angle);
+        mManageData.writeDoubleThreeArrayData(InputName.name, "DeviatedData" + String.valueOf(mode), "distance", distance);
+        mManageData.writeDoubleThreeArrayData(InputName.name, "DeviatedData" + String.valueOf(mode), "linearDistance", linearDistance);
+        mManageData.writeDoubleThreeArrayData(InputName.name, "DeviatedData" + String.valueOf(mode), "angle", angle);
 
 
         if (tmp == Enum.MEASURE.PERFECT || tmp == Enum.MEASURE.CORRECT) {
@@ -367,9 +372,9 @@ public class Result extends Handler implements Runnable {
     }
     //endregion
 
-    mManageData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatDistance", InputName.name, distance);
-    mManageData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatLinearDistance", InputName.name, linearDistance);
-    mManageData.writeDoubleThreeArrayData("AfterCalcData", "afterFormatAngle", InputName.name, angle);
+    mManageData.writeDoubleThreeArrayData(InputName.name, "AfterCalcData", "distance", distance);
+    mManageData.writeDoubleThreeArrayData(InputName.name, "AfterCalcData", "linearDistance", linearDistance);
+    mManageData.writeDoubleThreeArrayData(InputName.name, "AfterCalcData", "angle", angle);
 
     this.sendEmptyMessage(CORRELATION);
 

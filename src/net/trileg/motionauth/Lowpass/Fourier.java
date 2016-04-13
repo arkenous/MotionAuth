@@ -21,10 +21,10 @@ public class Fourier {
    * Low pass filtering double type 3-array data.
    *
    * @param data     Double type 3-array data you want to low pass filtering.
-   * @param dataName Output file name to write SD card.
+   * @param sensorName Sensor name.
    * @return Low pass filtered double type 3-array data.
    */
-  public double[][][] LowpassFilter(double[][][] data, String dataName) {
+  public double[][][] LowpassFilter(double[][][] data, String sensorName) {
     LogUtil.log(Log.INFO);
 
     DoubleFFT_1D realfft = new DoubleFFT_1D(data[0][0].length);
@@ -59,8 +59,8 @@ public class Fourier {
       }
     }
 
-    mManageData.writeDoubleThreeArrayData("ResultFFT", "rFFT" + dataName, net.trileg.motionauth.Registration.InputName.name, real);
-    mManageData.writeDoubleThreeArrayData("ResultFFT", "iFFT" + dataName, net.trileg.motionauth.Registration.InputName.name, imaginary);
+    mManageData.writeDoubleThreeArrayData(net.trileg.motionauth.Registration.InputName.name, "ResultFFT", "rFFT" + sensorName, real);
+    mManageData.writeDoubleThreeArrayData(net.trileg.motionauth.Registration.InputName.name, "ResultFFT", "iFFT" + sensorName, imaginary);
 
     double[][][] power = new double[Enum.NUM_TIME][Enum.NUM_AXIS][data[0][0].length / 2];
 
@@ -72,7 +72,7 @@ public class Fourier {
       }
     }
 
-    mManageData.writeDoubleThreeArrayData("ResultFFT", "powerFFT" + dataName, net.trileg.motionauth.Registration.InputName.name, power);
+    mManageData.writeDoubleThreeArrayData(net.trileg.motionauth.Registration.InputName.name, "ResultFFT", "powerFFT" + sensorName, power);
 
     // Low pass filtering
     for (int time = 0; time < Enum.NUM_TIME; time++) {
@@ -89,7 +89,7 @@ public class Fourier {
       }
     }
 
-    mManageData.writeDoubleThreeArrayData("AfterFFT", dataName, net.trileg.motionauth.Registration.InputName.name, data);
+    mManageData.writeDoubleThreeArrayData(net.trileg.motionauth.Registration.InputName.name, "AfterFFT", sensorName, data);
 
     return data;
   }
@@ -99,10 +99,10 @@ public class Fourier {
    * Low pass filtering double type 2-array data.
    *
    * @param data     Double type 2-array data you want to low pass filtering.
-   * @param dataName Output file name to write SD card.
+   * @param sensorName sensor name.
    * @return Low pass filtered double type 2-array data.
    */
-  public double[][] LowpassFilter(double[][] data, String dataName) {
+  public double[][] LowpassFilter(double[][] data, String sensorName) {
     LogUtil.log(Log.INFO);
 
     DoubleFFT_1D realfft = new DoubleFFT_1D(data[0].length);
@@ -132,8 +132,8 @@ public class Fourier {
       }
     }
 
-    mManageData.writeDoubleTwoArrayData("ResultFFT", "rFFT" + dataName, InputName.userName, real);
-    mManageData.writeDoubleTwoArrayData("ResultFFT", "iFFT" + dataName, InputName.userName, imaginary);
+    mManageData.writeDoubleTwoArrayData(InputName.userName, "ResultFFT", "rFFT" + sensorName, real);
+    mManageData.writeDoubleTwoArrayData(InputName.userName, "ResultFFT", "iFFT" + sensorName, imaginary);
 
     double[][] power = new double[Enum.NUM_AXIS][data[0].length / 2];
     for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
@@ -142,7 +142,7 @@ public class Fourier {
       }
     }
 
-    mManageData.writeDoubleTwoArrayData("ResultFFT", "powerFFT" + dataName, InputName.userName, power);
+    mManageData.writeDoubleTwoArrayData(InputName.userName, "ResultFFT", "powerFFT" + sensorName, power);
 
     // Low pass filtering
     for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
@@ -154,7 +154,7 @@ public class Fourier {
     // Execute inverse fourier transform
     for (double[] i : data) realfft.realInverse(i, true);
 
-    mManageData.writeDoubleTwoArrayData("AfterFFT", dataName, InputName.userName, data);
+    mManageData.writeDoubleTwoArrayData(InputName.userName, "AfterFFT", sensorName, data);
 
     return data;
   }

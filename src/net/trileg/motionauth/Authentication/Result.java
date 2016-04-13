@@ -46,18 +46,18 @@ public class Result extends Handler implements Runnable {
   private GetData mGetData;
   private ProgressDialog mProgressDialog;
   private double mAmp;
-  private ArrayList<ArrayList<Float>> mAccel;
-  private ArrayList<ArrayList<Float>> mLinearAccel;
-  private ArrayList<ArrayList<Float>> mGyro;
+  private float[][] mAccel;
+  private float[][] mLinearAccel;
+  private float[][] mGyro;
   private double[][] registeredDistance;
   private double[][] registeredLinearDistance;
   private double[][] registeredAngle;
   private boolean result = false;
 
 
-  public Result(Authentication authentication, ArrayList<ArrayList<Float>> accel,
-                ArrayList<ArrayList<Float>> linearAccel, ArrayList<ArrayList<Float>> gyro,
-                Button getMotion, ProgressDialog progressDialog, GetData getData) {
+  public Result(Authentication authentication, float[][] accel,
+                float[][] linearAccel, float[][] gyro, Button getMotion,
+                ProgressDialog progressDialog, GetData getData) {
     mAuthentication = authentication;
     mAccel = accel;
     mLinearAccel = linearAccel;
@@ -70,7 +70,14 @@ public class Result extends Handler implements Runnable {
 
   @Override
   public void run() {
+    mManageData.writeFloatData(InputName.userName, "AuthenticationRaw", "acceleration", mAccel);
+    mManageData.writeFloatData(InputName.userName, "AuthenticationRaw", "linearAcceleration", mLinearAccel);
+    mManageData.writeFloatData(InputName.userName, "AuthenticationRaw", "gyroscope", mGyro);
+
     readRegisteredData();
+    mManageData.writeDoubleTwoArrayData(InputName.userName, "AuthRegistered", "distance", registeredDistance);
+    mManageData.writeDoubleTwoArrayData(InputName.userName, "AuthRegistered", "linearDistance", registeredLinearDistance);
+    mManageData.writeDoubleTwoArrayData(InputName.userName, "AuthRegistered", "angle", registeredAngle);
     result = calculate(mAccel, mLinearAccel, mGyro);
 
     this.sendEmptyMessage(FINISH);
@@ -153,19 +160,16 @@ public class Result extends Handler implements Runnable {
   /**
    * Calculate data and authenticate.
    *
-   * @param accelList Acceleration data which collect in Authentication.GetData.
-   * @param linearAccelList Linear acceleration data which collect in Authentication.GetData.
-   * @param gyroList  Gyroscope data which collect in Authentication.GetData.
+   * @param accel Acceleration data which collect in Authentication.GetData.
+   * @param linearAccel Linear acceleration data which collect in Authentication.GetData.
+   * @param gyro  Gyroscope data which collect in Authentication.GetData.
    * @return true if authentication is succeed, otherwise false.
-   *
-   * //TODO すべてのデータをストレージにアウトプットする
    */
-  private boolean calculate(ArrayList<ArrayList<Float>> accelList, ArrayList<ArrayList<Float>> linearAccelList,
-                            ArrayList<ArrayList<Float>> gyroList) {
-    ArrayList<float[][]> adjusted = mAdjuster.adjust(accelList, linearAccelList, gyroList, registeredDistance[0].length);
-    float[][] accel = adjusted.get(0);
-    float[][] linearAccel = adjusted.get(1);
-    float[][] gyro = adjusted.get(2);
+  private boolean calculate(float[][] accel, float[][] linearAccel, float[][] gyro) {
+    ArrayList<float[][]> adjusted = mAdjuster.adjust(accel, linearAccel, gyro, registeredDistance[0].length);
+    accel = adjusted.get(0);
+    linearAccel = adjusted.get(1);
+    gyro = adjusted.get(2);
 
     this.sendEmptyMessage(FORMAT);
     double[][] acceleration = mFormatter.convertFloatToDouble(accel);
@@ -187,9 +191,9 @@ public class Result extends Handler implements Runnable {
     double[][] linearDistance = mCalc.accelToDistance(linearAcceleration, Enum.SENSOR_DELAY_TIME);
     double[][] angle = mCalc.gyroToAngle(gyroscope, Enum.SENSOR_DELAY_TIME);
 
-    mManageData.writeDoubleTwoArrayData("AuthAfterCalcData", "afterCalcDistance", InputName.userName, distance);
-    mManageData.writeDoubleTwoArrayData("AuthAfterCalcData", "afterCalcLinearDistance", InputName.userName, linearDistance);
-    mManageData.writeDoubleTwoArrayData("AuthAfterCalcData", "afterCalcAngle", InputName.userName, angle);
+    mManageData.writeDoubleTwoArrayData(InputName.userName, "AuthAfterCalcData", "distance", distance);
+    mManageData.writeDoubleTwoArrayData(InputName.userName, "AuthAfterCalcData", "linearDistance", linearDistance);
+    mManageData.writeDoubleTwoArrayData(InputName.userName, "AuthAfterCalcData", "angle", angle);
 
     //TODO この段階でコサイン類似度の測定を行い，データをアウトプットする
     // コサイン類似度を測る

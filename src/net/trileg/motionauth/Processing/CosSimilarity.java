@@ -4,7 +4,7 @@ import android.util.Log;
 import net.trileg.motionauth.Utility.LogUtil;
 
 public class CosSimilarity {
-  public void cosSimilarity(double[][][] input) {
+  public double[] cosSimilarity(double[][][] input) {
     double[] similarity = new double[input.length];
 
     for (int time = 0; time < input.length; time++) {
@@ -30,10 +30,12 @@ public class CosSimilarity {
       LogUtil.log(Log.INFO, String.valueOf("similarity: " + data));
     }
     LogUtil.log(Log.INFO, "---   CosSimilarity data end here   ---");
+
+    return similarity;
   }
 
 
-  public void cosSimilarity(double[][] A, double[][] B) {
+  public double cosSimilarity(double[][] A, double[][] B) {
     double similarity = 0.0;
 
     for (int item = 0; item < A[0].length; item++) {
@@ -49,5 +51,7 @@ public class CosSimilarity {
     LogUtil.log(Log.INFO, "---   CosSimilarity data begin here ---");
     LogUtil.log(Log.INFO, String.valueOf("similarity: " + similarity));
     LogUtil.log(Log.INFO, "---   CosSimilarity data end here ---");
+
+    return similarity;
   }
 }

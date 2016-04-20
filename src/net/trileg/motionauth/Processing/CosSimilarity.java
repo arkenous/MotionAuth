@@ -1,10 +1,12 @@
 package net.trileg.motionauth.Processing;
 
 import android.util.Log;
+import net.trileg.motionauth.Utility.Enum;
 import net.trileg.motionauth.Utility.LogUtil;
 
 public class CosSimilarity {
-  public void cosSimilarity(double[][][] input) {
+  public double[] cosSimilarity(double[][][] input) {
+    LogUtil.log(Log.INFO);
     double[] similarity = new double[input.length];
 
     for (int time = 0; time < input.length; time++) {
@@ -30,10 +32,13 @@ public class CosSimilarity {
       LogUtil.log(Log.INFO, String.valueOf("similarity: " + data));
     }
     LogUtil.log(Log.INFO, "---   CosSimilarity data end here   ---");
+
+    return similarity;
   }
 
 
-  public void cosSimilarity(double[][] A, double[][] B) {
+  public double cosSimilarity(double[][] A, double[][] B) {
+    LogUtil.log(Log.INFO);
     double similarity = 0.0;
 
     for (int item = 0; item < A[0].length; item++) {
@@ -49,5 +54,55 @@ public class CosSimilarity {
     LogUtil.log(Log.INFO, "---   CosSimilarity data begin here ---");
     LogUtil.log(Log.INFO, String.valueOf("similarity: " + similarity));
     LogUtil.log(Log.INFO, "---   CosSimilarity data end here ---");
+
+    return similarity;
+  }
+
+
+  public Enum.MEASURE measure(double[] distance, double[] linearDistance, double[] angle) {
+    LogUtil.log(Log.INFO);
+    double[] combined = new double[distance.length + linearDistance.length + angle.length];
+    int combinedCount = 0;
+
+    for (double value : distance) {
+      combined[combinedCount] = value;
+      combinedCount++;
+    }
+    for (double value : linearDistance) {
+      combined[combinedCount] = value;
+      combinedCount++;
+    }
+    for (double value : angle) {
+      combined[combinedCount] = value;
+      combinedCount++;
+    }
+
+    double average = 0.0;
+    for (double value : combined) {
+      average += value;
+    }
+    average /= combined.length;
+
+    if (average > Enum.LOOSE) {
+      if (average > Enum.NORMAL) {
+        if (average > Enum.STRICT) {
+          return Enum.MEASURE.PERFECT;
+        }
+        return Enum.MEASURE.CORRECT;
+      }
+      return Enum.MEASURE.INCORRECT;
+    }
+    return Enum.MEASURE.BAD;
+  }
+
+
+  public Enum.MEASURE measure(double distance, double linearDistance, double angle) {
+    LogUtil.log(Log.INFO);
+    double average = (distance + linearDistance + angle) / 3;
+
+    if (average > 0.5) {
+      return Enum.MEASURE.CORRECT;
+    }
+    return Enum.MEASURE.INCORRECT;
   }
 }

@@ -37,7 +37,6 @@ public class Result extends Handler implements Runnable {
   private Amplifier mAmplifier = new Amplifier();
   private Fourier mFourier = new Fourier();
   private Calc mCalc = new Calc();
-  private Correlation mCorrelation = new Correlation();
   private CorrectDeviation mCorrectDeviation = new CorrectDeviation();
   private Adjuster mAdjuster = new Adjuster();
   private CosSimilarity mCosSimilarity = new CosSimilarity();
@@ -237,32 +236,19 @@ public class Result extends Handler implements Runnable {
 
     LogUtil.log(Log.DEBUG, "After write data");
 
-
-    //TODO この段階でコサイン類似度の測定を行い，データをアウトプットする
-    // コサイン類似度を測る
-    LogUtil.log(Log.DEBUG, "Before CosSimilarity");
-    mCosSimilarity.cosSimilarity(distance);
-    mCosSimilarity.cosSimilarity(linearAcceleration);
-    mCosSimilarity.cosSimilarity(angle);
-    LogUtil.log(Log.DEBUG, "After CosSimilarity");
-
-
     this.sendEmptyMessage(DEVIATION);
-    // measureCorrelation用の平均値データを作成
-    averageDistance = new double[Enum.NUM_AXIS][distance[0][0].length];
-    averageLinearDistance = new double[Enum.NUM_AXIS][linearDistance[0][0].length];
-    averageAngle = new double[Enum.NUM_AXIS][angle[0][0].length];
 
-    averageDistance = calculateAverage(distance);
-    averageLinearDistance = calculateAverage(linearDistance);
-    averageAngle = calculateAverage(angle);
-
-
-    //TODO 相関係数を出力させ，コサイン類似度のものと比較する
     //region 同一のモーションであるかの確認をし，必要に応じてズレ修正を行う
     LogUtil.log(Log.DEBUG, "Before measure correlation");
-    Enum.MEASURE measure = mCorrelation.measureCorrelation(distance, linearDistance, angle, averageDistance,
-        averageLinearDistance, averageAngle);
+
+    // コサイン類似度を測る
+    LogUtil.log(Log.DEBUG, "Before CosSimilarity");
+    double[] distanceCosSimilarity = mCosSimilarity.cosSimilarity(distance);
+    double[] linearDistanceCosSimilarity = mCosSimilarity.cosSimilarity(linearDistance);
+    double[] angleCosSimilarity = mCosSimilarity.cosSimilarity(angle);
+    LogUtil.log(Log.DEBUG, "After CosSimilarity");
+
+    Enum.MEASURE measure = mCosSimilarity.measure(distanceCosSimilarity, linearDistanceCosSimilarity, angleCosSimilarity);
 
     LogUtil.log(Log.INFO, "After measure correlation");
     LogUtil.log(Log.INFO, "measure = " + String.valueOf(measure));
@@ -336,12 +322,11 @@ public class Result extends Handler implements Runnable {
           }
         }
 
-        averageDistance = calculateAverage(distance);
-        averageLinearDistance = calculateAverage(linearDistance);
-        averageAngle = calculateAverage(angle);
+        distanceCosSimilarity = mCosSimilarity.cosSimilarity(distance);
+        linearDistanceCosSimilarity = mCosSimilarity.cosSimilarity(linearDistance);
+        angleCosSimilarity = mCosSimilarity.cosSimilarity(angle);
 
-        Enum.MEASURE tmp = mCorrelation.measureCorrelation(distance, linearDistance, angle, averageDistance,
-            averageLinearDistance, averageAngle);
+        Enum.MEASURE tmp = mCosSimilarity.measure(distanceCosSimilarity, linearDistanceCosSimilarity, angleCosSimilarity);
 
         LogUtil.log(Log.INFO, "MEASURE: " + String.valueOf(tmp));
 
@@ -383,7 +368,11 @@ public class Result extends Handler implements Runnable {
     averageLinearDistance = calculateAverage(linearDistance);
     averageAngle = calculateAverage(angle);
 
-    measure = mCorrelation.measureCorrelation(distance, linearDistance, angle, averageDistance, averageLinearDistance, averageAngle);
+    distanceCosSimilarity = mCosSimilarity.cosSimilarity(distance);
+    linearDistanceCosSimilarity = mCosSimilarity.cosSimilarity(linearDistance);
+    angleCosSimilarity = mCosSimilarity.cosSimilarity(angle);
+
+    measure = mCosSimilarity.measure(distanceCosSimilarity, linearDistanceCosSimilarity, angleCosSimilarity);
     LogUtil.log(Log.INFO, "measure = " + measure);
     return measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT;
   }

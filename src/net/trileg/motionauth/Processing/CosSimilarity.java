@@ -6,6 +6,7 @@ import net.trileg.motionauth.Utility.LogUtil;
 
 public class CosSimilarity {
   public double[] cosSimilarity(double[][][] input) {
+    LogUtil.log(Log.INFO);
     double[] similarity = new double[input.length];
 
     for (int time = 0; time < input.length; time++) {
@@ -37,6 +38,7 @@ public class CosSimilarity {
 
 
   public double cosSimilarity(double[][] A, double[][] B) {
+    LogUtil.log(Log.INFO);
     double similarity = 0.0;
 
     for (int item = 0; item < A[0].length; item++) {
@@ -58,6 +60,7 @@ public class CosSimilarity {
 
 
   public Enum.MEASURE measure(double[] distance, double[] linearDistance, double[] angle) {
+    LogUtil.log(Log.INFO);
     double[] combined = new double[distance.length + linearDistance.length + angle.length];
     int combinedCount = 0;
 
@@ -94,6 +97,7 @@ public class CosSimilarity {
 
 
   public Enum.MEASURE measure(double distance, double linearDistance, double angle) {
+    LogUtil.log(Log.INFO);
     double average = (distance + linearDistance + angle) / 3;
 
     if (average > 0.5) {

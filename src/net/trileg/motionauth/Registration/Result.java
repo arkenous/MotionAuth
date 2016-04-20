@@ -239,18 +239,16 @@ public class Result extends Handler implements Runnable {
     this.sendEmptyMessage(DEVIATION);
 
     //region 同一のモーションであるかの確認をし，必要に応じてズレ修正を行う
-    LogUtil.log(Log.DEBUG, "Before measure correlation");
+    LogUtil.log(Log.DEBUG, "Before measure cosine similarity");
 
     // コサイン類似度を測る
-    LogUtil.log(Log.DEBUG, "Before CosSimilarity");
     double[] distanceCosSimilarity = mCosSimilarity.cosSimilarity(distance);
     double[] linearDistanceCosSimilarity = mCosSimilarity.cosSimilarity(linearDistance);
     double[] angleCosSimilarity = mCosSimilarity.cosSimilarity(angle);
-    LogUtil.log(Log.DEBUG, "After CosSimilarity");
 
     Enum.MEASURE measure = mCosSimilarity.measure(distanceCosSimilarity, linearDistanceCosSimilarity, angleCosSimilarity);
 
-    LogUtil.log(Log.INFO, "After measure correlation");
+    LogUtil.log(Log.INFO, "After measure cosine similarity");
     LogUtil.log(Log.INFO, "measure = " + String.valueOf(measure));
 
     if (Enum.MEASURE.BAD == measure) {

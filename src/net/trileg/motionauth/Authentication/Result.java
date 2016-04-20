@@ -29,7 +29,7 @@ public class Result extends Handler implements Runnable {
   private static final int AMPLIFY = 3;
   private static final int FOURIER = 4;
   private static final int CONVERT = 5;
-  private static final int CORRELATION = 6;
+  private static final int COSINE_SIMILARITY = 6;
   private static final int FINISH = 10;
 
   private ManageData mManageData = new ManageData();
@@ -102,8 +102,8 @@ public class Result extends Handler implements Runnable {
       case CONVERT:
         mProgressDialog.setMessage("データの変換中");
         break;
-      case CORRELATION:
-        mProgressDialog.setMessage("相関係数を算出中");
+      case COSINE_SIMILARITY:
+        mProgressDialog.setMessage("コサイン類似度を算出中");
         break;
       case FINISH:
         mProgressDialog.dismiss();
@@ -195,13 +195,13 @@ public class Result extends Handler implements Runnable {
     mManageData.writeDoubleTwoArrayData(InputName.userName, "AuthAfterCalcData", "angle", angle);
 
     // コサイン類似度を測る
-    LogUtil.log(Log.INFO, "Before CosSimilarity");
+    LogUtil.log(Log.INFO, "Before Cosine Similarity");
     double distanceSimilarity = mCosSimilarity.cosSimilarity(distance, registeredDistance);
     double linearDistanceSimilarity = mCosSimilarity.cosSimilarity(linearDistance, registeredLinearDistance);
     double angleSimilarity = mCosSimilarity.cosSimilarity(angle, registeredAngle);
-    LogUtil.log(Log.INFO, "After CosSimilarity");
+    LogUtil.log(Log.INFO, "After Cosine Similarity");
 
-    this.sendEmptyMessage(CORRELATION);
+    this.sendEmptyMessage(COSINE_SIMILARITY);
     Enum.MEASURE measure = mCosSimilarity.measure(distanceSimilarity, linearDistanceSimilarity, angleSimilarity);
     return measure == Enum.MEASURE.CORRECT;
   }

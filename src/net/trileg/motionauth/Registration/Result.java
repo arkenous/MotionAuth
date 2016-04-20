@@ -29,7 +29,7 @@ public class Result extends Handler implements Runnable {
   private static final int FOURIER = 3;
   private static final int CONVERT = 4;
   private static final int DEVIATION = 5;
-  private static final int CORRELATION = 6;
+  private static final int COSINE_SIMILARITY = 6;
   private static final int FINISH = 10;
 
   private ManageData mManageData = new ManageData();
@@ -105,8 +105,8 @@ public class Result extends Handler implements Runnable {
       case DEVIATION:
         mProgressDialog.setMessage("データのズレを修正中");
         break;
-      case CORRELATION:
-        mProgressDialog.setMessage("相関係数を算出中");
+      case COSINE_SIMILARITY:
+        mProgressDialog.setMessage("コサイン類似度を算出中");
         break;
       case FINISH:
         mProgressDialog.dismiss();
@@ -359,7 +359,7 @@ public class Result extends Handler implements Runnable {
     mManageData.writeDoubleThreeArrayData(InputName.name, "AfterCalcData", "linearDistance", linearDistance);
     mManageData.writeDoubleThreeArrayData(InputName.name, "AfterCalcData", "angle", angle);
 
-    this.sendEmptyMessage(CORRELATION);
+    this.sendEmptyMessage(COSINE_SIMILARITY);
 
     // Calculate average data.
     averageDistance = calculateAverage(distance);

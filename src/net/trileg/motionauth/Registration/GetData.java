@@ -37,7 +37,6 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
   private TextView mCount;
   private Vibrator mVibrator;
   private SensorManager mSensorManager;
-  private Sensor mAccelerometerSensor;
   private Sensor mLinearAccelerationSensor;
   private Sensor mGyroscopeSensor;
   private Registration mRegistration;
@@ -47,14 +46,11 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 
   private Enum.STATUS mStatus;
 
-  private float[] mOriginAcceleration = new float[3];
   private float[] mOriginLinearAcceleration = new float[3];
   private float[] mOriginGyro = new float[3];
 
-  private ArrayList<ArrayList<Float>> mAccelerationPerTime = new ArrayList<>();
   private ArrayList<ArrayList<Float>> mLinearAccelerationPerTime = new ArrayList<>();
   private ArrayList<ArrayList<Float>> mGyroPerTime = new ArrayList<>();
-  private ArrayList<ArrayList<ArrayList<Float>>> mAcceleration = new ArrayList<>();
   private ArrayList<ArrayList<ArrayList<Float>>> mLinearAcceleration = new ArrayList<>();
   private ArrayList<ArrayList<ArrayList<Float>>> mGyro = new ArrayList<>();
 
@@ -69,7 +65,6 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
     mStatus = status;
 
     mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-    mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     mLinearAccelerationSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
     mGyroscopeSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
   }
@@ -82,11 +77,9 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 
   @Override
   public void run() {
-    mAccelerationPerTime.clear();
     mLinearAccelerationPerTime.clear();
     mGyroPerTime.clear();
     for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-      mAccelerationPerTime.add(new ArrayList<Float>());
       mLinearAccelerationPerTime.add(new ArrayList<Float>());
       mGyroPerTime.add(new ArrayList<Float>());
     }
@@ -130,7 +123,7 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
         mSecond.setText("1");
         break;
       case 8:
-        mRegistration.finishGetMotion(mAcceleration, mLinearAcceleration, mGyro);
+        mRegistration.finishGetMotion(mLinearAcceleration, mGyro);
         break;
       case 10:
         mSecond.setText("3");
@@ -168,7 +161,6 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
       case GET_MOTION:
         if (mStatus == Enum.STATUS.DOWN) {
           for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-            mAccelerationPerTime.get(axis).add(mOriginAcceleration[axis]);
             mLinearAccelerationPerTime.get(axis).add(mOriginLinearAcceleration[axis]);
             mGyroPerTime.get(axis).add(mOriginGyro[axis]);
           }
@@ -181,8 +173,6 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
           collect(GET_MOTION);
         } else {
           // Correct data per time finished
-
-          mAcceleration.add(new ArrayList<>(mAccelerationPerTime));
           mLinearAcceleration.add(new ArrayList<>(mLinearAccelerationPerTime));
           mGyro.add(new ArrayList<>(mGyroPerTime));
           countTime++;
@@ -208,7 +198,6 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 
   @Override
   public void onSensorChanged(SensorEvent event) {
-    if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) mOriginAcceleration = event.values.clone();
     if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) mOriginLinearAcceleration = event.values.clone();
     if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) mOriginGyro = event.values.clone();
   }
@@ -223,7 +212,6 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
    * Register sensor listener.
    */
   public void registrationSensor() {
-    mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
     mSensorManager.registerListener(this, mLinearAccelerationSensor, SensorManager.SENSOR_DELAY_GAME);
     mSensorManager.registerListener(this, mGyroscopeSensor, SensorManager.SENSOR_DELAY_GAME);
   }
@@ -243,7 +231,6 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
   public void reset() {
     countdown = 4;
     countTime = 0;
-    mAcceleration.clear();
     mLinearAcceleration.clear();
     mGyro.clear();
     sendEmptyMessage(10);

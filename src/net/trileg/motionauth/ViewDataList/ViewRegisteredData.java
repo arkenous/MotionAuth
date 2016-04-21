@@ -80,16 +80,13 @@ public class ViewRegisteredData extends Activity {
 
     ManageData mManageData = new ManageData();
     ArrayList<double[][]> readData = mManageData.readRegisteredData(ViewRegisteredData.this, item);
-    double[][] readDistance = readData.get(0);
-    double[][] readLinearDistance = readData.get(1);
-    double[][] readAngle = readData.get(2);
+    double[][] readLinearDistance = readData.get(0);
+    double[][] readAngle = readData.get(1);
 
-    String[][] registeredDistance = new String[readDistance.length][readDistance[0].length];
     String[][] registeredLinearDistance = new String[readLinearDistance.length][readLinearDistance[0].length];
     String[][] registeredAngle = new String[readAngle.length][readAngle[0].length];
     for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-      for (int item = 0; item < readDistance[axis].length; item++) {
-        registeredDistance[axis][item] = String.valueOf(readDistance[axis][item]);
+      for (int item = 0; item < readLinearDistance[axis].length; item++) {
         registeredLinearDistance[axis][item] = String.valueOf(readLinearDistance[axis][item]);
         registeredAngle[axis][item] = String.valueOf(readAngle[axis][item]);
       }
@@ -103,23 +100,6 @@ public class ViewRegisteredData extends Activity {
     if ("".equals(ampValue)) throw new RuntimeException();
 
     String index = "";
-
-    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-      switch (axis) {
-        case 0:
-          index = "DistanceX";
-          break;
-        case 1:
-          index = "DistanceY";
-          break;
-        case 2:
-          index = "DistanceZ";
-          break;
-      }
-      for (int item = 0; item < registeredDistance[axis].length; item++) {
-        dataList.add(index + " : " + registeredDistance[axis][item] + " : " + ampValue);
-      }
-    }
 
     for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
       switch (axis) {

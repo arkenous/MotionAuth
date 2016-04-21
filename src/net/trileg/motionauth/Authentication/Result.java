@@ -45,20 +45,16 @@ public class Result extends Handler implements Runnable {
   private GetData mGetData;
   private ProgressDialog mProgressDialog;
   private double mAmp;
-  private float[][] mAccel;
   private float[][] mLinearAccel;
   private float[][] mGyro;
-  private double[][] registeredDistance;
   private double[][] registeredLinearDistance;
   private double[][] registeredAngle;
   private boolean result = false;
 
 
-  public Result(Authentication authentication, float[][] accel,
-                float[][] linearAccel, float[][] gyro, Button getMotion,
+  public Result(Authentication authentication, float[][] linearAccel, float[][] gyro, Button getMotion,
                 ProgressDialog progressDialog, GetData getData) {
     mAuthentication = authentication;
-    mAccel = accel;
     mLinearAccel = linearAccel;
     mGyro = gyro;
     mGetMotion = getMotion;
@@ -69,15 +65,13 @@ public class Result extends Handler implements Runnable {
 
   @Override
   public void run() {
-    mManageData.writeFloatData(InputName.userName, "AuthenticationRaw", "acceleration", mAccel);
     mManageData.writeFloatData(InputName.userName, "AuthenticationRaw", "linearAcceleration", mLinearAccel);
     mManageData.writeFloatData(InputName.userName, "AuthenticationRaw", "gyroscope", mGyro);
 
     readRegisteredData();
-    mManageData.writeDoubleTwoArrayData(InputName.userName, "AuthRegistered", "distance", registeredDistance);
     mManageData.writeDoubleTwoArrayData(InputName.userName, "AuthRegistered", "linearDistance", registeredLinearDistance);
     mManageData.writeDoubleTwoArrayData(InputName.userName, "AuthRegistered", "angle", registeredAngle);
-    result = calculate(mAccel, mLinearAccel, mGyro);
+    result = calculate(mLinearAccel, mGyro);
 
     this.sendEmptyMessage(FINISH);
   }
@@ -145,7 +139,6 @@ public class Result extends Handler implements Runnable {
   private void readRegisteredData() {
     this.sendEmptyMessage(READ_DATA);
     ArrayList<double[][]> readDataList = mManageData.readRegisteredData(mAuthentication, InputName.userName);
-    registeredDistance = readDataList.get(0);
     registeredLinearDistance = readDataList.get(1);
     registeredAngle = readDataList.get(2);
 
@@ -159,50 +152,42 @@ public class Result extends Handler implements Runnable {
   /**
    * Calculate data and authenticate.
    *
-   * @param accel Acceleration data which collect in Authentication.GetData.
    * @param linearAccel Linear acceleration data which collect in Authentication.GetData.
    * @param gyro  Gyroscope data which collect in Authentication.GetData.
    * @return true if authentication is succeed, otherwise false.
    */
-  private boolean calculate(float[][] accel, float[][] linearAccel, float[][] gyro) {
-    ArrayList<float[][]> adjusted = mAdjuster.adjust(accel, linearAccel, gyro, registeredDistance[0].length);
-    accel = adjusted.get(0);
+  private boolean calculate(float[][] linearAccel, float[][] gyro) {
+    ArrayList<float[][]> adjusted = mAdjuster.adjust(linearAccel, gyro, registeredLinearDistance[0].length);
     linearAccel = adjusted.get(1);
     gyro = adjusted.get(2);
 
     this.sendEmptyMessage(FORMAT);
-    double[][] acceleration = mFormatter.convertFloatToDouble(accel);
     double[][] linearAcceleration = mFormatter.convertFloatToDouble(linearAccel);
     double[][] gyroscope = mFormatter.convertFloatToDouble(gyro);
 
     this.sendEmptyMessage(AMPLIFY);
-    acceleration = mAmplifier.Amplify(acceleration, mAmp);
     linearAcceleration = mAmplifier.Amplify(linearAcceleration, mAmp);
     gyroscope = mAmplifier.Amplify(gyroscope, mAmp);
 
     this.sendEmptyMessage(FOURIER);
-    acceleration = mFourier.LowpassFilter(acceleration, "accel");
     linearAcceleration = mFourier.LowpassFilter(linearAcceleration, "linearAccel");
     gyroscope = mFourier.LowpassFilter(gyroscope, "gyro");
 
     this.sendEmptyMessage(CONVERT);
-    double[][] distance = mCalc.accelToDistance(acceleration, Enum.SENSOR_DELAY_TIME);
     double[][] linearDistance = mCalc.accelToDistance(linearAcceleration, Enum.SENSOR_DELAY_TIME);
     double[][] angle = mCalc.gyroToAngle(gyroscope, Enum.SENSOR_DELAY_TIME);
 
-    mManageData.writeDoubleTwoArrayData(InputName.userName, "AuthAfterCalcData", "distance", distance);
     mManageData.writeDoubleTwoArrayData(InputName.userName, "AuthAfterCalcData", "linearDistance", linearDistance);
     mManageData.writeDoubleTwoArrayData(InputName.userName, "AuthAfterCalcData", "angle", angle);
 
     // コサイン類似度を測る
     LogUtil.log(Log.INFO, "Before Cosine Similarity");
-    double distanceSimilarity = mCosSimilarity.cosSimilarity(distance, registeredDistance);
     double linearDistanceSimilarity = mCosSimilarity.cosSimilarity(linearDistance, registeredLinearDistance);
     double angleSimilarity = mCosSimilarity.cosSimilarity(angle, registeredAngle);
     LogUtil.log(Log.INFO, "After Cosine Similarity");
 
     this.sendEmptyMessage(COSINE_SIMILARITY);
-    Enum.MEASURE measure = mCosSimilarity.measure(distanceSimilarity, linearDistanceSimilarity, angleSimilarity);
+    Enum.MEASURE measure = mCosSimilarity.measure(linearDistanceSimilarity, angleSimilarity);
     return measure == Enum.MEASURE.CORRECT;
   }
 }

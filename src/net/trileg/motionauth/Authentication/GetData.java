@@ -36,7 +36,6 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
   private TextView mSecond;
   private Vibrator mVibrator;
   private SensorManager mSensorManager;
-  private Sensor mAccelerometerSensor;
   private Sensor mLinearAccelerationSensor;
   private Sensor mGyroscopeSensor;
   private Authentication mAuthentication;
@@ -45,10 +44,8 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 
   private Enum.STATUS mStatus;
 
-  private float[] mOriginAcceleration = new float[Enum.NUM_AXIS];
   private float[] mOriginLinearAcceleration = new float[Enum.NUM_AXIS];
   private float[] mOriginGyro = new float[Enum.NUM_AXIS];
-  private ArrayList<ArrayList<Float>> mAcceleration = new ArrayList<>();
   private ArrayList<ArrayList<Float>> mLinearAcceleration = new ArrayList<>();
   private ArrayList<ArrayList<Float>> mGyroscope = new ArrayList<>();
 
@@ -68,7 +65,6 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
     mStatus = status;
 
     mSensorManager = (SensorManager) mAuthentication.getSystemService(Context.SENSOR_SERVICE);
-    mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     mLinearAccelerationSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
     mGyroscopeSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
   }
@@ -81,11 +77,9 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 
   @Override
   public void run() {
-    mAcceleration.clear();
     mLinearAcceleration.clear();
     mGyroscope.clear();
     for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-      mAcceleration.add(new ArrayList<Float>());
       mLinearAcceleration.add(new ArrayList<Float>());
       mGyroscope.add(new ArrayList<Float>());
     }
@@ -121,7 +115,6 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
       case GET_MOTION:
         if (mStatus == Enum.STATUS.DOWN) {
           for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-            mAcceleration.get(axis).add(mOriginAcceleration[axis]);
             mLinearAcceleration.get(axis).add(mOriginLinearAcceleration[axis]);
             mGyroscope.get(axis).add(mOriginGyro[axis]);
           }
@@ -166,7 +159,7 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
         break;
       case 5:
         mVibrator.vibrate(VIBRATOR_LONG);
-        mAuthentication.finishGetMotion(mAcceleration, mLinearAcceleration, mGyroscope);
+        mAuthentication.finishGetMotion(mLinearAcceleration, mGyroscope);
         break;
       case 10:
         mSecond.setText("3");
@@ -178,7 +171,6 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
 
   @Override
   public void onSensorChanged(SensorEvent event) {
-    if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) mOriginAcceleration = event.values.clone();
     if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) mOriginLinearAcceleration = event.values.clone();
     if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) mOriginGyro = event.values.clone();
   }
@@ -193,7 +185,6 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
    * Register sensor listener.
    */
   public void registrationSensor() {
-    mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
     mSensorManager.registerListener(this, mLinearAccelerationSensor, SensorManager.SENSOR_DELAY_GAME);
     mSensorManager.registerListener(this, mGyroscopeSensor, SensorManager.SENSOR_DELAY_GAME);
   }

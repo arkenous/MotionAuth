@@ -131,7 +131,7 @@ public class ManageData {
   }
 
 
-  public void writeRData(String userName, String dataName, double[][] R_accel, double[][] R_linearAccel, double[][] R_gyro) {
+  public void writeRData(String userName, String dataName, double[][] R_linearAccel, double[][] R_gyro) {
     LogUtil.log(Log.INFO);
 
     String status = Environment.getExternalStorageState();
@@ -163,9 +163,6 @@ public class ManageData {
       String[] dimension = {"x", "y", "z"};
       for (int time = 0; time < Enum.NUM_TIME; time++) {
         for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-          bw.write(String.valueOf(time + 1) + "_" + "R-accel" + "_" + dimension[axis] + " " + R_accel[time][axis] + "\n");
-        }
-        for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
           bw.write(String.valueOf(time + 1) + "_" + "R-linearAccel" + "_" + dimension[axis] + " " + R_linearAccel[time][axis] + "\n");
         }
         for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
@@ -186,11 +183,10 @@ public class ManageData {
   /**
    * @param userName   User name.
    * @param dataName Data name.
-   * @param R_accel    Double type 1-array distance-R data.
    * @param R_linearAccel Double type 1-array linear distance R data.
    * @param R_gyro     Double type 1-array angle-R data.
    */
-  public void writeRData(String userName, String dataName, double[] R_accel, double[] R_linearAccel, double[] R_gyro) {
+  public void writeRData(String userName, String dataName, double[] R_linearAccel, double[] R_gyro) {
     LogUtil.log(Log.INFO);
 
     String status = Environment.getExternalStorageState();
@@ -222,9 +218,6 @@ public class ManageData {
       bw = new BufferedWriter(osw);
 
       String[] dimension = {"x", "y", "z"};
-      for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-        bw.write("R_accel" + "_" + dimension[axis] + " " + R_accel[axis] + "\n");
-      }
       for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
         bw.write("R_linearAccel" + "_" + dimension[axis] + " " + R_linearAccel[axis] + "\n");
       }
@@ -289,39 +282,34 @@ public class ManageData {
    * Save authentication key data which is collected from Registration.
    *
    * @param userName        User name.
-   * @param averageDistance Double type 2-array average distance data.
    * @param averageLinearDistance Double type 2-array average linear distance data.
    * @param averageAngle    Double type 2-array average angle data.
    * @param ampValue        Amplifier value.
    * @param context         Caller context.
    */
-  public void writeRegisterData(String userName, double[][] averageDistance, double[][] averageLinearDistance,
+  public void writeRegisterData(String userName, double[][] averageLinearDistance,
                                 double[][] averageAngle, double ampValue, Context context) {
 
     LogUtil.log(Log.INFO);
 
     CipherCrypt mCipherCrypt = new CipherCrypt(context);
 
-    String[][] averageDistanceStr = new String[averageDistance.length][averageDistance[0].length];
     String[][] averageLinearDistanceStr = new String[averageLinearDistance.length][averageLinearDistance[0].length];
     String[][] averageAngleStr = new String[averageAngle.length][averageAngle[0].length];
 
     for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-      for (int item = 0; item < averageDistance[axis].length; item++) {
-        averageDistanceStr[axis][item] = String.valueOf(averageDistance[axis][item]);
+      for (int item = 0; item < averageLinearDistance[axis].length; item++) {
         averageLinearDistanceStr[axis][item] = String.valueOf(averageLinearDistance[axis][item]);
         averageAngleStr[axis][item] = String.valueOf(averageAngle[axis][item]);
       }
     }
 
     // 暗号化
-    String[][] encryptedAverageDistanceStr = mCipherCrypt.encrypt(averageDistanceStr);
     String[][] encryptedAverageLinearDistanceStr = mCipherCrypt.encrypt(averageLinearDistanceStr);
     String[][] encryptedAverageAngleStr = mCipherCrypt.encrypt(averageAngleStr);
 
     // 配列データを特定文字列を挟んで連結する
     ConvertArrayAndString mConvertArrayAndString = new ConvertArrayAndString();
-    String registerDistanceData = mConvertArrayAndString.arrayToString(encryptedAverageDistanceStr);
     String registerLinearDistanceData = mConvertArrayAndString.arrayToString(encryptedAverageLinearDistanceStr);
     String registerAngleData = mConvertArrayAndString.arrayToString(encryptedAverageAngleStr);
 
@@ -335,7 +323,6 @@ public class ManageData {
     SharedPreferences preferences = mContext.getSharedPreferences(APP_NAME, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = preferences.edit();
 
-    editor.putString(userName + "distance", registerDistanceData);
     editor.putString(userName + "linearDistance", registerLinearDistanceData);
     editor.putString(userName + "angle", registerAngleData);
     editor.putString(userName + "amplify", String.valueOf(ampValue));
@@ -356,33 +343,28 @@ public class ManageData {
 
     SharedPreferences preferences = mContext.getSharedPreferences(APP_NAME, Context.MODE_PRIVATE);
 
-    String registeredDistanceData = preferences.getString(userName + "distance", "");
     String registeredLinearDistanceData = preferences.getString(userName + "linearDistance", "");
     String registeredAngleData = preferences.getString(userName + "angle", "");
 
-    if ("".equals(registeredDistanceData)) throw new RuntimeException();
+    if ("".equals(registeredLinearDistanceData)) throw new RuntimeException();
 
     ConvertArrayAndString mConvertArrayAndString = new ConvertArrayAndString();
     CipherCrypt mCipherCrypt = new CipherCrypt(context);
 
-    String[][] decryptedDistance = mCipherCrypt.decrypt(mConvertArrayAndString.stringToArray(registeredDistanceData));
     String[][] decryptedLinearDistance = mCipherCrypt.decrypt(mConvertArrayAndString.stringToArray(registeredLinearDistanceData));
     String[][] decryptedAngle = mCipherCrypt.decrypt(mConvertArrayAndString.stringToArray(registeredAngleData));
 
-    double[][] distance = new double[decryptedDistance.length][decryptedDistance[0].length];
     double[][] linearDistance = new double[decryptedLinearDistance.length][decryptedLinearDistance[0].length];
     double[][] angle = new double[decryptedAngle.length][decryptedAngle[0].length];
 
     for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-      for (int item = 0; item < decryptedDistance[axis].length; item++) {
-        distance[axis][item] = Double.valueOf(decryptedDistance[axis][item]);
+      for (int item = 0; item < decryptedLinearDistance[axis].length; item++) {
         linearDistance[axis][item] = Double.valueOf(decryptedLinearDistance[axis][item]);
         angle[axis][item] = Double.valueOf(decryptedAngle[axis][item]);
       }
     }
 
     ArrayList<double[][]> result = new ArrayList<>();
-    result.add(distance);
     result.add(linearDistance);
     result.add(angle);
 

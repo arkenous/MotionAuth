@@ -90,11 +90,10 @@ public class Authentication extends Activity {
    * Call when data collecting is finished.
    * Call Result using ExecutorService to authenticate and show result.
    *
-   * @param accel Original acceleration data collecting from GetData.
    * @param linearAccel Original linear acceleration data collecting from GetData.
    * @param gyro  Original gyroscope data collecting from GetData.
    */
-  public void finishGetMotion(ArrayList<ArrayList<Float>> accel, ArrayList<ArrayList<Float>> linearAccel,
+  public void finishGetMotion(ArrayList<ArrayList<Float>> linearAccel,
                               ArrayList<ArrayList<Float>> gyro) {
     LogUtil.log(Log.INFO);
     if (getMotionBtn.isClickable()) getMotionBtn.setClickable(false);
@@ -115,8 +114,7 @@ public class Authentication extends Activity {
     progressDialog.show();
 
 
-    Result mResult = new Result(this, mListToArray.listTo2DArray(accel),
-        mListToArray.listTo2DArray(linearAccel), mListToArray.listTo2DArray(gyro),
+    Result mResult = new Result(this, mListToArray.listTo2DArray(linearAccel), mListToArray.listTo2DArray(gyro),
         getMotionBtn, progressDialog, mGetData);
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     executorService.execute(mResult);

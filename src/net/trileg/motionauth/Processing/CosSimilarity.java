@@ -59,15 +59,11 @@ public class CosSimilarity {
   }
 
 
-  public Enum.MEASURE measure(double[] distance, double[] linearDistance, double[] angle) {
+  public Enum.MEASURE measure(double[] linearDistance, double[] angle) {
     LogUtil.log(Log.INFO);
-    double[] combined = new double[distance.length + linearDistance.length + angle.length];
+    double[] combined = new double[linearDistance.length + angle.length];
     int combinedCount = 0;
 
-    for (double value : distance) {
-      combined[combinedCount] = value;
-      combinedCount++;
-    }
     for (double value : linearDistance) {
       combined[combinedCount] = value;
       combinedCount++;
@@ -96,9 +92,9 @@ public class CosSimilarity {
   }
 
 
-  public Enum.MEASURE measure(double distance, double linearDistance, double angle) {
+  public Enum.MEASURE measure(double linearDistance, double angle) {
     LogUtil.log(Log.INFO);
-    double average = (distance + linearDistance + angle) / 3;
+    double average = (linearDistance + angle) / 2;
 
     if (average > 0.5) {
       return Enum.MEASURE.CORRECT;

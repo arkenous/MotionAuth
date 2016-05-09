@@ -26,7 +26,7 @@ import java.util.Map;
  * @author Kensuke Kosaka
  */
 public class RegistrantList extends Activity {
-  String item;
+  private String item;
 
 
   @Override

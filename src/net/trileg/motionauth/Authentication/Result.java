@@ -23,7 +23,7 @@ import java.util.ArrayList;
  *
  * @author Kensuke Kosaka
  */
-public class Result extends Handler implements Runnable {
+class Result extends Handler implements Runnable {
   private static final int READ_DATA = 1;
   private static final int FORMAT = 2;
   private static final int AMPLIFY = 3;
@@ -52,8 +52,8 @@ public class Result extends Handler implements Runnable {
   private boolean result = false;
 
 
-  public Result(Authentication authentication, float[][] linearAccel, float[][] gyro, Button getMotion,
-                ProgressDialog progressDialog, GetData getData) {
+  Result(Authentication authentication, float[][] linearAccel, float[][] gyro, Button getMotion,
+         ProgressDialog progressDialog, GetData getData) {
     mAuthentication = authentication;
     mLinearAccel = linearAccel;
     mGyro = gyro;

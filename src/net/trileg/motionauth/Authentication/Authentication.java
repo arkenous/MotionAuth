@@ -93,8 +93,8 @@ public class Authentication extends Activity {
    * @param linearAccel Original linear acceleration data collecting from GetData.
    * @param gyro  Original gyroscope data collecting from GetData.
    */
-  public void finishGetMotion(ArrayList<ArrayList<Float>> linearAccel,
-                              ArrayList<ArrayList<Float>> gyro) {
+  void finishGetMotion(ArrayList<ArrayList<Float>> linearAccel,
+                       ArrayList<ArrayList<Float>> gyro) {
     LogUtil.log(Log.INFO);
     if (getMotionBtn.isClickable()) getMotionBtn.setClickable(false);
     secondTv.setText("0");
@@ -125,7 +125,7 @@ public class Authentication extends Activity {
   /**
    * Move to Start activity.
    */
-  public void finishAuthentication() {
+  void finishAuthentication() {
     LogUtil.log(Log.INFO);
     Intent intent = new Intent();
     intent.setClassName(getPackageName(), getPackageName() + ".Start");

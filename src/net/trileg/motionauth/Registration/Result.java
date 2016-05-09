@@ -23,7 +23,7 @@ import java.util.ArrayList;
  *
  * @author Kensuke Kosaka
  */
-public class Result extends Handler implements Runnable {
+class Result extends Handler implements Runnable {
   private static final int FORMAT = 1;
   private static final int AMPLIFY = 2;
   private static final int FOURIER = 3;
@@ -56,9 +56,9 @@ public class Result extends Handler implements Runnable {
   private boolean result = false;
 
 
-  public Result(Registration registration, float[][][] linearAccel,
-                float[][][] gyro, Button getMotion, ProgressDialog progressDialog,
-                double checkRange, double amp, Context context, GetData getData) {
+  Result(Registration registration, float[][][] linearAccel,
+         float[][][] gyro, Button getMotion, ProgressDialog progressDialog,
+         double checkRange, double amp, Context context, GetData getData) {
     mRegistration = registration;
     mLinearAccel = linearAccel;
     mGyro = gyro;
@@ -159,7 +159,7 @@ public class Result extends Handler implements Runnable {
   }
 
 
-  public void setAmpAndRange(double amp, double checkRange) {
+  void setAmpAndRange(double amp, double checkRange) {
     mAmp = amp;
     mCheckRange = checkRange;
   }
@@ -168,7 +168,7 @@ public class Result extends Handler implements Runnable {
   /**
    * データ加工，計算処理を行う
    */
-  public boolean calculate(float[][][] linearAccelList, float[][][] gyroList) {
+  private boolean calculate(float[][][] linearAccelList, float[][][] gyroList) {
     LogUtil.log(Log.INFO);
 
     // 複数回のデータ取得について，データ数を揃える

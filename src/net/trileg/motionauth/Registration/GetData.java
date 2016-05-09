@@ -21,7 +21,7 @@ import java.util.ArrayList;
  *
  * @author Kensuke Kosaka
  */
-public class GetData extends Handler implements Runnable, SensorEventListener {
+class GetData extends Handler implements Runnable, SensorEventListener {
   private static final int PREPARATION = 1;
   private static final int GET_MOTION = 0;
 
@@ -55,8 +55,8 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
   private ArrayList<ArrayList<ArrayList<Float>>> mGyro = new ArrayList<>();
 
 
-  public GetData(Registration registration, Button getMotion, TextView second, TextView count, Vibrator vibrator,
-                 Enum.STATUS status, Context context) {
+  GetData(Registration registration, Button getMotion, TextView second, TextView count, Vibrator vibrator,
+          Enum.STATUS status, Context context) {
     mRegistration = registration;
     mGetMotion = getMotion;
     mSecond = second;
@@ -70,7 +70,7 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
   }
 
 
-  public void changeStatus(Enum.STATUS status) {
+  void changeStatus(Enum.STATUS status) {
     mStatus = status;
   }
 
@@ -211,7 +211,7 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
   /**
    * Register sensor listener.
    */
-  public void registrationSensor() {
+  void registrationSensor() {
     mSensorManager.registerListener(this, mLinearAccelerationSensor, SensorManager.SENSOR_DELAY_GAME);
     mSensorManager.registerListener(this, mGyroscopeSensor, SensorManager.SENSOR_DELAY_GAME);
   }
@@ -220,7 +220,7 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
   /**
    * Un-Register sensor listener.
    */
-  public void unRegistrationSensor() {
+  void unRegistrationSensor() {
     mSensorManager.unregisterListener(this);
   }
 
@@ -228,7 +228,7 @@ public class GetData extends Handler implements Runnable, SensorEventListener {
   /**
    * Reset value using count of collecting data.
    */
-  public void reset() {
+  void reset() {
     countdown = 4;
     countTime = 0;
     mLinearAcceleration.clear();

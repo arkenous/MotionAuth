@@ -25,8 +25,8 @@ import java.util.ArrayList;
  * @author Kensuke Kosaka
  */
 public class ViewRegisteredData extends Activity {
-  String item = null;
-  int flgCount;
+  private String item = null;
+  private int flgCount;
 
 
   @Override

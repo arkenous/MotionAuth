@@ -7,7 +7,7 @@ import android.util.Log;
  *
  * @author Kensuke Kosaka
  */
-public class ConvertArrayAndString {
+class ConvertArrayAndString {
 
   /**
    * Join String type 2-array data to String by special character.
@@ -15,7 +15,7 @@ public class ConvertArrayAndString {
    * @param input String type 2-array data.
    * @return Joined String data.
    */
-  public String arrayToString(String[][] input) {
+  String arrayToString(String[][] input) {
     LogUtil.log(Log.INFO);
     String join = "", result = "";
 
@@ -58,7 +58,7 @@ public class ConvertArrayAndString {
    * @param input String data.
    * @return Separated String type 2-array data.
    */
-  public String[][] stringToArray(String input) {
+  String[][] stringToArray(String input) {
     LogUtil.log(Log.INFO);
     String[] splitDimension = input.split("'");
     String[] dimenX = splitDimension[0].split(",");

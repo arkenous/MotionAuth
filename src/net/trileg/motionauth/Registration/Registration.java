@@ -53,7 +53,7 @@ public class Registration extends Activity {
   /**
    * Registration event listener and call GetData using ExecutorService to collect data.
    */
-  public void registration() {
+  private void registration() {
     LogUtil.log(Log.INFO);
 
     Vibrator mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
@@ -100,8 +100,8 @@ public class Registration extends Activity {
    * @param linearAcceleration Original linear acceleration data collecting from GetData.
    * @param gyro  Original gyroscope data collecting from GetData.
    */
-  public void finishGetMotion(ArrayList<ArrayList<ArrayList<Float>>> linearAcceleration,
-                              ArrayList<ArrayList<ArrayList<Float>>> gyro) {
+  void finishGetMotion(ArrayList<ArrayList<ArrayList<Float>>> linearAcceleration,
+                       ArrayList<ArrayList<ArrayList<Float>>> gyro) {
     LogUtil.log(Log.INFO);
     if (getMotionBtn.isClickable()) getMotionBtn.setClickable(false);
     secondTv.setText("0");
@@ -275,7 +275,7 @@ public class Registration extends Activity {
   /**
    * Move to Start activity.
    */
-  public void finishRegistration() {
+  void finishRegistration() {
     LogUtil.log(Log.INFO);
 
     Intent intent = new Intent();

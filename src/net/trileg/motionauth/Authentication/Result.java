@@ -139,8 +139,8 @@ class Result extends Handler implements Runnable {
   private void readRegisteredData() {
     this.sendEmptyMessage(READ_DATA);
     ArrayList<double[][]> readDataList = mManageData.readRegisteredData(mAuthentication, InputName.userName);
-    registeredLinearDistance = readDataList.get(1);
-    registeredAngle = readDataList.get(2);
+    registeredLinearDistance = readDataList.get(0);
+    registeredAngle = readDataList.get(1);
 
     SharedPreferences preferences = mAuthentication.getApplicationContext().getSharedPreferences("MotionAuth", Context.MODE_PRIVATE);
     String registeredAmplify = preferences.getString(InputName.userName + "amplify", "");
@@ -158,8 +158,8 @@ class Result extends Handler implements Runnable {
    */
   private boolean calculate(float[][] linearAccel, float[][] gyro) {
     ArrayList<float[][]> adjusted = mAdjuster.adjust(linearAccel, gyro, registeredLinearDistance[0].length);
-    linearAccel = adjusted.get(1);
-    gyro = adjusted.get(2);
+    linearAccel = adjusted.get(0);
+    gyro = adjusted.get(1);
 
     this.sendEmptyMessage(FORMAT);
     double[][] linearAcceleration = mFormatter.convertFloatToDouble(linearAccel);

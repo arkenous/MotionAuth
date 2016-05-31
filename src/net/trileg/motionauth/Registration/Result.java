@@ -173,8 +173,8 @@ class Result extends Handler implements Runnable {
 
     // 複数回のデータ取得について，データ数を揃える
     ArrayList<float[][][]> adjusted = mAdjuster.adjust(linearAccelList, gyroList);
-    float[][][] linearAccel = adjusted.get(1);
-    float[][][] gyro = adjusted.get(2);
+    float[][][] linearAccel = adjusted.get(0);
+    float[][][] gyro = adjusted.get(1);
 
     mManageData.writeFloatData(InputName.name, "RegAdjusted", "linearAcceleration", linearAccel);
     mManageData.writeFloatData(InputName.name, "RegAdjusted", "gyroscope", gyro);
@@ -281,8 +281,8 @@ class Result extends Handler implements Runnable {
         for (int time = 0; time < Enum.NUM_TIME; time++) {
           for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
             for (int item = 0; item < linearDistance[time][axis].length; item++) {
-              linearDistance[time][axis][item] = deviatedValue[1][time][axis][item];
-              angle[time][axis][item] = deviatedValue[2][time][axis][item];
+              linearDistance[time][axis][item] = deviatedValue[0][time][axis][item];
+              angle[time][axis][item] = deviatedValue[1][time][axis][item];
             }
           }
         }

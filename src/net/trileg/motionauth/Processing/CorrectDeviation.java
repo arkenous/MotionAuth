@@ -29,7 +29,7 @@ public class CorrectDeviation {
     LogUtil.log(Log.INFO);
 
     // ずらしたデータを格納する配列
-    double[][][][] newData = new double[3][Enum.NUM_TIME][Enum.NUM_AXIS][linearDistance[0][0].length];
+    double[][][][] newData = new double[2][Enum.NUM_TIME][Enum.NUM_AXIS][linearDistance[0][0].length];
 
     // 試行回ごとの代表値の出ている時間を抽出
     // 変数は，桁揃え，計算後のdistance，angleを利用する
@@ -188,8 +188,8 @@ public class CorrectDeviation {
     // 1回目のデータに関しては基準となるデータなのでそのまま入れる
     for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
       for (int item = 0; item < linearDistance[0][axis].length; item++) {
-        newData[1][0][axis][item] = linearDistance[0][axis][item];
-        newData[2][0][axis][item] = angle[0][axis][item];
+        newData[0][0][axis][item] = linearDistance[0][axis][item];
+        newData[1][0][axis][item] = angle[0][axis][item];
       }
     }
 
@@ -206,8 +206,8 @@ public class CorrectDeviation {
         Collections.rotate(linearDistanceTemp, lagData[time - 1][axis]);
         Collections.rotate(angleTemp, lagData[time - 1][axis]);
         for (int item = 0; item < linearDistance[time][axis].length; item++) {
-          newData[1][time][axis][item] = linearDistanceTemp.get(item);
-          newData[2][time][axis][item] = angleTemp.get(item);
+          newData[0][time][axis][item] = linearDistanceTemp.get(item);
+          newData[1][time][axis][item] = angleTemp.get(item);
         }
       }
     }

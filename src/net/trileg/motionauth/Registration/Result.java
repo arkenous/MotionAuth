@@ -203,8 +203,8 @@ class Result extends Handler implements Runnable {
     linearAcceleration = mFourier.LowpassFilter(linearAcceleration, "LinearAcceleration");
     gyroscope = mFourier.LowpassFilter(gyroscope, "Gyroscope");
 
-    mManageData.writeDoubleThreeArrayData(InputName.name, "RegLowpasswd", "linearAcceleration", linearAcceleration);
-    mManageData.writeDoubleThreeArrayData(InputName.name, "RegLowpasswd", "gyroscope", gyroscope);
+    mManageData.writeDoubleThreeArrayData(InputName.name, "RegLowpassed", "linearAcceleration", linearAcceleration);
+    mManageData.writeDoubleThreeArrayData(InputName.name, "RegLowpassed", "gyroscope", gyroscope);
 
     LogUtil.log(Log.DEBUG, "Finish fourier");
 

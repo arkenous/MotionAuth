@@ -160,7 +160,7 @@ public class Registration extends Activity {
           LayoutInflater inflater = LayoutInflater.from(Registration.this);
           View seekView = inflater.inflate(R.layout.seekdialog, (ViewGroup) findViewById(R.id.dialog_root));
 
-          // 閾値調整
+          //region 閾値調整
           SeekBar thresholdSeekBar = (SeekBar) seekView.findViewById(R.id.threshold);
           final TextView thresholdSeekText = (TextView) seekView.findViewById(R.id.thresholdtext);
           thresholdSeekText.setText("増幅器にかけるかどうかを判断する閾値を調整できます．\n" +
@@ -190,8 +190,9 @@ public class Registration extends Activity {
                   "現在の値は" + checkRangeValue + "です．");
             }
           });
+          //endregion
 
-          // 増幅値調整
+          //region 増幅値調整
           SeekBar amplifierSeekBar = (SeekBar) seekView.findViewById(R.id.amplifier);
           final TextView amplifierText = (TextView) seekView.findViewById(R.id.amplifierText);
           amplifierText.setText("増幅器にかける場合に，何倍増幅するかを調整できます．標準は2倍です．\n" +
@@ -218,6 +219,7 @@ public class Registration extends Activity {
                   "現在の値は" + ampValue + "です．");
             }
           });
+          //endregion
 
           AlertDialog.Builder dialog = new AlertDialog.Builder(Registration.this);
           dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {

@@ -22,14 +22,9 @@ import java.util.ArrayList;
  * @author Kensuke Kosaka
  */
 class GetData extends Handler implements Runnable, SensorEventListener {
-  private static final int PREPARATION = 1;
-  private static final int GET_MOTION = 0;
-
   private static final int VIBRATOR_SHORT = 25;
-  private static final int VIBRATOR_NORMAL = 50;
   private static final int VIBRATOR_LONG = 100;
 
-  private static final int PREPARATION_INTERVAL = 1000;
   private static final int GET_INTERVAL = 30;
 
   private Button mGetMotion;
@@ -41,8 +36,8 @@ class GetData extends Handler implements Runnable, SensorEventListener {
   private Sensor mGyroscopeSensor;
   private Registration mRegistration;
 
-  private int countdown = 4;
   private int countTime = 0;
+  private int collectTime = 0;
 
   private Enum.STATUS mStatus;
 
@@ -83,33 +78,15 @@ class GetData extends Handler implements Runnable, SensorEventListener {
       mLinearAccelerationPerTime.add(new ArrayList<Float>());
       mGyroPerTime.add(new ArrayList<Float>());
     }
-    collect(PREPARATION);
+    collect();
   }
 
 
   @Override
   public void dispatchMessage(@NonNull Message msg) {
     switch (msg.what) {
-      case 0:
-        mSecond.setText(String.valueOf(countdown));
-        mVibrator.vibrate(VIBRATOR_SHORT);
-        break;
       case 1:
-        mSecond.setText("Start");
-        mVibrator.vibrate(VIBRATOR_LONG);
-        mGetMotion.setText("Getting data");
-        break;
-      case 2:
-        mSecond.setText("3");
-        mVibrator.vibrate(VIBRATOR_NORMAL);
-        break;
-      case 3:
-        mSecond.setText("2");
-        mVibrator.vibrate(VIBRATOR_NORMAL);
-        break;
-      case 4:
-        mSecond.setText("1");
-        mVibrator.vibrate(VIBRATOR_NORMAL);
+        mVibrator.vibrate(VIBRATOR_SHORT);
         break;
       case 5:
         mVibrator.vibrate(VIBRATOR_LONG);
@@ -135,30 +112,8 @@ class GetData extends Handler implements Runnable, SensorEventListener {
 
   /**
    * Collecting data from sensor.
-   *
-   * @param stage Stage of PREPARATION or GET_MOTION
    */
-  private void collect(int stage) {
-    switch (stage) {
-      case PREPARATION:
-        countdown--;
-        switch (countdown) {
-          case 0:
-            super.sendEmptyMessage(1);
-            collect(GET_MOTION);
-            break;
-          default:
-            super.sendEmptyMessage(0);
-            try {
-              Thread.sleep(PREPARATION_INTERVAL);
-            } catch (InterruptedException e) {
-              e.printStackTrace();
-            }
-            collect(PREPARATION);
-            break;
-        }
-        break;
-      case GET_MOTION:
+  private void collect() {
         if (mStatus == Enum.STATUS.DOWN) {
           for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
             mLinearAccelerationPerTime.get(axis).add(mOriginLinearAcceleration[axis]);
@@ -170,13 +125,17 @@ class GetData extends Handler implements Runnable, SensorEventListener {
           } catch (InterruptedException e) {
             e.printStackTrace();
           }
-          collect(GET_MOTION);
+          collectTime++;
+          if (collectTime % 33 == 0) {
+            super.sendEmptyMessage(1);
+          }
+          collect();
         } else {
           // Correct data per time finished
           mLinearAcceleration.add(new ArrayList<>(mLinearAccelerationPerTime));
           mGyro.add(new ArrayList<>(mGyroPerTime));
           countTime++;
-          countdown = 4;
+          collectTime = 0;
           super.sendEmptyMessage(5);
 
           switch (countTime) {
@@ -191,8 +150,6 @@ class GetData extends Handler implements Runnable, SensorEventListener {
               break;
           }
         }
-        break;
-    }
   }
 
 
@@ -229,8 +186,8 @@ class GetData extends Handler implements Runnable, SensorEventListener {
    * Reset value using count of collecting data.
    */
   void reset() {
-    countdown = 4;
     countTime = 0;
+    collectTime = 0;
     mLinearAcceleration.clear();
     mGyro.clear();
     sendEmptyMessage(10);

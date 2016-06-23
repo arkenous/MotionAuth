@@ -71,8 +71,7 @@ public class Registration extends Activity {
         switch (event.getAction()) {
           case MotionEvent.ACTION_DOWN:
             LogUtil.log(Log.VERBOSE, "Action down getMotionBtn");
-            getMotionBtn.setText("Interval");
-            countSecondTv.setText("秒");
+            getMotionBtn.setText("取得中");
             mGetData.changeStatus(STATUS.DOWN);
             ExecutorService executorService = Executors.newSingleThreadExecutor();
             executorService.execute(mGetData);

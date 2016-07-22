@@ -2,6 +2,8 @@ package net.trileg.motionauth.Utility;
 
 import android.util.Log;
 
+import static android.util.Log.*;
+
 /**
  * @author Kensuke Kosaka
  */
@@ -15,11 +17,11 @@ public class LogUtil {
   }
 
   public static void log() {
-    outputLog(Log.DEBUG, null, null);
+    outputLog(DEBUG, null, null);
   }
 
   public static void log(String message) {
-    outputLog(Log.DEBUG, message, null);
+    outputLog(DEBUG, message, null);
   }
 
   public static void log(int type) {
@@ -49,35 +51,35 @@ public class LogUtil {
 
     // ログを出力
     switch (type) {
-      case Log.DEBUG:
+      case DEBUG:
         if (throwable == null) {
           Log.d(TAG, message);
         } else {
           Log.d(TAG, message, throwable);
         }
         break;
-      case Log.ERROR:
+      case ERROR:
         if (throwable == null) {
           Log.e(TAG, message);
         } else {
           Log.e(TAG, message, throwable);
         }
         break;
-      case Log.INFO:
+      case INFO:
         if (throwable == null) {
           Log.i(TAG, message);
         } else {
           Log.i(TAG, message, throwable);
         }
         break;
-      case Log.VERBOSE:
+      case VERBOSE:
         if (throwable == null) {
           Log.v(TAG, message);
         } else {
           Log.v(TAG, message, throwable);
         }
         break;
-      case Log.WARN:
+      case WARN:
         if (throwable == null) {
           Log.w(TAG, message);
         } else {

@@ -1,6 +1,7 @@
 package net.trileg.motionauth.Utility;
 
-import android.util.Log;
+import static android.util.Log.INFO;
+import static net.trileg.motionauth.Utility.LogUtil.log;
 
 /**
  * Join String type array to String, or separate String to String type array.
@@ -16,7 +17,7 @@ class ConvertArrayAndString {
    * @return Joined String data.
    */
   String arrayToString(String[][] input) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
     String join = "", result = "";
 
     // aaa   bbb   ccc
@@ -59,7 +60,7 @@ class ConvertArrayAndString {
    * @return Separated String type 2-array data.
    */
   String[][] stringToArray(String input) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
     String[] splitDimension = input.split("'");
     String[] dimenX = splitDimension[0].split(",");
     String[] dimenY = splitDimension[1].split(",");

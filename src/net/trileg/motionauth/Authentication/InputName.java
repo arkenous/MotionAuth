@@ -29,7 +29,7 @@ import static net.trileg.motionauth.Utility.LogUtil.log;
  * @author Kensuke Kosaka
  */
 public class InputName extends Activity {
-  public static String userName = "";
+  static String userName = "";
   private Context mContext;
 
 

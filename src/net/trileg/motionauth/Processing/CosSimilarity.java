@@ -94,11 +94,9 @@ public class CosSimilarity {
 
   public Enum.MEASURE measure(double linearDistance, double angle) {
     LogUtil.log(Log.INFO);
-    double average = (linearDistance + angle) / 2;
-
-    if (average > 0.5) {
-      return Enum.MEASURE.CORRECT;
-    }
-    return Enum.MEASURE.INCORRECT;
+    if (Enum.STRICT < linearDistance && Enum.STRICT < angle) return Enum.MEASURE.PERFECT;
+    else if (Enum.NORMAL < linearDistance && Enum.NORMAL < angle) return Enum.MEASURE.CORRECT;
+    else if (Enum.LOOSE < linearDistance && Enum.LOOSE < angle) return Enum.MEASURE.INCORRECT;
+    else return Enum.MEASURE.BAD;
   }
 }

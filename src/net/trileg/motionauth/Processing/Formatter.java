@@ -1,8 +1,8 @@
 package net.trileg.motionauth.Processing;
 
-import android.util.Log;
-import net.trileg.motionauth.Utility.Enum;
-import net.trileg.motionauth.Utility.LogUtil;
+import static android.util.Log.INFO;
+import static net.trileg.motionauth.Utility.Enum.*;
+import static net.trileg.motionauth.Utility.LogUtil.log;
 
 
 /**
@@ -13,9 +13,9 @@ import net.trileg.motionauth.Utility.LogUtil;
 public class Formatter {
 
   public double[][] convertFloatToDouble(float[][] inputVal) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
-    double[][] returnVal = new double[Enum.NUM_AXIS][inputVal[0].length];
+    double[][] returnVal = new double[NUM_AXIS][inputVal[0].length];
 
     for (int axis = 0; axis < inputVal.length; axis++) {
       for (int item = 0; item < inputVal[axis].length; item++) {
@@ -28,9 +28,9 @@ public class Formatter {
 
 
   public double[][][] convertFloatToDouble(float[][][] inputVal) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
-    double[][][] returnVal = new double[Enum.NUM_TIME][Enum.NUM_AXIS][inputVal[0][0].length];
+    double[][][] returnVal = new double[NUM_TIME][NUM_AXIS][inputVal[0][0].length];
 
     for (int time = 0; time < inputVal.length; time++) {
       for (int axis = 0; axis < inputVal[time].length; axis++) {

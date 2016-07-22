@@ -232,10 +232,10 @@ class Result extends Handler implements Runnable {
     LogUtil.log(Log.INFO, "After measure cosine similarity");
     LogUtil.log(Log.INFO, "measure = " + String.valueOf(measure));
 
-    if (Enum.MEASURE.BAD == measure) {
+    if (Enum.MEASURE.INCORRECT == measure) {
       // 相関係数が0.4以下
       return false;
-    } else if (Enum.MEASURE.INCORRECT == measure) {
+    } else if (Enum.MEASURE.MAYBE == measure) {
       LogUtil.log(Log.DEBUG, "Deviation");
       // 相関係数が0.4よりも高く，0.6以下の場合
       // ズレ修正を行う

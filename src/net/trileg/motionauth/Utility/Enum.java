@@ -11,7 +11,7 @@ public class Enum {
   }
 
   public enum MEASURE {
-    BAD, INCORRECT, CORRECT, PERFECT
+    INCORRECT, MAYBE, CORRECT, PERFECT
   }
 
   public enum MODE {

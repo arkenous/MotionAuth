@@ -188,6 +188,6 @@ class Result extends Handler implements Runnable {
 
     this.sendEmptyMessage(COSINE_SIMILARITY);
     Enum.MEASURE measure = mCosSimilarity.measure(linearDistanceSimilarity, angleSimilarity);
-    return measure == Enum.MEASURE.CORRECT;
+    return measure == Enum.MEASURE.PERFECT || measure == Enum.MEASURE.CORRECT;
   }
 }

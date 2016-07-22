@@ -86,9 +86,9 @@ public class CosSimilarity {
         }
         return Enum.MEASURE.CORRECT;
       }
-      return Enum.MEASURE.INCORRECT;
+      return Enum.MEASURE.MAYBE;
     }
-    return Enum.MEASURE.BAD;
+    return Enum.MEASURE.INCORRECT;
   }
 
 
@@ -96,7 +96,7 @@ public class CosSimilarity {
     LogUtil.log(Log.INFO);
     if (Enum.STRICT < linearDistance && Enum.STRICT < angle) return Enum.MEASURE.PERFECT;
     else if (Enum.NORMAL < linearDistance && Enum.NORMAL < angle) return Enum.MEASURE.CORRECT;
-    else if (Enum.LOOSE < linearDistance && Enum.LOOSE < angle) return Enum.MEASURE.INCORRECT;
-    else return Enum.MEASURE.BAD;
+    else if (Enum.LOOSE < linearDistance && Enum.LOOSE < angle) return Enum.MEASURE.MAYBE;
+    else return Enum.MEASURE.INCORRECT;
   }
 }

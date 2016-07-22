@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -16,7 +15,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import net.trileg.motionauth.R;
-import net.trileg.motionauth.Utility.LogUtil;
+
+import static android.content.Intent.*;
+import static android.util.Log.*;
+import static android.view.KeyEvent.*;
+import static android.widget.Toast.LENGTH_LONG;
+import static net.trileg.motionauth.Utility.LogUtil.log;
 
 
 /**
@@ -33,7 +37,7 @@ public class InputName extends Activity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     requestWindowFeature(Window.FEATURE_NO_TITLE);
     setContentView(R.layout.activity_auth_name_input);
@@ -47,7 +51,7 @@ public class InputName extends Activity {
    * Input user name.
    */
   private void nameInput() {
-    LogUtil.log(Log.INFO);
+    log(INFO);
     final EditText nameInput = (EditText) findViewById(R.id.nameInputEditText);
 
     nameInput.addTextChangedListener(new TextWatcher() {
@@ -61,7 +65,8 @@ public class InputName extends Activity {
 
       // After text changed.
       public void afterTextChanged(Editable s) {
-        if (nameInput.getText() != null) userName = nameInput.getText().toString().trim();
+        if (nameInput.getText() != null)
+          userName = nameInput.getText().toString().trim();
       }
     });
 
@@ -69,9 +74,9 @@ public class InputName extends Activity {
     nameInput.setOnKeyListener(new View.OnKeyListener() {
       @Override
       public boolean onKey(View v, int keyCode, KeyEvent event) {
-        if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-          LogUtil.log(Log.VERBOSE, "Push enter key");
-          InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (event.getAction() == ACTION_DOWN && keyCode == KEYCODE_ENTER) {
+          log(VERBOSE, "Push enter key");
+          InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
           inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
           return true;
@@ -85,15 +90,15 @@ public class InputName extends Activity {
     ok.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        LogUtil.log(Log.VERBOSE, "Click ok button");
+        log(VERBOSE, "Click ok button");
 
         // Check user inputted name is already registered or not.
         if (checkUserExists()) {
-          LogUtil.log(Log.DEBUG, "User is existed");
+          log(DEBUG, "User is existed");
           moveActivity(getPackageName(), getPackageName() + ".Authentication.Authentication", true);
         } else {
-          LogUtil.log(Log.DEBUG, "User is not existed");
-          Toast.makeText(mContext, "ユーザが登録されていません", Toast.LENGTH_LONG).show();
+          log(DEBUG, "User is not existed");
+          Toast.makeText(mContext, "ユーザが登録されていません", LENGTH_LONG).show();
         }
       }
     });
@@ -106,11 +111,11 @@ public class InputName extends Activity {
    * @return true if name is already registered, otherwise false.
    */
   private boolean checkUserExists() {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     // Get already registered user list from SharedPreferences using Application context.
     Context context = getApplicationContext();
-    SharedPreferences preferences = context.getSharedPreferences("UserList", Context.MODE_PRIVATE);
+    SharedPreferences preferences = context.getSharedPreferences("UserList", MODE_PRIVATE);
 
     return preferences.contains(userName);
   }
@@ -124,11 +129,11 @@ public class InputName extends Activity {
    * @param flg     Whether to show this activity if user push BACK KEY.
    */
   private void moveActivity(String pkgName, String actName, boolean flg) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     Intent intent = new Intent();
     intent.setClassName(pkgName, actName);
-    if (flg) intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+    if (flg) intent.setFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_NEW_TASK);
 
     startActivity(intent);
   }

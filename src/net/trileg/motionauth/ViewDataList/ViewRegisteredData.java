@@ -5,18 +5,21 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import net.trileg.motionauth.R;
-import net.trileg.motionauth.Utility.Enum;
-import net.trileg.motionauth.Utility.LogUtil;
 import net.trileg.motionauth.Utility.ManageData;
 
 import java.util.ArrayList;
+
+import static android.content.Intent.*;
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH;
+import static android.util.Log.INFO;
+import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
+import static net.trileg.motionauth.Utility.LogUtil.log;
 
 
 /**
@@ -33,11 +36,11 @@ public class ViewRegisteredData extends Activity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     setContentView(R.layout.activity_view_registed_data);
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+    if (SDK_INT >= ICE_CREAM_SANDWICH) {
       ActionBar actionBar = getActionBar();
       if (actionBar != null) actionBar.setHomeButtonEnabled(true);
     }
@@ -51,7 +54,7 @@ public class ViewRegisteredData extends Activity {
    * Show user data.
    */
   private void viewRegisteredData() {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     // Receive user name sent from RegistrantList
     Intent intent = getIntent();
@@ -75,7 +78,7 @@ public class ViewRegisteredData extends Activity {
    * @return String type list.
    */
   private ArrayList<String> readData() {
-    LogUtil.log(Log.INFO);
+    log(INFO);
     ArrayList<String> dataList = new ArrayList<>();
 
     ManageData mManageData = new ManageData();
@@ -85,7 +88,7 @@ public class ViewRegisteredData extends Activity {
 
     String[][] registeredLinearDistance = new String[readLinearDistance.length][readLinearDistance[0].length];
     String[][] registeredAngle = new String[readAngle.length][readAngle[0].length];
-    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+    for (int axis = 0; axis < NUM_AXIS; axis++) {
       for (int item = 0; item < readLinearDistance[axis].length; item++) {
         registeredLinearDistance[axis][item] = String.valueOf(readLinearDistance[axis][item]);
         registeredAngle[axis][item] = String.valueOf(readAngle[axis][item]);
@@ -93,7 +96,7 @@ public class ViewRegisteredData extends Activity {
     }
 
     Context mContext = ViewRegisteredData.this.getApplicationContext();
-    SharedPreferences preferences = mContext.getSharedPreferences("MotionAuth", Context.MODE_PRIVATE);
+    SharedPreferences preferences = mContext.getSharedPreferences("MotionAuth", MODE_PRIVATE);
 
     String ampValue = preferences.getString(item + "amplify", "");
 
@@ -101,7 +104,7 @@ public class ViewRegisteredData extends Activity {
 
     String index = "";
 
-    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+    for (int axis = 0; axis < NUM_AXIS; axis++) {
       switch (axis) {
         case 0:
           index = "LinearDistanceX";
@@ -118,7 +121,7 @@ public class ViewRegisteredData extends Activity {
       }
     }
 
-    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+    for (int axis = 0; axis < NUM_AXIS; axis++) {
       switch (axis) {
         case 0:
           index = "AngleX";
@@ -156,12 +159,12 @@ public class ViewRegisteredData extends Activity {
 
 
   private void moveActivity(String pkgName, String actName, boolean flg) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     Intent intent = new Intent();
     intent.setClassName(pkgName, actName);
 
-    if (flg) intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+    if (flg) intent.setFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_NEW_TASK);
 
     startActivity(intent);
     finish();

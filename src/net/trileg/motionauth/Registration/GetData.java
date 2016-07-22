@@ -15,6 +15,11 @@ import net.trileg.motionauth.Utility.Enum;
 
 import java.util.ArrayList;
 
+import static android.hardware.Sensor.*;
+import static android.hardware.SensorManager.SENSOR_DELAY_GAME;
+import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
+import static net.trileg.motionauth.Utility.Enum.STATUS.DOWN;
+
 /**
  * Collecting data and return it.
  * Data collecting is running on the ExecutorService thread.
@@ -60,8 +65,8 @@ class GetData extends Handler implements Runnable, SensorEventListener {
     mStatus = status;
 
     mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-    mLinearAccelerationSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-    mGyroscopeSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+    mLinearAccelerationSensor = mSensorManager.getDefaultSensor(TYPE_LINEAR_ACCELERATION);
+    mGyroscopeSensor = mSensorManager.getDefaultSensor(TYPE_GYROSCOPE);
   }
 
 
@@ -74,7 +79,7 @@ class GetData extends Handler implements Runnable, SensorEventListener {
   public void run() {
     mLinearAccelerationPerTime.clear();
     mGyroPerTime.clear();
-    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+    for (int axis = 0; axis < NUM_AXIS; axis++) {
       mLinearAccelerationPerTime.add(new ArrayList<Float>());
       mGyroPerTime.add(new ArrayList<Float>());
     }
@@ -114,8 +119,8 @@ class GetData extends Handler implements Runnable, SensorEventListener {
    * Collecting data from sensor.
    */
   private void collect() {
-        if (mStatus == Enum.STATUS.DOWN) {
-          for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+        if (mStatus == DOWN) {
+          for (int axis = 0; axis < NUM_AXIS; axis++) {
             mLinearAccelerationPerTime.get(axis).add(mOriginLinearAcceleration[axis]);
             mGyroPerTime.get(axis).add(mOriginGyro[axis]);
           }
@@ -155,8 +160,8 @@ class GetData extends Handler implements Runnable, SensorEventListener {
 
   @Override
   public void onSensorChanged(SensorEvent event) {
-    if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) mOriginLinearAcceleration = event.values.clone();
-    if (event.sensor.getType() == Sensor.TYPE_GYROSCOPE) mOriginGyro = event.values.clone();
+    if (event.sensor.getType() == TYPE_LINEAR_ACCELERATION) mOriginLinearAcceleration = event.values.clone();
+    if (event.sensor.getType() == TYPE_GYROSCOPE) mOriginGyro = event.values.clone();
   }
 
 
@@ -169,8 +174,8 @@ class GetData extends Handler implements Runnable, SensorEventListener {
    * Register sensor listener.
    */
   void registrationSensor() {
-    mSensorManager.registerListener(this, mLinearAccelerationSensor, SensorManager.SENSOR_DELAY_GAME);
-    mSensorManager.registerListener(this, mGyroscopeSensor, SensorManager.SENSOR_DELAY_GAME);
+    mSensorManager.registerListener(this, mLinearAccelerationSensor, SENSOR_DELAY_GAME);
+    mSensorManager.registerListener(this, mGyroscopeSensor, SENSOR_DELAY_GAME);
   }
 
 

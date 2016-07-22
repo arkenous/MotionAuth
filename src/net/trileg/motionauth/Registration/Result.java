@@ -18,6 +18,8 @@ import net.trileg.motionauth.Utility.ManageData;
 
 import java.util.ArrayList;
 
+import static net.trileg.motionauth.Registration.InputName.name;
+
 /**
  * Register and show result to user.
  *
@@ -73,8 +75,8 @@ class Result extends Handler implements Runnable {
 
   @Override
   public void run() {
-    mManageData.writeFloatData(InputName.name, "RegRaw", "linearAcceleration", mLinearAccel);
-    mManageData.writeFloatData(InputName.name, "RegRaw", "gyroscope", mGyro);
+    mManageData.writeFloatData(name, "RegRaw", "linearAcceleration", mLinearAccel);
+    mManageData.writeFloatData(name, "RegRaw", "gyroscope", mGyro);
 
     result = calculate(mLinearAccel, mGyro);
     this.sendEmptyMessage(FINISH);
@@ -128,9 +130,9 @@ class Result extends Handler implements Runnable {
           alert.show();
         } else {
           // 3回のモーションの平均値をファイルに書き出す
-          mManageData.writeDoubleTwoArrayData(InputName.name, "RegRegistered", "linearDistance", averageLinearDistance);
-          mManageData.writeDoubleTwoArrayData(InputName.name, "RegRegistered", "angle", averageAngle);
-          mManageData.writeRegisterData(InputName.name, averageLinearDistance, averageAngle, mAmp, mContext);
+          mManageData.writeDoubleTwoArrayData(name, "RegRegistered", "linearDistance", averageLinearDistance);
+          mManageData.writeDoubleTwoArrayData(name, "RegRegistered", "angle", averageAngle);
+          mManageData.writeRegisterData(name, averageLinearDistance, averageAngle, mAmp, mContext);
 
           AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
           alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
@@ -176,16 +178,16 @@ class Result extends Handler implements Runnable {
     float[][][] linearAccel = adjusted.get(0);
     float[][][] gyro = adjusted.get(1);
 
-    mManageData.writeFloatData(InputName.name, "RegAdjusted", "linearAcceleration", linearAccel);
-    mManageData.writeFloatData(InputName.name, "RegAdjusted", "gyroscope", gyro);
+    mManageData.writeFloatData(name, "RegAdjusted", "linearAcceleration", linearAccel);
+    mManageData.writeFloatData(name, "RegAdjusted", "gyroscope", gyro);
 
     // データのフォーマット
     this.sendEmptyMessage(FORMAT);
     double[][][] linearAcceleration = mFormatter.convertFloatToDouble(linearAccel);
     double[][][] gyroscope = mFormatter.convertFloatToDouble(gyro);
 
-    mManageData.writeDoubleThreeArrayData(InputName.name, "RegFormatted", "linearAcceleration", linearAcceleration);
-    mManageData.writeDoubleThreeArrayData(InputName.name, "RegFormatted", "gyroscope", gyroscope);
+    mManageData.writeDoubleThreeArrayData(name, "RegFormatted", "linearAcceleration", linearAcceleration);
+    mManageData.writeDoubleThreeArrayData(name, "RegFormatted", "gyroscope", gyroscope);
 
     // データの増幅処理
     if (mAmplifier.CheckValueRange(linearAcceleration, mCheckRange)
@@ -195,16 +197,16 @@ class Result extends Handler implements Runnable {
       gyroscope = mAmplifier.Amplify(gyroscope, mAmp);
     }
 
-    mManageData.writeDoubleThreeArrayData(InputName.name, "RegAmplified", "linearAcceleration", linearAcceleration);
-    mManageData.writeDoubleThreeArrayData(InputName.name, "RegAmplified", "gyroscope", gyroscope);
+    mManageData.writeDoubleThreeArrayData(name, "RegAmplified", "linearAcceleration", linearAcceleration);
+    mManageData.writeDoubleThreeArrayData(name, "RegAmplified", "gyroscope", gyroscope);
 
     // フーリエ変換によるローパスフィルタ
     this.sendEmptyMessage(FOURIER);
-    linearAcceleration = mFourier.LowpassFilter(linearAcceleration, "LinearAcceleration");
-    gyroscope = mFourier.LowpassFilter(gyroscope, "Gyroscope");
+    linearAcceleration = mFourier.LowpassFilter(linearAcceleration, "LinearAcceleration", name);
+    gyroscope = mFourier.LowpassFilter(gyroscope, "Gyroscope", name);
 
-    mManageData.writeDoubleThreeArrayData(InputName.name, "RegLowpassed", "linearAcceleration", linearAcceleration);
-    mManageData.writeDoubleThreeArrayData(InputName.name, "RegLowpassed", "gyroscope", gyroscope);
+    mManageData.writeDoubleThreeArrayData(name, "RegLowpassed", "linearAcceleration", linearAcceleration);
+    mManageData.writeDoubleThreeArrayData(name, "RegLowpassed", "gyroscope", gyroscope);
 
     LogUtil.log(Log.DEBUG, "Finish fourier");
 
@@ -213,8 +215,8 @@ class Result extends Handler implements Runnable {
     double[][][] linearDistance = mCalc.accelToDistance(linearAcceleration, Enum.SENSOR_DELAY_TIME);
     double[][][] angle = mCalc.gyroToAngle(gyroscope, Enum.SENSOR_DELAY_TIME);
 
-    mManageData.writeDoubleThreeArrayData(InputName.name, "RegConverted", "linearDistance", linearDistance);
-    mManageData.writeDoubleThreeArrayData(InputName.name, "RegConverted", "angle", angle);
+    mManageData.writeDoubleThreeArrayData(name, "RegConverted", "linearDistance", linearDistance);
+    mManageData.writeDoubleThreeArrayData(name, "RegConverted", "angle", angle);
 
     LogUtil.log(Log.DEBUG, "After write data");
 
@@ -294,8 +296,8 @@ class Result extends Handler implements Runnable {
 
         LogUtil.log(Log.INFO, "MEASURE: " + String.valueOf(tmp));
 
-        mManageData.writeDoubleThreeArrayData(InputName.name, "DeviatedData" + String.valueOf(mode), "linearDistance", linearDistance);
-        mManageData.writeDoubleThreeArrayData(InputName.name, "DeviatedData" + String.valueOf(mode), "angle", angle);
+        mManageData.writeDoubleThreeArrayData(name, "DeviatedData" + String.valueOf(mode), "linearDistance", linearDistance);
+        mManageData.writeDoubleThreeArrayData(name, "DeviatedData" + String.valueOf(mode), "angle", angle);
 
 
         if (tmp == Enum.MEASURE.PERFECT || tmp == Enum.MEASURE.CORRECT) {
@@ -319,8 +321,8 @@ class Result extends Handler implements Runnable {
     }
     //endregion
 
-    mManageData.writeDoubleThreeArrayData(InputName.name, "AfterCalcData", "linearDistance", linearDistance);
-    mManageData.writeDoubleThreeArrayData(InputName.name, "AfterCalcData", "angle", angle);
+    mManageData.writeDoubleThreeArrayData(name, "AfterCalcData", "linearDistance", linearDistance);
+    mManageData.writeDoubleThreeArrayData(name, "AfterCalcData", "angle", angle);
 
     this.sendEmptyMessage(COSINE_SIMILARITY);
 

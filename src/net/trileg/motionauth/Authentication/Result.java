@@ -174,8 +174,8 @@ class Result extends Handler implements Runnable {
     gyroscope = mAmplifier.Amplify(gyroscope, mAmp);
 
     this.sendEmptyMessage(FOURIER);
-    linearAcceleration = mFourier.LowpassFilter(linearAcceleration, "linearAccel");
-    gyroscope = mFourier.LowpassFilter(gyroscope, "gyro");
+    linearAcceleration = mFourier.LowpassFilter(linearAcceleration, "linearAccel", userName);
+    gyroscope = mFourier.LowpassFilter(gyroscope, "gyro", userName);
 
     this.sendEmptyMessage(CONVERT);
     double[][] linearDistance = mCalc.accelToDistance(linearAcceleration, SENSOR_DELAY_TIME);

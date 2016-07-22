@@ -1,11 +1,12 @@
 package net.trileg.motionauth.Lowpass;
 
-import android.util.Log;
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
-import net.trileg.motionauth.Authentication.InputName;
-import net.trileg.motionauth.Utility.Enum;
-import net.trileg.motionauth.Utility.LogUtil;
 import net.trileg.motionauth.Utility.ManageData;
+
+import static android.util.Log.INFO;
+import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
+import static net.trileg.motionauth.Utility.Enum.NUM_TIME;
+import static net.trileg.motionauth.Utility.LogUtil.log;
 
 /**
  * Low pass filter using Fourier transform.
@@ -22,10 +23,11 @@ public class Fourier {
    *
    * @param data     Double type 3-array data you want to low pass filtering.
    * @param sensorName Sensor name.
+   * @param userName user name.
    * @return Low pass filtered double type 3-array data.
    */
-  public double[][][] LowpassFilter(double[][][] data, String sensorName) {
-    LogUtil.log(Log.INFO);
+  public double[][][] LowpassFilter(double[][][] data, String sensorName, String userName) {
+    log(INFO);
 
     DoubleFFT_1D realfft = new DoubleFFT_1D(data[0][0].length);
 
@@ -36,15 +38,15 @@ public class Fourier {
       }
     }
 
-    double[][][] real = new double[Enum.NUM_TIME][Enum.NUM_AXIS][data[0][0].length / 2];
-    double[][][] imaginary = new double[Enum.NUM_TIME][Enum.NUM_AXIS][data[0][0].length / 2];
+    double[][][] real = new double[NUM_TIME][NUM_AXIS][data[0][0].length / 2];
+    double[][][] imaginary = new double[NUM_TIME][NUM_AXIS][data[0][0].length / 2];
 
     int countReal;
     int countImaginary;
 
     // Decompose real-part and imaginary-part
-    for (int time = 0; time < Enum.NUM_TIME; time++) {
-      for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+    for (int time = 0; time < NUM_TIME; time++) {
+      for (int axis = 0; axis < NUM_AXIS; axis++) {
         countReal = 0;
         countImaginary = 0;
         for (int item = 0; item < data[time][axis].length; item++) {
@@ -59,24 +61,24 @@ public class Fourier {
       }
     }
 
-    mManageData.writeDoubleThreeArrayData(net.trileg.motionauth.Registration.InputName.name, "ResultFFT", "rFFT" + sensorName, real);
-    mManageData.writeDoubleThreeArrayData(net.trileg.motionauth.Registration.InputName.name, "ResultFFT", "iFFT" + sensorName, imaginary);
+    mManageData.writeDoubleThreeArrayData(userName, "ResultFFT", "rFFT" + sensorName, real);
+    mManageData.writeDoubleThreeArrayData(userName, "ResultFFT", "iFFT" + sensorName, imaginary);
 
-    double[][][] power = new double[Enum.NUM_TIME][Enum.NUM_AXIS][data[0][0].length / 2];
+    double[][][] power = new double[NUM_TIME][NUM_AXIS][data[0][0].length / 2];
 
-    for (int time = 0; time < Enum.NUM_TIME; time++) {
-      for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+    for (int time = 0; time < NUM_TIME; time++) {
+      for (int axis = 0; axis < NUM_AXIS; axis++) {
         for (int item = 0; item < data[time][axis].length / 2; item++) {
           power[time][axis][item] = Math.sqrt(Math.pow(real[time][axis][item], 2) + Math.pow(imaginary[time][axis][item], 2));
         }
       }
     }
 
-    mManageData.writeDoubleThreeArrayData(net.trileg.motionauth.Registration.InputName.name, "ResultFFT", "powerFFT" + sensorName, power);
+    mManageData.writeDoubleThreeArrayData(userName, "ResultFFT", "powerFFT" + sensorName, power);
 
     // Low pass filtering
-    for (int time = 0; time < Enum.NUM_TIME; time++) {
-      for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+    for (int time = 0; time < NUM_TIME; time++) {
+      for (int axis = 0; axis < NUM_AXIS; axis++) {
         for (int item = 0; item < data[time][axis].length; item++) {
           if (item > 30) data[time][axis][item] = 0;
         }
@@ -89,7 +91,7 @@ public class Fourier {
       }
     }
 
-    mManageData.writeDoubleThreeArrayData(net.trileg.motionauth.Registration.InputName.name, "AfterFFT", sensorName, data);
+    mManageData.writeDoubleThreeArrayData(userName, "AfterFFT", sensorName, data);
 
     return data;
   }
@@ -100,24 +102,25 @@ public class Fourier {
    *
    * @param data     Double type 2-array data you want to low pass filtering.
    * @param sensorName sensor name.
+   * @param userName user name.
    * @return Low pass filtered double type 2-array data.
    */
-  public double[][] LowpassFilter(double[][] data, String sensorName) {
-    LogUtil.log(Log.INFO);
+  public double[][] LowpassFilter(double[][] data, String sensorName, String userName) {
+    log(INFO);
 
     DoubleFFT_1D realfft = new DoubleFFT_1D(data[0].length);
 
     // Execute forward fourier transform
     for (double[] i : data) realfft.realForward(i);
 
-    double[][] real = new double[Enum.NUM_AXIS][data[0].length / 2];
-    double[][] imaginary = new double[Enum.NUM_AXIS][data[0].length / 2];
+    double[][] real = new double[NUM_AXIS][data[0].length / 2];
+    double[][] imaginary = new double[NUM_AXIS][data[0].length / 2];
 
     int countReal;
     int countImaginary;
 
     // Decompose real-part and imaginary-part
-    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+    for (int axis = 0; axis < NUM_AXIS; axis++) {
       countReal = 0;
       countImaginary = 0;
       for (int item = 0; item < data[axis].length; item++) {
@@ -132,20 +135,20 @@ public class Fourier {
       }
     }
 
-    mManageData.writeDoubleTwoArrayData(InputName.userName, "ResultFFT", "rFFT" + sensorName, real);
-    mManageData.writeDoubleTwoArrayData(InputName.userName, "ResultFFT", "iFFT" + sensorName, imaginary);
+    mManageData.writeDoubleTwoArrayData(userName, "ResultFFT", "rFFT" + sensorName, real);
+    mManageData.writeDoubleTwoArrayData(userName, "ResultFFT", "iFFT" + sensorName, imaginary);
 
-    double[][] power = new double[Enum.NUM_AXIS][data[0].length / 2];
-    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+    double[][] power = new double[NUM_AXIS][data[0].length / 2];
+    for (int axis = 0; axis < NUM_AXIS; axis++) {
       for (int item = 0; item < data[axis].length / 2; item++) {
         power[axis][item] = Math.sqrt(Math.pow(real[axis][item], 2) + Math.pow(imaginary[axis][item], 2));
       }
     }
 
-    mManageData.writeDoubleTwoArrayData(InputName.userName, "ResultFFT", "powerFFT" + sensorName, power);
+    mManageData.writeDoubleTwoArrayData(userName, "ResultFFT", "powerFFT" + sensorName, power);
 
     // Low pass filtering
-    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+    for (int axis = 0; axis < NUM_AXIS; axis++) {
       for (int item = 0; item < data[axis].length; item++) {
         if (item > 30) data[axis][item] = 0;
       }
@@ -154,7 +157,7 @@ public class Fourier {
     // Execute inverse fourier transform
     for (double[] i : data) realfft.realInverse(i, true);
 
-    mManageData.writeDoubleTwoArrayData(InputName.userName, "AfterFFT", sensorName, data);
+    mManageData.writeDoubleTwoArrayData(userName, "AfterFFT", sensorName, data);
 
     return data;
   }

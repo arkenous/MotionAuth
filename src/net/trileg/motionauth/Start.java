@@ -6,12 +6,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import net.trileg.motionauth.Utility.LogUtil;
+
+import static android.content.Intent.*;
+import static android.util.Log.*;
+import static android.view.KeyEvent.KEYCODE_BACK;
+import static net.trileg.motionauth.Utility.LogUtil.*;
 
 
 /**
@@ -31,9 +34,9 @@ public class Start extends Activity {
 
     // Read log configuration file and switch log output.
     boolean isShowLog = getResources().getBoolean(R.bool.isShowLog);
-    LogUtil.setShowLog(isShowLog);
+    setShowLog(isShowLog);
 
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     // Disable title bar.
     requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -47,20 +50,20 @@ public class Start extends Activity {
    * Select mode.
    */
   private void selectMode() {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     Button startBtn = (Button) findViewById(R.id.start);
     startBtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        LogUtil.log(Log.VERBOSE, "Click start button.");
+        log(VERBOSE, "Click start button.");
 
         String[] btnMsg = {"View data", "Authentication", "Registration"};
         AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
         alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
           @Override
           public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-            if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (keyCode == KEYCODE_BACK) {
               // Close dialog and finish activity if user click BACK KEY when dialog is showing.
               dialog.dismiss();
               finish();
@@ -107,11 +110,11 @@ public class Start extends Activity {
    * @param flg     Whether to show this activity if user push BACK KEY.
    */
   private void moveActivity(String pkgName, String actName, boolean flg) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     Intent intent = new Intent();
     intent.setClassName(pkgName, actName);
-    if (flg) intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+    if (flg) intent.setFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_NEW_TASK);
 
     startActivity(intent);
   }

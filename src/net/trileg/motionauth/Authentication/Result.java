@@ -2,21 +2,25 @@ package net.trileg.motionauth.Authentication;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.widget.Button;
 import net.trileg.motionauth.Lowpass.Fourier;
 import net.trileg.motionauth.Processing.*;
 import net.trileg.motionauth.Utility.Enum;
-import net.trileg.motionauth.Utility.LogUtil;
 import net.trileg.motionauth.Utility.ManageData;
 
 import java.util.ArrayList;
+
+import static android.content.Context.MODE_PRIVATE;
+import static android.util.Log.*;
+import static net.trileg.motionauth.Authentication.InputName.userName;
+import static net.trileg.motionauth.Utility.Enum.MEASURE.*;
+import static net.trileg.motionauth.Utility.Enum.SENSOR_DELAY_TIME;
+import static net.trileg.motionauth.Utility.LogUtil.log;
 
 /**
  * Authenticate and show result to user.
@@ -52,8 +56,8 @@ class Result extends Handler implements Runnable {
   private boolean result = false;
 
 
-  Result(Authentication authentication, float[][] linearAccel, float[][] gyro, Button getMotion,
-         ProgressDialog progressDialog, GetData getData) {
+  Result(Authentication authentication, float[][] linearAccel, float[][] gyro,
+         Button getMotion, ProgressDialog progressDialog, GetData getData) {
     mAuthentication = authentication;
     mLinearAccel = linearAccel;
     mGyro = gyro;
@@ -65,12 +69,12 @@ class Result extends Handler implements Runnable {
 
   @Override
   public void run() {
-    mManageData.writeFloatData(InputName.userName, "AuthenticationRaw", "linearAcceleration", mLinearAccel);
-    mManageData.writeFloatData(InputName.userName, "AuthenticationRaw", "gyroscope", mGyro);
+    mManageData.writeFloatData(userName, "AuthenticationRaw", "linearAcceleration", mLinearAccel);
+    mManageData.writeFloatData(userName, "AuthenticationRaw", "gyroscope", mGyro);
 
     readRegisteredData();
-    mManageData.writeDoubleTwoArrayData(InputName.userName, "AuthRegistered", "linearDistance", registeredLinearDistance);
-    mManageData.writeDoubleTwoArrayData(InputName.userName, "AuthRegistered", "angle", registeredAngle);
+    mManageData.writeDoubleTwoArrayData(userName, "AuthRegistered", "linearDistance", registeredLinearDistance);
+    mManageData.writeDoubleTwoArrayData(userName, "AuthRegistered", "angle", registeredAngle);
     result = calculate(mLinearAccel, mGyro);
 
     this.sendEmptyMessage(FINISH);
@@ -102,7 +106,7 @@ class Result extends Handler implements Runnable {
       case FINISH:
         mProgressDialog.dismiss();
         if (!result) {
-          LogUtil.log(Log.INFO, "False authentication");
+          log(INFO, "False authentication");
           AlertDialog.Builder alert = new AlertDialog.Builder(mAuthentication);
           alert.setTitle("認証失敗");
           alert.setMessage("認証に失敗しました");
@@ -115,7 +119,7 @@ class Result extends Handler implements Runnable {
           });
           alert.show();
         } else {
-          LogUtil.log(Log.INFO, "Success authentication");
+          log(INFO, "Success authentication");
           AlertDialog.Builder alert = new AlertDialog.Builder(mAuthentication);
           alert.setTitle("認証成功");
           alert.setMessage("認証に成功しました．\nスタート画面に戻ります");
@@ -138,12 +142,12 @@ class Result extends Handler implements Runnable {
    */
   private void readRegisteredData() {
     this.sendEmptyMessage(READ_DATA);
-    ArrayList<double[][]> readDataList = mManageData.readRegisteredData(mAuthentication, InputName.userName);
+    ArrayList<double[][]> readDataList = mManageData.readRegisteredData(mAuthentication, userName);
     registeredLinearDistance = readDataList.get(0);
     registeredAngle = readDataList.get(1);
 
-    SharedPreferences preferences = mAuthentication.getApplicationContext().getSharedPreferences("MotionAuth", Context.MODE_PRIVATE);
-    String registeredAmplify = preferences.getString(InputName.userName + "amplify", "");
+    SharedPreferences preferences = mAuthentication.getApplicationContext().getSharedPreferences("MotionAuth", MODE_PRIVATE);
+    String registeredAmplify = preferences.getString(userName + "amplify", "");
     if ("".equals(registeredAmplify)) throw new RuntimeException();
     mAmp = Double.valueOf(registeredAmplify);
   }
@@ -153,7 +157,7 @@ class Result extends Handler implements Runnable {
    * Calculate data and authenticate.
    *
    * @param linearAccel Linear acceleration data which collect in Authentication.GetData.
-   * @param gyro  Gyroscope data which collect in Authentication.GetData.
+   * @param gyro        Gyroscope data which collect in Authentication.GetData.
    * @return true if authentication is succeed, otherwise false.
    */
   private boolean calculate(float[][] linearAccel, float[][] gyro) {
@@ -174,20 +178,20 @@ class Result extends Handler implements Runnable {
     gyroscope = mFourier.LowpassFilter(gyroscope, "gyro");
 
     this.sendEmptyMessage(CONVERT);
-    double[][] linearDistance = mCalc.accelToDistance(linearAcceleration, Enum.SENSOR_DELAY_TIME);
-    double[][] angle = mCalc.gyroToAngle(gyroscope, Enum.SENSOR_DELAY_TIME);
+    double[][] linearDistance = mCalc.accelToDistance(linearAcceleration, SENSOR_DELAY_TIME);
+    double[][] angle = mCalc.gyroToAngle(gyroscope, SENSOR_DELAY_TIME);
 
-    mManageData.writeDoubleTwoArrayData(InputName.userName, "AuthAfterCalcData", "linearDistance", linearDistance);
-    mManageData.writeDoubleTwoArrayData(InputName.userName, "AuthAfterCalcData", "angle", angle);
+    mManageData.writeDoubleTwoArrayData(userName, "AuthAfterCalcData", "linearDistance", linearDistance);
+    mManageData.writeDoubleTwoArrayData(userName, "AuthAfterCalcData", "angle", angle);
 
     // コサイン類似度を測る
-    LogUtil.log(Log.INFO, "Before Cosine Similarity");
+    log(INFO, "Before Cosine Similarity");
     double linearDistanceSimilarity = mCosSimilarity.cosSimilarity(linearDistance, registeredLinearDistance);
     double angleSimilarity = mCosSimilarity.cosSimilarity(angle, registeredAngle);
-    LogUtil.log(Log.INFO, "After Cosine Similarity");
+    log(INFO, "After Cosine Similarity");
 
     this.sendEmptyMessage(COSINE_SIMILARITY);
     Enum.MEASURE measure = mCosSimilarity.measure(linearDistanceSimilarity, angleSimilarity);
-    return measure == Enum.MEASURE.PERFECT || measure == Enum.MEASURE.CORRECT;
+    return measure == PERFECT || measure == CORRECT;
   }
 }

@@ -1,8 +1,8 @@
 package net.trileg.motionauth.Processing;
 
-import net.trileg.motionauth.Utility.Enum;
-
 import java.util.ArrayList;
+
+import static net.trileg.motionauth.Utility.Enum.*;
 
 /**
  * Adjustment data length.
@@ -39,9 +39,9 @@ public class Adjuster {
     float[][][] linearAccelerationArray = new float[linearAcceleration.length][linearAcceleration[0].length][maxLength];
     float[][][] gyroscopeArray = new float[gyroscope.length][gyroscope[0].length][maxLength];
 
-    for (int time = 0; time < Enum.NUM_TIME; time++) {
+    for (int time = 0; time < NUM_TIME; time++) {
       if (time == maxTime) {
-        for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+        for (int axis = 0; axis < NUM_AXIS; axis++) {
           for (int length = 0; length < maxLength; length++) {
             linearAccelerationArray[time][axis][length] = linearAcceleration[time][axis][length];
             gyroscopeArray[time][axis][length] = gyroscope[time][axis][length];
@@ -50,7 +50,7 @@ public class Adjuster {
       } else {
         int diff = maxLength - linearAcceleration[time][0].length;
 
-        for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+        for (int axis = 0; axis < NUM_AXIS; axis++) {
           for (int length = 0; length < maxLength; length++) {
             if (length < maxLength - diff) {
               linearAccelerationArray[time][axis][length] = linearAcceleration[time][axis][length];
@@ -79,7 +79,7 @@ public class Adjuster {
 
     if (registeredDataLength < linearAcceleration[0].length) {
       // New data is longer than registered data.
-      for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+      for (int axis = 0; axis < NUM_AXIS; axis++) {
         for (int length = 0; length < registeredDataLength; length++) {
           linearAccelerationArray[axis][length] = linearAcceleration[axis][length];
           gyroscopeArray[axis][length] = gyroscope[axis][length];
@@ -89,7 +89,7 @@ public class Adjuster {
       // New data is shorter than registered data.
       int diff = registeredDataLength - linearAcceleration[0].length;
 
-      for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+      for (int axis = 0; axis < NUM_AXIS; axis++) {
         for (int length = 0; length < registeredDataLength; length++) {
           if (length < registeredDataLength - diff) {
             linearAccelerationArray[axis][length] = linearAcceleration[axis][length];
@@ -101,7 +101,7 @@ public class Adjuster {
         }
       }
     } else {
-      for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+      for (int axis = 0; axis < NUM_AXIS; axis++) {
         for (int length = 0; length < registeredDataLength; length++) {
           linearAccelerationArray[axis][length] = linearAcceleration[axis][length];
           gyroscopeArray[axis][length] = gyroscope[axis][length];

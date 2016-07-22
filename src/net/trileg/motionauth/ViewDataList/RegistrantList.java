@@ -7,17 +7,19 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import net.trileg.motionauth.R;
-import net.trileg.motionauth.Utility.LogUtil;
 
 import java.util.ArrayList;
 import java.util.Map;
+
+import static android.content.Intent.*;
+import static android.util.Log.*;
+import static net.trileg.motionauth.Utility.LogUtil.log;
 
 
 /**
@@ -33,7 +35,7 @@ public class RegistrantList extends Activity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     // Disable title bar.
     requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -48,7 +50,7 @@ public class RegistrantList extends Activity {
    * Send user name to ViewRegisteredData when user name is selected.
    */
   private void registrantList() {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     // Create registered user name list.
     ArrayList<String> userList = getRegistrantName();
@@ -80,7 +82,7 @@ public class RegistrantList extends Activity {
     lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-        LogUtil.log(Log.VERBOSE, "Click item");
+        log(VERBOSE, "Click item");
 
         // Get item value which selected.
         item = lv.getItemAtPosition(position).toString();
@@ -97,10 +99,10 @@ public class RegistrantList extends Activity {
    * @return Created String type list.
    */
   private ArrayList<String> getRegistrantName() {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     Context mContext = RegistrantList.this.getApplicationContext();
-    SharedPreferences preferences = mContext.getSharedPreferences("UserList", Context.MODE_PRIVATE);
+    SharedPreferences preferences = mContext.getSharedPreferences("UserList", MODE_PRIVATE);
 
     ArrayList<String> keyList = new ArrayList<>();
 
@@ -119,12 +121,12 @@ public class RegistrantList extends Activity {
    * @param flg     Whether to show this activity if user push BACK KEY.
    */
   private void moveActivity(String pkgName, String actName, boolean flg) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     Intent intent = new Intent();
     intent.setClassName(pkgName, actName);
     if (actName.equals(getPackageName() + ".ViewDataList.ViewRegisteredData")) intent.putExtra("item", item);
-    if (flg) intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+    if (flg) intent.setFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_NEW_TASK);
 
     startActivity(intent);
   }

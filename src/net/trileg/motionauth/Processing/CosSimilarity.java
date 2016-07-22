@@ -1,12 +1,14 @@
 package net.trileg.motionauth.Processing;
 
-import android.util.Log;
-import net.trileg.motionauth.Utility.Enum;
-import net.trileg.motionauth.Utility.LogUtil;
+import static android.util.Log.*;
+import static net.trileg.motionauth.Utility.LogUtil.*;
+
+import static net.trileg.motionauth.Utility.Enum.*;
+import static net.trileg.motionauth.Utility.Enum.MEASURE.*;
 
 public class CosSimilarity {
   public double[] cosSimilarity(double[][][] input) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
     double[] similarity = new double[input.length];
 
     for (int time = 0; time < input.length; time++) {
@@ -27,18 +29,18 @@ public class CosSimilarity {
     }
 
     // 取得回数AB, AC, BCそれぞれの類似度が出るはずなので，これから判断する
-    LogUtil.log(Log.INFO, "---   CosSimilarity data begin here   ---");
+    log(INFO, "---   CosSimilarity data begin here   ---");
     for (double data : similarity) {
-      LogUtil.log(Log.INFO, String.valueOf("similarity: " + data));
+      log(INFO, String.valueOf("similarity: " + data));
     }
-    LogUtil.log(Log.INFO, "---   CosSimilarity data end here   ---");
+    log(INFO, "---   CosSimilarity data end here   ---");
 
     return similarity;
   }
 
 
   public double cosSimilarity(double[][] A, double[][] B) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
     double similarity = 0.0;
 
     for (int item = 0; item < A[0].length; item++) {
@@ -51,16 +53,16 @@ public class CosSimilarity {
 
     similarity /= A[0].length;
 
-    LogUtil.log(Log.INFO, "---   CosSimilarity data begin here ---");
-    LogUtil.log(Log.INFO, String.valueOf("similarity: " + similarity));
-    LogUtil.log(Log.INFO, "---   CosSimilarity data end here ---");
+    log(INFO, "---   CosSimilarity data begin here ---");
+    log(INFO, String.valueOf("similarity: " + similarity));
+    log(INFO, "---   CosSimilarity data end here ---");
 
     return similarity;
   }
 
 
-  public Enum.MEASURE measure(double[] linearDistance, double[] angle) {
-    LogUtil.log(Log.INFO);
+  public MEASURE measure(double[] linearDistance, double[] angle) {
+    log(INFO);
     double[] combined = new double[linearDistance.length + angle.length];
     int combinedCount = 0;
 
@@ -79,24 +81,24 @@ public class CosSimilarity {
     }
     average /= combined.length;
 
-    if (average > Enum.LOOSE) {
-      if (average > Enum.NORMAL) {
-        if (average > Enum.STRICT) {
-          return Enum.MEASURE.PERFECT;
+    if (average > LOOSE) {
+      if (average > NORMAL) {
+        if (average > STRICT) {
+          return PERFECT;
         }
-        return Enum.MEASURE.CORRECT;
+        return CORRECT;
       }
-      return Enum.MEASURE.MAYBE;
+      return MAYBE;
     }
-    return Enum.MEASURE.INCORRECT;
+    return INCORRECT;
   }
 
 
-  public Enum.MEASURE measure(double linearDistance, double angle) {
-    LogUtil.log(Log.INFO);
-    if (Enum.STRICT < linearDistance && Enum.STRICT < angle) return Enum.MEASURE.PERFECT;
-    else if (Enum.NORMAL < linearDistance && Enum.NORMAL < angle) return Enum.MEASURE.CORRECT;
-    else if (Enum.LOOSE < linearDistance && Enum.LOOSE < angle) return Enum.MEASURE.MAYBE;
-    else return Enum.MEASURE.INCORRECT;
+  public MEASURE measure(double linearDistance, double angle) {
+    log(INFO);
+    if (STRICT < linearDistance && STRICT < angle) return PERFECT;
+    else if (NORMAL < linearDistance && NORMAL < angle) return CORRECT;
+    else if (LOOSE < linearDistance && LOOSE < angle) return MAYBE;
+    else return INCORRECT;
   }
 }

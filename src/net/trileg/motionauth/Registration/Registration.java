@@ -7,19 +7,24 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.util.Log;
 import android.view.*;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import net.trileg.motionauth.R;
-import net.trileg.motionauth.Utility.Enum.STATUS;
 import net.trileg.motionauth.Utility.ListToArray;
-import net.trileg.motionauth.Utility.LogUtil;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static android.content.Intent.*;
+import static android.util.Log.*;
+import static android.view.KeyEvent.KEYCODE_BACK;
+import static android.view.MotionEvent.*;
+import static net.trileg.motionauth.Registration.InputName.userName;
+import static net.trileg.motionauth.Utility.Enum.STATUS.*;
+import static net.trileg.motionauth.Utility.LogUtil.log;
 
 /**
  * Registration.
@@ -42,7 +47,7 @@ public class Registration extends Activity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     setContentView(R.layout.activity_regist_motion);
     mRegistration = this;
@@ -54,7 +59,7 @@ public class Registration extends Activity {
    * Registration event listener and call GetData using ExecutorService to collect data.
    */
   private void registration() {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     Vibrator mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
     TextView nameTv = (TextView) findViewById(R.id.textView2);
@@ -62,28 +67,28 @@ public class Registration extends Activity {
     countSecondTv = (TextView) findViewById(R.id.textView4);
     getMotionBtn = (Button) findViewById(R.id.button1);
 
-    nameTv.setText(InputName.userName + "さん読んでね！");
-    mGetData = new GetData(mRegistration, getMotionBtn, secondTv, countSecondTv, mVibrator, STATUS.UP, this);
+    nameTv.setText(userName + "さん読んでね！");
+    mGetData = new GetData(mRegistration, getMotionBtn, secondTv, countSecondTv, mVibrator, UP, this);
 
     getMotionBtn.setOnTouchListener(new View.OnTouchListener() {
       @Override
       public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction()) {
-          case MotionEvent.ACTION_DOWN:
-            LogUtil.log(Log.VERBOSE, "Action down getMotionBtn");
+          case ACTION_DOWN:
+            log(VERBOSE, "Action down getMotionBtn");
             getMotionBtn.setText("取得中");
-            mGetData.changeStatus(STATUS.DOWN);
+            mGetData.changeStatus(DOWN);
             ExecutorService executorService = Executors.newSingleThreadExecutor();
             executorService.execute(mGetData);
             executorService.shutdown();
             break;
-          case MotionEvent.ACTION_UP:
-            LogUtil.log(Log.VERBOSE, "Action up getMotionBtn");
-            mGetData.changeStatus(STATUS.UP);
+          case ACTION_UP:
+            log(VERBOSE, "Action up getMotionBtn");
+            mGetData.changeStatus(UP);
             break;
-          case MotionEvent.ACTION_CANCEL:
-            LogUtil.log(Log.VERBOSE, "Action cancel getMotionBtn");
-            mGetData.changeStatus(STATUS.UP);
+          case ACTION_CANCEL:
+            log(VERBOSE, "Action cancel getMotionBtn");
+            mGetData.changeStatus(UP);
             break;
         }
         return true;
@@ -97,16 +102,16 @@ public class Registration extends Activity {
    * Call Result using ExecutorService to register and show result.
    *
    * @param linearAcceleration Original linear acceleration data collecting from GetData.
-   * @param gyro  Original gyroscope data collecting from GetData.
+   * @param gyro               Original gyroscope data collecting from GetData.
    */
   void finishGetMotion(ArrayList<ArrayList<ArrayList<Float>>> linearAcceleration,
                        ArrayList<ArrayList<ArrayList<Float>>> gyro) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
     if (getMotionBtn.isClickable()) getMotionBtn.setClickable(false);
     secondTv.setText("0");
     getMotionBtn.setText("データ処理中");
 
-    LogUtil.log(Log.DEBUG, "Start initialize progress dialog");
+    log(DEBUG, "Start initialize progress dialog");
 
     ProgressDialog progressDialog = new ProgressDialog(this);
     progressDialog.setTitle("計算処理中");
@@ -115,7 +120,7 @@ public class Registration extends Activity {
     progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
     progressDialog.setCancelable(false);
 
-    LogUtil.log(Log.DEBUG, "Finish initialize Progress dialog");
+    log(DEBUG, "Finish initialize Progress dialog");
 
     progressDialog.show();
 
@@ -131,7 +136,7 @@ public class Registration extends Activity {
   @Override
   protected void onResume() {
     super.onResume();
-    LogUtil.log(Log.INFO);
+    log(INFO);
     mGetData.registrationSensor();
   }
 
@@ -139,7 +144,7 @@ public class Registration extends Activity {
   @Override
   protected void onPause() {
     super.onPause();
-    LogUtil.log(Log.INFO);
+    log(INFO);
     mGetData.unRegistrationSensor();
   }
 
@@ -224,7 +229,7 @@ public class Registration extends Activity {
           dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
             @Override
             public boolean onKey(DialogInterface dialog1, int keyCode, KeyEvent event) {
-              return keyCode == KeyEvent.KEYCODE_BACK;
+              return keyCode == KEYCODE_BACK;
             }
           });
           dialog.setTitle("増幅器設定");
@@ -246,7 +251,7 @@ public class Registration extends Activity {
           alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
             @Override
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-              return keyCode == KeyEvent.KEYCODE_BACK;
+              return keyCode == KEYCODE_BACK;
             }
           });
           alert.setCancelable(false);
@@ -277,11 +282,11 @@ public class Registration extends Activity {
    * Move to Start activity.
    */
   void finishRegistration() {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     Intent intent = new Intent();
     intent.setClassName(getPackageName(), getPackageName() + ".Start");
-    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+    intent.setFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_NEW_TASK);
 
     startActivity(intent);
     finish();

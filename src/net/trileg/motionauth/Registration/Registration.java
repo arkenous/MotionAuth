@@ -62,7 +62,7 @@ public class Registration extends Activity {
     countSecondTv = (TextView) findViewById(R.id.textView4);
     getMotionBtn = (Button) findViewById(R.id.button1);
 
-    nameTv.setText(InputName.name + "さん読んでね！");
+    nameTv.setText(InputName.userName + "さん読んでね！");
     mGetData = new GetData(mRegistration, getMotionBtn, secondTv, countSecondTv, mVibrator, STATUS.UP, this);
 
     getMotionBtn.setOnTouchListener(new View.OnTouchListener() {

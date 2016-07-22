@@ -26,7 +26,7 @@ import static net.trileg.motionauth.Utility.LogUtil.log;
  * @author Kensuke Kosaka
  */
 public class InputName extends Activity {
-  public static String name;
+  public static String userName;
 
 
   @Override
@@ -39,7 +39,7 @@ public class InputName extends Activity {
     requestWindowFeature(Window.FEATURE_NO_TITLE);
     setContentView(R.layout.activity_regist_name_input);
 
-    name = "";
+    userName = "";
 
     nameInput();
   }
@@ -64,7 +64,7 @@ public class InputName extends Activity {
 
       // After text changed.
       public void afterTextChanged(Editable s) {
-        if (nameInput.getText() != null) name = nameInput.getText().toString().trim();
+        if (nameInput.getText() != null) userName = nameInput.getText().toString().trim();
       }
     });
 
@@ -90,7 +90,7 @@ public class InputName extends Activity {
       public void onClick(View v) {
         log(DEBUG, "Click ok button");
         // Check user inputted name is correctly.
-        if (name.length() == 0) {
+        if (userName.length() == 0) {
           Toast.makeText(InputName.this, "名前が入力されていません", Toast.LENGTH_LONG).show();
         } else {
           InputName.this.moveActivity(getPackageName(), getPackageName() + ".Registration.Registration", true);

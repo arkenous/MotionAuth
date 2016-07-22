@@ -4,8 +4,7 @@ import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 import net.trileg.motionauth.Utility.ManageData;
 
 import static android.util.Log.INFO;
-import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
-import static net.trileg.motionauth.Utility.Enum.NUM_TIME;
+import static net.trileg.motionauth.Utility.Enum.*;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
 /**

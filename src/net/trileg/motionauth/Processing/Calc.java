@@ -1,8 +1,8 @@
 package net.trileg.motionauth.Processing;
 
-import android.util.Log;
-import net.trileg.motionauth.Utility.Enum;
-import net.trileg.motionauth.Utility.LogUtil;
+import static android.util.Log.INFO;
+import static net.trileg.motionauth.Utility.Enum.*;
+import static net.trileg.motionauth.Utility.LogUtil.log;
 
 /**
  * Calculate distance or angle from acceleration or gyroscope.
@@ -19,12 +19,12 @@ public class Calc {
    * @return After converted 3-array distance data.
    */
   public double[][][] accelToDistance(double[][][] inputVal, double t) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
-    double[][][] returnVal = new double[Enum.NUM_TIME][Enum.NUM_AXIS][inputVal[0][0].length];
+    double[][][] returnVal = new double[NUM_TIME][NUM_AXIS][inputVal[0][0].length];
 
-    for (int time = 0; time < Enum.NUM_TIME; time++) {
-      for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+    for (int time = 0; time < NUM_TIME; time++) {
+      for (int axis = 0; axis < NUM_AXIS; axis++) {
         for (int item = 0; item < inputVal[time][axis].length; item++) {
           returnVal[time][axis][item] = (inputVal[time][axis][item] * t * t) / 2;
         }
@@ -43,12 +43,12 @@ public class Calc {
    * @return After converted 3-array angle data.
    */
   public double[][][] gyroToAngle(double[][][] inputVal, double t) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
-    double[][][] returnVal = new double[Enum.NUM_TIME][Enum.NUM_AXIS][inputVal[0][0].length];
+    double[][][] returnVal = new double[NUM_TIME][NUM_AXIS][inputVal[0][0].length];
 
-    for (int time = 0; time < Enum.NUM_TIME; time++) {
-      for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+    for (int time = 0; time < NUM_TIME; time++) {
+      for (int axis = 0; axis < NUM_AXIS; axis++) {
         for (int item = 0; item < inputVal[time][axis].length; item++) {
           returnVal[time][axis][item] = (inputVal[time][axis][item] * t);
         }
@@ -67,11 +67,11 @@ public class Calc {
    * @return After converted 2-array distance data.
    */
   public double[][] accelToDistance(double[][] inputVal, double t) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
-    double[][] returnVal = new double[Enum.NUM_AXIS][inputVal[0].length];
+    double[][] returnVal = new double[NUM_AXIS][inputVal[0].length];
 
-    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+    for (int axis = 0; axis < NUM_AXIS; axis++) {
       for (int item = 0; item < inputVal[axis].length; item++) {
         returnVal[axis][item] = (inputVal[axis][item] * t * t) / 2;
       }
@@ -89,11 +89,11 @@ public class Calc {
    * @return After converted 2-array angle data.
    */
   public double[][] gyroToAngle(double[][] inputVal, double t) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
-    double[][] returnVal = new double[Enum.NUM_AXIS][inputVal[0].length];
+    double[][] returnVal = new double[NUM_AXIS][inputVal[0].length];
 
-    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+    for (int axis = 0; axis < NUM_AXIS; axis++) {
       for (int item = 0; item < inputVal[axis].length; item++) {
         returnVal[axis][item] = (inputVal[axis][item] * t);
       }

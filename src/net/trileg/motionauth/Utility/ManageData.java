@@ -3,11 +3,17 @@ package net.trileg.motionauth.Utility;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
-import android.util.Log;
 import net.trileg.motionauth.Processing.CipherCrypt;
 
 import java.io.*;
 import java.util.ArrayList;
+
+import static android.content.Context.MODE_PRIVATE;
+import static android.os.Environment.MEDIA_MOUNTED;
+import static android.util.Log.*;
+import static java.io.File.separator;
+import static net.trileg.motionauth.Utility.Enum.*;
+import static net.trileg.motionauth.Utility.LogUtil.log;
 
 
 /**
@@ -30,32 +36,32 @@ public class ManageData {
    * @return Return true when write data complete, otherwise false.
    */
   public boolean writeDoubleTwoArrayData(String userName, String dataName, String sensorName, double[][] data) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     String status = Environment.getExternalStorageState();
-    if (!status.equals(Environment.MEDIA_MOUNTED)) {
-      LogUtil.log(Log.ERROR, "SDCard not mounted");
+    if (!status.equals(MEDIA_MOUNTED)) {
+      log(ERROR, "SDCard not mounted");
       return false;
     }
 
     String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-    String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + userName + File.separator + dataName;
+    String FOLDER_PATH = SD_PATH + separator + APP_NAME + separator + userName + separator + dataName;
 
     File file = new File(FOLDER_PATH);
 
     try {
       if (!file.exists()) {
         if (!file.mkdirs()) {
-          LogUtil.log(Log.ERROR, "Make directory error");
+          log(ERROR, "Make directory error");
         }
       }
     } catch (Exception e) {
-      LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
+      log(ERROR, e.getMessage(), e.getCause());
       return false;
     }
 
     try {
-      String filePath = FOLDER_PATH + File.separator + sensorName + ".dat";
+      String filePath = FOLDER_PATH + separator + sensorName + ".dat";
       file = new File(filePath);
 
       fos = new FileOutputStream(file, false);
@@ -71,7 +77,7 @@ public class ManageData {
       osw.close();
       fos.close();
     } catch (Exception e) {
-      LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
+      log(ERROR, e.getMessage(), e.getCause());
       return false;
     }
     return true;
@@ -85,31 +91,31 @@ public class ManageData {
    * @param data       Double type 3-array data to write.
    */
   public void writeDoubleThreeArrayData(String userName, String dataName, String sensorName, double[][][] data) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     String status = Environment.getExternalStorageState();
-    if (!status.equals(Environment.MEDIA_MOUNTED)) {
-      LogUtil.log(Log.ERROR, "SDCard not mounted");
+    if (!status.equals(MEDIA_MOUNTED)) {
+      log(ERROR, "SDCard not mounted");
     }
 
     String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-    String FOLDER_PATH = SD_PATH + File.separator + APP_NAME + File.separator + userName + File.separator + dataName;
+    String FOLDER_PATH = SD_PATH + separator + APP_NAME + separator + userName + separator + dataName;
 
     File file = new File(FOLDER_PATH);
 
     try {
       if (!file.exists()) {
         if (!file.mkdirs()) {
-          LogUtil.log(Log.ERROR, "Make directory Error");
+          log(ERROR, "Make directory Error");
         }
       }
     } catch (Exception e) {
-      LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
+      log(ERROR, e.getMessage(), e.getCause());
     }
 
     try {
-      for (int time = 0; time < Enum.NUM_TIME; time++) {
-        String filePath = FOLDER_PATH + File.separator + sensorName + String.valueOf(time) + ".dat";
+      for (int time = 0; time < NUM_TIME; time++) {
+        String filePath = FOLDER_PATH + separator + sensorName + String.valueOf(time) + ".dat";
         file = new File(filePath);
 
         fos = new FileOutputStream(file, false);
@@ -126,7 +132,7 @@ public class ManageData {
         fos.close();
       }
     } catch (Exception e) {
-      LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
+      log(ERROR, e.getMessage(), e.getCause());
     }
   }
 
@@ -143,14 +149,14 @@ public class ManageData {
   public void writeRegisterData(String userName, double[][] averageLinearDistance,
                                 double[][] averageAngle, double ampValue, Context context) {
 
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     CipherCrypt mCipherCrypt = new CipherCrypt(context);
 
     String[][] averageLinearDistanceStr = new String[averageLinearDistance.length][averageLinearDistance[0].length];
     String[][] averageAngleStr = new String[averageAngle.length][averageAngle[0].length];
 
-    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+    for (int axis = 0; axis < NUM_AXIS; axis++) {
       for (int item = 0; item < averageLinearDistance[axis].length; item++) {
         averageLinearDistanceStr[axis][item] = String.valueOf(averageLinearDistance[axis][item]);
         averageAngleStr[axis][item] = String.valueOf(averageAngle[axis][item]);
@@ -167,13 +173,13 @@ public class ManageData {
     String registerAngleData = mConvertArrayAndString.arrayToString(encryptedAverageAngleStr);
 
     Context mContext = context.getApplicationContext();
-    SharedPreferences userPref = mContext.getSharedPreferences("UserList", Context.MODE_PRIVATE);
+    SharedPreferences userPref = mContext.getSharedPreferences("UserList", MODE_PRIVATE);
     SharedPreferences.Editor userPrefEditor = userPref.edit();
 
     userPrefEditor.putString(userName, "");
     userPrefEditor.apply();
 
-    SharedPreferences preferences = mContext.getSharedPreferences(APP_NAME, Context.MODE_PRIVATE);
+    SharedPreferences preferences = mContext.getSharedPreferences(APP_NAME, MODE_PRIVATE);
     SharedPreferences.Editor editor = preferences.edit();
 
     editor.putString(userName + "linearDistance", registerLinearDistanceData);
@@ -191,10 +197,10 @@ public class ManageData {
    * @return Double type 2-array registered data list.
    */
   public ArrayList<double[][]> readRegisteredData(Context context, String userName) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
     Context mContext = context.getApplicationContext();
 
-    SharedPreferences preferences = mContext.getSharedPreferences(APP_NAME, Context.MODE_PRIVATE);
+    SharedPreferences preferences = mContext.getSharedPreferences(APP_NAME, MODE_PRIVATE);
 
     String registeredLinearDistanceData = preferences.getString(userName + "linearDistance", "");
     String registeredAngleData = preferences.getString(userName + "angle", "");
@@ -210,7 +216,7 @@ public class ManageData {
     double[][] linearDistance = new double[decryptedLinearDistance.length][decryptedLinearDistance[0].length];
     double[][] angle = new double[decryptedAngle.length][decryptedAngle[0].length];
 
-    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+    for (int axis = 0; axis < NUM_AXIS; axis++) {
       for (int item = 0; item < decryptedLinearDistance[axis].length; item++) {
         linearDistance[axis][item] = Double.valueOf(decryptedLinearDistance[axis][item]);
         angle[axis][item] = Double.valueOf(decryptedAngle[axis][item]);
@@ -232,30 +238,30 @@ public class ManageData {
    * @param data Float type 3-array list data.
    */
   public void writeFloatData(String userName, String dataName, String sensorName, float[][][] data) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
-    if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-      LogUtil.log(Log.ERROR, "SD-Card not mounted");
+    if (!Environment.getExternalStorageState().equals(MEDIA_MOUNTED)) {
+      log(ERROR, "SD-Card not mounted");
       return;
     }
 
     String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-    String DIR_PATH = SD_PATH + File.separator + APP_NAME + File.separator + userName + File.separator + dataName;
+    String DIR_PATH = SD_PATH + separator + APP_NAME + separator + userName + separator + dataName;
 
     File file = new File(DIR_PATH);
     try {
       if (!file.exists()) {
         if (!file.mkdirs()) {
-          LogUtil.log(Log.DEBUG, "Make directory Error");
+          log(DEBUG, "Make directory Error");
         }
       }
     } catch (Exception e) {
-      LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
+      log(ERROR, e.getMessage(), e.getCause());
     }
 
     try {
-      for (int time = 0; time < Enum.NUM_TIME; time++) {
-        String filePath = DIR_PATH + File.separator + sensorName + String.valueOf(time) + ".dat";
+      for (int time = 0; time < NUM_TIME; time++) {
+        String filePath = DIR_PATH + separator + sensorName + String.valueOf(time) + ".dat";
         file = new File(filePath);
 
         fos = new FileOutputStream(file, false);
@@ -272,35 +278,35 @@ public class ManageData {
         fos.close();
       }
     } catch (IOException e) {
-      LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
+      log(ERROR, e.getMessage(), e.getCause());
     }
   }
 
 
   public void writeFloatData(String userName, String dataName, String sensorName, float[][] data) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
-    if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-      LogUtil.log(Log.ERROR, "SD-Card not mounted");
+    if (!Environment.getExternalStorageState().equals(MEDIA_MOUNTED)) {
+      log(ERROR, "SD-Card not mounted");
       return;
     }
 
     String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-    String DIR_PATH = SD_PATH + File.separator + APP_NAME + File.separator + userName + File.separator + dataName;
+    String DIR_PATH = SD_PATH + separator + APP_NAME + separator + userName + separator + dataName;
 
     File file = new File(DIR_PATH);
     try {
       if (!file.exists()) {
         if (!file.mkdirs()) {
-          LogUtil.log(Log.DEBUG, "Make directory Error");
+          log(DEBUG, "Make directory Error");
         }
       }
     } catch (Exception e) {
-      LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
+      log(ERROR, e.getMessage(), e.getCause());
     }
 
     try {
-      String filePath = DIR_PATH + File.separator + sensorName + ".dat";
+      String filePath = DIR_PATH + separator + sensorName + ".dat";
       file = new File(filePath);
 
       fos = new FileOutputStream(file, false);
@@ -316,7 +322,7 @@ public class ManageData {
       osw.close();
       fos.close();
     } catch (IOException e) {
-      LogUtil.log(Log.ERROR, e.getMessage(), e.getCause());
+      log(ERROR, e.getMessage(), e.getCause());
     }
   }
 }

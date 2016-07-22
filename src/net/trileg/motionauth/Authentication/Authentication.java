@@ -20,6 +20,7 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static android.content.Intent.*;
 import static android.util.Log.*;
 import static android.view.MotionEvent.*;
+import static net.trileg.motionauth.Authentication.InputName.userName;
 import static net.trileg.motionauth.Utility.Enum.STATUS.*;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
@@ -59,7 +60,7 @@ public class Authentication extends Activity {
     countSecondTv = (TextView) findViewById(R.id.textView4);
     getMotionBtn = (Button) findViewById(R.id.button1);
 
-    nameTv.setText(InputName.userName + "さん読んでね！");
+    nameTv.setText(userName + "さん読んでね！");
     mGetData = new GetData(this, getMotionBtn, secondTv, vibrator, UP);
 
     getMotionBtn.setOnTouchListener(new View.OnTouchListener() {

@@ -17,8 +17,10 @@ import net.trileg.motionauth.R;
 import java.util.ArrayList;
 import java.util.Map;
 
-import static android.content.Intent.*;
-import static android.util.Log.*;
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static android.util.Log.INFO;
+import static android.util.Log.VERBOSE;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
 
@@ -107,7 +109,8 @@ public class RegistrantList extends Activity {
     ArrayList<String> keyList = new ArrayList<>();
 
     Map<String, ?> allEntries = preferences.getAll();
-    for (Map.Entry<String, ?> entry : allEntries.entrySet()) keyList.add(entry.getKey());
+    for (Map.Entry<String, ?> entry : allEntries.entrySet())
+      keyList.add(entry.getKey());
 
     return keyList;
   }
@@ -125,7 +128,8 @@ public class RegistrantList extends Activity {
 
     Intent intent = new Intent();
     intent.setClassName(pkgName, actName);
-    if (actName.equals(getPackageName() + ".ViewDataList.ViewRegisteredData")) intent.putExtra("item", item);
+    if (actName.equals(getPackageName() + ".ViewDataList.ViewRegisteredData"))
+      intent.putExtra("item", item);
     if (flg) intent.setFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_NEW_TASK);
 
     startActivity(intent);

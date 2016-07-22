@@ -1,7 +1,8 @@
 package net.trileg.motionauth.Processing;
 
 import static android.util.Log.INFO;
-import static net.trileg.motionauth.Utility.Enum.*;
+import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
+import static net.trileg.motionauth.Utility.Enum.NUM_TIME;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
 

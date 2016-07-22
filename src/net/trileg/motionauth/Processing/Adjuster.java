@@ -2,7 +2,8 @@ package net.trileg.motionauth.Processing;
 
 import java.util.ArrayList;
 
-import static net.trileg.motionauth.Utility.Enum.*;
+import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
+import static net.trileg.motionauth.Utility.Enum.NUM_TIME;
 
 /**
  * Adjustment data length.

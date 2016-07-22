@@ -12,7 +12,8 @@ import static android.content.Context.MODE_PRIVATE;
 import static android.os.Environment.MEDIA_MOUNTED;
 import static android.util.Log.*;
 import static java.io.File.separator;
-import static net.trileg.motionauth.Utility.Enum.*;
+import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
+import static net.trileg.motionauth.Utility.Enum.NUM_TIME;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
 
@@ -30,8 +31,8 @@ public class ManageData {
 
   /**
    * @param userName   User name.
-   * @param dataName Data name.
-   * @param sensorName   Sensor name.
+   * @param dataName   Data name.
+   * @param sensorName Sensor name.
    * @param data       Double type 2-array data to write.
    * @return Return true when write data complete, otherwise false.
    */
@@ -86,8 +87,8 @@ public class ManageData {
 
   /**
    * @param userName   User name.
-   * @param dataName Data name.
-   * @param sensorName   Sensor name.
+   * @param dataName   Data name.
+   * @param sensorName Sensor name.
    * @param data       Double type 3-array data to write.
    */
   public void writeDoubleThreeArrayData(String userName, String dataName, String sensorName, double[][][] data) {
@@ -140,11 +141,11 @@ public class ManageData {
   /**
    * Save authentication key data which is collected from Registration.
    *
-   * @param userName        User name.
+   * @param userName              User name.
    * @param averageLinearDistance Double type 2-array average linear distance data.
-   * @param averageAngle    Double type 2-array average angle data.
-   * @param ampValue        Amplifier value.
-   * @param context         Caller context.
+   * @param averageAngle          Double type 2-array average angle data.
+   * @param ampValue              Amplifier value.
+   * @param context               Caller context.
    */
   public void writeRegisterData(String userName, double[][] averageLinearDistance,
                                 double[][] averageAngle, double ampValue, Context context) {
@@ -232,10 +233,10 @@ public class ManageData {
 
 
   /**
-   * @param userName  User name.
-   * @param dataName Data name.
+   * @param userName   User name.
+   * @param dataName   Data name.
    * @param sensorName Sensor name.
-   * @param data Float type 3-array list data.
+   * @param data       Float type 3-array list data.
    */
   public void writeFloatData(String userName, String dataName, String sensorName, float[][][] data) {
     log(INFO);

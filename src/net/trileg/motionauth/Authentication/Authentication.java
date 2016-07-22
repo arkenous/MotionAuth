@@ -15,13 +15,14 @@ import net.trileg.motionauth.Utility.ListToArray;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 
-import static java.util.concurrent.Executors.newSingleThreadExecutor;
-
-import static android.content.Intent.*;
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static android.util.Log.*;
 import static android.view.MotionEvent.*;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static net.trileg.motionauth.Authentication.InputName.userName;
-import static net.trileg.motionauth.Utility.Enum.STATUS.*;
+import static net.trileg.motionauth.Utility.Enum.STATUS.DOWN;
+import static net.trileg.motionauth.Utility.Enum.STATUS.UP;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
 /**

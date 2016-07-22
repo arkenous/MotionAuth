@@ -16,9 +16,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 import net.trileg.motionauth.R;
 
-import static android.content.Intent.*;
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static android.util.Log.*;
-import static android.view.KeyEvent.*;
+import static android.view.KeyEvent.ACTION_DOWN;
+import static android.view.KeyEvent.KEYCODE_ENTER;
 import static android.widget.Toast.LENGTH_LONG;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 

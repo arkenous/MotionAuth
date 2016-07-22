@@ -4,7 +4,8 @@ import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 import net.trileg.motionauth.Utility.ManageData;
 
 import static android.util.Log.INFO;
-import static net.trileg.motionauth.Utility.Enum.*;
+import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
+import static net.trileg.motionauth.Utility.Enum.NUM_TIME;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
 /**
@@ -20,9 +21,9 @@ public class Fourier {
   /**
    * Low pass filtering double type 3-array data.
    *
-   * @param data     Double type 3-array data you want to low pass filtering.
+   * @param data       Double type 3-array data you want to low pass filtering.
    * @param sensorName Sensor name.
-   * @param userName user name.
+   * @param userName   user name.
    * @return Low pass filtered double type 3-array data.
    */
   public double[][][] LowpassFilter(double[][][] data, String sensorName, String userName) {
@@ -99,9 +100,9 @@ public class Fourier {
   /**
    * Low pass filtering double type 2-array data.
    *
-   * @param data     Double type 2-array data you want to low pass filtering.
+   * @param data       Double type 2-array data you want to low pass filtering.
    * @param sensorName sensor name.
-   * @param userName user name.
+   * @param userName   user name.
    * @return Low pass filtered double type 2-array data.
    */
   public double[][] LowpassFilter(double[][] data, String sensorName, String userName) {

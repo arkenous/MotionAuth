@@ -14,7 +14,8 @@ import net.trileg.motionauth.Utility.ManageData;
 
 import java.util.ArrayList;
 
-import static android.content.Intent.*;
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH;
 import static android.util.Log.INFO;

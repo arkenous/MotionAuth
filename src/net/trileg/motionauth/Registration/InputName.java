@@ -14,9 +14,12 @@ import android.widget.EditText;
 import android.widget.Toast;
 import net.trileg.motionauth.R;
 
-import static android.content.Intent.*;
-import static android.util.Log.*;
-import static android.view.KeyEvent.*;
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static android.util.Log.DEBUG;
+import static android.util.Log.INFO;
+import static android.view.KeyEvent.ACTION_DOWN;
+import static android.view.KeyEvent.KEYCODE_ENTER;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
 
@@ -64,7 +67,8 @@ public class InputName extends Activity {
 
       // After text changed.
       public void afterTextChanged(Editable s) {
-        if (nameInput.getText() != null) userName = nameInput.getText().toString().trim();
+        if (nameInput.getText() != null)
+          userName = nameInput.getText().toString().trim();
       }
     });
 

@@ -16,9 +16,10 @@ import net.trileg.motionauth.Utility.ManageData;
 import java.util.ArrayList;
 
 import static android.content.Context.MODE_PRIVATE;
-import static android.util.Log.*;
+import static android.util.Log.INFO;
 import static net.trileg.motionauth.Authentication.InputName.userName;
-import static net.trileg.motionauth.Utility.Enum.MEASURE.*;
+import static net.trileg.motionauth.Utility.Enum.MEASURE.CORRECT;
+import static net.trileg.motionauth.Utility.Enum.MEASURE.PERFECT;
 import static net.trileg.motionauth.Utility.Enum.SENSOR_DELAY_TIME;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 

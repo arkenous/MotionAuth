@@ -10,9 +10,11 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.*;
 
 import static android.content.Context.MODE_PRIVATE;
-import static android.util.Base64.*;
+import static android.util.Base64.NO_WRAP;
+import static android.util.Base64.URL_SAFE;
 import static android.util.Log.*;
-import static javax.crypto.Cipher.*;
+import static javax.crypto.Cipher.DECRYPT_MODE;
+import static javax.crypto.Cipher.ENCRYPT_MODE;
 import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 

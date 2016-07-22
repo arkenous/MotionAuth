@@ -15,7 +15,8 @@ import net.trileg.motionauth.Utility.Enum.STATUS;
 
 import java.util.ArrayList;
 
-import static android.hardware.Sensor.*;
+import static android.hardware.Sensor.TYPE_GYROSCOPE;
+import static android.hardware.Sensor.TYPE_LINEAR_ACCELERATION;
 import static android.hardware.SensorManager.SENSOR_DELAY_GAME;
 import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
 

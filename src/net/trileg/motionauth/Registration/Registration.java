@@ -18,12 +18,14 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static android.content.Intent.*;
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static android.util.Log.*;
 import static android.view.KeyEvent.KEYCODE_BACK;
 import static android.view.MotionEvent.*;
 import static net.trileg.motionauth.Registration.InputName.userName;
-import static net.trileg.motionauth.Utility.Enum.STATUS.*;
+import static net.trileg.motionauth.Utility.Enum.STATUS.DOWN;
+import static net.trileg.motionauth.Utility.Enum.STATUS.UP;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
 /**

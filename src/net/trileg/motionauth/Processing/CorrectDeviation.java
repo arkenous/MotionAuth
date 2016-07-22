@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.TreeMap;
 
-import static android.util.Log.*;
+import static android.util.Log.DEBUG;
+import static android.util.Log.INFO;
 import static net.trileg.motionauth.Utility.Enum.*;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
@@ -20,9 +21,9 @@ public class CorrectDeviation {
    * Correct time gap of each data.
    *
    * @param linearDistance Double type 3-array linear distance data.
-   * @param angle    Double type 3-array angle data.
-   * @param mode     Criterion for correction.
-   * @param target   Which data to set standard.
+   * @param angle          Double type 3-array angle data.
+   * @param mode           Criterion for correction.
+   * @param target         Which data to set standard.
    * @return newData Corrected double type 4-array data which include distance and angle data.
    */
   public double[][][][] correctDeviation(double[][][] linearDistance, double[][][] angle, MODE mode, TARGET target) {

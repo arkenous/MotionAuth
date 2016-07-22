@@ -11,10 +11,13 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 
-import static android.content.Intent.*;
-import static android.util.Log.*;
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static android.util.Log.INFO;
+import static android.util.Log.VERBOSE;
 import static android.view.KeyEvent.KEYCODE_BACK;
-import static net.trileg.motionauth.Utility.LogUtil.*;
+import static net.trileg.motionauth.Utility.LogUtil.log;
+import static net.trileg.motionauth.Utility.LogUtil.setShowLog;
 
 
 /**

@@ -15,7 +15,8 @@ import net.trileg.motionauth.Utility.Enum;
 
 import java.util.ArrayList;
 
-import static android.hardware.Sensor.*;
+import static android.hardware.Sensor.TYPE_GYROSCOPE;
+import static android.hardware.Sensor.TYPE_LINEAR_ACCELERATION;
 import static android.hardware.SensorManager.SENSOR_DELAY_GAME;
 import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
 import static net.trileg.motionauth.Utility.Enum.STATUS.DOWN;
@@ -119,49 +120,51 @@ class GetData extends Handler implements Runnable, SensorEventListener {
    * Collecting data from sensor.
    */
   private void collect() {
-        if (mStatus == DOWN) {
-          for (int axis = 0; axis < NUM_AXIS; axis++) {
-            mLinearAccelerationPerTime.get(axis).add(mOriginLinearAcceleration[axis]);
-            mGyroPerTime.get(axis).add(mOriginGyro[axis]);
-          }
+    if (mStatus == DOWN) {
+      for (int axis = 0; axis < NUM_AXIS; axis++) {
+        mLinearAccelerationPerTime.get(axis).add(mOriginLinearAcceleration[axis]);
+        mGyroPerTime.get(axis).add(mOriginGyro[axis]);
+      }
 
-          try {
-            Thread.sleep(GET_INTERVAL);
-          } catch (InterruptedException e) {
-            e.printStackTrace();
-          }
-          collectTime++;
-          if (collectTime % 33 == 0) {
-            super.sendEmptyMessage(1);
-          }
-          collect();
-        } else {
-          // Correct data per time finished
-          mLinearAcceleration.add(new ArrayList<>(mLinearAccelerationPerTime));
-          mGyro.add(new ArrayList<>(mGyroPerTime));
-          countTime++;
-          collectTime = 0;
-          super.sendEmptyMessage(5);
+      try {
+        Thread.sleep(GET_INTERVAL);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      collectTime++;
+      if (collectTime % 33 == 0) {
+        super.sendEmptyMessage(1);
+      }
+      collect();
+    } else {
+      // Correct data per time finished
+      mLinearAcceleration.add(new ArrayList<>(mLinearAccelerationPerTime));
+      mGyro.add(new ArrayList<>(mGyroPerTime));
+      countTime++;
+      collectTime = 0;
+      super.sendEmptyMessage(5);
 
-          switch (countTime) {
-            case 1:
-              sendEmptyMessage(6);
-              break;
-            case 2:
-              sendEmptyMessage(7);
-              break;
-            case 3:
-              sendEmptyMessage(8);
-              break;
-          }
-        }
+      switch (countTime) {
+        case 1:
+          sendEmptyMessage(6);
+          break;
+        case 2:
+          sendEmptyMessage(7);
+          break;
+        case 3:
+          sendEmptyMessage(8);
+          break;
+      }
+    }
   }
 
 
   @Override
   public void onSensorChanged(SensorEvent event) {
-    if (event.sensor.getType() == TYPE_LINEAR_ACCELERATION) mOriginLinearAcceleration = event.values.clone();
-    if (event.sensor.getType() == TYPE_GYROSCOPE) mOriginGyro = event.values.clone();
+    if (event.sensor.getType() == TYPE_LINEAR_ACCELERATION)
+      mOriginLinearAcceleration = event.values.clone();
+    if (event.sensor.getType() == TYPE_GYROSCOPE)
+      mOriginGyro = event.values.clone();
   }
 
 

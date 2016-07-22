@@ -1,10 +1,9 @@
 package net.trileg.motionauth.Processing;
 
-import static android.util.Log.*;
-import static net.trileg.motionauth.Utility.LogUtil.*;
-
+import static android.util.Log.INFO;
 import static net.trileg.motionauth.Utility.Enum.*;
 import static net.trileg.motionauth.Utility.Enum.MEASURE.*;
+import static net.trileg.motionauth.Utility.LogUtil.log;
 
 public class CosSimilarity {
   public double[] cosSimilarity(double[][][] input) {

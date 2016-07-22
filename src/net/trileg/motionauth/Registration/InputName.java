@@ -1,12 +1,10 @@
 package net.trileg.motionauth.Registration;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -15,7 +13,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import net.trileg.motionauth.R;
-import net.trileg.motionauth.Utility.LogUtil;
+
+import static android.content.Intent.*;
+import static android.util.Log.*;
+import static android.view.KeyEvent.*;
+import static net.trileg.motionauth.Utility.LogUtil.log;
 
 
 /**
@@ -31,7 +33,7 @@ public class InputName extends Activity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     // Disable title bar.
     requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -47,7 +49,7 @@ public class InputName extends Activity {
    * Input user name.
    */
   private void nameInput() {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     final EditText nameInput = (EditText) findViewById(R.id.nameInputEditText);
 
@@ -70,8 +72,8 @@ public class InputName extends Activity {
     nameInput.setOnKeyListener(new View.OnKeyListener() {
       @Override
       public boolean onKey(View v, int keyCode, KeyEvent event) {
-        if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-          InputMethodManager inputMethodManager = (InputMethodManager) InputName.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (event.getAction() == ACTION_DOWN && keyCode == KEYCODE_ENTER) {
+          InputMethodManager inputMethodManager = (InputMethodManager) InputName.this.getSystemService(INPUT_METHOD_SERVICE);
           inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
           return true;
@@ -86,7 +88,7 @@ public class InputName extends Activity {
     ok.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        LogUtil.log(Log.DEBUG, "Click ok button");
+        log(DEBUG, "Click ok button");
         // Check user inputted name is correctly.
         if (name.length() == 0) {
           Toast.makeText(InputName.this, "名前が入力されていません", Toast.LENGTH_LONG).show();
@@ -106,13 +108,12 @@ public class InputName extends Activity {
    * @param flg     Whether to show this activity if user push BACK KEY.
    */
   private void moveActivity(String pkgName, String actName, boolean flg) {
-    LogUtil.log(Log.INFO);
+    log(INFO);
 
     Intent intent = new Intent();
     intent.setClassName(pkgName, actName);
-    if (flg) intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+    if (flg) intent.setFlags(FLAG_ACTIVITY_CLEAR_TOP | FLAG_ACTIVITY_NEW_TASK);
 
     startActivity(intent);
   }
-
 }

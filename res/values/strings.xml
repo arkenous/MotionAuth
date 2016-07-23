@@ -10,7 +10,7 @@
     <string name="title_activity_regist_motion">Registration</string>
     <string name="please_read">さん読んでね！！</string>
     <string name="one">①</string>
-    <string name="description1">モーションデータ取得ボタンを押すと，３秒間の準備時間の後，スマートフォンの動きを取得し始めます．3秒間でお好きな動きをどうぞ</string>
+    <string name="description1">モーションデータ取得ボタンを押している間，モーションデータを取得します．お好きな動きをどうぞ．</string>
     <string name="two">②</string>
     <string name="regist_description2">データ取得は3回行います．データ取得が正常に完了すれば，登録は終了です．</string>
     <string name="auth_description2">データ取得は1回行います．</string>

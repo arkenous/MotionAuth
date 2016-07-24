@@ -34,8 +34,10 @@ import static net.trileg.motionauth.Utility.LogUtil.log;
  * @author Kensuke Kosaka
  */
 public class Registration extends Activity {
+  private static final int VIBRATOR_LONG = 100;
   private TextView secondTv;
   private TextView countSecondTv;
+  private TextView rest;
   private Button getMotionBtn;
   private GetData mGetData;
   private Result mResult;
@@ -63,14 +65,15 @@ public class Registration extends Activity {
   private void registration() {
     log(INFO);
 
-    Vibrator mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+    final Vibrator mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
     TextView nameTv = (TextView) findViewById(R.id.textView2);
     secondTv = (TextView) findViewById(R.id.secondTextView);
     countSecondTv = (TextView) findViewById(R.id.textView4);
+    rest = (TextView) findViewById(R.id.rest);
     getMotionBtn = (Button) findViewById(R.id.button1);
 
     nameTv.setText(userName + "さん読んでね！");
-    mGetData = new GetData(mRegistration, getMotionBtn, secondTv, countSecondTv, mVibrator, UP, this);
+    mGetData = new GetData(mRegistration, secondTv, getMotionBtn, mVibrator, UP, this);
 
     getMotionBtn.setOnTouchListener(new View.OnTouchListener() {
       @Override
@@ -79,6 +82,10 @@ public class Registration extends Activity {
           case ACTION_DOWN:
             log(VERBOSE, "Action down getMotionBtn");
             getMotionBtn.setText("取得中");
+            rest.setText("");
+            secondTv.setText("0");
+            countSecondTv.setText("秒");
+            mVibrator.vibrate(VIBRATOR_LONG);
             mGetData.changeStatus(DOWN);
             ExecutorService executorService = Executors.newSingleThreadExecutor();
             executorService.execute(mGetData);
@@ -87,10 +94,18 @@ public class Registration extends Activity {
           case ACTION_UP:
             log(VERBOSE, "Action up getMotionBtn");
             mGetData.changeStatus(UP);
+            mVibrator.vibrate(VIBRATOR_LONG);
+            getMotionBtn.setText("モーションデータ取得");
+            rest.setText("あと");
+            countSecondTv.setText("回");
             break;
           case ACTION_CANCEL:
             log(VERBOSE, "Action cancel getMotionBtn");
             mGetData.changeStatus(UP);
+            mVibrator.vibrate(VIBRATOR_LONG);
+            getMotionBtn.setText("モーションデータ取得");
+            rest.setText("あと");
+            countSecondTv.setText("回");
             break;
         }
         return true;

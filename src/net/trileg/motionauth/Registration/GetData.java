@@ -29,13 +29,11 @@ import static net.trileg.motionauth.Utility.Enum.STATUS.DOWN;
  */
 class GetData extends Handler implements Runnable, SensorEventListener {
   private static final int VIBRATOR_SHORT = 25;
-  private static final int VIBRATOR_LONG = 100;
 
   private static final int GET_INTERVAL = 30;
 
-  private Button mGetMotion;
   private TextView mSecond;
-  private TextView mCount;
+  private Button mGetMotion;
   private Vibrator mVibrator;
   private SensorManager mSensorManager;
   private Sensor mLinearAccelerationSensor;
@@ -44,6 +42,7 @@ class GetData extends Handler implements Runnable, SensorEventListener {
 
   private int countTime = 0;
   private int collectTime = 0;
+  private int countSecond = 0;
 
   private Enum.STATUS mStatus;
 
@@ -56,12 +55,11 @@ class GetData extends Handler implements Runnable, SensorEventListener {
   private ArrayList<ArrayList<ArrayList<Float>>> mGyro = new ArrayList<>();
 
 
-  GetData(Registration registration, Button getMotion, TextView second, TextView count, Vibrator vibrator,
-          Enum.STATUS status, Context context) {
+  GetData(Registration registration, TextView second, Button getMotion,
+          Vibrator vibrator, Enum.STATUS status, Context context) {
     mRegistration = registration;
-    mGetMotion = getMotion;
     mSecond = second;
-    mCount = count;
+    mGetMotion = getMotion;
     mVibrator = vibrator;
     mStatus = status;
 
@@ -93,11 +91,7 @@ class GetData extends Handler implements Runnable, SensorEventListener {
     switch (msg.what) {
       case 1:
         mVibrator.vibrate(VIBRATOR_SHORT);
-        break;
-      case 5:
-        mVibrator.vibrate(VIBRATOR_LONG);
-        mCount.setText("回");
-        mGetMotion.setText("モーションデータ取得");
+        mSecond.setText(String.valueOf(countSecond));
         break;
       case 6:
         mSecond.setText("2");
@@ -110,7 +104,6 @@ class GetData extends Handler implements Runnable, SensorEventListener {
         break;
       case 10:
         mSecond.setText("3");
-        mGetMotion.setText("モーションデータ取得");
         break;
     }
   }
@@ -133,6 +126,7 @@ class GetData extends Handler implements Runnable, SensorEventListener {
       }
       collectTime++;
       if (collectTime % 33 == 0) {
+        countSecond++;
         super.sendEmptyMessage(1);
       }
       collect();
@@ -142,7 +136,7 @@ class GetData extends Handler implements Runnable, SensorEventListener {
       mGyro.add(new ArrayList<>(mGyroPerTime));
       countTime++;
       collectTime = 0;
-      super.sendEmptyMessage(5);
+      countSecond = 0;
 
       switch (countTime) {
         case 1:
@@ -196,6 +190,8 @@ class GetData extends Handler implements Runnable, SensorEventListener {
   void reset() {
     countTime = 0;
     collectTime = 0;
+    countSecond = 0;
+    mGetMotion.setClickable(true);
     mLinearAcceleration.clear();
     mGyro.clear();
     sendEmptyMessage(10);

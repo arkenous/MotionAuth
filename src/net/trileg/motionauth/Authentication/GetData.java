@@ -41,6 +41,7 @@ class GetData extends Handler implements Runnable, SensorEventListener {
   private Authentication mAuthentication;
 
   private int collectTime = 0;
+  private int countSecond = 0;
 
   private STATUS mStatus;
 
@@ -105,6 +106,7 @@ class GetData extends Handler implements Runnable, SensorEventListener {
       }
       collectTime++;
       if (collectTime % 33 == 0) {
+        countSecond++;
         super.sendEmptyMessage(1);
       }
       collect();
@@ -119,13 +121,14 @@ class GetData extends Handler implements Runnable, SensorEventListener {
     switch (msg.what) {
       case 1:
         mVibrator.vibrate(VIBRATOR_SHORT);
+        mSecond.setText(String.valueOf(countSecond));
         break;
       case 5:
         mVibrator.vibrate(VIBRATOR_LONG);
         mAuthentication.finishGetMotion(mLinearAcceleration, mGyroscope);
         break;
       case 10:
-        mSecond.setText("3");
+        mSecond.setText("1");
         mGetMotion.setText("モーションデータ取得");
         break;
     }
@@ -168,6 +171,7 @@ class GetData extends Handler implements Runnable, SensorEventListener {
    */
   void reset() {
     collectTime = 0;
+    countSecond = 0;
     sendEmptyMessage(10);
   }
 }

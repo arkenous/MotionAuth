@@ -31,8 +31,10 @@ import static net.trileg.motionauth.Utility.LogUtil.log;
  * @author Kensuke Kosaka
  */
 public class Authentication extends Activity {
+  private static final int VIBRATOR_LONG = 100;
   private TextView secondTv;
   private TextView countSecondTv;
+  private TextView rest;
   private Button getMotionBtn;
 
   private GetData mGetData;
@@ -55,10 +57,11 @@ public class Authentication extends Activity {
   private void authentication() {
     log(INFO);
 
-    Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+    final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
     TextView nameTv = (TextView) findViewById(R.id.textView1);
     secondTv = (TextView) findViewById(R.id.secondTextView);
     countSecondTv = (TextView) findViewById(R.id.textView4);
+    rest = (TextView) findViewById(R.id.rest);
     getMotionBtn = (Button) findViewById(R.id.button1);
 
     nameTv.setText(userName + "さん読んでね！");
@@ -71,6 +74,10 @@ public class Authentication extends Activity {
           case ACTION_DOWN:
             log(VERBOSE, "Action down getMotionBtn");
             getMotionBtn.setText("取得中");
+            rest.setText("");
+            secondTv.setText("0");
+            countSecondTv.setText("秒");
+            vibrator.vibrate(VIBRATOR_LONG);
             mGetData.changeStatus(DOWN);
             ExecutorService executorService = newSingleThreadExecutor();
             executorService.execute(mGetData);
@@ -79,10 +86,16 @@ public class Authentication extends Activity {
           case ACTION_UP:
             log(VERBOSE, "Action up getMotionBtn");
             mGetData.changeStatus(UP);
+            vibrator.vibrate(VIBRATOR_LONG);
+            rest.setText("あと");
+            countSecondTv.setText("回");
             break;
           case ACTION_CANCEL:
             log(VERBOSE, "Action cancel getMotionBtn");
             mGetData.changeStatus(UP);
+            vibrator.vibrate(VIBRATOR_LONG);
+            rest.setText("あと");
+            countSecondTv.setText("回");
             break;
         }
         return true;

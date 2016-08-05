@@ -1,6 +1,8 @@
 package net.trileg.motionauth.Authentication;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -9,6 +11,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
+import android.view.KeyEvent;
 import android.widget.Button;
 import android.widget.TextView;
 import net.trileg.motionauth.Utility.Enum.STATUS;
@@ -29,8 +32,8 @@ import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
 class GetData extends Handler implements Runnable, SensorEventListener {
   private static final int VIBRATOR_SHORT = 25;
   private static final int VIBRATOR_LONG = 100;
-
   private static final int GET_INTERVAL = 30;
+  private static final int LEAST_MOTION_LENGTH = 10;
 
   private Button mGetMotion;
   private TextView mSecond;
@@ -111,7 +114,11 @@ class GetData extends Handler implements Runnable, SensorEventListener {
       }
       collect();
     } else {
-      sendEmptyMessage(5); // Completed collecting data.
+      if (collectTime < LEAST_MOTION_LENGTH) {
+        sendEmptyMessage(0);
+      } else {
+        sendEmptyMessage(5); // Completed collecting data.
+      }
     }
   }
 
@@ -119,6 +126,24 @@ class GetData extends Handler implements Runnable, SensorEventListener {
   @Override
   public void dispatchMessage(@NonNull Message msg) {
     switch (msg.what) {
+      case 0:
+        AlertDialog.Builder alert = new AlertDialog.Builder(mAuthentication);
+        alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
+          @Override
+          public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+            return keyCode == KeyEvent.KEYCODE_BACK;
+          }
+        });
+        alert.setCancelable(false);
+        alert.setTitle("モーション取り直し");
+        alert.setMessage("モーションの入力時間が短すぎます．もう少し長めに入力してください．");
+        alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick(DialogInterface dialog, int which) {
+            reset();
+          }
+        });
+        alert.show();
       case 1:
         mVibrator.vibrate(VIBRATOR_SHORT);
         mSecond.setText(String.valueOf(countSecond));

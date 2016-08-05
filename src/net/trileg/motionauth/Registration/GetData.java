@@ -104,6 +104,7 @@ class GetData extends Handler implements Runnable, SensorEventListener {
         break;
       case 10:
         mSecond.setText("3");
+        mGetMotion.setText("モーションデータ取得");
         break;
     }
   }

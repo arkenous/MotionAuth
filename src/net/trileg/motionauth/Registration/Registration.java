@@ -11,12 +11,16 @@ import android.view.*;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import net.trileg.motionauth.Processing.GetData;
+import net.trileg.motionauth.Processing.Timer;
 import net.trileg.motionauth.R;
 import net.trileg.motionauth.Utility.ListToArray;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -24,8 +28,6 @@ import static android.util.Log.*;
 import static android.view.KeyEvent.KEYCODE_BACK;
 import static android.view.MotionEvent.*;
 import static net.trileg.motionauth.Registration.InputName.userName;
-import static net.trileg.motionauth.Utility.Enum.STATUS.DOWN;
-import static net.trileg.motionauth.Utility.Enum.STATUS.UP;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
 /**
@@ -35,17 +37,26 @@ import static net.trileg.motionauth.Utility.LogUtil.log;
  */
 public class Registration extends Activity {
   private static final int VIBRATOR_LONG = 100;
-  private TextView secondTv;
-  private TextView countSecondTv;
+  private static final int LEAST_MOTION_LENGTH = 10;
+  private TextView second;
+  private TextView unit;
   private TextView rest;
-  private Button getMotionBtn;
-  private GetData mGetData;
-  private Result mResult;
-  private ListToArray mListToArray = new ListToArray();
-  private Registration mRegistration;
+  private Button getMotion;
+  private Result result;
+  private ListToArray listToArray = new ListToArray();
+  private Registration registration;
 
   private double checkRangeValue = 2.0;
   private double ampValue = 2.0;
+  private Future<Boolean> timer;
+  private GetData linearAcceleration;
+  private GetData gyroscope;
+  private Future<ArrayList<ArrayList<Float>>> linearAccelerationFuture;
+  private Future<ArrayList<ArrayList<Float>>> gyroscopeFuture;
+
+  private ArrayList<ArrayList<ArrayList<Float>>> linearAccelerationData = new ArrayList<>();
+  private ArrayList<ArrayList<ArrayList<Float>>> gyroscopeData = new ArrayList<>();
+  private int countTime = 0;
 
 
   @Override
@@ -54,7 +65,7 @@ public class Registration extends Activity {
     log(INFO);
 
     setContentView(R.layout.activity_regist_motion);
-    mRegistration = this;
+    registration = this;
     registration();
   }
 
@@ -67,50 +78,123 @@ public class Registration extends Activity {
 
     final Vibrator mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
     TextView nameTv = (TextView) findViewById(R.id.textView2);
-    secondTv = (TextView) findViewById(R.id.secondTextView);
-    countSecondTv = (TextView) findViewById(R.id.textView4);
+    second = (TextView) findViewById(R.id.secondTextView);
+    unit = (TextView) findViewById(R.id.textView4);
     rest = (TextView) findViewById(R.id.rest);
-    getMotionBtn = (Button) findViewById(R.id.button1);
+    getMotion = (Button) findViewById(R.id.button1);
 
     nameTv.setText(userName + "さん読んでね！");
-    mGetData = new GetData(mRegistration, secondTv, getMotionBtn, mVibrator, UP, this);
 
-    getMotionBtn.setOnTouchListener(new View.OnTouchListener() {
+    getMotion.setOnTouchListener(new View.OnTouchListener() {
       @Override
       public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction()) {
           case ACTION_DOWN:
-            log(VERBOSE, "Action down getMotionBtn");
-            getMotionBtn.setText("取得中");
+            log(VERBOSE, "Action down getMotion");
+
+            getMotion.setText("取得中");
             rest.setText("");
-            secondTv.setText("0");
-            countSecondTv.setText("秒");
+            second.setText("0");
+            unit.setText("秒");
             mVibrator.vibrate(VIBRATOR_LONG);
-            mGetData.changeStatus(DOWN);
-            ExecutorService executorService = Executors.newSingleThreadExecutor();
-            executorService.execute(mGetData);
+
+            ExecutorService executorService = Executors.newFixedThreadPool(3);
+            timer = executorService.submit(new Timer(mVibrator, second));
+            linearAcceleration = new GetData(registration, true);
+            linearAccelerationFuture = executorService.submit(linearAcceleration);
+            gyroscope = new GetData(registration, false);
+            gyroscopeFuture = executorService.submit(gyroscope);
+
             executorService.shutdown();
             break;
           case ACTION_UP:
-            log(VERBOSE, "Action up getMotionBtn");
-            mGetData.changeStatus(UP);
+            log(VERBOSE, "Action up getMotion");
             mVibrator.vibrate(VIBRATOR_LONG);
-            getMotionBtn.setText("モーションデータ取得");
-            rest.setText("あと");
-            countSecondTv.setText("回");
+            getMotion.setClickable(false);
+            timer.cancel(true);
+            linearAcceleration.unRegisterSensor();
+            gyroscope.unRegisterSensor();
+
+            organizeData(linearAccelerationFuture, gyroscopeFuture);
             break;
           case ACTION_CANCEL:
-            log(VERBOSE, "Action cancel getMotionBtn");
-            mGetData.changeStatus(UP);
+            log(VERBOSE, "Action up getMotion");
             mVibrator.vibrate(VIBRATOR_LONG);
-            getMotionBtn.setText("モーションデータ取得");
-            rest.setText("あと");
-            countSecondTv.setText("回");
+            getMotion.setClickable(false);
+            timer.cancel(true);
+            linearAcceleration.unRegisterSensor();
+            gyroscope.unRegisterSensor();
+
+            organizeData(linearAccelerationFuture, gyroscopeFuture);
             break;
         }
         return true;
       }
     });
+  }
+
+
+  /**
+   * Get data from GetData class, check data length, add data to list,
+   * and call finishGetMotion when countTime is 3.
+   * @param linearAccelerationFuture Future instance of linearAcceleration
+   * @param gyroscopeFuture Future instance of gyroscope
+   */
+  private void organizeData(Future<ArrayList<ArrayList<Float>>> linearAccelerationFuture,
+                            Future<ArrayList<ArrayList<Float>>> gyroscopeFuture) {
+    log(INFO);
+    try {
+      ArrayList<ArrayList<Float>> linearAccelerationPerTime = linearAccelerationFuture.get();
+      ArrayList<ArrayList<Float>> gyroscopePerTime = gyroscopeFuture.get();
+
+      if (!checkDataLength(linearAccelerationPerTime, gyroscopePerTime)) reCollectDialog();
+      else {
+        linearAccelerationData.add(new ArrayList<>(linearAccelerationPerTime));
+        gyroscopeData.add(new ArrayList<>(gyroscopePerTime));
+        countTime++;
+        if (countTime == 3) finishGetMotion(linearAccelerationData, gyroscopeData);
+        else init();
+      }
+    } catch (InterruptedException | ExecutionException e) {
+      e.printStackTrace();
+      init();
+    }
+  }
+
+
+  /**
+   * Check data length
+   * @param linearAcceleration linearAcceleration data
+   * @param gyroscope gyroscope data
+   * @return return true if data length >= LEAST_MOTION_LENGTH
+   */
+  private boolean checkDataLength(ArrayList<ArrayList<Float>> linearAcceleration, ArrayList<ArrayList<Float>> gyroscope) {
+    log(INFO);
+    return (linearAcceleration.get(0).size() >= LEAST_MOTION_LENGTH || gyroscope.get(0).size() >= LEAST_MOTION_LENGTH);
+  }
+
+
+  /**
+   * Show re-collect dialog when data length is too short
+   */
+  private void reCollectDialog() {
+    log(INFO);
+    AlertDialog.Builder alert = new AlertDialog.Builder(registration);
+    alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
+      @Override
+      public boolean onKey(DialogInterface dialogInterface, int keyCode, KeyEvent keyEvent) {
+        return keyCode == KeyEvent.KEYCODE_BACK;
+      }
+    });
+    alert.setCancelable(false);
+    alert.setTitle("モーション取り直し");
+    alert.setMessage("モーションの入力時間が短すぎます．もう少し長めに入力してください．");
+    alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialogInterface, int which) {
+        reset();
+      }
+    }).show();
   }
 
 
@@ -124,9 +208,9 @@ public class Registration extends Activity {
   void finishGetMotion(ArrayList<ArrayList<ArrayList<Float>>> linearAcceleration,
                        ArrayList<ArrayList<ArrayList<Float>>> gyro) {
     log(INFO);
-    if (getMotionBtn.isClickable()) getMotionBtn.setClickable(false);
-    secondTv.setText("0");
-    getMotionBtn.setText("データ処理中");
+    if (getMotion.isClickable()) getMotion.setClickable(false);
+    second.setText("0");
+    getMotion.setText("データ処理中");
 
     log(DEBUG, "Start initialize progress dialog");
 
@@ -141,28 +225,51 @@ public class Registration extends Activity {
 
     progressDialog.show();
 
-    mResult = new Result(mRegistration, mListToArray.listTo3DArray(linearAcceleration),
-        mListToArray.listTo3DArray(gyro), getMotionBtn, progressDialog,
-        checkRangeValue, ampValue, this, mGetData);
+    result = new Result(registration, listToArray.listTo3DArray(linearAcceleration),
+        listToArray.listTo3DArray(gyro), getMotion, progressDialog,
+        checkRangeValue, ampValue, this);
     ExecutorService executorService = Executors.newSingleThreadExecutor();
-    executorService.submit(mResult);
+    executorService.submit(result);
     executorService.shutdown();
   }
 
+
+  /**
+   * Reset data and counter.
+   */
+  void reset() {
+    log(INFO);
+    linearAccelerationData.clear();
+    gyroscopeData.clear();
+    countTime = 0;
+    init();
+  }
+
+
+  /**
+   * Initialize TextView text and button clickable status.
+   */
+  private void init() {
+    log(INFO);
+    getMotion.setText("モーションデータ取得");
+    rest.setText("あと");
+    second.setText(String.valueOf(3 - countTime));
+    unit.setText("回");
+    getMotion.setClickable(true);
+  }
 
   @Override
   protected void onResume() {
     super.onResume();
     log(INFO);
-    mGetData.registrationSensor();
   }
 
 
   @Override
   protected void onPause() {
     super.onPause();
+    //TODO モーションセンサの停止コードを書く
     log(INFO);
-    mGetData.unRegistrationSensor();
   }
 
 
@@ -177,7 +284,7 @@ public class Registration extends Activity {
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
       case R.id.change_range_value:
-        if (getMotionBtn.isClickable()) {
+        if (getMotion.isClickable()) {
           LayoutInflater inflater = LayoutInflater.from(Registration.this);
           View seekView = inflater.inflate(R.layout.seekdialog, (ViewGroup) findViewById(R.id.dialog_root));
 
@@ -255,7 +362,7 @@ public class Registration extends Activity {
           dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog1, int which) {
-              mResult.setAmpAndRange(ampValue, checkRangeValue);
+              result.setAmpAndRange(ampValue, checkRangeValue);
             }
           });
           dialog.show();
@@ -263,7 +370,7 @@ public class Registration extends Activity {
         return true;
 
       case R.id.reset:
-        if (getMotionBtn.isClickable()) {
+        if (getMotion.isClickable()) {
           AlertDialog.Builder alert = new AlertDialog.Builder(Registration.this);
           alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
             @Override
@@ -283,7 +390,7 @@ public class Registration extends Activity {
           alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-              mGetData.reset();
+              reset();
             }
           });
 

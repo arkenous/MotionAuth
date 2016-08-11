@@ -34,25 +34,24 @@ class Result extends Handler implements Runnable {
   private static final int COSINE_SIMILARITY = 6;
   private static final int FINISH = 10;
 
-  private ManageData mManageData = new ManageData();
-  private Formatter mFormatter = new Formatter();
-  private Amplifier mAmplifier = new Amplifier();
-  private Fourier mFourier = new Fourier();
-  private Calc mCalc = new Calc();
-  private CorrectDeviation mCorrectDeviation = new CorrectDeviation();
-  private Adjuster mAdjuster = new Adjuster();
-  private CosSimilarity mCosSimilarity = new CosSimilarity();
+  private ManageData manageData = new ManageData();
+  private Formatter formatter = new Formatter();
+  private Amplifier amplifier = new Amplifier();
+  private Fourier fourier = new Fourier();
+  private Calc calc = new Calc();
+  private CorrectDeviation correctDeviation = new CorrectDeviation();
+  private Adjuster adjuster = new Adjuster();
+  private CosSimilarity cosSimilarity = new CosSimilarity();
 
-  private Registration mRegistration;
-  private Button mGetMotion;
-  private Context mContext;
-  private GetData mGetData;
-  private ProgressDialog mProgressDialog;
-  private double mCheckRange;
-  private double mAmp;
+  private Registration registration;
+  private Button getMotion;
+  private Context context;
+  private ProgressDialog progressDialog;
+  private double checkRange;
+  private double amp;
 
-  private float[][][] mLinearAccel;
-  private float[][][] mGyro;
+  private float[][][] linearAccel;
+  private float[][][] gyro;
   private double[][] averageLinearDistance;
   private double[][] averageAngle;
   private boolean result = false;
@@ -60,57 +59,56 @@ class Result extends Handler implements Runnable {
 
   Result(Registration registration, float[][][] linearAccel,
          float[][][] gyro, Button getMotion, ProgressDialog progressDialog,
-         double checkRange, double amp, Context context, GetData getData) {
-    mRegistration = registration;
-    mLinearAccel = linearAccel;
-    mGyro = gyro;
-    mGetMotion = getMotion;
-    mProgressDialog = progressDialog;
-    mCheckRange = checkRange;
-    mAmp = amp;
-    mContext = context;
-    mGetData = getData;
+         double checkRange, double amp, Context context) {
+    this.registration = registration;
+    this.linearAccel = linearAccel;
+    this.gyro = gyro;
+    this.getMotion = getMotion;
+    this.progressDialog = progressDialog;
+    this.checkRange = checkRange;
+    this.amp = amp;
+    this.context = context;
   }
 
 
   @Override
   public void run() {
-    mManageData.writeFloatData(userName, "RegRaw", "linearAcceleration", mLinearAccel);
-    mManageData.writeFloatData(userName, "RegRaw", "gyroscope", mGyro);
+    manageData.writeFloatData(userName, "RegRaw", "linearAcceleration", linearAccel);
+    manageData.writeFloatData(userName, "RegRaw", "gyroscope", gyro);
 
-    result = calculate(mLinearAccel, mGyro);
+    result = calculate(linearAccel, gyro);
     this.sendEmptyMessage(FINISH);
   }
 
 
   @Override
   public void dispatchMessage(@NonNull Message msg) {
-    if (mGetMotion.isClickable()) mGetMotion.setClickable(false);
+    if (getMotion.isClickable()) getMotion.setClickable(false);
     switch (msg.what) {
       case FORMAT:
-        mProgressDialog.setMessage("データのフォーマット中");
+        progressDialog.setMessage("データのフォーマット中");
         break;
       case AMPLIFY:
-        mProgressDialog.setMessage("データの増幅処理中");
+        progressDialog.setMessage("データの増幅処理中");
         break;
       case FOURIER:
-        mProgressDialog.setMessage("フーリエ変換中");
+        progressDialog.setMessage("フーリエ変換中");
         break;
       case CONVERT:
-        mProgressDialog.setMessage("データの変換中");
+        progressDialog.setMessage("データの変換中");
         break;
       case DEVIATION:
-        mProgressDialog.setMessage("データのズレを修正中");
+        progressDialog.setMessage("データのズレを修正中");
         break;
       case COSINE_SIMILARITY:
-        mProgressDialog.setMessage("コサイン類似度を算出中");
+        progressDialog.setMessage("コサイン類似度を算出中");
         break;
       case FINISH:
-        mProgressDialog.dismiss();
+        progressDialog.dismiss();
         LogUtil.log(Log.DEBUG, "ProgressDialog was dismissed now");
 
         if (!result) {
-          AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
+          AlertDialog.Builder alert = new AlertDialog.Builder(context);
           alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
             @Override
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
@@ -123,18 +121,18 @@ class Result extends Handler implements Runnable {
           alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-              mGetData.reset();
+              registration.reset();
             }
           });
 
           alert.show();
         } else {
           // 3回のモーションの平均値をファイルに書き出す
-          mManageData.writeDoubleTwoArrayData(userName, "RegRegistered", "linearDistance", averageLinearDistance);
-          mManageData.writeDoubleTwoArrayData(userName, "RegRegistered", "angle", averageAngle);
-          mManageData.writeRegisterData(userName, averageLinearDistance, averageAngle, mAmp, mContext);
+          manageData.writeDoubleTwoArrayData(userName, "RegRegistered", "linearDistance", averageLinearDistance);
+          manageData.writeDoubleTwoArrayData(userName, "RegRegistered", "angle", averageAngle);
+          manageData.writeRegisterData(userName, averageLinearDistance, averageAngle, amp, context);
 
-          AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
+          AlertDialog.Builder alert = new AlertDialog.Builder(context);
           alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
             @Override
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
@@ -147,7 +145,7 @@ class Result extends Handler implements Runnable {
           alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-              mRegistration.finishRegistration();
+              registration.finishRegistration();
             }
           });
 
@@ -162,8 +160,8 @@ class Result extends Handler implements Runnable {
 
 
   void setAmpAndRange(double amp, double checkRange) {
-    mAmp = amp;
-    mCheckRange = checkRange;
+    this.amp = amp;
+    this.checkRange = checkRange;
   }
 
 
@@ -174,49 +172,49 @@ class Result extends Handler implements Runnable {
     LogUtil.log(Log.INFO);
 
     // 複数回のデータ取得について，データ数を揃える
-    ArrayList<float[][][]> adjusted = mAdjuster.adjust(linearAccelList, gyroList);
+    ArrayList<float[][][]> adjusted = adjuster.adjust(linearAccelList, gyroList);
     float[][][] linearAccel = adjusted.get(0);
     float[][][] gyro = adjusted.get(1);
 
-    mManageData.writeFloatData(userName, "RegAdjusted", "linearAcceleration", linearAccel);
-    mManageData.writeFloatData(userName, "RegAdjusted", "gyroscope", gyro);
+    manageData.writeFloatData(userName, "RegAdjusted", "linearAcceleration", linearAccel);
+    manageData.writeFloatData(userName, "RegAdjusted", "gyroscope", gyro);
 
     // データのフォーマット
     this.sendEmptyMessage(FORMAT);
-    double[][][] linearAcceleration = mFormatter.convertFloatToDouble(linearAccel);
-    double[][][] gyroscope = mFormatter.convertFloatToDouble(gyro);
+    double[][][] linearAcceleration = formatter.convertFloatToDouble(linearAccel);
+    double[][][] gyroscope = formatter.convertFloatToDouble(gyro);
 
-    mManageData.writeDoubleThreeArrayData(userName, "RegFormatted", "linearAcceleration", linearAcceleration);
-    mManageData.writeDoubleThreeArrayData(userName, "RegFormatted", "gyroscope", gyroscope);
+    manageData.writeDoubleThreeArrayData(userName, "RegFormatted", "linearAcceleration", linearAcceleration);
+    manageData.writeDoubleThreeArrayData(userName, "RegFormatted", "gyroscope", gyroscope);
 
     // データの増幅処理
-    if (mAmplifier.CheckValueRange(linearAcceleration, mCheckRange)
-        || mAmplifier.CheckValueRange(gyroscope, mCheckRange)) {
+    if (amplifier.CheckValueRange(linearAcceleration, checkRange)
+        || amplifier.CheckValueRange(gyroscope, checkRange)) {
       this.sendEmptyMessage(AMPLIFY);
-      linearAcceleration = mAmplifier.Amplify(linearAcceleration, mAmp);
-      gyroscope = mAmplifier.Amplify(gyroscope, mAmp);
+      linearAcceleration = amplifier.Amplify(linearAcceleration, amp);
+      gyroscope = amplifier.Amplify(gyroscope, amp);
     }
 
-    mManageData.writeDoubleThreeArrayData(userName, "RegAmplified", "linearAcceleration", linearAcceleration);
-    mManageData.writeDoubleThreeArrayData(userName, "RegAmplified", "gyroscope", gyroscope);
+    manageData.writeDoubleThreeArrayData(userName, "RegAmplified", "linearAcceleration", linearAcceleration);
+    manageData.writeDoubleThreeArrayData(userName, "RegAmplified", "gyroscope", gyroscope);
 
     // フーリエ変換によるローパスフィルタ
     this.sendEmptyMessage(FOURIER);
-    linearAcceleration = mFourier.LowpassFilter(linearAcceleration, "LinearAcceleration", userName);
-    gyroscope = mFourier.LowpassFilter(gyroscope, "Gyroscope", userName);
+    linearAcceleration = fourier.LowpassFilter(linearAcceleration, "LinearAcceleration", userName);
+    gyroscope = fourier.LowpassFilter(gyroscope, "Gyroscope", userName);
 
-    mManageData.writeDoubleThreeArrayData(userName, "RegLowpassed", "linearAcceleration", linearAcceleration);
-    mManageData.writeDoubleThreeArrayData(userName, "RegLowpassed", "gyroscope", gyroscope);
+    manageData.writeDoubleThreeArrayData(userName, "RegLowpassed", "linearAcceleration", linearAcceleration);
+    manageData.writeDoubleThreeArrayData(userName, "RegLowpassed", "gyroscope", gyroscope);
 
     LogUtil.log(Log.DEBUG, "Finish fourier");
 
     // 加速度から距離，角速度から角度へ変換（第二引数はセンサの取得間隔）
     this.sendEmptyMessage(CONVERT);
-    double[][][] linearDistance = mCalc.accelToDistance(linearAcceleration, Enum.SENSOR_DELAY_TIME);
-    double[][][] angle = mCalc.gyroToAngle(gyroscope, Enum.SENSOR_DELAY_TIME);
+    double[][][] linearDistance = calc.accelToDistance(linearAcceleration, Enum.SENSOR_DELAY_TIME);
+    double[][][] angle = calc.gyroToAngle(gyroscope, Enum.SENSOR_DELAY_TIME);
 
-    mManageData.writeDoubleThreeArrayData(userName, "RegConverted", "linearDistance", linearDistance);
-    mManageData.writeDoubleThreeArrayData(userName, "RegConverted", "angle", angle);
+    manageData.writeDoubleThreeArrayData(userName, "RegConverted", "linearDistance", linearDistance);
+    manageData.writeDoubleThreeArrayData(userName, "RegConverted", "angle", angle);
 
     LogUtil.log(Log.DEBUG, "After write data");
 
@@ -226,10 +224,10 @@ class Result extends Handler implements Runnable {
     LogUtil.log(Log.DEBUG, "Before measure cosine similarity");
 
     // コサイン類似度を測る
-    double[] linearDistanceCosSimilarity = mCosSimilarity.cosSimilarity(linearDistance);
-    double[] angleCosSimilarity = mCosSimilarity.cosSimilarity(angle);
+    double[] linearDistanceCosSimilarity = cosSimilarity.cosSimilarity(linearDistance);
+    double[] angleCosSimilarity = cosSimilarity.cosSimilarity(angle);
 
-    Enum.MEASURE measure = mCosSimilarity.measure(linearDistanceCosSimilarity, angleCosSimilarity);
+    Enum.MEASURE measure = cosSimilarity.measure(linearDistanceCosSimilarity, angleCosSimilarity);
 
     LogUtil.log(Log.INFO, "After measure cosine similarity");
     LogUtil.log(Log.INFO, "measure = " + String.valueOf(measure));
@@ -277,7 +275,7 @@ class Result extends Handler implements Runnable {
             break;
         }
 
-        double[][][][] deviatedValue = mCorrectDeviation.correctDeviation(originalLinearDistance,
+        double[][][][] deviatedValue = correctDeviation.correctDeviation(originalLinearDistance,
             originalAngle, mode, target);
 
         for (int time = 0; time < Enum.NUM_TIME; time++) {
@@ -289,15 +287,15 @@ class Result extends Handler implements Runnable {
           }
         }
 
-        linearDistanceCosSimilarity = mCosSimilarity.cosSimilarity(linearDistance);
-        angleCosSimilarity = mCosSimilarity.cosSimilarity(angle);
+        linearDistanceCosSimilarity = cosSimilarity.cosSimilarity(linearDistance);
+        angleCosSimilarity = cosSimilarity.cosSimilarity(angle);
 
-        Enum.MEASURE tmp = mCosSimilarity.measure(linearDistanceCosSimilarity, angleCosSimilarity);
+        Enum.MEASURE tmp = cosSimilarity.measure(linearDistanceCosSimilarity, angleCosSimilarity);
 
         LogUtil.log(Log.INFO, "MEASURE: " + String.valueOf(tmp));
 
-        mManageData.writeDoubleThreeArrayData(userName, "DeviatedData" + String.valueOf(mode), "linearDistance", linearDistance);
-        mManageData.writeDoubleThreeArrayData(userName, "DeviatedData" + String.valueOf(mode), "angle", angle);
+        manageData.writeDoubleThreeArrayData(userName, "DeviatedData" + String.valueOf(mode), "linearDistance", linearDistance);
+        manageData.writeDoubleThreeArrayData(userName, "DeviatedData" + String.valueOf(mode), "angle", angle);
 
 
         if (tmp == Enum.MEASURE.PERFECT || tmp == Enum.MEASURE.CORRECT) {
@@ -321,8 +319,8 @@ class Result extends Handler implements Runnable {
     }
     //endregion
 
-    mManageData.writeDoubleThreeArrayData(userName, "AfterCalcData", "linearDistance", linearDistance);
-    mManageData.writeDoubleThreeArrayData(userName, "AfterCalcData", "angle", angle);
+    manageData.writeDoubleThreeArrayData(userName, "AfterCalcData", "linearDistance", linearDistance);
+    manageData.writeDoubleThreeArrayData(userName, "AfterCalcData", "angle", angle);
 
     this.sendEmptyMessage(COSINE_SIMILARITY);
 
@@ -330,10 +328,10 @@ class Result extends Handler implements Runnable {
     averageLinearDistance = calculateAverage(linearDistance);
     averageAngle = calculateAverage(angle);
 
-    linearDistanceCosSimilarity = mCosSimilarity.cosSimilarity(linearDistance);
-    angleCosSimilarity = mCosSimilarity.cosSimilarity(angle);
+    linearDistanceCosSimilarity = cosSimilarity.cosSimilarity(linearDistance);
+    angleCosSimilarity = cosSimilarity.cosSimilarity(angle);
 
-    measure = mCosSimilarity.measure(linearDistanceCosSimilarity, angleCosSimilarity);
+    measure = cosSimilarity.measure(linearDistanceCosSimilarity, angleCosSimilarity);
     LogUtil.log(Log.INFO, "measure = " + measure);
     return measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT;
   }

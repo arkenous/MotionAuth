@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.view.KeyEvent;
 import android.widget.Button;
 import net.trileg.motionauth.Lowpass.Fourier;
 import net.trileg.motionauth.Processing.*;
@@ -37,46 +38,45 @@ class Result extends Handler implements Runnable {
   private static final int COSINE_SIMILARITY = 6;
   private static final int FINISH = 10;
 
-  private ManageData mManageData = new ManageData();
-  private Formatter mFormatter = new Formatter();
-  private Amplifier mAmplifier = new Amplifier();
-  private Fourier mFourier = new Fourier();
-  private Calc mCalc = new Calc();
-  private Adjuster mAdjuster = new Adjuster();
-  private CosSimilarity mCosSimilarity = new CosSimilarity();
+  private ManageData manageData = new ManageData();
+  private Formatter formatter = new Formatter();
+  private Amplifier amplifier = new Amplifier();
+  private Fourier fourier = new Fourier();
+  private Calc calc = new Calc();
+  private Adjuster adjuster = new Adjuster();
+  private CosSimilarity cosSimilarity = new CosSimilarity();
 
-  private Authentication mAuthentication;
-  private Button mGetMotion;
-  private GetData mGetData;
-  private ProgressDialog mProgressDialog;
-  private double mAmp;
-  private float[][] mLinearAccel;
-  private float[][] mGyro;
+  private Authentication authentication;
+  private Button getMotion;
+  private ProgressDialog progressDialog;
+  private double amp;
+
+  private float[][] linearAccel;
+  private float[][] gyro;
   private double[][] registeredLinearDistance;
   private double[][] registeredAngle;
   private boolean result = false;
 
 
   Result(Authentication authentication, float[][] linearAccel, float[][] gyro,
-         Button getMotion, ProgressDialog progressDialog, GetData getData) {
-    mAuthentication = authentication;
-    mLinearAccel = linearAccel;
-    mGyro = gyro;
-    mGetMotion = getMotion;
-    mProgressDialog = progressDialog;
-    mGetData = getData;
+         Button getMotion, ProgressDialog progressDialog) {
+    this.authentication = authentication;
+    this.linearAccel = linearAccel;
+    this.gyro = gyro;
+    this.getMotion = getMotion;
+    this.progressDialog = progressDialog;
   }
 
 
   @Override
   public void run() {
-    mManageData.writeFloatData(userName, "AuthenticationRaw", "linearAcceleration", mLinearAccel);
-    mManageData.writeFloatData(userName, "AuthenticationRaw", "gyroscope", mGyro);
+    manageData.writeFloatData(userName, "AuthenticationRaw", "linearAcceleration", linearAccel);
+    manageData.writeFloatData(userName, "AuthenticationRaw", "gyroscope", gyro);
 
     readRegisteredData();
-    mManageData.writeDoubleTwoArrayData(userName, "AuthRegistered", "linearDistance", registeredLinearDistance);
-    mManageData.writeDoubleTwoArrayData(userName, "AuthRegistered", "angle", registeredAngle);
-    result = calculate(mLinearAccel, mGyro);
+    manageData.writeDoubleTwoArrayData(userName, "AuthRegistered", "linearDistance", registeredLinearDistance);
+    manageData.writeDoubleTwoArrayData(userName, "AuthRegistered", "angle", registeredAngle);
+    result = calculate(linearAccel, gyro);
 
     this.sendEmptyMessage(FINISH);
   }
@@ -84,51 +84,63 @@ class Result extends Handler implements Runnable {
 
   @Override
   public void dispatchMessage(@NonNull Message msg) {
-    if (mGetMotion.isClickable()) mGetMotion.setClickable(false);
+    if (getMotion.isClickable()) getMotion.setClickable(false);
     switch (msg.what) {
       case READ_DATA:
-        mProgressDialog.setMessage("登録データの読み込み中");
+        progressDialog.setMessage("登録データの読み込み中");
         break;
       case FORMAT:
-        mProgressDialog.setMessage("データのフォーマット中");
+        progressDialog.setMessage("データのフォーマット中");
         break;
       case AMPLIFY:
-        mProgressDialog.setMessage("データの増幅処理中");
+        progressDialog.setMessage("データの増幅処理中");
         break;
       case FOURIER:
-        mProgressDialog.setMessage("フーリエ変換中");
+        progressDialog.setMessage("フーリエ変換中");
         break;
       case CONVERT:
-        mProgressDialog.setMessage("データの変換中");
+        progressDialog.setMessage("データの変換中");
         break;
       case COSINE_SIMILARITY:
-        mProgressDialog.setMessage("コサイン類似度を算出中");
+        progressDialog.setMessage("コサイン類似度を算出中");
         break;
       case FINISH:
-        mProgressDialog.dismiss();
+        progressDialog.dismiss();
         if (!result) {
           log(INFO, "False authentication");
-          AlertDialog.Builder alert = new AlertDialog.Builder(mAuthentication);
+          AlertDialog.Builder alert = new AlertDialog.Builder(authentication);
+          alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialogInterface, int keyCode, KeyEvent keyEvent) {
+              return keyCode == KeyEvent.KEYCODE_BACK;
+            }
+          });
           alert.setTitle("認証失敗");
           alert.setMessage("認証に失敗しました");
           alert.setCancelable(false);
           alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-              mGetData.reset();
+              authentication.reset();
             }
           });
           alert.show();
         } else {
           log(INFO, "Success authentication");
-          AlertDialog.Builder alert = new AlertDialog.Builder(mAuthentication);
+          AlertDialog.Builder alert = new AlertDialog.Builder(authentication);
+          alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialogInterface, int keyCode, KeyEvent keyEvent) {
+              return keyCode == KeyEvent.KEYCODE_BACK;
+            }
+          });
           alert.setTitle("認証成功");
           alert.setMessage("認証に成功しました．\nスタート画面に戻ります");
           alert.setCancelable(false);
           alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-              mAuthentication.finishAuthentication();
+              authentication.finishAuthentication();
             }
           });
           alert.show();
@@ -143,14 +155,14 @@ class Result extends Handler implements Runnable {
    */
   private void readRegisteredData() {
     this.sendEmptyMessage(READ_DATA);
-    ArrayList<double[][]> readDataList = mManageData.readRegisteredData(mAuthentication, userName);
+    ArrayList<double[][]> readDataList = manageData.readRegisteredData(authentication, userName);
     registeredLinearDistance = readDataList.get(0);
     registeredAngle = readDataList.get(1);
 
-    SharedPreferences preferences = mAuthentication.getApplicationContext().getSharedPreferences("MotionAuth", MODE_PRIVATE);
+    SharedPreferences preferences = authentication.getApplicationContext().getSharedPreferences("MotionAuth", MODE_PRIVATE);
     String registeredAmplify = preferences.getString(userName + "amplify", "");
     if ("".equals(registeredAmplify)) throw new RuntimeException();
-    mAmp = Double.valueOf(registeredAmplify);
+    amp = Double.valueOf(registeredAmplify);
   }
 
 
@@ -162,37 +174,37 @@ class Result extends Handler implements Runnable {
    * @return true if authentication is succeed, otherwise false.
    */
   private boolean calculate(float[][] linearAccel, float[][] gyro) {
-    ArrayList<float[][]> adjusted = mAdjuster.adjust(linearAccel, gyro, registeredLinearDistance[0].length);
+    ArrayList<float[][]> adjusted = adjuster.adjust(linearAccel, gyro, registeredLinearDistance[0].length);
     linearAccel = adjusted.get(0);
     gyro = adjusted.get(1);
 
     this.sendEmptyMessage(FORMAT);
-    double[][] linearAcceleration = mFormatter.convertFloatToDouble(linearAccel);
-    double[][] gyroscope = mFormatter.convertFloatToDouble(gyro);
+    double[][] linearAcceleration = formatter.convertFloatToDouble(linearAccel);
+    double[][] gyroscope = formatter.convertFloatToDouble(gyro);
 
     this.sendEmptyMessage(AMPLIFY);
-    linearAcceleration = mAmplifier.Amplify(linearAcceleration, mAmp);
-    gyroscope = mAmplifier.Amplify(gyroscope, mAmp);
+    linearAcceleration = amplifier.Amplify(linearAcceleration, amp);
+    gyroscope = amplifier.Amplify(gyroscope, amp);
 
     this.sendEmptyMessage(FOURIER);
-    linearAcceleration = mFourier.LowpassFilter(linearAcceleration, "linearAccel", userName);
-    gyroscope = mFourier.LowpassFilter(gyroscope, "gyro", userName);
+    linearAcceleration = fourier.LowpassFilter(linearAcceleration, "linearAccel", userName);
+    gyroscope = fourier.LowpassFilter(gyroscope, "gyro", userName);
 
     this.sendEmptyMessage(CONVERT);
-    double[][] linearDistance = mCalc.accelToDistance(linearAcceleration, SENSOR_DELAY_TIME);
-    double[][] angle = mCalc.gyroToAngle(gyroscope, SENSOR_DELAY_TIME);
+    double[][] linearDistance = calc.accelToDistance(linearAcceleration, SENSOR_DELAY_TIME);
+    double[][] angle = calc.gyroToAngle(gyroscope, SENSOR_DELAY_TIME);
 
-    mManageData.writeDoubleTwoArrayData(userName, "AuthAfterCalcData", "linearDistance", linearDistance);
-    mManageData.writeDoubleTwoArrayData(userName, "AuthAfterCalcData", "angle", angle);
+    manageData.writeDoubleTwoArrayData(userName, "AuthAfterCalcData", "linearDistance", linearDistance);
+    manageData.writeDoubleTwoArrayData(userName, "AuthAfterCalcData", "angle", angle);
 
     // コサイン類似度を測る
     log(INFO, "Before Cosine Similarity");
-    double linearDistanceSimilarity = mCosSimilarity.cosSimilarity(linearDistance, registeredLinearDistance);
-    double angleSimilarity = mCosSimilarity.cosSimilarity(angle, registeredAngle);
+    double linearDistanceSimilarity = cosSimilarity.cosSimilarity(linearDistance, registeredLinearDistance);
+    double angleSimilarity = cosSimilarity.cosSimilarity(angle, registeredAngle);
     log(INFO, "After Cosine Similarity");
 
     this.sendEmptyMessage(COSINE_SIMILARITY);
-    Enum.MEASURE measure = mCosSimilarity.measure(linearDistanceSimilarity, angleSimilarity);
+    Enum.MEASURE measure = cosSimilarity.measure(linearDistanceSimilarity, angleSimilarity);
     return measure == PERFECT || measure == CORRECT;
   }
 }

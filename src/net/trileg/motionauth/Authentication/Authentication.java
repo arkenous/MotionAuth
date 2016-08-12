@@ -1,19 +1,27 @@
 package net.trileg.motionauth.Authentication;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import net.trileg.motionauth.Processing.GetData;
+import net.trileg.motionauth.Processing.Timer;
 import net.trileg.motionauth.R;
 import net.trileg.motionauth.Utility.ListToArray;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -21,8 +29,6 @@ import static android.util.Log.*;
 import static android.view.MotionEvent.*;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static net.trileg.motionauth.Authentication.InputName.userName;
-import static net.trileg.motionauth.Utility.Enum.STATUS.DOWN;
-import static net.trileg.motionauth.Utility.Enum.STATUS.UP;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
 /**
@@ -32,13 +38,19 @@ import static net.trileg.motionauth.Utility.LogUtil.log;
  */
 public class Authentication extends Activity {
   private static final int VIBRATOR_LONG = 100;
-  private TextView secondTv;
-  private TextView countSecondTv;
+  private static final int LEAST_MOTION_LENGTH = 10;
+  private TextView second;
+  private TextView unit;
   private TextView rest;
-  private Button getMotionBtn;
+  private Button getMotion;
 
-  private GetData mGetData;
-  private ListToArray mListToArray = new ListToArray();
+  private Authentication authentication;
+  private ListToArray listToArray = new ListToArray();
+  private Future<Boolean> timer;
+  private GetData linearAcceleration;
+  private GetData gyroscope;
+  private Future<ArrayList<ArrayList<Float>>> linearAccelerationFuture;
+  private Future<ArrayList<ArrayList<Float>>> gyroscopeFuture;
 
 
   @Override
@@ -47,6 +59,7 @@ public class Authentication extends Activity {
     log(INFO);
 
     setContentView(R.layout.activity_auth_motion);
+    authentication = this;
     authentication();
   }
 
@@ -59,48 +72,116 @@ public class Authentication extends Activity {
 
     final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
     TextView nameTv = (TextView) findViewById(R.id.textView1);
-    secondTv = (TextView) findViewById(R.id.secondTextView);
-    countSecondTv = (TextView) findViewById(R.id.textView4);
+    second = (TextView) findViewById(R.id.secondTextView);
+    unit = (TextView) findViewById(R.id.textView4);
     rest = (TextView) findViewById(R.id.rest);
-    getMotionBtn = (Button) findViewById(R.id.button1);
+    getMotion = (Button) findViewById(R.id.button1);
 
     nameTv.setText(userName + "さん読んでね！");
-    mGetData = new GetData(this, getMotionBtn, secondTv, vibrator, UP);
 
-    getMotionBtn.setOnTouchListener(new View.OnTouchListener() {
+    getMotion.setOnTouchListener(new View.OnTouchListener() {
       @Override
       public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction()) {
           case ACTION_DOWN:
-            log(VERBOSE, "Action down getMotionBtn");
-            getMotionBtn.setText("取得中");
+            log(VERBOSE, "Action down getMotion");
+
+            getMotion.setText("取得中");
             rest.setText("");
-            secondTv.setText("0");
-            countSecondTv.setText("秒");
+            second.setText("0");
+            unit.setText("秒");
             vibrator.vibrate(VIBRATOR_LONG);
-            mGetData.changeStatus(DOWN);
-            ExecutorService executorService = newSingleThreadExecutor();
-            executorService.execute(mGetData);
+
+            ExecutorService executorService = Executors.newFixedThreadPool(3);
+            timer = executorService.submit(new Timer(vibrator, second));
+            linearAcceleration = new GetData(authentication, true);
+            linearAccelerationFuture = executorService.submit(linearAcceleration);
+            gyroscope = new GetData(authentication, false);
+            gyroscopeFuture = executorService.submit(gyroscope);
+
             executorService.shutdown();
             break;
           case ACTION_UP:
-            log(VERBOSE, "Action up getMotionBtn");
-            mGetData.changeStatus(UP);
+            log(VERBOSE, "Action up getMotion");
             vibrator.vibrate(VIBRATOR_LONG);
-            rest.setText("あと");
-            countSecondTv.setText("回");
+            getMotion.setClickable(false);
+            timer.cancel(true);
+            linearAcceleration.unRegisterSensor();
+            gyroscope.unRegisterSensor();
+
+            organizeData(linearAccelerationFuture, gyroscopeFuture);
             break;
           case ACTION_CANCEL:
-            log(VERBOSE, "Action cancel getMotionBtn");
-            mGetData.changeStatus(UP);
+            log(VERBOSE, "Action cancel getMotion");
             vibrator.vibrate(VIBRATOR_LONG);
-            rest.setText("あと");
-            countSecondTv.setText("回");
+            getMotion.setClickable(false);
+            timer.cancel(true);
+            linearAcceleration.unRegisterSensor();
+            gyroscope.unRegisterSensor();
+
+            organizeData(linearAccelerationFuture, gyroscopeFuture);
             break;
         }
         return true;
       }
     });
+  }
+
+
+  /**
+   * Get data from GetData class, check data length, and call finishGetMotion.
+   * @param linearAccelerationFuture Future instance of linearAcceleration
+   * @param gyroscopeFuture Future instance of gyroscope
+   */
+  private void organizeData(Future<ArrayList<ArrayList<Float>>> linearAccelerationFuture,
+                            Future<ArrayList<ArrayList<Float>>> gyroscopeFuture) {
+    log(INFO);
+    try {
+      ArrayList<ArrayList<Float>> linearAccelerationPerTime = linearAccelerationFuture.get();
+      ArrayList<ArrayList<Float>> gyroscopePerTime = gyroscopeFuture.get();
+
+      if (!checkDataLength(linearAccelerationPerTime, gyroscopePerTime)) reCollectDialog();
+      else finishGetMotion(linearAccelerationPerTime, gyroscopePerTime);
+    } catch (InterruptedException | ExecutionException e) {
+      e.printStackTrace();
+      init();
+    }
+  }
+
+
+  /**
+   * Check data length
+   * @param linearAcceleration linearAcceleration data
+   * @param gyroscope gyroscope data
+   * @return return true if data length >= LEAST_MOTION_LENGTH
+   */
+  private boolean checkDataLength(ArrayList<ArrayList<Float>> linearAcceleration, ArrayList<ArrayList<Float>> gyroscope) {
+    log(INFO);
+    return (linearAcceleration.get(0).size() >= LEAST_MOTION_LENGTH || gyroscope.get(0).size() >= LEAST_MOTION_LENGTH);
+  }
+
+
+  /**
+   * Show re-collect dialog when data length is too short
+   */
+  private void reCollectDialog() {
+    log(INFO);
+    AlertDialog.Builder alert = new AlertDialog.Builder(authentication);
+    alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
+      @Override
+      public boolean onKey(DialogInterface dialogInterface, int keyCode, KeyEvent keyEvent) {
+        return keyCode == KeyEvent.KEYCODE_BACK;
+      }
+    });
+    alert.setCancelable(false);
+    alert.setTitle("モーション取り直し");
+    alert.setMessage("モーションの入力時間が短すぎます．もう少し長めに入力してください．");
+    alert.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialogInterface, int which) {
+        reset();
+      }
+    }).show();
   }
 
 
@@ -111,12 +192,12 @@ public class Authentication extends Activity {
    * @param linearAccel Original linear acceleration data collecting from GetData.
    * @param gyro        Original gyroscope data collecting from GetData.
    */
-  void finishGetMotion(ArrayList<ArrayList<Float>> linearAccel,
+  private void finishGetMotion(ArrayList<ArrayList<Float>> linearAccel,
                        ArrayList<ArrayList<Float>> gyro) {
     log(INFO);
-    if (getMotionBtn.isClickable()) getMotionBtn.setClickable(false);
-    secondTv.setText("0");
-    getMotionBtn.setText("認証処理中");
+    if (getMotion.isClickable()) getMotion.setClickable(false);
+    second.setText("0");
+    getMotion.setText("認証処理中");
 
     log(DEBUG, "Start initialize ProgressDialog");
 
@@ -130,13 +211,34 @@ public class Authentication extends Activity {
     log(DEBUG, "Finish initialize ProgressDialog");
 
     progressDialog.show();
-
-
-    Result mResult = new Result(this, mListToArray.listTo2DArray(linearAccel),
-        mListToArray.listTo2DArray(gyro), getMotionBtn, progressDialog, mGetData);
+    
+    Result result = new Result(this, listToArray.listTo2DArray(linearAccel),
+        listToArray.listTo2DArray(gyro), getMotion, progressDialog);
     ExecutorService executorService = newSingleThreadExecutor();
-    executorService.execute(mResult);
+    executorService.execute(result);
     executorService.shutdown();
+  }
+
+
+  /**
+   * Reset data.
+   */
+  void reset() {
+    log(INFO);
+    init();
+  }
+
+
+  /**
+   * Initialize TextView text and button clickable status.
+   */
+  private void init() {
+    log(INFO);
+    getMotion.setText("モーションデータ取得");
+    rest.setText("あと");
+    second.setText("1");
+    unit.setText("回");
+    getMotion.setClickable(true);
   }
 
 
@@ -157,13 +259,11 @@ public class Authentication extends Activity {
   @Override
   protected void onResume() {
     super.onResume();
-    mGetData.registrationSensor();
   }
 
 
   @Override
   protected void onPause() {
     super.onPause();
-    mGetData.unRegistrationSensor();
   }
 }

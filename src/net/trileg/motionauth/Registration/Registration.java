@@ -76,7 +76,7 @@ public class Registration extends Activity {
   private void registration() {
     log(INFO);
 
-    final Vibrator mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+    final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
     TextView nameTv = (TextView) findViewById(R.id.textView2);
     second = (TextView) findViewById(R.id.secondTextView);
     unit = (TextView) findViewById(R.id.textView4);
@@ -96,10 +96,10 @@ public class Registration extends Activity {
             rest.setText("");
             second.setText("0");
             unit.setText("秒");
-            mVibrator.vibrate(VIBRATOR_LONG);
+            vibrator.vibrate(VIBRATOR_LONG);
 
             ExecutorService executorService = Executors.newFixedThreadPool(3);
-            timer = executorService.submit(new Timer(mVibrator, second));
+            timer = executorService.submit(new Timer(vibrator, second));
             linearAcceleration = new GetData(registration, true);
             linearAccelerationFuture = executorService.submit(linearAcceleration);
             gyroscope = new GetData(registration, false);
@@ -109,7 +109,7 @@ public class Registration extends Activity {
             break;
           case ACTION_UP:
             log(VERBOSE, "Action up getMotion");
-            mVibrator.vibrate(VIBRATOR_LONG);
+            vibrator.vibrate(VIBRATOR_LONG);
             getMotion.setClickable(false);
             timer.cancel(true);
             linearAcceleration.unRegisterSensor();
@@ -119,7 +119,7 @@ public class Registration extends Activity {
             break;
           case ACTION_CANCEL:
             log(VERBOSE, "Action up getMotion");
-            mVibrator.vibrate(VIBRATOR_LONG);
+            vibrator.vibrate(VIBRATOR_LONG);
             getMotion.setClickable(false);
             timer.cancel(true);
             linearAcceleration.unRegisterSensor();

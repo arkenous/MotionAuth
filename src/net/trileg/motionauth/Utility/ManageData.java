@@ -140,52 +140,42 @@ public class ManageData {
 
   /**
    * Save authentication key data which is collected from Registration.
-   *
-   * @param userName              User name.
-   * @param averageLinearDistance Double type 2-array average linear distance data.
-   * @param averageAngle          Double type 2-array average angle data.
-   * @param ampValue              Amplifier value.
-   * @param context               Caller context.
+   * @param userName User name.
+   * @param averageVector Vector data.
+   * @param ampValue Amplifier value.
+   * @param context Caller context.
    */
-  public void writeRegisterData(String userName, double[][] averageLinearDistance,
-                                double[][] averageAngle, double ampValue, Context context) {
-
+  public void writeRegisterData(String userName, double[][] averageVector, double ampValue, Context context) {
     log(INFO);
 
     CipherCrypt mCipherCrypt = new CipherCrypt(context);
 
-    String[][] averageLinearDistanceStr = new String[averageLinearDistance.length][averageLinearDistance[0].length];
-    String[][] averageAngleStr = new String[averageAngle.length][averageAngle[0].length];
+    String[][] averageVectorStr = new String[averageVector.length][averageVector[0].length];
 
     for (int axis = 0; axis < NUM_AXIS; axis++) {
-      for (int item = 0; item < averageLinearDistance[axis].length; item++) {
-        averageLinearDistanceStr[axis][item] = String.valueOf(averageLinearDistance[axis][item]);
-        averageAngleStr[axis][item] = String.valueOf(averageAngle[axis][item]);
+      for (int item = 0; item < averageVector[axis].length; item++) {
+        averageVectorStr[axis][item] = String.valueOf(averageVector[axis][item]);
       }
     }
 
     // 暗号化
-    String[][] encryptedAverageLinearDistanceStr = mCipherCrypt.encrypt(averageLinearDistanceStr);
-    String[][] encryptedAverageAngleStr = mCipherCrypt.encrypt(averageAngleStr);
+    String[][] encryptedAverageVectorStr = mCipherCrypt.encrypt(averageVectorStr);
 
     // 配列データを特定文字列を挟んで連結する
     ConvertArrayAndString mConvertArrayAndString = new ConvertArrayAndString();
-    String registerLinearDistanceData = mConvertArrayAndString.arrayToString(encryptedAverageLinearDistanceStr);
-    String registerAngleData = mConvertArrayAndString.arrayToString(encryptedAverageAngleStr);
+    String registerVectorData = mConvertArrayAndString.arrayToString(encryptedAverageVectorStr);
 
-    Context mContext = context.getApplicationContext();
-    SharedPreferences userPref = mContext.getSharedPreferences("UserList", MODE_PRIVATE);
+    SharedPreferences userPref = context.getApplicationContext().getSharedPreferences("UserList", MODE_PRIVATE);
     SharedPreferences.Editor userPrefEditor = userPref.edit();
 
     userPrefEditor.putString(userName, "");
     userPrefEditor.apply();
 
-    SharedPreferences preferences = mContext.getSharedPreferences(APP_NAME, MODE_PRIVATE);
+    SharedPreferences preferences = context.getApplicationContext().getSharedPreferences(APP_NAME, MODE_PRIVATE);
     SharedPreferences.Editor editor = preferences.edit();
 
-    editor.putString(userName + "linearDistance", registerLinearDistanceData);
-    editor.putString(userName + "angle", registerAngleData);
-    editor.putString(userName + "amplify", String.valueOf(ampValue));
+    editor.putString(userName+"vector", registerVectorData);
+    editor.putString(userName+"apmlify", String.valueOf(ampValue));
     editor.apply();
   }
 

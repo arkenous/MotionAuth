@@ -60,25 +60,14 @@ public class CosSimilarity {
   }
 
 
-  public MEASURE measure(double[] linearDistance, double[] angle) {
+  public MEASURE measure(double[] vectorCosSimilarity) {
     log(INFO);
-    double[] combined = new double[linearDistance.length + angle.length];
-    int combinedCount = 0;
-
-    for (double value : linearDistance) {
-      combined[combinedCount] = value;
-      combinedCount++;
-    }
-    for (double value : angle) {
-      combined[combinedCount] = value;
-      combinedCount++;
-    }
 
     double average = 0.0;
-    for (double value : combined) {
+    for (double value : vectorCosSimilarity) {
       average += value;
     }
-    average /= combined.length;
+    average /= vectorCosSimilarity.length;
 
     if (average > LOOSE) {
       if (average > NORMAL) {

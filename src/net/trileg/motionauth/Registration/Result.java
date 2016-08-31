@@ -52,8 +52,7 @@ class Result extends Handler implements Runnable {
 
   private float[][][] linearAccel;
   private float[][][] gyro;
-  private double[][] averageLinearDistance;
-  private double[][] averageAngle;
+  private double[][] averageVector;
   private boolean result = false;
 
 
@@ -128,9 +127,8 @@ class Result extends Handler implements Runnable {
           alert.show();
         } else {
           // 3回のモーションの平均値をファイルに書き出す
-          manageData.writeDoubleTwoArrayData(userName, "RegRegistered", "linearDistance", averageLinearDistance);
-          manageData.writeDoubleTwoArrayData(userName, "RegRegistered", "angle", averageAngle);
-          manageData.writeRegisterData(userName, averageLinearDistance, averageAngle, amp, context);
+          manageData.writeDoubleTwoArrayData(userName, "RegRegistered", "vector", averageVector);
+          manageData.writeRegisterData(userName, averageVector, amp, context);
 
           AlertDialog.Builder alert = new AlertDialog.Builder(context);
           alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
@@ -218,94 +216,70 @@ class Result extends Handler implements Runnable {
 
     LogUtil.log(Log.DEBUG, "After write data");
 
+    // 加速度センサより得られたデータを角速度センサより得られたデータで回転させる
+    RotateVector rotateVector = new RotateVector();
+    double[][][] vector = new double[linearDistance.length][linearDistance[0].length][linearDistance[0][0].length];
+    for (int time = 0; time < linearDistance.length; time++) {
+      vector[time] = rotateVector.rotate(linearDistance[time], angle[time]);
+    }
+
+    manageData.writeDoubleThreeArrayData(userName, "Combined", "vector", vector);
+
     this.sendEmptyMessage(DEVIATION);
 
     //region 同一のモーションであるかの確認をし，必要に応じてズレ修正を行う
     LogUtil.log(Log.DEBUG, "Before measure cosine similarity");
 
     // コサイン類似度を測る
-    double[] linearDistanceCosSimilarity = cosSimilarity.cosSimilarity(linearDistance);
-    double[] angleCosSimilarity = cosSimilarity.cosSimilarity(angle);
+    double[] vectorCosSimilarity = cosSimilarity.cosSimilarity(vector);
 
-    Enum.MEASURE measure = cosSimilarity.measure(linearDistanceCosSimilarity, angleCosSimilarity);
+    Enum.MEASURE measure = cosSimilarity.measure(vectorCosSimilarity);
 
     LogUtil.log(Log.INFO, "After measure cosine similarity");
     LogUtil.log(Log.INFO, "measure = " + String.valueOf(measure));
 
     if (Enum.MEASURE.INCORRECT == measure) {
-      // 相関係数が0.4以下
+      // 類似度が0.4以下
       return false;
     } else if (Enum.MEASURE.MAYBE == measure) {
       LogUtil.log(Log.DEBUG, "Deviation");
-      // 相関係数が0.4よりも高く，0.6以下の場合
-      // ズレ修正を行う
+      // 類似度が0.4よりも高く，0.6以下の場合，ズレ修正を行う
       int count = 0;
       Enum.MODE mode = Enum.MODE.MAX;
-      Enum.TARGET target = Enum.TARGET.DISTANCE;
 
-      double[][][] originalLinearDistance = linearDistance;
-      double[][][] originalAngle = angle;
+      double[][][] originalVector = vector;
 
-      // ズレ修正は基準値を最大値，最小値，中央値の順に置き，さらにdistance, linearDistance, angleの順にベースを置く．
+      // ズレ修正は基準値を最大値，最小値，中央値の順に置く．
       while (true) {
         switch (count) {
           case 0:
             mode = Enum.MODE.MAX;
-            target = Enum.TARGET.LINEAR_DISTANCE;
             break;
           case 1:
-            mode = Enum.MODE.MAX;
-            target = Enum.TARGET.ANGLE;
+            mode = Enum.MODE.MIN;
             break;
           case 2:
-            mode = Enum.MODE.MIN;
-            target = Enum.TARGET.LINEAR_DISTANCE;
-            break;
-          case 3:
-            mode = Enum.MODE.MIN;
-            target = Enum.TARGET.ANGLE;
-            break;
-          case 4:
             mode = Enum.MODE.MEDIAN;
-            target = Enum.TARGET.LINEAR_DISTANCE;
-            break;
-          case 5:
-            mode = Enum.MODE.MEDIAN;
-            target = Enum.TARGET.ANGLE;
             break;
         }
 
-        double[][][][] deviatedValue = correctDeviation.correctDeviation(originalLinearDistance,
-            originalAngle, mode, target);
+        vector = correctDeviation.correctDeviation(vector, mode);
 
-        for (int time = 0; time < Enum.NUM_TIME; time++) {
-          for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-            for (int item = 0; item < linearDistance[time][axis].length; item++) {
-              linearDistance[time][axis][item] = deviatedValue[0][time][axis][item];
-              angle[time][axis][item] = deviatedValue[1][time][axis][item];
-            }
-          }
-        }
+        vectorCosSimilarity = cosSimilarity.cosSimilarity(vector);
 
-        linearDistanceCosSimilarity = cosSimilarity.cosSimilarity(linearDistance);
-        angleCosSimilarity = cosSimilarity.cosSimilarity(angle);
-
-        Enum.MEASURE tmp = cosSimilarity.measure(linearDistanceCosSimilarity, angleCosSimilarity);
+        Enum.MEASURE tmp = cosSimilarity.measure(vectorCosSimilarity);
 
         LogUtil.log(Log.INFO, "MEASURE: " + String.valueOf(tmp));
 
-        manageData.writeDoubleThreeArrayData(userName, "DeviatedData" + String.valueOf(mode), "linearDistance", linearDistance);
-        manageData.writeDoubleThreeArrayData(userName, "DeviatedData" + String.valueOf(mode), "angle", angle);
-
+        manageData.writeDoubleThreeArrayData(userName, "DeviatedData" + String.valueOf(mode), "vector", vector);
 
         if (tmp == Enum.MEASURE.PERFECT || tmp == Enum.MEASURE.CORRECT) {
           break;
         }
 
-        linearDistance = originalLinearDistance;
-        angle = originalAngle;
+        vector = originalVector;
 
-        if (count == 5) {
+        if (count == 2) {
           // Break this loop if all pattern attempts were failed
           break;
         }
@@ -319,19 +293,16 @@ class Result extends Handler implements Runnable {
     }
     //endregion
 
-    manageData.writeDoubleThreeArrayData(userName, "AfterCalcData", "linearDistance", linearDistance);
-    manageData.writeDoubleThreeArrayData(userName, "AfterCalcData", "angle", angle);
+    manageData.writeDoubleThreeArrayData(userName, "AfterCalcData", "vector", vector);
 
     this.sendEmptyMessage(COSINE_SIMILARITY);
 
     // Calculate average data.
-    averageLinearDistance = calculateAverage(linearDistance);
-    averageAngle = calculateAverage(angle);
+    averageVector = calculateAverage(vector);
 
-    linearDistanceCosSimilarity = cosSimilarity.cosSimilarity(linearDistance);
-    angleCosSimilarity = cosSimilarity.cosSimilarity(angle);
+    vectorCosSimilarity = cosSimilarity.cosSimilarity(vector);
 
-    measure = cosSimilarity.measure(linearDistanceCosSimilarity, angleCosSimilarity);
+    measure = cosSimilarity.measure(vectorCosSimilarity);
     LogUtil.log(Log.INFO, "measure = " + measure);
     return measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT;
   }

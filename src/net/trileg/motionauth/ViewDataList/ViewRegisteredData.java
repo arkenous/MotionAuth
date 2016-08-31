@@ -83,16 +83,12 @@ public class ViewRegisteredData extends Activity {
     ArrayList<String> dataList = new ArrayList<>();
 
     ManageData mManageData = new ManageData();
-    ArrayList<double[][]> readData = mManageData.readRegisteredData(ViewRegisteredData.this, item);
-    double[][] readLinearDistance = readData.get(0);
-    double[][] readAngle = readData.get(1);
+    double[][] readVector = mManageData.readRegisteredData(ViewRegisteredData.this, item);
 
-    String[][] registeredLinearDistance = new String[readLinearDistance.length][readLinearDistance[0].length];
-    String[][] registeredAngle = new String[readAngle.length][readAngle[0].length];
+    String[][] registeredVector = new String[readVector.length][readVector[0].length];
     for (int axis = 0; axis < NUM_AXIS; axis++) {
-      for (int item = 0; item < readLinearDistance[axis].length; item++) {
-        registeredLinearDistance[axis][item] = String.valueOf(readLinearDistance[axis][item]);
-        registeredAngle[axis][item] = String.valueOf(readAngle[axis][item]);
+      for (int item = 0; item < readVector[axis].length; item++) {
+        registeredVector[axis][item] = String.valueOf(readVector[axis][item]);
       }
     }
 
@@ -108,34 +104,17 @@ public class ViewRegisteredData extends Activity {
     for (int axis = 0; axis < NUM_AXIS; axis++) {
       switch (axis) {
         case 0:
-          index = "LinearDistanceX";
+          index = "VectorX";
           break;
         case 1:
-          index = "LinearDistanceY";
+          index = "VectorY";
           break;
         case 2:
-          index = "LinearDistanceZ";
+          index = "VectorZ";
           break;
       }
-      for (int item = 0; item < registeredLinearDistance[axis].length; item++) {
-        dataList.add(index + " : " + registeredLinearDistance[axis][item] + " : " + ampValue);
-      }
-    }
-
-    for (int axis = 0; axis < NUM_AXIS; axis++) {
-      switch (axis) {
-        case 0:
-          index = "AngleX";
-          break;
-        case 1:
-          index = "AngleY";
-          break;
-        case 2:
-          index = "AngleZ";
-          break;
-      }
-      for (int item = 0; item < registeredAngle[axis].length; item++) {
-        dataList.add(index + " : " + registeredAngle[axis][item] + " : " + ampValue);
+      for (int item = 0; item < registeredVector[axis].length; item++) {
+        dataList.add(index + " : " + registeredVector[axis][item] + " : " + ampValue);
       }
     }
 

@@ -6,20 +6,12 @@ package net.trileg.motionauth.Utility;
  * @author Kensuke Kosaka
  */
 public class Enum {
-  public enum STATUS {
-    DOWN, UP
-  }
-
   public enum MEASURE {
     INCORRECT, MAYBE, CORRECT, PERFECT
   }
 
   public enum MODE {
     MAX, MIN, MEDIAN
-  }
-
-  public enum TARGET {
-    DISTANCE, LINEAR_DISTANCE, ANGLE
   }
 
   public static final double LOOSE = 0.4;

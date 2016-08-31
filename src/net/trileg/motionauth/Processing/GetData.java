@@ -16,6 +16,7 @@ import static android.hardware.SensorManager.SENSOR_DELAY_FASTEST;
 import static android.util.Log.DEBUG;
 import static android.util.Log.INFO;
 import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
+import static net.trileg.motionauth.Utility.Enum.SENSOR_DELAY_TIME;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
 public class GetData extends Handler implements Callable<ArrayList<ArrayList<Float>>>, SensorEventListener {
@@ -26,9 +27,14 @@ public class GetData extends Handler implements Callable<ArrayList<ArrayList<Flo
   private boolean isAcceleration;
   private ArrayList<ArrayList<Float>> dataPerTime = new ArrayList<>();
   private boolean isActive;
+  private int time;
+  private long firstMillis;
+
 
   public GetData(Context context, boolean isAcceleration) {
     log(INFO);
+    time = 0;
+    firstMillis = 0;
     this.isAcceleration = isAcceleration;
     this.sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
     if (this.isAcceleration) this.linearAcceleration = sensorManager.getDefaultSensor(TYPE_LINEAR_ACCELERATION);
@@ -71,6 +77,14 @@ public class GetData extends Handler implements Callable<ArrayList<ArrayList<Flo
 
   @Override
   public void onSensorChanged(SensorEvent sensorEvent) {
+    if (time == 1){
+      long secondMillis = System.currentTimeMillis();
+      SENSOR_DELAY_TIME = (secondMillis - firstMillis) / 1000.0;
+      time++;
+    } else if (time == 0) {
+      firstMillis = System.currentTimeMillis();
+      time++;
+    }
     collect(sensorEvent.values.clone());
   }
 

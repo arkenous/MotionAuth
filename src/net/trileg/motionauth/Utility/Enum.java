@@ -29,5 +29,5 @@ public class Enum {
   public static final int NUM_AXIS = 3;
   public static final int NUM_TIME = 3;
 
-  public static final double SENSOR_DELAY_TIME = 0.02;
+  public static double SENSOR_DELAY_TIME = 0.02;
 }

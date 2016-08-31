@@ -53,8 +53,7 @@ class Result extends Handler implements Runnable {
 
   private float[][] linearAccel;
   private float[][] gyro;
-  private double[][] registeredLinearDistance;
-  private double[][] registeredAngle;
+  private double[][] registeredVector;
   private boolean result = false;
 
 
@@ -74,8 +73,7 @@ class Result extends Handler implements Runnable {
     manageData.writeFloatData(userName, "AuthenticationRaw", "gyroscope", gyro);
 
     readRegisteredData();
-    manageData.writeDoubleTwoArrayData(userName, "AuthRegistered", "linearDistance", registeredLinearDistance);
-    manageData.writeDoubleTwoArrayData(userName, "AuthRegistered", "angle", registeredAngle);
+    manageData.writeDoubleTwoArrayData(userName, "AuthRegistered", "vector", registeredVector);
     result = calculate(linearAccel, gyro);
 
     this.sendEmptyMessage(FINISH);
@@ -155,9 +153,7 @@ class Result extends Handler implements Runnable {
    */
   private void readRegisteredData() {
     this.sendEmptyMessage(READ_DATA);
-    ArrayList<double[][]> readDataList = manageData.readRegisteredData(authentication, userName);
-    registeredLinearDistance = readDataList.get(0);
-    registeredAngle = readDataList.get(1);
+    registeredVector = manageData.readRegisteredData(authentication, userName);
 
     SharedPreferences preferences = authentication.getApplicationContext().getSharedPreferences("MotionAuth", MODE_PRIVATE);
     String registeredAmplify = preferences.getString(userName + "amplify", "");
@@ -174,7 +170,7 @@ class Result extends Handler implements Runnable {
    * @return true if authentication is succeed, otherwise false.
    */
   private boolean calculate(float[][] linearAccel, float[][] gyro) {
-    ArrayList<float[][]> adjusted = adjuster.adjust(linearAccel, gyro, registeredLinearDistance[0].length);
+    ArrayList<float[][]> adjusted = adjuster.adjust(linearAccel, gyro, registeredVector[0].length);
     linearAccel = adjusted.get(0);
     gyro = adjusted.get(1);
 
@@ -194,17 +190,18 @@ class Result extends Handler implements Runnable {
     double[][] linearDistance = calc.accelToDistance(linearAcceleration, SENSOR_DELAY_TIME);
     double[][] angle = calc.gyroToAngle(gyroscope, SENSOR_DELAY_TIME);
 
-    manageData.writeDoubleTwoArrayData(userName, "AuthAfterCalcData", "linearDistance", linearDistance);
-    manageData.writeDoubleTwoArrayData(userName, "AuthAfterCalcData", "angle", angle);
+    RotateVector rotateVector = new RotateVector();
+    double[][] vector = rotateVector.rotate(linearDistance, angle);
+
+    manageData.writeDoubleTwoArrayData(userName, "AuthAfterCalcData", "vector", vector);
 
     // コサイン類似度を測る
     log(INFO, "Before Cosine Similarity");
-    double linearDistanceSimilarity = cosSimilarity.cosSimilarity(linearDistance, registeredLinearDistance);
-    double angleSimilarity = cosSimilarity.cosSimilarity(angle, registeredAngle);
+    double vectorSimilarity = cosSimilarity.cosSimilarity(vector, registeredVector);
     log(INFO, "After Cosine Similarity");
 
     this.sendEmptyMessage(COSINE_SIMILARITY);
-    Enum.MEASURE measure = cosSimilarity.measure(linearDistanceSimilarity, angleSimilarity);
+    Enum.MEASURE measure = cosSimilarity.measure(vectorSimilarity);
     return measure == PERFECT || measure == CORRECT;
   }
 }

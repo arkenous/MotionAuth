@@ -6,7 +6,6 @@ import android.os.Environment;
 import net.trileg.motionauth.Processing.CipherCrypt;
 
 import java.io.*;
-import java.util.ArrayList;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.os.Environment.MEDIA_MOUNTED;
@@ -187,38 +186,30 @@ public class ManageData {
    * @param userName User name.
    * @return Double type 2-array registered data list.
    */
-  public ArrayList<double[][]> readRegisteredData(Context context, String userName) {
+  public double[][] readRegisteredData(Context context, String userName) {
     log(INFO);
     Context mContext = context.getApplicationContext();
 
     SharedPreferences preferences = mContext.getSharedPreferences(APP_NAME, MODE_PRIVATE);
 
-    String registeredLinearDistanceData = preferences.getString(userName + "linearDistance", "");
-    String registeredAngleData = preferences.getString(userName + "angle", "");
+    String registeredVectorData = preferences.getString(userName+"vector", "");
 
-    if ("".equals(registeredLinearDistanceData)) throw new RuntimeException();
+    if ("".equals(registeredVectorData)) throw new RuntimeException();
 
     ConvertArrayAndString mConvertArrayAndString = new ConvertArrayAndString();
     CipherCrypt mCipherCrypt = new CipherCrypt(context);
 
-    String[][] decryptedLinearDistance = mCipherCrypt.decrypt(mConvertArrayAndString.stringToArray(registeredLinearDistanceData));
-    String[][] decryptedAngle = mCipherCrypt.decrypt(mConvertArrayAndString.stringToArray(registeredAngleData));
+    String[][] decryptedVector = mCipherCrypt.decrypt(mConvertArrayAndString.stringToArray(registeredVectorData));
 
-    double[][] linearDistance = new double[decryptedLinearDistance.length][decryptedLinearDistance[0].length];
-    double[][] angle = new double[decryptedAngle.length][decryptedAngle[0].length];
+    double[][] vector = new double[decryptedVector.length][decryptedVector[0].length];
 
     for (int axis = 0; axis < NUM_AXIS; axis++) {
-      for (int item = 0; item < decryptedLinearDistance[axis].length; item++) {
-        linearDistance[axis][item] = Double.valueOf(decryptedLinearDistance[axis][item]);
-        angle[axis][item] = Double.valueOf(decryptedAngle[axis][item]);
+      for (int item = 0; item < decryptedVector[axis].length; item++) {
+        vector[axis][item] = Double.valueOf(decryptedVector[axis][item]);
       }
     }
 
-    ArrayList<double[][]> result = new ArrayList<>();
-    result.add(linearDistance);
-    result.add(angle);
-
-    return result;
+    return vector;
   }
 
 

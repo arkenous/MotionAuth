@@ -82,11 +82,11 @@ public class CosSimilarity {
   }
 
 
-  public MEASURE measure(double linearDistance, double angle) {
+  public MEASURE measure(double vector) {
     log(INFO);
-    if (STRICT < linearDistance && STRICT < angle) return PERFECT;
-    else if (NORMAL < linearDistance && NORMAL < angle) return CORRECT;
-    else if (LOOSE < linearDistance && LOOSE < angle) return MAYBE;
+    if (STRICT < vector) return PERFECT;
+    else if (NORMAL < vector) return CORRECT;
+    else if (LOOSE < vector) return MAYBE;
     else return INCORRECT;
   }
 }

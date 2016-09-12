@@ -60,24 +60,12 @@ public class CosSimilarity {
   }
 
 
-  public MEASURE measure(double[] vectorCosSimilarity) {
+  public MEASURE measure(double[] cosSimilarity) {
     log(INFO);
 
-    double average = 0.0;
-    for (double value : vectorCosSimilarity) {
-      average += value;
-    }
-    average /= vectorCosSimilarity.length;
-
-    if (average > LOOSE) {
-      if (average > NORMAL) {
-        if (average > STRICT) {
-          return PERFECT;
-        }
-        return CORRECT;
-      }
-      return MAYBE;
-    }
+    if (cosSimilarity[0] > STRICT && cosSimilarity[1] > STRICT && cosSimilarity[2] > STRICT) return PERFECT;
+    if (cosSimilarity[0] > NORMAL && cosSimilarity[1] > NORMAL && cosSimilarity[2] > NORMAL) return CORRECT;
+    if (cosSimilarity[0] > LOOSE && cosSimilarity[1] > LOOSE && cosSimilarity[2] > LOOSE) return MAYBE;
     return INCORRECT;
   }
 

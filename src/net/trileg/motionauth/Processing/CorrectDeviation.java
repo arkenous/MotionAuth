@@ -28,13 +28,13 @@ public class CorrectDeviation {
     log(INFO);
 
     // ずらしたデータを格納する配列
-    double[][][] corrected = new double[NUM_TIME][NUM_AXIS][vector[0][0].length];
+    double[][][] corrected = new double[vector.length][NUM_AXIS][vector[0][0].length];
 
     //region 試行回ごとの代表値の出ている時間を抽出
-    double[][] representativeValue = new double[NUM_TIME][NUM_AXIS];
-    int[][] representativeTime = new int[NUM_TIME][NUM_AXIS];
+    double[][] representativeValue = new double[vector.length][NUM_AXIS];
+    int[][] representativeTime = new int[vector.length][NUM_AXIS];
 
-    for (int time = 0; time < NUM_TIME; time++) {
+    for (int time = 0; time < vector.length; time++) {
       for (int axis = 0; axis < NUM_AXIS; axis++) {
         representativeValue[time][axis] = vector[time][axis][0];
       }
@@ -43,7 +43,7 @@ public class CorrectDeviation {
     switch (mode) {
       case MAX:
         log(DEBUG, "MAX");
-        for (int time = 0; time < NUM_TIME; time++) {
+        for (int time = 0; time < vector.length; time++) {
           for (int axis = 0; axis < NUM_AXIS; axis++) {
             for (int item = 0; item < vector[time][axis].length; item++) {
               if (representativeValue[time][axis] < vector[time][axis][item]) {
@@ -56,7 +56,7 @@ public class CorrectDeviation {
         break;
       case MIN:
         log(DEBUG, "MIN");
-        for (int time = 0; time < NUM_TIME; time++) {
+        for (int time = 0; time < vector.length; time++) {
           for (int axis = 0; axis < NUM_AXIS; axis++) {
             for (int item = 0; item < vector[time][axis].length; item++) {
               if (representativeValue[time][axis] > vector[time][axis][item]) {
@@ -70,7 +70,7 @@ public class CorrectDeviation {
       case MEDIAN:
         log(DEBUG, "MEDIAN");
         // キーが自動ソートされるTreeMapを用いる．データと順番を紐付けしたものを作成し，中央値の初期の順番の値を取り出す．
-        for (int time = 0; time < NUM_TIME; time++) {
+        for (int time = 0; time < vector.length; time++) {
           for (int axis = 0; axis < NUM_AXIS; axis++) {
             TreeMap<Double, Integer> treeMap = new TreeMap<>();
 
@@ -91,26 +91,24 @@ public class CorrectDeviation {
     }
     //endregion
 
-    //region 1回目のデータの代表値が出た場所と2回目・3回目のデータのだ痔表値が出た場所の差を取り，その差だけデータをずらす（ずらしてはみ出たデータは空いたところに入れる）
-    int lagData[][] = new int[2][NUM_AXIS];
+    //region 1回目のデータの代表値が出た場所とそれ以降のデータの代表値が出た場所の差を取り，その差だけデータをずらす（ずらしてはみ出たデータは空いたところに入れる）
+    int lagData[][] = new int[vector.length - 1][NUM_AXIS];
 
     // どれだけずれているかを計算する
     for (int axis = 0; axis < NUM_AXIS; axis++) {
-      lagData[0][axis] = representativeTime[0][axis] - representativeTime[1][axis];
-      lagData[1][axis] = representativeTime[0][axis] - representativeTime[2][axis];
-      log(DEBUG, "lagData[0][" + axis + "]: " + lagData[0][axis]);
-      log(DEBUG, "lagData[1][" + axis + "]: " + lagData[1][axis]);
+      for (int time = 0; time < lagData.length; time++) {
+        lagData[time][axis] = representativeTime[0][axis] - representativeTime[time + 1][axis];
+        log(DEBUG, "lagData["+time+"]["+axis+"]: " + lagData[time][axis]);
+      }
     }
 
     // 1回目のデータに関しては基準となるデータなのでそのまま入れる
     for (int axis = 0; axis < NUM_AXIS; axis++) {
-      for (int item = 0; item < vector[0][axis].length; item++) {
-        corrected[0][axis][item] = vector[0][axis][item];
-      }
+      System.arraycopy(vector[0][axis], 0, corrected[0][axis], 0, vector[0][axis].length);
     }
 
     // 実際にデータをずらしていく（ずらすのは，1回目を除くデータ）
-    for (int time = 1; time < NUM_TIME; time++) {
+    for (int time = 1; time < vector.length; time++) {
       for (int axis = 0; axis < NUM_AXIS; axis++) {
         ArrayList<Double> vectorTmp = new ArrayList<>();
 

@@ -12,7 +12,6 @@ import static android.os.Environment.MEDIA_MOUNTED;
 import static android.util.Log.*;
 import static java.io.File.separator;
 import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
-import static net.trileg.motionauth.Utility.Enum.NUM_TIME;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
 
@@ -114,7 +113,7 @@ public class ManageData {
     }
 
     try {
-      for (int time = 0; time < NUM_TIME; time++) {
+      for (int time = 0; time < data.length; time++) {
         String filePath = FOLDER_PATH + separator + sensorName + String.valueOf(time) + ".dat";
         file = new File(filePath);
 
@@ -242,7 +241,7 @@ public class ManageData {
     }
 
     try {
-      for (int time = 0; time < NUM_TIME; time++) {
+      for (int time = 0; time < data.length; time++) {
         String filePath = DIR_PATH + separator + sensorName + String.valueOf(time) + ".dat";
         file = new File(filePath);
 

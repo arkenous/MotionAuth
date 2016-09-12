@@ -11,6 +11,7 @@ import android.view.*;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import net.trileg.motionauth.Processing.GetData;
 import net.trileg.motionauth.Processing.Timer;
 import net.trileg.motionauth.R;
@@ -57,6 +58,7 @@ public class Registration extends Activity {
   private ArrayList<ArrayList<ArrayList<Float>>> linearAccelerationData = new ArrayList<>();
   private ArrayList<ArrayList<ArrayList<Float>>> gyroscopeData = new ArrayList<>();
   private int countTime = 0;
+  private int getTimes = 3;
 
 
   @Override
@@ -152,7 +154,7 @@ public class Registration extends Activity {
         linearAccelerationData.add(new ArrayList<>(linearAccelerationPerTime));
         gyroscopeData.add(new ArrayList<>(gyroscopePerTime));
         countTime++;
-        if (countTime == 3) finishGetMotion(linearAccelerationData, gyroscopeData);
+        if (countTime == getTimes) finishGetMotion(linearAccelerationData, gyroscopeData);
         else init();
       }
     } catch (InterruptedException | ExecutionException e) {
@@ -253,7 +255,7 @@ public class Registration extends Activity {
     log(INFO);
     getMotion.setText("モーションデータ取得");
     rest.setText("あと");
-    second.setText(String.valueOf(3 - countTime));
+    second.setText(String.valueOf(getTimes - countTime));
     unit.setText("回");
     getMotion.setClickable(true);
   }
@@ -283,6 +285,66 @@ public class Registration extends Activity {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
+      case R.id.change_get_times:
+        if (getMotion.isClickable() && countTime == 0) {
+          LayoutInflater inflater = LayoutInflater.from(Registration.this);
+          View seekView = inflater.inflate(R.layout.change_get_times, (ViewGroup) findViewById(R.id.dialog_root));
+
+          //region モーション取得回数変更
+          SeekBar getTimesSeekBar = (SeekBar) seekView.findViewById(R.id.change_get_times_seekbar);
+          final TextView getTimesSeekText = (TextView) seekView.findViewById(R.id.change_get_times_text);
+          getTimesSeekText.setText("モーションの取得回数を設定します．\n" +
+              "回数が少ない場合，平均化されにくくなることで認証が通りづらくなる可能性があります．\n" +
+              "デフォルトは3回です．現在の値は" + getTimes + "です．");
+
+          getTimesSeekBar.setMax(5);
+          getTimesSeekBar.setProgress(3);
+          getTimesSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+              getTimes = seekBar.getProgress();
+              if (getTimes == 0) getTimes = 1;
+              getTimesSeekText.setText("モーションの取得回数を設定します．\n" +
+                  "回数が少ない場合，平均化されにくくなることで認証が通りづらくなる可能性があります．\n" +
+                  "デフォルトは3回です．現在の値は" + getTimes + "です．");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar){}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+              getTimes = seekBar.getProgress();
+              if (getTimes == 0) getTimes = 1;
+              getTimesSeekText.setText("モーションの取得回数を設定します．\n" +
+                  "回数が少ない場合，平均化されにくくなることで認証が通りづらくなる可能性があります．\n" +
+                  "デフォルトは3回です．現在の値は" + getTimes + "です．");
+            }
+          });
+          //endregion
+
+          AlertDialog.Builder dialog = new AlertDialog.Builder(Registration.this);
+          dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialogInterface, int keyCode, KeyEvent keyEvent) {
+              return keyCode == KEYCODE_BACK;
+            }
+          });
+          dialog.setTitle("モーション取得回数変更");
+          dialog.setView(seekView);
+          dialog.setCancelable(false);
+          dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+              second.setText(String.valueOf(getTimes - countTime));
+            }
+          });
+          dialog.show();
+        } else {
+          Toast.makeText(Registration.this, "取得回数の変更はモーション入力後には出来ません．", Toast.LENGTH_LONG).show();
+        }
+        return true;
+
       case R.id.change_range_value:
         if (getMotion.isClickable()) {
           LayoutInflater inflater = LayoutInflater.from(Registration.this);

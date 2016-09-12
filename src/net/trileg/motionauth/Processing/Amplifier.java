@@ -3,7 +3,6 @@ package net.trileg.motionauth.Processing;
 import static android.util.Log.DEBUG;
 import static android.util.Log.INFO;
 import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
-import static net.trileg.motionauth.Utility.Enum.NUM_TIME;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
 /**
@@ -26,10 +25,10 @@ public class Amplifier {
 
     log(DEBUG, "checkRangeValue" + checkRangeValue);
 
-    double[][] max = new double[NUM_TIME][NUM_AXIS];
-    double[][] min = new double[NUM_TIME][NUM_AXIS];
+    double[][] max = new double[data.length][NUM_AXIS];
+    double[][] min = new double[data.length][NUM_AXIS];
 
-    for (int time = 0; time < NUM_TIME; time++) {
+    for (int time = 0; time < data.length; time++) {
       for (int axis = 0; axis < NUM_AXIS; axis++) {
         max[time][axis] = 0;
         min[time][axis] = 0;
@@ -37,7 +36,7 @@ public class Amplifier {
     }
 
     double range;
-    for (int time = 0; time < NUM_TIME; time++) {
+    for (int time = 0; time < data.length; time++) {
       for (int axis = 0; axis < NUM_AXIS; axis++) {
         for (int item = 0; item < data[time][axis].length; item++) {
           if (data[time][axis][item] > max[time][axis]) {
@@ -49,7 +48,7 @@ public class Amplifier {
       }
     }
 
-    for (int time = 0; time < NUM_TIME; time++) {
+    for (int time = 0; time < data.length; time++) {
       for (int axis = 0; axis < NUM_AXIS; axis++) {
         range = max[time][axis] - min[time][axis];
         log(DEBUG, "range = " + range);
@@ -72,7 +71,7 @@ public class Amplifier {
     log(INFO);
 
     if (ampValue != 0.0) {
-      for (int time = 0; time < NUM_TIME; time++) {
+      for (int time = 0; time < data.length; time++) {
         for (int axis = 0; axis < NUM_AXIS; axis++) {
           for (int item = 0; item < data[time][axis].length; item++) {
             data[time][axis][item] *= ampValue;

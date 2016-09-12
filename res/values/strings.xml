@@ -12,7 +12,7 @@
     <string name="one">①</string>
     <string name="description1">モーションデータ取得ボタンを押している間，モーションデータを取得します．お好きな動きをどうぞ．</string>
     <string name="two">②</string>
-    <string name="regist_description2">データ取得は3回行います．データ取得が正常に完了すれば，登録は終了です．</string>
+    <string name="regist_description2">データ取得はデフォルトでは3回行います．データ取得が正常に完了すれば，登録は終了です．</string>
     <string name="auth_description2">データ取得は1回行います．</string>
     <string name="three">③</string>
     <string name="description3">データ取得完了後，認証を行います．</string>
@@ -31,5 +31,6 @@
     <string name="reset">リセット</string>
     <string name="title_activity_view_auth_rdata">ViewAuthRData</string>
     <string name="text">text</string>
+    <string name="change_get_times">データ取得回数設定</string>
 
 </resources>

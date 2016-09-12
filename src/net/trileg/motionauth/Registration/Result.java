@@ -126,7 +126,7 @@ class Result extends Handler implements Runnable {
 
           alert.show();
         } else {
-          // 3回のモーションの平均値をファイルに書き出す
+          // モーションの平均値をファイルに書き出す
           manageData.writeDoubleTwoArrayData(userName, "RegRegistered", "vector", averageVector);
           manageData.writeRegisterData(userName, averageVector, amp, context);
 
@@ -312,7 +312,8 @@ class Result extends Handler implements Runnable {
     double[][] output = new double[Enum.NUM_AXIS][input[0][0].length];
     for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
       for (int item = 0; item < output[axis].length; item++) {
-        output[axis][item] = (input[0][axis][item] + input[1][axis][item] + input[2][axis][item]) / 3;
+        for (double[][] anInput : input) output[axis][item] += anInput[axis][item];
+        output[axis][item] /= input.length;
       }
     }
 

@@ -63,10 +63,16 @@ public class CosSimilarity {
   public MEASURE measure(double[] cosSimilarity) {
     log(INFO);
 
-    if (cosSimilarity[0] > STRICT && cosSimilarity[1] > STRICT && cosSimilarity[2] > STRICT) return PERFECT;
-    if (cosSimilarity[0] > NORMAL && cosSimilarity[1] > NORMAL && cosSimilarity[2] > NORMAL) return CORRECT;
-    if (cosSimilarity[0] > LOOSE && cosSimilarity[1] > LOOSE && cosSimilarity[2] > LOOSE) return MAYBE;
-    return INCORRECT;
+    MEASURE result = PERFECT;
+
+    for (double aCosSimilarity : cosSimilarity) if (aCosSimilarity <= STRICT) result = CORRECT;
+    if (result == PERFECT) return result;
+
+    for (double aCosSimilarity : cosSimilarity) if (aCosSimilarity <= NORMAL) result = MAYBE;
+    if (result == CORRECT) return result;
+
+    for (double aCosSimilarity : cosSimilarity) if (aCosSimilarity <= LOOSE) result = INCORRECT;
+    return result;
   }
 
 

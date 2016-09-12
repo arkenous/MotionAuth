@@ -5,7 +5,6 @@ import net.trileg.motionauth.Utility.ManageData;
 
 import static android.util.Log.INFO;
 import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
-import static net.trileg.motionauth.Utility.Enum.NUM_TIME;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
 /**
@@ -38,14 +37,14 @@ public class Fourier {
       }
     }
 
-    double[][][] real = new double[NUM_TIME][NUM_AXIS][data[0][0].length / 2];
-    double[][][] imaginary = new double[NUM_TIME][NUM_AXIS][data[0][0].length / 2];
+    double[][][] real = new double[data.length][NUM_AXIS][data[0][0].length / 2];
+    double[][][] imaginary = new double[data.length][NUM_AXIS][data[0][0].length / 2];
 
     int countReal;
     int countImaginary;
 
     // Decompose real-part and imaginary-part
-    for (int time = 0; time < NUM_TIME; time++) {
+    for (int time = 0; time < data.length; time++) {
       for (int axis = 0; axis < NUM_AXIS; axis++) {
         countReal = 0;
         countImaginary = 0;
@@ -64,9 +63,9 @@ public class Fourier {
     mManageData.writeDoubleThreeArrayData(userName, "ResultFFT", "rFFT" + sensorName, real);
     mManageData.writeDoubleThreeArrayData(userName, "ResultFFT", "iFFT" + sensorName, imaginary);
 
-    double[][][] power = new double[NUM_TIME][NUM_AXIS][data[0][0].length / 2];
+    double[][][] power = new double[data.length][NUM_AXIS][data[0][0].length / 2];
 
-    for (int time = 0; time < NUM_TIME; time++) {
+    for (int time = 0; time < data.length; time++) {
       for (int axis = 0; axis < NUM_AXIS; axis++) {
         for (int item = 0; item < data[time][axis].length / 2; item++) {
           power[time][axis][item] = Math.sqrt(Math.pow(real[time][axis][item], 2) + Math.pow(imaginary[time][axis][item], 2));
@@ -77,7 +76,7 @@ public class Fourier {
     mManageData.writeDoubleThreeArrayData(userName, "ResultFFT", "powerFFT" + sensorName, power);
 
     // Low pass filtering
-    for (int time = 0; time < NUM_TIME; time++) {
+    for (int time = 0; time < data.length; time++) {
       for (int axis = 0; axis < NUM_AXIS; axis++) {
         for (int item = 0; item < data[time][axis].length; item++) {
           if (item > 30) data[time][axis][item] = 0;

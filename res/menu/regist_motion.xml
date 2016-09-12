@@ -6,6 +6,9 @@
     <!--android:showAsAction="never"-->
     <!--android:title="@string/action_settings"/>-->
     <item
+        android:id="@+id/change_get_times"
+        android:title="@string/change_get_times"/>
+    <item
         android:id="@+id/change_range_value"
         android:title="@string/amplifier_settings"/>
     <item

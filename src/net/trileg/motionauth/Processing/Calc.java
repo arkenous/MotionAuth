@@ -2,7 +2,6 @@ package net.trileg.motionauth.Processing;
 
 import static android.util.Log.INFO;
 import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
-import static net.trileg.motionauth.Utility.Enum.NUM_TIME;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
 /**
@@ -22,9 +21,9 @@ public class Calc {
   public double[][][] accelToDistance(double[][][] inputVal, double t) {
     log(INFO);
 
-    double[][][] returnVal = new double[NUM_TIME][NUM_AXIS][inputVal[0][0].length];
+    double[][][] returnVal = new double[inputVal.length][NUM_AXIS][inputVal[0][0].length];
 
-    for (int time = 0; time < NUM_TIME; time++) {
+    for (int time = 0; time < inputVal.length; time++) {
       for (int axis = 0; axis < NUM_AXIS; axis++) {
         for (int item = 0; item < inputVal[time][axis].length; item++) {
           returnVal[time][axis][item] = (inputVal[time][axis][item] * t * t) / 2;
@@ -46,9 +45,9 @@ public class Calc {
   public double[][][] gyroToAngle(double[][][] inputVal, double t) {
     log(INFO);
 
-    double[][][] returnVal = new double[NUM_TIME][NUM_AXIS][inputVal[0][0].length];
+    double[][][] returnVal = new double[inputVal.length][NUM_AXIS][inputVal[0][0].length];
 
-    for (int time = 0; time < NUM_TIME; time++) {
+    for (int time = 0; time < inputVal.length; time++) {
       for (int axis = 0; axis < NUM_AXIS; axis++) {
         for (int item = 0; item < inputVal[time][axis].length; item++) {
           returnVal[time][axis][item] = (inputVal[time][axis][item] * t);

@@ -3,7 +3,6 @@ package net.trileg.motionauth.Processing;
 import java.util.ArrayList;
 
 import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
-import static net.trileg.motionauth.Utility.Enum.NUM_TIME;
 
 /**
  * Adjustment data length.
@@ -16,22 +15,19 @@ public class Adjuster {
   public ArrayList<float[][][]> adjust(float[][][] linearAcceleration,
                                        float[][][] gyroscope) {
     // Get max length of each time data.
-    int firstLength = linearAcceleration[0][0].length;
-    int secondLength = linearAcceleration[1][0].length;
-    int thirdLength = linearAcceleration[2][0].length;
+    ArrayList<Integer> lengthList = new ArrayList<>();
+    for (float[][] aLinearAcceleration : linearAcceleration)
+      lengthList.add(aLinearAcceleration[0].length);
 
-    int maxTime;
-    int maxLength;
+    int maxTime = 0;
+    int maxLength = 0;
 
-    if (firstLength >= secondLength && firstLength >= thirdLength) {
-      maxTime = 0;
-      maxLength = firstLength;
-    } else if (secondLength >= firstLength && secondLength >= thirdLength) {
-      maxTime = 1;
-      maxLength = secondLength;
-    } else {
-      maxTime = 2;
-      maxLength = thirdLength;
+    int tmp = 0;
+    for (int time = 0; time < linearAcceleration.length; time++) {
+      if (tmp < lengthList.get(time)) {
+        maxTime = time;
+        maxLength = lengthList.get(time);
+      }
     }
 
     // Adjust data length to even number for low pass filtering
@@ -40,7 +36,7 @@ public class Adjuster {
     float[][][] linearAccelerationArray = new float[linearAcceleration.length][linearAcceleration[0].length][maxLength];
     float[][][] gyroscopeArray = new float[gyroscope.length][gyroscope[0].length][maxLength];
 
-    for (int time = 0; time < NUM_TIME; time++) {
+    for (int time = 0; time < linearAcceleration.length; time++) {
       if (time == maxTime) {
         for (int axis = 0; axis < NUM_AXIS; axis++) {
           for (int length = 0; length < maxLength; length++) {

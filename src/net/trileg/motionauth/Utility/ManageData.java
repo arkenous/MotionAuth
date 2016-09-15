@@ -68,7 +68,7 @@ public class ManageData {
       bw = new BufferedWriter(osw);
 
       for (int item = 0; item < data[0].length; item++) {
-        bw.write(data[0][item] + " " + data[1][item] + " " + data[2][item] + "\n");
+        bw.write(data[0][item] + "," + data[1][item] + "," + data[2][item] + ",\n");
       }
 
       bw.flush();
@@ -122,7 +122,7 @@ public class ManageData {
         bw = new BufferedWriter(osw);
 
         for (int item = 0; item < data[time][0].length; item++) {
-          bw.write(data[time][0][item] + " " + data[time][1][item] + " " + data[time][2][item] + "\n");
+          bw.write(data[time][0][item] + "," + data[time][1][item] + "," + data[time][2][item] + ",\n");
         }
 
         bw.flush();
@@ -250,7 +250,7 @@ public class ManageData {
         bw = new BufferedWriter(osw);
 
         for (int item = 0; item < data[time][0].length; item++) {
-          bw.write(data[time][0][item] + " " + data[time][1][item] + " " + data[time][2][item] + "\n");
+          bw.write(data[time][0][item] + "," + data[time][1][item] + "," + data[time][2][item] + ",\n");
         }
 
         bw.flush();
@@ -295,7 +295,7 @@ public class ManageData {
       bw = new BufferedWriter(osw);
 
       for (int item = 0; item < data[0].length; item++) {
-        bw.write(data[0][item] + " " + data[1][item] + " " + data[2][item] + "\n");
+        bw.write(data[0][item] + "," + data[1][item] + "," + data[2][item] + ",\n");
       }
 
       bw.flush();

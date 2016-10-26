@@ -173,7 +173,7 @@ public class ManageData {
     SharedPreferences.Editor editor = preferences.edit();
 
     editor.putString(userName+"vector", registerVectorData);
-    editor.putString(userName+"apmlify", String.valueOf(ampValue));
+    editor.putString(userName+"amplify", String.valueOf(ampValue));
     editor.apply();
   }
 

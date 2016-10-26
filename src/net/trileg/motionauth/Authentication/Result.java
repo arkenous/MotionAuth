@@ -14,8 +14,6 @@ import net.trileg.motionauth.Processing.*;
 import net.trileg.motionauth.Utility.Enum;
 import net.trileg.motionauth.Utility.ManageData;
 
-import java.util.ArrayList;
-
 import static android.content.Context.MODE_PRIVATE;
 import static android.util.Log.INFO;
 import static net.trileg.motionauth.Authentication.InputName.userName;
@@ -170,9 +168,8 @@ class Result extends Handler implements Runnable {
    * @return true if authentication is succeed, otherwise false.
    */
   private boolean calculate(float[][] linearAccel, float[][] gyro) {
-    ArrayList<float[][]> adjusted = adjuster.adjust(linearAccel, gyro, registeredVector[0].length);
-    linearAccel = adjusted.get(0);
-    gyro = adjusted.get(1);
+    linearAccel = adjuster.adjust(linearAccel, registeredVector[0].length);
+    gyro = adjuster.adjust(gyro, registeredVector[0].length);
 
     this.sendEmptyMessage(FORMAT);
     double[][] linearAcceleration = formatter.convertFloatToDouble(linearAccel);
@@ -194,6 +191,9 @@ class Result extends Handler implements Runnable {
     double[][] vector = rotateVector.rotate(linearDistance, angle);
 
     manageData.writeDoubleTwoArrayData(userName, "AuthAfterCalcData", "vector", vector);
+
+    manageData.writeDoubleTwoArrayData(userName, "NNTest", "RegisteredVector", registeredVector);
+    manageData.writeDoubleTwoArrayData(userName, "NNTest", "InputVector", vector);
 
     // コサイン類似度を測る
     log(INFO, "Before Cosine Similarity");

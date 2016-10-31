@@ -17,6 +17,14 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.0"
 
+    defaultConfig {
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++11"
+            }
+        }
+    }
+
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'

@@ -49,8 +49,16 @@ public class Start extends Activity {
     requestWindowFeature(Window.FEATURE_NO_TITLE);
     setContentView(R.layout.activity_start);
 
-    double retValue = mlplearn(5.0);
-    log(DEBUG, "retValue: "+retValue);
+    double[][] input = {
+        {0.0, 1.0},
+        {2.0, 3.0}
+    };
+    double[][] retValue = mlplearn(input);
+    for (double ret1[] : retValue) {
+      for (double ret2 : ret1) {
+        log(DEBUG, "Value: " + ret2);
+      }
+    }
 
     selectMode();
   }
@@ -129,5 +137,5 @@ public class Start extends Activity {
     startActivity(intent);
   }
 
-  public native double mlplearn(double input);
+  public native double[][] mlplearn(double[][] input);
 }

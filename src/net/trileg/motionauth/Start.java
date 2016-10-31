@@ -13,6 +13,7 @@ import android.widget.Button;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static android.util.Log.DEBUG;
 import static android.util.Log.INFO;
 import static android.util.Log.VERBOSE;
 import static android.view.KeyEvent.KEYCODE_BACK;
@@ -29,6 +30,9 @@ import static net.trileg.motionauth.Utility.LogUtil.setShowLog;
 public class Start extends Activity {
   private Context mContext;
 
+  static {
+    System.loadLibrary("mlp-lib");
+  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +48,9 @@ public class Start extends Activity {
     // Disable title bar.
     requestWindowFeature(Window.FEATURE_NO_TITLE);
     setContentView(R.layout.activity_start);
+
+    double retValue = mlplearn(5.0);
+    log(DEBUG, "retValue: "+retValue);
 
     selectMode();
   }
@@ -121,4 +128,6 @@ public class Start extends Activity {
 
     startActivity(intent);
   }
+
+  public native double mlplearn(double input);
 }

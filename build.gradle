@@ -40,4 +40,9 @@ android {
         debug.setRoot('build-types/debug')
         release.setRoot('build-types/release')
     }
+    externalNativeBuild {
+        cmake {
+            path 'src/cpp/CMakeLists.txt'
+        }
+    }
 }

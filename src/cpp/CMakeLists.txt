@@ -1,4 +1,4 @@
 cmake_minimum_required(VERSION 3.6)
 
-add_library ( mlp-lib SHARED MlpInterface.cpp MultiLayerPerceptron.cpp Neuron.cpp)
-target_include_directories(mlp-lib PRIVATE ${ANDROID_NDK}/sources/android/cpufeatures)
+include_directories(${ANDROID_NDK}/sources/android/cpufeatures)
+add_library ( mlp-lib SHARED MlpInterface.cpp MultiLayerPerceptron.cpp Neuron.cpp ${ANDROID_NDK}/sources/android/cpufeatures/cpu-features.c)

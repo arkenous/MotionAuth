@@ -3,30 +3,28 @@
 //
 
 #include "Neuron.h"
-#include <iostream>
-#include <sstream>
-#include <random>
-#include <math.h>
 
 
 /**
  * Neuronのコンストラクタ
  * @param inputNeuronNum 入力ニューロン数（入力データ数）
+ * @param weight 結合荷重の重み付けデータ
  * @return
  */
-Neuron::Neuron(unsigned long inputNeuronNum) {
+Neuron::Neuron(unsigned long inputNeuronNum, std::vector<double> weight, double threshold) {
   this->inputNeuronNum = inputNeuronNum;
-  this->inputWeights.reserve(this->inputNeuronNum);
   std::random_device rnd; // 非決定的乱数生成器
   std::mt19937 mt; // メルセンヌ・ツイスタ
   mt.seed(rnd());
   std::uniform_real_distribution<double> real_rnd(0.0, 1.0);
-  this->threshold = real_rnd(mt); // 閾値を乱数で設定
 
-  // 結合荷重をを乱数で初期化
-  for (int i = 0; i < this->inputNeuronNum; ++i) {
-    this->inputWeights.push_back(real_rnd(mt));
-  }
+  // 0.0以外の閾値が渡されて入ればそれをセットし，そうでなければ乱数で初期化
+  if (threshold != 0.0) this->threshold = threshold;
+  else this->threshold = real_rnd(mt); // 閾値を乱数で設定
+
+  // 結合荷重が渡されていればそれをセットし，無ければ乱数で初期化
+  if (weight.size() > 0) for (int i = 0; i < weight.size(); ++i) this->inputWeights.push_back(weight[i]);
+  else for (int i = 0; i < this->inputNeuronNum; ++i) this->inputWeights.push_back(real_rnd(mt));
 }
 
 /**
@@ -39,7 +37,7 @@ void Neuron::learn(double delta, std::vector<double> inputValues) {
 
   // 結合荷重の更新
   for (int i = 0; i < this->inputNeuronNum; ++i) {
-    this->inputWeights[i] += this->eater * this->delta * inputValues[i];
+    this->inputWeights[i] += this->eta * this->delta * inputValues[i];
   }
 }
 
@@ -99,24 +97,16 @@ double Neuron::getInputWeightIndexOf(int i){
 }
 
 /**
+ * このニューロンの閾値を返す
+ */
+double Neuron::getThreshold() {
+  return this->threshold;
+}
+
+/**
  * 現在の修正量を返す
  * @return 修正量
  */
 double Neuron::getDelta() {
   return this->delta;
-}
-
-/**
- * このニューロンの結合荷重を文字列でまとめて返す
- * @return このニューロンの結合荷重をまとめた文字列
- */
-std::string Neuron::toString() {
-  std::stringstream ss;
-  ss << "weight : ";
-  for (int neuron = 0; neuron < inputNeuronNum; ++neuron) {
-    ss << inputWeights[neuron] << " , ";
-  }
-
-  std::string output = ss.str();
-  return output;
 }

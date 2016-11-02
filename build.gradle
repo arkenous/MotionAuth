@@ -20,7 +20,8 @@ android {
     defaultConfig {
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++11"
+                cppFlags "-std=c++11 -Ofast" // c++11を使う
+                arguments "-DANDROID_STL=c++_static" // STLにc++_staticを使う（これを指定しないとcmathとかでエラー吐く）
             }
         }
     }

@@ -7,22 +7,22 @@
 
 #include <vector>
 #include <random>
-#include <string>
+
 
 class Neuron {
 public:
-  Neuron(unsigned long inputNeuronNum);
+  Neuron(unsigned long inputNeuronNum, std::vector<double> weight, double threshold);
   void learn(double delta, std::vector<double> inputValues);
   double output(std::vector<double> inputValues);
   double getInputWeightIndexOf(int i);
+  double getThreshold();
   double getDelta();
-  std::string toString();
 private:
   unsigned long inputNeuronNum = 0;
   std::vector<double> inputWeights;
   double delta = 0.0; // 修正量
   double threshold = 0.0; // ニューロンの域値
-  double eater = 0.3; // 学習率
+  double eta = 0.3; // 学習率
   double activation_sigmoid(double x);
   double activation_relu(double x);
   double activation_tanh(double x);

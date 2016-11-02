@@ -3,8 +3,10 @@
 //
 
 #include "MultiLayerPerceptron.h"
-#include "iostream"
+
 #include <thread>
+#include <sstream>
+using namespace std;
 
 /**
  * MultiLayerPerceptronのコンストラクタ
@@ -12,26 +14,86 @@
  * @param middle 中間層のニューロン数
  * @param output 出力層のニューロン数
  * @param middleLayer 中間層の層数
+ * @param double型二次元の重み付け&閾値データ，（ニューロン * 重み付け）
  * @return
  */
-MultiLayerPerceptron::MultiLayerPerceptron(unsigned short input, unsigned short middle, unsigned short output, unsigned short middleLayer) {
+MultiLayerPerceptron::MultiLayerPerceptron(unsigned short input, unsigned short middle, unsigned short output, unsigned short middleLayer, std::string weightAndThreshold) {
   this->inputNumber = input;
   this->middleNumber = middle;
   this->outputNumber = output;
   this->middleLayerNumber = middleLayer;
 
-  for (int neuron = 0; neuron < output; ++neuron) {
-    this->outputNeurons.push_back(Neuron(inputNumber));
-  }
-
   std::vector<Neuron> neuronPerLayer;
 
-  for (int layer = 0; layer < middleLayerNumber; ++layer) {
-    for (int neuron = 0; neuron < middleNumber; ++neuron) {
-      neuronPerLayer.push_back(Neuron(inputNumber));
+  if (weightAndThreshold.length() <= 0) {
+    std::vector<double> emptyWeightAndThreshold;
+    for (int layer = 0; layer < middleLayerNumber; ++layer) {
+      for (int neuron = 0; neuron < middleNumber; ++neuron) {
+        neuronPerLayer.push_back(Neuron(inputNumber, emptyWeightAndThreshold, 0.0));
+      }
+      this->middleNeurons.push_back(neuronPerLayer);
+      neuronPerLayer.clear();
     }
-    this->middleNeurons.push_back(neuronPerLayer);
-    neuronPerLayer.clear();
+
+    for (int neuron = 0; neuron < output; ++neuron) {
+      this->outputNeurons.push_back(Neuron(inputNumber, emptyWeightAndThreshold, 0.0));
+    }
+  } else {
+    std::vector<std::string> splitByNeuron;
+    std::stringstream ssByNeuron(weightAndThreshold);
+    std::string itemPerNeuron;
+    while (std::getline(ssByNeuron, itemPerNeuron, '\'')) {
+      if (!itemPerNeuron.empty()) {
+        splitByNeuron.push_back(itemPerNeuron);
+      }
+    }
+    ssByNeuron.str("");
+    ssByNeuron.clear(stringstream::goodbit);
+
+    for (int layer = 0; layer < middleLayerNumber; ++layer) {
+      for (int neuron = 0; neuron < middleNumber; ++neuron) {
+        // ニューロンごとの重み付けデータと閾値データを取り出す
+        std::vector<double> dataPerNeuron;
+        std::stringstream ss(splitByNeuron[(layer * middleNumber) + neuron]);
+        std::string item;
+        while (std::getline(ss, item, ',')) {
+          if (!item.empty()) {
+            dataPerNeuron.push_back(std::stod(item));
+          }
+        }
+        // まずは閾値を取り出す
+        double threshold = dataPerNeuron.back();
+        dataPerNeuron.pop_back();
+        neuronPerLayer.push_back(Neuron(inputNumber, dataPerNeuron, threshold));
+
+        dataPerNeuron.clear();
+        ss.str(""); // バッファをクリアする
+        ss.clear(stringstream::goodbit); // ストリームの状態をクリアする
+      }
+      this->middleNeurons.push_back(neuronPerLayer);
+      neuronPerLayer.clear();
+    }
+
+    for (int neuron = 0; neuron < output; ++neuron) {
+      // ニューロンごとの重み付けデータと閾値データを取り出す
+      std::vector<double> dataPerNeuron;
+      std::stringstream ss(splitByNeuron[(middleLayerNumber * middleNumber) + neuron]);
+      std::string item;
+      while (std::getline(ss, item, ',')) {
+        if (!item.empty()) {
+          dataPerNeuron.push_back(std::stod(item));
+        }
+      }
+
+      // まずは閾値を取り出す
+      double threshold = dataPerNeuron.back();
+      dataPerNeuron.pop_back();
+      this->outputNeurons.push_back(Neuron(inputNumber, dataPerNeuron, threshold));
+
+      dataPerNeuron.clear();
+      ss.str(""); // バッファをクリアする
+      ss.clear(stringstream::goodbit); // ストリームの状態をクリアする
+    }
   }
 }
 
@@ -39,16 +101,14 @@ MultiLayerPerceptron::MultiLayerPerceptron(unsigned short input, unsigned short 
  * 教師入力データと教師出力データを元にニューラルネットワークを学習する
  * @param x 二次元の教師入力データ，データセット * データ
  * @param answer 教師入力データに対応した二次元の教師出力データ，データセット * データ
+ * @return ニューロンごとの学習後の重み付けが入ったdouble型二次元ベクトル
  */
-void MultiLayerPerceptron::learn(std::vector<std::vector<double>> x, std::vector<std::vector<double>> answer) {
+std::string MultiLayerPerceptron::learn(std::vector<std::vector<double>> x, std::vector<std::vector<double>> answer) {
   std::vector<std::vector<double>> h = std::vector<std::vector<double>>(middleLayerNumber, std::vector<double>(middleNumber, 0));
   std::vector<double> o = std::vector<double>(outputNumber, 0);
 
   int succeed = 0; //  連続正解回数のカウンタを初期化
   for (int trial = 0; trial < this->MAX_TRIAL; ++trial) {
-    std::cout << std::endl;
-    std::cout << "Trial:" << trial << std::endl;
-
     // 使用する教師データを選択
     std::vector<double> in = x[trial % answer.size()]; // 利用する教師入力データ
     std::vector<double> ans = answer[trial % answer.size()]; // 教師出力データ
@@ -214,34 +274,33 @@ void MultiLayerPerceptron::learn(std::vector<std::vector<double>> x, std::vector
 
   // 全ての教師データで正解を出すか，収束限度回数を超えた場合に終了
 //    std::cout << "[finish] " << this->toString() << std::endl;
-  std::cout << "[finish]" << std::endl;
-}
 
-/**
- * ニューラルネットワークの状態をまとめた文字列を返す
- * @return  ニューラルネットワークの状態（重み付け）をまとめた文字列
- */
-std::string MultiLayerPerceptron::toString() {
-  // 戻り値変数
-  std::string str = "";
-
-  // 中間層ニューロン出力
-  str += " middle neurons ( ";
+  std::string resultWeightAndThreshold;
+  std::stringstream ss;
   for (int layer = 0; layer < middleLayerNumber; ++layer) {
     for (int neuron = 0; neuron < middleNumber; ++neuron) {
-      str += middleNeurons[layer][neuron].toString();
+      for (int weightNum = 0; weightNum < inputNumber; ++weightNum) {
+        ss << middleNeurons[layer][neuron].getInputWeightIndexOf(weightNum) << ",";
+      }
+      // 各ニューロンの閾値を入れ，最後に ' を入れる
+      ss << middleNeurons[layer][neuron].getThreshold() << "'";
     }
   }
-  str += ") ";
-
-  // 出力層ニューロン出力
-  str += " output neurons ( ";
   for (int neuron = 0; neuron < outputNumber; ++neuron) {
-    str += outputNeurons[neuron].toString();
+    for (int weightNum = 0; weightNum < inputNumber; ++weightNum) {
+      ss << outputNeurons[neuron].getInputWeightIndexOf(weightNum) << ",";
+    }
+    // 各ニューロンの閾値を入れ，最後に ' を入れる
+    ss << outputNeurons[neuron].getThreshold() << "'";
   }
-  str += ") ";
 
-  return str;
+  resultWeightAndThreshold = ss.str();
+  // 末尾の ' を削除する
+  resultWeightAndThreshold.pop_back();
+  ss.str(""); // バッファをクリアする
+  ss.clear(stringstream::goodbit); // ストリームの状態をクリアする
+
+  return resultWeightAndThreshold;
 }
 
 /**
@@ -258,9 +317,7 @@ void MultiLayerPerceptron::outLearnThread(const std::vector<double> ans, const s
     // 出力層ニューロンの修正量deltaを計算
     double delta = (ans[neuron] - o[neuron]) * o[neuron] * (1.0 - o[neuron]);
 
-    // 教師データとの誤差が十分小さい場合は学習しない．そうでなければ正解フラグをfalseに
 //        std::cout << "delta: " << delta << "= (" << ans[neuron] << " - " << o[neuron] << ") * " << o[neuron] << " * (1.0 - " << o[neuron] << ")" << std::endl;
-    std::cout << "GAP: " << std::abs(ans[neuron] - o[neuron]) << std::endl;
     if (std::abs(ans[neuron] - o[neuron]) < MAX_GAP) continue;
     else successFlg = false;
 
@@ -357,8 +414,9 @@ void MultiLayerPerceptron::middleFirstLayerLearnThread(const std::vector<std::ve
 /**
  * 与えられたデータをニューラルネットワークに入力し，出力をコンソールに書き出す
  * @param input ニューラルネットワークに入力するデータ
+ * @return ニューラルネットワークの計算結果
  */
-void MultiLayerPerceptron::out(std::vector<double> input){
+std::vector<double> MultiLayerPerceptron::out(std::vector<double> input){
   std::vector<std::vector<double>> h = std::vector<std::vector<double>>(middleLayerNumber, std::vector<double>(middleNumber, 0));
   std::vector<double> o = std::vector<double>(outputNumber, 0);
 
@@ -376,8 +434,5 @@ void MultiLayerPerceptron::out(std::vector<double> input){
     o[neuron] = outputNeurons[neuron].output(h[middleLayerNumber - 1]);
   }
 
-  for (int neuron = 0; neuron < outputNumber; ++neuron) {
-    std::cout << "output[" << neuron << "]: " << o[neuron] << " ";
-  }
-  std::cout << std::endl;
+  return o;
 }

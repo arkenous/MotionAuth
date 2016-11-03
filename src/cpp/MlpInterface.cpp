@@ -15,28 +15,7 @@ extern "C" {
 #include "JniCppUtil.h"
 
 
-JNIEXPORT jobjectArray JNICALL Java_net_trileg_motionauth_Start_test(JNIEnv *env, jobject thiz, jobjectArray input) {
-
-  std::vector<std::vector<double>> inputData = jobjectArrayToTwoDimenDoubleVector(env, input);
-
-  for (int i = 0; i < inputData.size(); ++i) {
-    for (int j = 0; j < inputData[i].size(); ++j) {
-      inputData[i][j] += 1.0;
-    }
-  }
-
-  jobjectArray array2D = twoDimenDoubleVectorToJOBjectArray(env, inputData);
-
-  return array2D;
-}
-
-JNIEXPORT jint JNICALL Java_net_trileg_motionauth_Start_getCpuNum(JNIEnv *env, jobject thiz) {
-  int num_cpu_core = android_getCpuCount();
-  jint result = num_cpu_core;
-  return result;
-}
-
-JNIEXPORT jstring JNICALL Java_net_trileg_motionauth_Start_learn(JNIEnv *env, jobject thiz, jshort input, jshort middle, jshort output, jshort middleLayer, jstring weightAndThreshold, jobjectArray x, jobjectArray answer) {
+JNIEXPORT jstring JNICALL Java_net_trileg_motionauth_Registration_Result_learn(JNIEnv *env, jobject thiz, jshort input, jshort middle, jshort output, jshort middleLayer, jstring weightAndThreshold, jobjectArray x, jobjectArray answer) {
   // jstringをstringに変換する
   std::string weightAndThresholdString = jstringToString(env, weightAndThreshold);
 
@@ -54,6 +33,25 @@ JNIEXPORT jstring JNICALL Java_net_trileg_motionauth_Start_learn(JNIEnv *env, jo
   std::string resultString = mlp.learn(xVector, answerVector);
 
   jstring result = stringToJString(env, resultString);
+
+  return result;
+}
+
+JNIEXPORT jdoubleArray JNICALL Java_net_trileg_motionauth_Authentication_Result_out(JNIEnv *env, jobject thiz, jshort input, jshort middle, jshort output, jshort middleLayer, jstring weightAndThreshold, jdoubleArray x) {
+  // jstringをstringに変換する
+  std::string weightAndThresholdString = jstringToString(env, weightAndThreshold);
+
+  // MultiLayerPerceptronインスタンスを用意する
+  MultiLayerPerceptron mlp((unsigned short)input, (unsigned short)middle, (unsigned short) output, (unsigned short)middleLayer, weightAndThresholdString);
+
+  std::vector<double> xVector = jdoubleArrayToOneDimenDoubleVector(env, x);
+
+  // 入力データを正規化する
+  xVector = normalize(xVector);
+
+  std::vector<double> resultDoubleVector = mlp.out(xVector);
+
+  jdoubleArray result = oneDimenDoubleVectorToJDoubleArray(env, resultDoubleVector);
 
   return result;
 }

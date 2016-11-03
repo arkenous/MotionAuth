@@ -4,15 +4,27 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
 
-import javax.crypto.*;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.*;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.util.Base64.NO_WRAP;
 import static android.util.Base64.URL_SAFE;
-import static android.util.Log.*;
+import static android.util.Log.DEBUG;
+import static android.util.Log.INFO;
+import static android.util.Log.VERBOSE;
+import static android.util.Log.WARN;
 import static javax.crypto.Cipher.DECRYPT_MODE;
 import static javax.crypto.Cipher.ENCRYPT_MODE;
 import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
@@ -188,6 +200,41 @@ public class CipherCrypt {
 
 
   /**
+   * Encrypt String type data
+   * @param input String type data
+   * @return Encrypted String type data
+   */
+  public String encrypt(String input) {
+    log(INFO);
+
+    if (input == null) {
+      log(WARN, "Input data is NULL");
+      return null;
+    }
+
+    try {
+      Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+      cipher.init(ENCRYPT_MODE, key, iv);
+
+      byte[] result = cipher.doFinal(input.getBytes());
+      return Base64.encodeToString(result, URL_SAFE | NO_WRAP);
+    } catch (NoSuchAlgorithmException e) {
+      throw new RuntimeException(e);
+    } catch (NoSuchPaddingException e) {
+      throw new RuntimeException(e);
+    } catch (InvalidKeyException e) {
+      throw new RuntimeException(e);
+    } catch (BadPaddingException e) {
+      throw new RuntimeException(e);
+    } catch (IllegalBlockSizeException e) {
+      throw new RuntimeException(e);
+    } catch (InvalidAlgorithmParameterException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+
+  /**
    * Decrypt String type 2-array data.
    *
    * @param input String type encrypted 2-array data
@@ -217,6 +264,42 @@ public class CipherCrypt {
       }
 
       return decrypted;
+    } catch (NoSuchAlgorithmException e) {
+      throw new RuntimeException(e);
+    } catch (NoSuchPaddingException e) {
+      throw new RuntimeException(e);
+    } catch (InvalidKeyException e) {
+      throw new RuntimeException(e);
+    } catch (BadPaddingException e) {
+      throw new RuntimeException(e);
+    } catch (IllegalBlockSizeException e) {
+      throw new RuntimeException(e);
+    } catch (InvalidAlgorithmParameterException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+
+  /**
+   * Decrypt String type data
+   * @param input String type encrypted data
+   * @return Decrypted String type data
+   */
+  public String decrypt(String input) {
+    log(INFO);
+
+    if (input == null) {
+      log(WARN, "Input data is NULL");
+      return null;
+    }
+
+    try {
+      // 復号を行う
+      Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+      cipher.init(DECRYPT_MODE, key, iv);
+
+      byte[] result = cipher.doFinal(Base64.decode(input, URL_SAFE | NO_WRAP));
+      return new String(result);
     } catch (NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
     } catch (NoSuchPaddingException e) {

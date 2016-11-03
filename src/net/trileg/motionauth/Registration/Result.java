@@ -10,15 +10,23 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Button;
+
 import net.trileg.motionauth.Lowpass.Fourier;
-import net.trileg.motionauth.Processing.*;
+import net.trileg.motionauth.Processing.Adjuster;
+import net.trileg.motionauth.Processing.Amplifier;
+import net.trileg.motionauth.Processing.Calc;
+import net.trileg.motionauth.Processing.CorrectDeviation;
+import net.trileg.motionauth.Processing.CosSimilarity;
+import net.trileg.motionauth.Processing.Formatter;
+import net.trileg.motionauth.Processing.RotateVector;
 import net.trileg.motionauth.Utility.Enum;
-import net.trileg.motionauth.Utility.LogUtil;
 import net.trileg.motionauth.Utility.ManageData;
 
 import java.util.ArrayList;
 
+import static android.util.Log.DEBUG;
 import static net.trileg.motionauth.Registration.InputName.userName;
+import static net.trileg.motionauth.Utility.LogUtil.log;
 
 /**
  * Register and show result to user.
@@ -32,6 +40,7 @@ class Result extends Handler implements Runnable {
   private static final int CONVERT = 4;
   private static final int DEVIATION = 5;
   private static final int COSINE_SIMILARITY = 6;
+  private static final int NN_LEARNING = 7;
   private static final int FINISH = 10;
 
   private ManageData manageData = new ManageData();
@@ -49,11 +58,16 @@ class Result extends Handler implements Runnable {
   private ProgressDialog progressDialog;
   private double checkRange;
   private double amp;
+  private String learnResult = "";
 
   private float[][][] linearAccel;
   private float[][][] gyro;
   private double[][] averageVector;
   private boolean result = false;
+
+  static {
+    System.loadLibrary("mlp-lib");
+  }
 
 
   Result(Registration registration, float[][][] linearAccel,
@@ -102,9 +116,12 @@ class Result extends Handler implements Runnable {
       case COSINE_SIMILARITY:
         progressDialog.setMessage("コサイン類似度を算出中");
         break;
+      case NN_LEARNING:
+        progressDialog.setMessage("ニューラルネットワークの学習中");
+        break;
       case FINISH:
         progressDialog.dismiss();
-        LogUtil.log(Log.DEBUG, "ProgressDialog was dismissed now");
+        log(DEBUG, "ProgressDialog was dismissed now");
 
         if (!result) {
           AlertDialog.Builder alert = new AlertDialog.Builder(context);
@@ -128,7 +145,7 @@ class Result extends Handler implements Runnable {
         } else {
           // モーションの平均値をファイルに書き出す
           manageData.writeDoubleTwoArrayData(userName, "RegRegistered", "vector", averageVector);
-          manageData.writeRegisterData(userName, averageVector, amp, context);
+          manageData.writeRegisterData(userName, averageVector, amp, learnResult, context);
 
           AlertDialog.Builder alert = new AlertDialog.Builder(context);
           alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
@@ -151,7 +168,7 @@ class Result extends Handler implements Runnable {
         }
         break;
       default:
-        LogUtil.log(Log.ERROR, "Something went wrong");
+        log(Log.ERROR, "Something went wrong");
         break;
     }
   }
@@ -167,7 +184,7 @@ class Result extends Handler implements Runnable {
    * データ加工，計算処理を行う
    */
   private boolean calculate(float[][][] linearAccelList, float[][][] gyroList) {
-    LogUtil.log(Log.INFO);
+    log(Log.INFO);
 
     // 複数回のデータ取得について，データ数を揃える
     ArrayList<float[][][]> adjusted = adjuster.adjust(linearAccelList, gyroList);
@@ -204,7 +221,7 @@ class Result extends Handler implements Runnable {
     manageData.writeDoubleThreeArrayData(userName, "RegLowpassed", "linearAcceleration", linearAcceleration);
     manageData.writeDoubleThreeArrayData(userName, "RegLowpassed", "gyroscope", gyroscope);
 
-    LogUtil.log(Log.DEBUG, "Finish fourier");
+    log(DEBUG, "Finish fourier");
 
     // 加速度から距離，角速度から角度へ変換（第二引数はセンサの取得間隔）
     this.sendEmptyMessage(CONVERT);
@@ -214,7 +231,7 @@ class Result extends Handler implements Runnable {
     manageData.writeDoubleThreeArrayData(userName, "RegConverted", "linearDistance", linearDistance);
     manageData.writeDoubleThreeArrayData(userName, "RegConverted", "angle", angle);
 
-    LogUtil.log(Log.DEBUG, "After write data");
+    log(DEBUG, "After write data");
 
     // 加速度センサより得られたデータを角速度センサより得られたデータで回転させる
     RotateVector rotateVector = new RotateVector();
@@ -228,21 +245,21 @@ class Result extends Handler implements Runnable {
     this.sendEmptyMessage(DEVIATION);
 
     //region 同一のモーションであるかの確認をし，必要に応じてズレ修正を行う
-    LogUtil.log(Log.DEBUG, "Before measure cosine similarity");
+    log(DEBUG, "Before measure cosine similarity");
 
     // コサイン類似度を測る
     double[] vectorCosSimilarity = cosSimilarity.cosSimilarity(vector);
 
     Enum.MEASURE measure = cosSimilarity.measure(vectorCosSimilarity);
 
-    LogUtil.log(Log.INFO, "After measure cosine similarity");
-    LogUtil.log(Log.INFO, "measure = " + String.valueOf(measure));
+    log(Log.INFO, "After measure cosine similarity");
+    log(Log.INFO, "measure = " + String.valueOf(measure));
 
     if (Enum.MEASURE.INCORRECT == measure) {
       // 類似度が0.4以下
       return false;
     } else if (Enum.MEASURE.MAYBE == measure) {
-      LogUtil.log(Log.DEBUG, "Deviation");
+      log(DEBUG, "Deviation");
       // 類似度が0.4よりも高く，0.6以下の場合，ズレ修正を行う
       int count = 0;
       Enum.MODE mode = Enum.MODE.MAX;
@@ -269,7 +286,7 @@ class Result extends Handler implements Runnable {
 
         Enum.MEASURE tmp = cosSimilarity.measure(vectorCosSimilarity);
 
-        LogUtil.log(Log.INFO, "MEASURE: " + String.valueOf(tmp));
+        log(Log.INFO, "MEASURE: " + String.valueOf(tmp));
 
         manageData.writeDoubleThreeArrayData(userName, "DeviatedData" + String.valueOf(mode), "vector", vector);
 
@@ -287,7 +304,7 @@ class Result extends Handler implements Runnable {
         count++;
       }
     } else if (measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT) {
-      LogUtil.log(Log.INFO, "SUCCESS");
+      log(Log.INFO, "SUCCESS");
     } else {
       return false;
     }
@@ -303,8 +320,20 @@ class Result extends Handler implements Runnable {
     vectorCosSimilarity = cosSimilarity.cosSimilarity(vector);
 
     measure = cosSimilarity.measure(vectorCosSimilarity);
-    LogUtil.log(Log.INFO, "measure = " + measure);
-    return measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT;
+    log(Log.INFO, "measure = " + measure);
+    if (measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT) {
+      this.sendEmptyMessage(NN_LEARNING);
+      // ニューラルネットワークの学習を行う
+      // 取得したデータを，ニューラルネットワークの教師入力用に調整する
+      double[][] x = manipulateMotionDataToNeuralNetwork(vector);
+      double[][] answer = new double[x.length][1];
+      for (int time = 0; time < x.length; time++) answer[time][0] = 1.0;
+      String weightAndThreshold = "";
+
+      learnResult = learn((short)x[0].length, (short)x[0].length, (short)answer[0].length, (short)1, weightAndThreshold, x, answer);
+      log(DEBUG, "learnResult: "+learnResult);
+      return true;
+    } else return false;
   }
 
 
@@ -319,4 +348,38 @@ class Result extends Handler implements Runnable {
 
     return output;
   }
+
+
+  /**
+   * モーションデータをニューラルネットワークの教師入力用に組み直す
+   * @param input 組み直すモーションデータ
+   * @return 組み直したモーションデータ
+   */
+  private double[][] manipulateMotionDataToNeuralNetwork(double[][][] input) {
+    double[][] output = new double[input.length][input[0][0].length * 3]; // 入力回数 * (データ長 * 軸数）
+
+    for (int time = 0; time < input.length; ++time) {
+      for (int data = 0, dataPerAxis = 0; data < input[time][0].length * 3; data += 3, dataPerAxis++) {
+        output[time][data] = input[time][0][dataPerAxis];
+        output[time][data + 1] = input[time][1][dataPerAxis];
+        output[time][data + 2] = input[time][2][dataPerAxis];
+      }
+    }
+
+    return output;
+  }
+
+
+  /**
+   * C++ネイティブのニューラルネットワーク学習メソッド
+   * @param input 入力層のニューロン数
+   * @param middle 中間層一層あたりのニューロン数
+   * @param output 出力層のニューロン数
+   * @param middleLayer 中間層の層数
+   * @param weightAndThreshold ニューロンの結合荷重の重みと閾値をカンマで連結し，それらニューロンごとのデータをシングルクオートで連結した文字列データ
+   * @param x 教師入力データ
+   * @param answer 教師出力データ
+   * @return 学習後のニューロンの結合荷重の重みと閾値をカンマで連結し，それらニューロンごとのデータをシングルクオートで連結した文字列データ
+   */
+  public native String learn(short input, short middle, short output, short middleLayer, String weightAndThreshold, double[][] x, double[][] answer);
 }

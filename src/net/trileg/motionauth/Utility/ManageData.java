@@ -141,9 +141,10 @@ public class ManageData {
    * @param userName User name.
    * @param averageVector Vector data.
    * @param ampValue Amplifier value.
+   * @param learnResult Weights and thresholds after learn neural network
    * @param context Caller context.
    */
-  public void writeRegisterData(String userName, double[][] averageVector, double ampValue, Context context) {
+  public void writeRegisterData(String userName, double[][] averageVector, double ampValue, String learnResult, Context context) {
     log(INFO);
 
     CipherCrypt mCipherCrypt = new CipherCrypt(context);
@@ -158,6 +159,7 @@ public class ManageData {
 
     // 暗号化
     String[][] encryptedAverageVectorStr = mCipherCrypt.encrypt(averageVectorStr);
+    String encryptedLearnResult = mCipherCrypt.encrypt(learnResult);
 
     // 配列データを特定文字列を挟んで連結する
     ConvertArrayAndString mConvertArrayAndString = new ConvertArrayAndString();
@@ -174,6 +176,7 @@ public class ManageData {
 
     editor.putString(userName+"vector", registerVectorData);
     editor.putString(userName+"amplify", String.valueOf(ampValue));
+    editor.putString(userName+"learnResult", encryptedLearnResult);
     editor.apply();
   }
 

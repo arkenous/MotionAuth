@@ -2,6 +2,7 @@ package net.trileg.motionauth.Authentication;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Handler;
@@ -15,6 +16,7 @@ import net.trileg.motionauth.Utility.Enum;
 import net.trileg.motionauth.Utility.ManageData;
 
 import static android.content.Context.MODE_PRIVATE;
+import static android.util.Log.DEBUG;
 import static android.util.Log.INFO;
 import static net.trileg.motionauth.Authentication.InputName.userName;
 import static net.trileg.motionauth.Utility.Enum.MEASURE.CORRECT;
@@ -34,6 +36,7 @@ class Result extends Handler implements Runnable {
   private static final int FOURIER = 4;
   private static final int CONVERT = 5;
   private static final int COSINE_SIMILARITY = 6;
+  private static final int NN_OUT = 7;
   private static final int FINISH = 10;
 
   private ManageData manageData = new ManageData();
@@ -48,20 +51,27 @@ class Result extends Handler implements Runnable {
   private Button getMotion;
   private ProgressDialog progressDialog;
   private double amp;
+  private Context context;
 
   private float[][] linearAccel;
   private float[][] gyro;
   private double[][] registeredVector;
   private boolean result = false;
+  private String learnResult;
+
+  static {
+    System.loadLibrary("mlp-lib");
+  }
 
 
   Result(Authentication authentication, float[][] linearAccel, float[][] gyro,
-         Button getMotion, ProgressDialog progressDialog) {
+         Button getMotion, ProgressDialog progressDialog, Context context) {
     this.authentication = authentication;
     this.linearAccel = linearAccel;
     this.gyro = gyro;
     this.getMotion = getMotion;
     this.progressDialog = progressDialog;
+    this.context = context;
   }
 
 
@@ -99,6 +109,9 @@ class Result extends Handler implements Runnable {
         break;
       case COSINE_SIMILARITY:
         progressDialog.setMessage("コサイン類似度を算出中");
+        break;
+      case NN_OUT:
+        progressDialog.setMessage("ニューラルネットワークの計算中");
         break;
       case FINISH:
         progressDialog.dismiss();
@@ -157,6 +170,9 @@ class Result extends Handler implements Runnable {
     String registeredAmplify = preferences.getString(userName + "amplify", "");
     if ("".equals(registeredAmplify)) throw new RuntimeException();
     amp = Double.valueOf(registeredAmplify);
+
+    CipherCrypt cipherCrypt = new CipherCrypt(context);
+    learnResult = cipherCrypt.decrypt(preferences.getString(userName + "learnResult", ""));
   }
 
 
@@ -195,6 +211,12 @@ class Result extends Handler implements Runnable {
     manageData.writeDoubleTwoArrayData(userName, "NNTest", "RegisteredVector", registeredVector);
     manageData.writeDoubleTwoArrayData(userName, "NNTest", "InputVector", vector);
 
+    // 学習済みニューラルネットワークの出力を得る
+    this.sendEmptyMessage(NN_OUT);
+    double[] x = manipulateMotionDataToNeuralNetwork(vector);
+    double[] result = out((short)x.length, (short)x.length, (short)1, (short)1, learnResult, x);
+    for (int i = 0; i < result.length; i++) log(DEBUG, "Neural Network Output["+i+"]: "+result[i]);
+
     // コサイン類似度を測る
     log(INFO, "Before Cosine Similarity");
     double vectorSimilarity = cosSimilarity.cosSimilarity(vector, registeredVector);
@@ -202,6 +224,37 @@ class Result extends Handler implements Runnable {
 
     this.sendEmptyMessage(COSINE_SIMILARITY);
     Enum.MEASURE measure = cosSimilarity.measure(vectorSimilarity);
+
+    //TODO 認証に成功した場合，ニューラルネットワークに追加学習を行う
     return measure == PERFECT || measure == CORRECT;
   }
+
+  /**
+   * モーションデータをニューラルネットワークの入力用に組み直す
+   * @param input 組み直すモーションデータ
+   * @return 組み直したモーションデータ
+   */
+  private double[] manipulateMotionDataToNeuralNetwork(double[][] input) {
+    double[] output = new double[input[0].length * 3]; // データ長 * 軸数
+
+    for (int data = 0, dataPerAxis = 0; data < input[0].length * 3; data += 3, dataPerAxis++) {
+      output[data] = input[0][dataPerAxis];
+      output[data + 1] = input[1][dataPerAxis];
+      output[data + 2] = input[2][dataPerAxis];
+    }
+    return output;
+  }
+
+
+  /**
+   * C++ネイティブのニューラルネットワーク出力メソッド
+   * @param input 入力層のニューロン数
+   * @param middle 中間層一層あたりのニューロン数
+   * @param output 出力層のニューロン数
+   * @param middleLayer 中間層の層数
+   * @param weightAndThreshold ニューロンの結合荷重の重みと閾値をカンマで連結し，それらニューロンごとのデータをシングルクオートで連結した文字列データ
+   * @param x 入力データ
+   * @return 出力データ
+   */
+  public native double[] out(short input, short middle, short output, short middleLayer, String weightAndThreshold, double[] x);
 }

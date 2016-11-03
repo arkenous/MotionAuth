@@ -213,7 +213,7 @@ public class Authentication extends Activity {
     progressDialog.show();
     
     Result result = new Result(this, listToArray.listTo2DArray(linearAccel),
-        listToArray.listTo2DArray(gyro), getMotion, progressDialog);
+        listToArray.listTo2DArray(gyro), getMotion, progressDialog, this);
     ExecutorService executorService = newSingleThreadExecutor();
     executorService.execute(result);
     executorService.shutdown();

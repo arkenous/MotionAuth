@@ -15,7 +15,7 @@ public:
   std::vector<double> out(std::vector<double> input);
 private:
   static const unsigned int MAX_TRIAL = 10000000; // 学習上限回数
-  constexpr static const double MAX_GAP = 0.001; // 許容する誤差の域値
+  constexpr static const double MAX_GAP = 0.0001; // 許容する誤差の域値
 //  int num_thread = (int)sysconf(_SC_NPROCESSORS_ONLN); // プロセッサのコア数
   int num_thread = android_getCpuCount(); // Androidデバイスのプロセッサのコア数
 

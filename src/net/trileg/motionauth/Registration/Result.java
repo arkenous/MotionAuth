@@ -327,10 +327,12 @@ class Result extends Handler implements Runnable {
       // 取得したデータを，ニューラルネットワークの教師入力用に調整する
       double[][] x = manipulateMotionDataToNeuralNetwork(vector);
       double[][] answer = new double[x.length][1];
-      for (int time = 0; time < x.length; time++) answer[time][0] = 1.0;
-      String weightAndThreshold = "";
+      for (int time = 0; time < x.length; time++) {
+        answer[time][0] = 0.1;
+      }
+      String neuronParams = "";
 
-      learnResult = learn((short)x[0].length, (short)x[0].length, (short)answer[0].length, (short)1, weightAndThreshold, x, answer);
+      learnResult = learn((short)x[0].length, (short)x[0].length, (short)answer[0].length, (short)1, neuronParams, x, answer);
       log(DEBUG, "learnResult: "+learnResult);
       return true;
     } else return false;

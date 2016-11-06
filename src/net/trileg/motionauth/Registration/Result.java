@@ -321,21 +321,27 @@ class Result extends Handler implements Runnable {
 
     measure = cosSimilarity.measure(vectorCosSimilarity);
     log(Log.INFO, "measure = " + measure);
-    if (measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT) {
-      this.sendEmptyMessage(NN_LEARNING);
-      // ニューラルネットワークの学習を行う
-      // 取得したデータを，ニューラルネットワークの教師入力用に調整する
-      double[][] x = manipulateMotionDataToNeuralNetwork(vector);
-      double[][] answer = new double[x.length][1];
-      for (int time = 0; time < x.length; time++) {
-        answer[time][0] = 0.1;
-      }
-      String neuronParams = "";
 
-      learnResult = learn((short)x[0].length, (short)x[0].length, (short)answer[0].length, (short)1, neuronParams, x, answer);
-      log(DEBUG, "learnResult: "+learnResult);
-      return true;
-    } else return false;
+    this.sendEmptyMessage(NN_LEARNING);
+    // ニューラルネットワークの学習を行う
+    // 取得したデータを，ニューラルネットワークの教師入力用に調整する
+    double[][] x = manipulateMotionDataToNeuralNetwork(vector);
+    double[][] answer = new double[x.length][1];
+    for (int time = 0; time < x.length; time++) {
+      answer[time][0] = 0.1;
+    }
+    String neuronParams = "";
+
+    learnResult = learn((short)x[0].length, (short)x[0].length, (short)answer[0].length, (short)1, neuronParams, x, answer);
+    log(DEBUG, "learnResult: "+learnResult);
+
+    // テストデータで期待した出力が得られるか確認する．出力が0.1よりも大きければ登録失敗とする
+    for (int set = 0; set < x.length; ++set) {
+      double[] result = out((short)x[set].length, (short)x[set].length, (short)1, (short)1, learnResult, x[set]);
+      log(DEBUG, "set["+set+"] result[0]: "+result[0]);
+      if (result[0] > 0.1) return false;
+    }
+    return true;
   }
 
 
@@ -378,10 +384,22 @@ class Result extends Handler implements Runnable {
    * @param middle 中間層一層あたりのニューロン数
    * @param output 出力層のニューロン数
    * @param middleLayer 中間層の層数
-   * @param weightAndThreshold ニューロンの結合荷重の重みと閾値をカンマで連結し，それらニューロンごとのデータをシングルクオートで連結した文字列データ
+   * @param neuronParams ニューロンの結合荷重の重みとAdaGradのgとバイアスをパイプで連結し，それらニューロンごとのデータをシングルクオートで連結した文字列データ
    * @param x 教師入力データ
    * @param answer 教師出力データ
    * @return 学習後のニューロンの結合荷重の重みと閾値をカンマで連結し，それらニューロンごとのデータをシングルクオートで連結した文字列データ
    */
-  public native String learn(short input, short middle, short output, short middleLayer, String weightAndThreshold, double[][] x, double[][] answer);
+  public native String learn(short input, short middle, short output, short middleLayer, String neuronParams, double[][] x, double[][] answer);
+
+  /**
+   * C++ネイティブのニューラルネットワーク出力メソッド
+   * @param input 入力層のニューロン数
+   * @param middle 中間層一層あたりのニューロン数
+   * @param output 出力層のニューロン数
+   * @param middleLayer 中間層の層数
+   * @param neuronParams ニューロンの結合荷重の重みとAdaGradのgとバイアスをパイプで連結し，それらニューロンごとのデータをシングルクオートで連結した文字列データ
+   * @param x 入力データ
+   * @return ニューラルネットワークの出力
+   */
+  public native double[] out(short input, short middle, short output, short middleLayer, String neuronParams, double[] x);
 }

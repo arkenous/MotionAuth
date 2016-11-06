@@ -42,6 +42,26 @@ JNIEXPORT jstring JNICALL Java_net_trileg_motionauth_Registration_Result_learn(J
   return result;
 }
 
+JNIEXPORT jdoubleArray JNICALL Java_net_trileg_motionauth_Registration_Result_out(JNIEnv *env, jobject thiz, jshort input, jshort middle, jshort output, jshort middleLayer, jstring neuronParams, jdoubleArray x) {
+  // jstringをstringに変換する
+  std::string neuronParamsString = jstringToString(env, neuronParams);
+
+  // MultiLayerPerceptronインスタンスを用意する
+  MultiLayerPerceptron mlp((unsigned short)input, (unsigned short)middle, (unsigned short) output, (unsigned short)middleLayer, neuronParamsString, 1);
+
+  std::vector<double> xVector = jdoubleArrayToOneDimenDoubleVector(env, x);
+
+  // 入力データを正規化する
+  xVector = normalize(xVector);
+
+  std::vector<double> resultDoubleVector = mlp.out(xVector);
+
+  jdoubleArray result = oneDimenDoubleVectorToJDoubleArray(env, resultDoubleVector);
+
+  return result;
+}
+
+
 JNIEXPORT jdoubleArray JNICALL Java_net_trileg_motionauth_Authentication_Result_out(JNIEnv *env, jobject thiz, jshort input, jshort middle, jshort output, jshort middleLayer, jstring neuronParams, jdoubleArray x) {
   // jstringをstringに変換する
   std::string neuronParamsString = jstringToString(env, neuronParams);

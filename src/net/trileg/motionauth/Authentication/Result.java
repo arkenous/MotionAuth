@@ -10,8 +10,15 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.view.KeyEvent;
 import android.widget.Button;
+
 import net.trileg.motionauth.Lowpass.Fourier;
-import net.trileg.motionauth.Processing.*;
+import net.trileg.motionauth.Processing.Adjuster;
+import net.trileg.motionauth.Processing.Amplifier;
+import net.trileg.motionauth.Processing.Calc;
+import net.trileg.motionauth.Processing.CipherCrypt;
+import net.trileg.motionauth.Processing.CosSimilarity;
+import net.trileg.motionauth.Processing.Formatter;
+import net.trileg.motionauth.Processing.RotateVector;
 import net.trileg.motionauth.Utility.Enum;
 import net.trileg.motionauth.Utility.ManageData;
 
@@ -20,6 +27,7 @@ import static android.util.Log.DEBUG;
 import static android.util.Log.INFO;
 import static net.trileg.motionauth.Authentication.InputName.userName;
 import static net.trileg.motionauth.Utility.Enum.MEASURE.CORRECT;
+import static net.trileg.motionauth.Utility.Enum.MEASURE.INCORRECT;
 import static net.trileg.motionauth.Utility.Enum.MEASURE.PERFECT;
 import static net.trileg.motionauth.Utility.Enum.SENSOR_DELAY_TIME;
 import static net.trileg.motionauth.Utility.LogUtil.log;
@@ -225,8 +233,19 @@ class Result extends Handler implements Runnable {
     this.sendEmptyMessage(COSINE_SIMILARITY);
     Enum.MEASURE measure = cosSimilarity.measure(vectorSimilarity);
 
-    //TODO 認証に成功した場合，ニューラルネットワークに追加学習を行う
-    return measure == PERFECT || measure == CORRECT;
+    // ニューラルネットワークの結果，正規モーションでないと判定された場合
+    if (result[0] > 0.1) return false;
+
+    // コサイン類似度が低い場合
+    if (measure == INCORRECT) return false;
+    else {
+      // コサイン類似度が0.4より高く，ニューラルネットワークの結果，正規モーションであると判定された場合
+      if (measure == PERFECT || measure == CORRECT) {
+        //TODO コサイン類似度が0.6より高ければ，ニューラルネットワークに追加学習を行う
+        log(DEBUG, "追加学習を行う");
+      }
+      return true;
+    }
   }
 
   /**

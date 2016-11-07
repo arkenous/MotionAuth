@@ -15,6 +15,7 @@ import static android.hardware.Sensor.TYPE_LINEAR_ACCELERATION;
 import static android.hardware.SensorManager.SENSOR_DELAY_FASTEST;
 import static android.util.Log.DEBUG;
 import static android.util.Log.INFO;
+import static android.util.Log.VERBOSE;
 import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
 import static net.trileg.motionauth.Utility.Enum.SENSOR_DELAY_TIME;
 import static net.trileg.motionauth.Utility.LogUtil.log;
@@ -51,7 +52,7 @@ public class GetData extends Handler implements Callable<ArrayList<ArrayList<Flo
    * @param data Data array
    */
   private void collect(float[] data) {
-    log(DEBUG);
+    log(VERBOSE);
     for (int axis = 0; axis < NUM_AXIS; axis++) dataPerTime.get(axis).add(data[axis]);
   }
 
@@ -70,7 +71,7 @@ public class GetData extends Handler implements Callable<ArrayList<ArrayList<Flo
       }
     }
 
-    log(DEBUG, "return data");
+    log(DEBUG, "dataPerTime: "+dataPerTime);
     return dataPerTime;
   }
 

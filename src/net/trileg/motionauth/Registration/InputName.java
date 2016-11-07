@@ -29,7 +29,7 @@ import static net.trileg.motionauth.Utility.LogUtil.log;
  * @author Kensuke Kosaka
  */
 public class InputName extends Activity {
-  static String userName;
+  static String userName = "";
 
 
   @Override
@@ -42,8 +42,6 @@ public class InputName extends Activity {
     requestWindowFeature(Window.FEATURE_NO_TITLE);
     setContentView(R.layout.activity_regist_name_input);
 
-    userName = "";
-
     nameInput();
   }
 
@@ -54,21 +52,18 @@ public class InputName extends Activity {
   private void nameInput() {
     log(INFO);
 
-    final EditText nameInput = (EditText) findViewById(R.id.nameInputEditText);
+    final EditText nameInput = (EditText) findViewById(R.id.nameInput);
 
     nameInput.addTextChangedListener(new TextWatcher() {
       // Before text changed.
-      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-      }
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
       // Just before text changed.
-      public void onTextChanged(CharSequence s, int start, int before, int count) {
-      }
+      public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
       // After text changed.
       public void afterTextChanged(Editable s) {
-        if (nameInput.getText() != null)
-          userName = nameInput.getText().toString().trim();
+        if (nameInput.getText() != null) userName = nameInput.getText().toString().trim();
       }
     });
 
@@ -77,6 +72,7 @@ public class InputName extends Activity {
       @Override
       public boolean onKey(View v, int keyCode, KeyEvent event) {
         if (event.getAction() == ACTION_DOWN && keyCode == KEYCODE_ENTER) {
+          log(DEBUG, "Push enter key");
           InputMethodManager inputMethodManager = (InputMethodManager) InputName.this.getSystemService(INPUT_METHOD_SERVICE);
           inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
@@ -87,18 +83,15 @@ public class InputName extends Activity {
     });
 
     // Move activity if user push OK button.
-    final Button ok = (Button) findViewById(R.id.okButton);
+    final Button ok = (Button) findViewById(R.id.ok);
 
     ok.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
         log(DEBUG, "Click ok button");
         // Check user inputted name is correctly.
-        if (userName.length() == 0) {
-          Toast.makeText(InputName.this, "名前が入力されていません", Toast.LENGTH_LONG).show();
-        } else {
-          InputName.this.moveActivity(getPackageName(), getPackageName() + ".Registration.Registration", true);
-        }
+        if (userName.length() == 0) Toast.makeText(InputName.this, "名前が入力されていません", Toast.LENGTH_SHORT).show();
+        else InputName.this.moveActivity(getPackageName(), getPackageName() + ".Registration.Registration", true);
       }
     });
   }

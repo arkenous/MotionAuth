@@ -4,7 +4,7 @@
     <string name="app_name">MotionAuth</string>
     <string name="action_settings">Settings</string>
     <string name="start">Start</string>
-    <string name="title_activity_regist_name_input">NameInput</string>
+    <string name="title_activity_regist_name_input">InputName</string>
     <string name="name_input">Please input your name.</string>
     <string name="OK">OK</string>
     <string name="title_activity_regist_motion">Registration</string>
@@ -22,14 +22,12 @@
     <string name="first">1</string>
     <string name="hoge">hoge</string>
     <string name="getData">モーションデータ取得</string>
-    <string name="title_activity_auth_name_input">NameInput</string>
+    <string name="title_activity_auth_name_input">InputName</string>
     <string name="title_activity_auth_motion">Authentication</string>
     <string name="title_activity_registrant_list">RegistrantList</string>
-    <string name="title_activity_view_registed_data">ViewRegistedData</string>
+    <string name="title_activity_view_registered_data">ViewRegisteredData</string>
     <string name="amplifier_settings">増幅器設定</string>
-    <string name="title_activity_view_registed_rdata">ViewRegistedRData</string>
     <string name="reset">リセット</string>
-    <string name="title_activity_view_auth_rdata">ViewAuthRData</string>
     <string name="text">text</string>
     <string name="change_get_times">データ取得回数設定</string>
 

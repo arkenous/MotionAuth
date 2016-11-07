@@ -39,18 +39,17 @@ import static net.trileg.motionauth.Utility.LogUtil.log;
 public class Authentication extends Activity {
   private static final int VIBRATOR_LONG = 100;
   private static final int LEAST_MOTION_LENGTH = 10;
+
   private TextView second;
   private TextView unit;
   private TextView rest;
   private Button getMotion;
-
-  private Authentication authentication;
-  private ListToArray listToArray = new ListToArray();
-  private Future<Boolean> timer;
   private GetData linearAcceleration;
   private GetData gyroscope;
+  private Future<Boolean> timer;
   private Future<ArrayList<ArrayList<Float>>> linearAccelerationFuture;
   private Future<ArrayList<ArrayList<Float>>> gyroscopeFuture;
+  private ListToArray listToArray = new ListToArray();
 
 
   @Override
@@ -59,7 +58,6 @@ public class Authentication extends Activity {
     log(INFO);
 
     setContentView(R.layout.activity_auth_motion);
-    authentication = this;
     authentication();
   }
 
@@ -71,11 +69,11 @@ public class Authentication extends Activity {
     log(INFO);
 
     final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-    TextView nameTv = (TextView) findViewById(R.id.textView1);
-    second = (TextView) findViewById(R.id.secondTextView);
-    unit = (TextView) findViewById(R.id.textView4);
+    TextView nameTv = (TextView) findViewById(R.id.userName);
+    second = (TextView) findViewById(R.id.second);
+    unit = (TextView) findViewById(R.id.unit);
     rest = (TextView) findViewById(R.id.rest);
-    getMotion = (Button) findViewById(R.id.button1);
+    getMotion = (Button) findViewById(R.id.getMotion);
 
     nameTv.setText(userName + "さん読んでね！");
 
@@ -84,7 +82,7 @@ public class Authentication extends Activity {
       public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction()) {
           case ACTION_DOWN:
-            log(VERBOSE, "Action down getMotion");
+            log(DEBUG, "Action down getMotion");
 
             getMotion.setText("取得中");
             rest.setText("");
@@ -94,15 +92,15 @@ public class Authentication extends Activity {
 
             ExecutorService executorService = Executors.newFixedThreadPool(3);
             timer = executorService.submit(new Timer(vibrator, second));
-            linearAcceleration = new GetData(authentication, true);
+            linearAcceleration = new GetData(Authentication.this, true);
+            gyroscope = new GetData(Authentication.this, false);
             linearAccelerationFuture = executorService.submit(linearAcceleration);
-            gyroscope = new GetData(authentication, false);
             gyroscopeFuture = executorService.submit(gyroscope);
 
             executorService.shutdown();
             break;
           case ACTION_UP:
-            log(VERBOSE, "Action up getMotion");
+            log(DEBUG, "Action up getMotion");
             vibrator.vibrate(VIBRATOR_LONG);
             getMotion.setClickable(false);
             timer.cancel(true);
@@ -112,7 +110,7 @@ public class Authentication extends Activity {
             organizeData(linearAccelerationFuture, gyroscopeFuture);
             break;
           case ACTION_CANCEL:
-            log(VERBOSE, "Action cancel getMotion");
+            log(DEBUG, "Action cancel getMotion");
             vibrator.vibrate(VIBRATOR_LONG);
             getMotion.setClickable(false);
             timer.cancel(true);
@@ -166,7 +164,7 @@ public class Authentication extends Activity {
    */
   private void reCollectDialog() {
     log(INFO);
-    AlertDialog.Builder alert = new AlertDialog.Builder(authentication);
+    AlertDialog.Builder alert = new AlertDialog.Builder(Authentication.this);
     alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
       @Override
       public boolean onKey(DialogInterface dialogInterface, int keyCode, KeyEvent keyEvent) {
@@ -192,8 +190,7 @@ public class Authentication extends Activity {
    * @param linearAccel Original linear acceleration data collecting from GetData.
    * @param gyro        Original gyroscope data collecting from GetData.
    */
-  private void finishGetMotion(ArrayList<ArrayList<Float>> linearAccel,
-                       ArrayList<ArrayList<Float>> gyro) {
+  private void finishGetMotion(ArrayList<ArrayList<Float>> linearAccel, ArrayList<ArrayList<Float>> gyro) {
     log(INFO);
     if (getMotion.isClickable()) getMotion.setClickable(false);
     second.setText("0");
@@ -212,8 +209,8 @@ public class Authentication extends Activity {
 
     progressDialog.show();
     
-    Result result = new Result(this, listToArray.listTo2DArray(linearAccel),
-        listToArray.listTo2DArray(gyro), getMotion, progressDialog, this);
+    Result result = new Result(listToArray.listTo2DArray(linearAccel),
+        listToArray.listTo2DArray(gyro), getMotion, progressDialog, Authentication.this);
     ExecutorService executorService = newSingleThreadExecutor();
     executorService.execute(result);
     executorService.shutdown();

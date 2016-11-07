@@ -2,7 +2,6 @@ package net.trileg.motionauth;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,8 +12,8 @@ import android.widget.Button;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static android.util.Log.DEBUG;
 import static android.util.Log.INFO;
-import static android.util.Log.VERBOSE;
 import static android.view.KeyEvent.KEYCODE_BACK;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 import static net.trileg.motionauth.Utility.LogUtil.setShowLog;
@@ -27,18 +26,13 @@ import static net.trileg.motionauth.Utility.LogUtil.setShowLog;
  * @author Kensuke Kosaka
  */
 public class Start extends Activity {
-  private Context mContext;
 
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    mContext = this;
-
     // Read log configuration file and switch log output.
-    boolean isShowLog = getResources().getBoolean(R.bool.isShowLog);
-    setShowLog(isShowLog);
-
+    setShowLog(getResources().getBoolean(R.bool.isShowLog));
     log(INFO);
 
     // Disable title bar.
@@ -59,10 +53,10 @@ public class Start extends Activity {
     startBtn.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        log(VERBOSE, "Click start button.");
+        log(DEBUG, "Click start button.");
 
         String[] btnMsg = {"View data", "Authentication", "Registration"};
-        AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
+        AlertDialog.Builder alert = new AlertDialog.Builder(Start.this);
         alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
           @Override
           public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {

@@ -6,10 +6,10 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".AuthMotion">
+    tools:context=".Authentication.Authentication">
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/userName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -18,7 +18,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/getMotion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -26,20 +26,20 @@
         android:text="@string/getData" />
 
     <TextView
-        android:id="@+id/secondTextView"
+        android:id="@+id/second"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button1"
+        android:layout_above="@+id/getMotion"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="29dp"
         android:text="@string/first"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/unit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button1"
+        android:layout_above="@+id/getMotion"
         android:layout_alignParentRight="true"
         android:layout_marginBottom="11dp"
         android:text="@string/count"
@@ -49,7 +49,7 @@
         android:id="@+id/rest"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/secondTextView"
+        android:layout_above="@+id/second"
         android:layout_alignParentLeft="true"
         android:text="@string/ato"
         android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -57,10 +57,7 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/textView3"
-        android:layout_alignLeft="@+id/textView3"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/textView1"
+        android:layout_below="@+id/userName"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
         android:orientation="vertical">
@@ -70,14 +67,14 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/one"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/one"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
-                android:id="@+id/textView5"
+                android:id="@+id/oneDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/description1"
@@ -89,14 +86,14 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/textView6"
+                android:id="@+id/two"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/two"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
-                android:id="@+id/textView7"
+                android:id="@+id/twoDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/auth_description2"
@@ -108,14 +105,14 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/textView8"
+                android:id="@+id/three"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/three"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
-                android:id="@+id/textView9"
+                android:id="@+id/threeDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/description3"

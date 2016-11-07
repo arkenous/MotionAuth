@@ -1,7 +1,8 @@
 package net.trileg.motionauth.Lowpass;
 
-import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 import net.trileg.motionauth.Utility.ManageData;
+
+import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 
 import static android.util.Log.INFO;
 import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
@@ -15,7 +16,7 @@ import static net.trileg.motionauth.Utility.LogUtil.log;
  * @see <a href="https://sites.google.com/site/piotrwendykier/software/jtransforms">https://sites.google.com/site/piotrwendykier/software/jtransforms</a>
  */
 public class Fourier {
-  private ManageData mManageData = new ManageData();
+  private ManageData manageData = new ManageData();
 
   /**
    * Low pass filtering double type 3-array data.
@@ -60,8 +61,8 @@ public class Fourier {
       }
     }
 
-    mManageData.writeDoubleThreeArrayData(userName, "ResultFFT", "rFFT" + sensorName, real);
-    mManageData.writeDoubleThreeArrayData(userName, "ResultFFT", "iFFT" + sensorName, imaginary);
+    manageData.writeDoubleThreeArrayData(userName, "ResultFFT", "rFFT" + sensorName, real);
+    manageData.writeDoubleThreeArrayData(userName, "ResultFFT", "iFFT" + sensorName, imaginary);
 
     double[][][] power = new double[data.length][NUM_AXIS][data[0][0].length / 2];
 
@@ -73,7 +74,7 @@ public class Fourier {
       }
     }
 
-    mManageData.writeDoubleThreeArrayData(userName, "ResultFFT", "powerFFT" + sensorName, power);
+    manageData.writeDoubleThreeArrayData(userName, "ResultFFT", "powerFFT" + sensorName, power);
 
     // Low pass filtering
     for (int time = 0; time < data.length; time++) {
@@ -90,7 +91,7 @@ public class Fourier {
       }
     }
 
-    mManageData.writeDoubleThreeArrayData(userName, "AfterFFT", sensorName, data);
+    manageData.writeDoubleThreeArrayData(userName, "AfterFFT", sensorName, data);
 
     return data;
   }
@@ -134,8 +135,8 @@ public class Fourier {
       }
     }
 
-    mManageData.writeDoubleTwoArrayData(userName, "ResultFFT", "rFFT" + sensorName, real);
-    mManageData.writeDoubleTwoArrayData(userName, "ResultFFT", "iFFT" + sensorName, imaginary);
+    manageData.writeDoubleTwoArrayData(userName, "ResultFFT", "rFFT" + sensorName, real);
+    manageData.writeDoubleTwoArrayData(userName, "ResultFFT", "iFFT" + sensorName, imaginary);
 
     double[][] power = new double[NUM_AXIS][data[0].length / 2];
     for (int axis = 0; axis < NUM_AXIS; axis++) {
@@ -144,7 +145,7 @@ public class Fourier {
       }
     }
 
-    mManageData.writeDoubleTwoArrayData(userName, "ResultFFT", "powerFFT" + sensorName, power);
+    manageData.writeDoubleTwoArrayData(userName, "ResultFFT", "powerFFT" + sensorName, power);
 
     // Low pass filtering
     for (int axis = 0; axis < NUM_AXIS; axis++) {
@@ -156,7 +157,7 @@ public class Fourier {
     // Execute inverse fourier transform
     for (double[] i : data) realfft.realInverse(i, true);
 
-    mManageData.writeDoubleTwoArrayData(userName, "AfterFFT", sensorName, data);
+    manageData.writeDoubleTwoArrayData(userName, "AfterFFT", sensorName, data);
 
     return data;
   }

@@ -61,7 +61,7 @@ public class ViewRegisteredData extends Activity {
     Intent intent = getIntent();
     item = intent.getStringExtra("item");
 
-    ListView lv = (ListView) findViewById(R.id.listView1);
+    ListView lv = (ListView) findViewById(R.id.dataList);
 
     ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
 

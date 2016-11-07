@@ -3,8 +3,12 @@ package net.trileg.motionauth.Utility;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static android.util.Log.INFO;
+import static net.trileg.motionauth.Utility.LogUtil.log;
+
 public class ListToArray {
   public float[][] listTo2DArray(ArrayList<ArrayList<Float>> list) {
+    log(INFO);
     float[][] array = new float[list.size()][];
 
     for (int i = 0; i < list.size(); i++) {
@@ -20,6 +24,7 @@ public class ListToArray {
 
 
   public float[][][] listTo3DArray(ArrayList<ArrayList<ArrayList<Float>>> list) {
+    log(INFO);
     float[][][] array = new float[list.size()][list.get(0).size()][];
 
     for (int i = 0; i < list.size(); i++) {

@@ -52,7 +52,7 @@
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".ViewDataList.ViewRegisteredData"
-            android:label="@string/title_activity_view_registed_data"
+            android:label="@string/title_activity_view_registered_data"
             android:screenOrientation="portrait"></activity>
     </application>
 </manifest>

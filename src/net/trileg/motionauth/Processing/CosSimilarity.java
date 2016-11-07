@@ -1,5 +1,6 @@
 package net.trileg.motionauth.Processing;
 
+import static android.util.Log.DEBUG;
 import static android.util.Log.INFO;
 import static net.trileg.motionauth.Utility.Enum.*;
 import static net.trileg.motionauth.Utility.Enum.MEASURE.*;
@@ -28,11 +29,11 @@ public class CosSimilarity {
     }
 
     // 取得回数AB, AC, BCそれぞれの類似度が出るはずなので，これから判断する
-    log(INFO, "---   CosSimilarity data begin here   ---");
+    log(DEBUG, "---   CosSimilarity data begin here   ---");
     for (double data : similarity) {
-      log(INFO, String.valueOf("similarity: " + data));
+      log(DEBUG, String.valueOf("similarity: " + data));
     }
-    log(INFO, "---   CosSimilarity data end here   ---");
+    log(DEBUG, "---   CosSimilarity data end here   ---");
 
     return similarity;
   }
@@ -52,9 +53,9 @@ public class CosSimilarity {
 
     similarity /= A[0].length;
 
-    log(INFO, "---   CosSimilarity data begin here ---");
-    log(INFO, String.valueOf("similarity: " + similarity));
-    log(INFO, "---   CosSimilarity data end here ---");
+    log(DEBUG, "---   CosSimilarity data begin here ---");
+    log(DEBUG, String.valueOf("similarity: " + similarity));
+    log(DEBUG, "---   CosSimilarity data end here ---");
 
     return similarity;
   }

@@ -2,7 +2,7 @@ package net.trileg.motionauth.Processing;
 
 import java.util.ArrayList;
 
-import static android.util.Log.DEBUG;
+import static android.util.Log.INFO;
 import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
@@ -14,9 +14,8 @@ import static net.trileg.motionauth.Utility.LogUtil.log;
  */
 public class Adjuster {
 
-  public ArrayList<float[][][]> adjust(float[][][] linearAcceleration,
-                                       float[][][] gyroscope) {
-    log(DEBUG);
+  public ArrayList<float[][][]> adjust(float[][][] linearAcceleration, float[][][] gyroscope) {
+    log(INFO);
     // Get max length of each time data
     ArrayList<Integer> linearAccelerationLengthList = new ArrayList<>();
     ArrayList<Integer> gyroscopeLengthList = new ArrayList<>();
@@ -93,7 +92,7 @@ public class Adjuster {
 
 
   public float[][] adjust(float[][] input, int registeredDataLength) {
-    log(DEBUG);
+    log(INFO);
     float[][] result = new float[input.length][registeredDataLength];
 
     if (registeredDataLength < input[0].length) {

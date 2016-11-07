@@ -4,9 +4,7 @@ import android.util.Log;
 
 import static android.util.Log.*;
 
-/**
- * @author Kensuke Kosaka
- */
+
 public class LogUtil {
   private static final String TAG = "Logging";
 

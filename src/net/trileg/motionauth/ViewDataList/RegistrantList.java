@@ -12,6 +12,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
 import net.trileg.motionauth.R;
 
 import java.util.ArrayList;
@@ -19,8 +20,8 @@ import java.util.Map;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static android.util.Log.DEBUG;
 import static android.util.Log.INFO;
-import static android.util.Log.VERBOSE;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
 
@@ -57,7 +58,7 @@ public class RegistrantList extends Activity {
     // Create registered user name list.
     ArrayList<String> userList = getRegistrantName();
 
-    final ListView lv = (ListView) findViewById(R.id.listView1);
+    final ListView lv = (ListView) findViewById(R.id.userList);
 
     ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
 
@@ -84,7 +85,7 @@ public class RegistrantList extends Activity {
     lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-        log(VERBOSE, "Click item");
+        log(DEBUG, "Click item");
 
         // Get item value which selected.
         item = lv.getItemAtPosition(position).toString();

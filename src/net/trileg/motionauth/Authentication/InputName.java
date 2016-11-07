@@ -14,14 +14,15 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import net.trileg.motionauth.R;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static android.util.Log.*;
+import static android.util.Log.DEBUG;
+import static android.util.Log.INFO;
 import static android.view.KeyEvent.ACTION_DOWN;
 import static android.view.KeyEvent.KEYCODE_ENTER;
-import static android.widget.Toast.LENGTH_LONG;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
 
@@ -32,7 +33,6 @@ import static net.trileg.motionauth.Utility.LogUtil.log;
  */
 public class InputName extends Activity {
   static String userName = "";
-  private Context mContext;
 
 
   @Override
@@ -41,9 +41,9 @@ public class InputName extends Activity {
 
     log(INFO);
 
+    // Disable title bar
     requestWindowFeature(Window.FEATURE_NO_TITLE);
     setContentView(R.layout.activity_auth_name_input);
-    mContext = this;
 
     nameInput();
   }
@@ -54,21 +54,19 @@ public class InputName extends Activity {
    */
   private void nameInput() {
     log(INFO);
-    final EditText nameInput = (EditText) findViewById(R.id.nameInputEditText);
+
+    final EditText nameInput = (EditText) findViewById(R.id.nameInput);
 
     nameInput.addTextChangedListener(new TextWatcher() {
       // Before text changed.
-      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-      }
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
       // Just before text changed.
-      public void onTextChanged(CharSequence s, int start, int before, int count) {
-      }
+      public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
       // After text changed.
       public void afterTextChanged(Editable s) {
-        if (nameInput.getText() != null)
-          userName = nameInput.getText().toString().trim();
+        if (nameInput.getText() != null) userName = nameInput.getText().toString().trim();
       }
     });
 
@@ -77,7 +75,7 @@ public class InputName extends Activity {
       @Override
       public boolean onKey(View v, int keyCode, KeyEvent event) {
         if (event.getAction() == ACTION_DOWN && keyCode == KEYCODE_ENTER) {
-          log(VERBOSE, "Push enter key");
+          log(DEBUG, "Push enter key");
           InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
           inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
@@ -88,11 +86,11 @@ public class InputName extends Activity {
     });
 
     // Move activity if user push OK button.
-    Button ok = (Button) findViewById(R.id.okButton);
+    Button ok = (Button) findViewById(R.id.ok);
     ok.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        log(VERBOSE, "Click ok button");
+        log(DEBUG, "Click ok button");
 
         // Check user inputted name is already registered or not.
         if (checkUserExists()) {
@@ -100,7 +98,7 @@ public class InputName extends Activity {
           moveActivity(getPackageName(), getPackageName() + ".Authentication.Authentication", true);
         } else {
           log(DEBUG, "User is not existed");
-          Toast.makeText(mContext, "ユーザが登録されていません", LENGTH_LONG).show();
+          Toast.makeText(InputName.this, "ユーザが登録されていません", Toast.LENGTH_SHORT).show();
         }
       }
     });

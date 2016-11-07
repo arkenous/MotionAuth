@@ -39,26 +39,24 @@ import static net.trileg.motionauth.Utility.LogUtil.log;
 public class Registration extends Activity {
   private static final int VIBRATOR_LONG = 100;
   private static final int LEAST_MOTION_LENGTH = 10;
+
   private TextView second;
   private TextView unit;
   private TextView rest;
   private Button getMotion;
-  private Result result;
-  private ListToArray listToArray = new ListToArray();
-  private Registration registration;
-
-  private double checkRangeValue = 2.0;
-  private double ampValue = 2.0;
-  private Future<Boolean> timer;
   private GetData linearAcceleration;
   private GetData gyroscope;
+  private Future<Boolean> timer;
   private Future<ArrayList<ArrayList<Float>>> linearAccelerationFuture;
   private Future<ArrayList<ArrayList<Float>>> gyroscopeFuture;
-
   private ArrayList<ArrayList<ArrayList<Float>>> linearAccelerationData = new ArrayList<>();
   private ArrayList<ArrayList<ArrayList<Float>>> gyroscopeData = new ArrayList<>();
-  private int countTime = 0;
-  private int getTimes = 3;
+  private ListToArray listToArray = new ListToArray();
+
+  private double checkRangeValue = 2.0; // 増幅器にかけるかどうかを判断する，モーションの振れ幅の閾値
+  private double ampValue = 2.0; // 増幅する量（モーションデータ * ampValue）
+  private int countTime = 0; // 何回入力されたかを計測する
+  private int getTimes = 3; // モーションの取得回数
 
 
   @Override
@@ -67,7 +65,6 @@ public class Registration extends Activity {
     log(INFO);
 
     setContentView(R.layout.activity_regist_motion);
-    registration = this;
     registration();
   }
 
@@ -79,11 +76,11 @@ public class Registration extends Activity {
     log(INFO);
 
     final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-    TextView nameTv = (TextView) findViewById(R.id.textView2);
-    second = (TextView) findViewById(R.id.secondTextView);
-    unit = (TextView) findViewById(R.id.textView4);
+    TextView nameTv = (TextView) findViewById(R.id.userName);
+    second = (TextView) findViewById(R.id.second);
+    unit = (TextView) findViewById(R.id.unit);
     rest = (TextView) findViewById(R.id.rest);
-    getMotion = (Button) findViewById(R.id.button1);
+    getMotion = (Button) findViewById(R.id.getMotion);
 
     nameTv.setText(userName + "さん読んでね！");
 
@@ -92,7 +89,7 @@ public class Registration extends Activity {
       public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction()) {
           case ACTION_DOWN:
-            log(VERBOSE, "Action down getMotion");
+            log(DEBUG, "Action down getMotion");
 
             getMotion.setText("取得中");
             rest.setText("");
@@ -100,17 +97,18 @@ public class Registration extends Activity {
             unit.setText("秒");
             vibrator.vibrate(VIBRATOR_LONG);
 
+            // 時間計測スレッドと加速度データ取得スレッド，角速度データ取得スレッドを開始する
             ExecutorService executorService = Executors.newFixedThreadPool(3);
             timer = executorService.submit(new Timer(vibrator, second));
-            linearAcceleration = new GetData(registration, true);
+            linearAcceleration = new GetData(Registration.this, true);
+            gyroscope = new GetData(Registration.this, false);
             linearAccelerationFuture = executorService.submit(linearAcceleration);
-            gyroscope = new GetData(registration, false);
             gyroscopeFuture = executorService.submit(gyroscope);
 
             executorService.shutdown();
             break;
           case ACTION_UP:
-            log(VERBOSE, "Action up getMotion");
+            log(DEBUG, "Action up getMotion");
             vibrator.vibrate(VIBRATOR_LONG);
             getMotion.setClickable(false);
             timer.cancel(true);
@@ -120,7 +118,7 @@ public class Registration extends Activity {
             organizeData(linearAccelerationFuture, gyroscopeFuture);
             break;
           case ACTION_CANCEL:
-            log(VERBOSE, "Action up getMotion");
+            log(DEBUG, "Action up getMotion");
             vibrator.vibrate(VIBRATOR_LONG);
             getMotion.setClickable(false);
             timer.cancel(true);
@@ -138,7 +136,7 @@ public class Registration extends Activity {
 
   /**
    * Get data from GetData class, check data length, add data to list,
-   * and call finishGetMotion when countTime is 3.
+   * and call finishGetMotion when countTime == getTimes.
    * @param linearAccelerationFuture Future instance of linearAcceleration
    * @param gyroscopeFuture Future instance of gyroscope
    */
@@ -181,7 +179,7 @@ public class Registration extends Activity {
    */
   private void reCollectDialog() {
     log(INFO);
-    AlertDialog.Builder alert = new AlertDialog.Builder(registration);
+    AlertDialog.Builder alert = new AlertDialog.Builder(Registration.this);
     alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
       @Override
       public boolean onKey(DialogInterface dialogInterface, int keyCode, KeyEvent keyEvent) {
@@ -207,14 +205,13 @@ public class Registration extends Activity {
    * @param linearAcceleration Original linear acceleration data collecting from GetData.
    * @param gyro               Original gyroscope data collecting from GetData.
    */
-  void finishGetMotion(ArrayList<ArrayList<ArrayList<Float>>> linearAcceleration,
-                       ArrayList<ArrayList<ArrayList<Float>>> gyro) {
+  void finishGetMotion(ArrayList<ArrayList<ArrayList<Float>>> linearAcceleration, ArrayList<ArrayList<ArrayList<Float>>> gyro) {
     log(INFO);
     if (getMotion.isClickable()) getMotion.setClickable(false);
     second.setText("0");
     getMotion.setText("データ処理中");
 
-    log(DEBUG, "Start initialize progress dialog");
+    log(DEBUG, "Start initializing progress dialog");
 
     ProgressDialog progressDialog = new ProgressDialog(this);
     progressDialog.setTitle("計算処理中");
@@ -223,13 +220,13 @@ public class Registration extends Activity {
     progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
     progressDialog.setCancelable(false);
 
-    log(DEBUG, "Finish initialize Progress dialog");
+    log(DEBUG, "Finish initializing Progress dialog");
 
     progressDialog.show();
 
-    result = new Result(registration, listToArray.listTo3DArray(linearAcceleration),
+    Result result = new Result(listToArray.listTo3DArray(linearAcceleration),
         listToArray.listTo3DArray(gyro), getMotion, progressDialog,
-        checkRangeValue, ampValue, this);
+        checkRangeValue, ampValue, Registration.this);
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     executorService.submit(result);
     executorService.shutdown();
@@ -423,9 +420,7 @@ public class Registration extends Activity {
           dialog.setCancelable(false);
           dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog1, int which) {
-              result.setAmpAndRange(ampValue, checkRangeValue);
-            }
+            public void onClick(DialogInterface dialog1, int which) {}
           });
           dialog.show();
         }

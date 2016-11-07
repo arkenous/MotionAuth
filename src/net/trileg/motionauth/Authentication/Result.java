@@ -2,7 +2,6 @@ package net.trileg.motionauth.Authentication;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Handler;
@@ -45,7 +44,7 @@ class Result extends Handler implements Runnable {
   private static final int CONVERT = 5;
   private static final int COSINE_SIMILARITY = 6;
   private static final int NN_OUT = 7;
-  private static final int FINISH = 10;
+  private static final int FINISH = 8;
 
   private ManageData manageData = new ManageData();
   private Formatter formatter = new Formatter();
@@ -58,28 +57,27 @@ class Result extends Handler implements Runnable {
   private Authentication authentication;
   private Button getMotion;
   private ProgressDialog progressDialog;
-  private double amp;
-  private Context context;
 
+  private double amp;
   private float[][] linearAccel;
   private float[][] gyro;
   private double[][] registeredVector;
   private boolean result = false;
   private String learnResult;
 
+  // C++で書いたMLPライブラリの呼び出しに必要
   static {
     System.loadLibrary("mlp-lib");
   }
 
 
-  Result(Authentication authentication, float[][] linearAccel, float[][] gyro,
-         Button getMotion, ProgressDialog progressDialog, Context context) {
-    this.authentication = authentication;
+  Result(float[][] linearAccel, float[][] gyro, Button getMotion, ProgressDialog progressDialog, Authentication authentication) {
+    log(INFO);
     this.linearAccel = linearAccel;
     this.gyro = gyro;
     this.getMotion = getMotion;
     this.progressDialog = progressDialog;
-    this.context = context;
+    this.authentication = authentication;
   }
 
 
@@ -171,6 +169,7 @@ class Result extends Handler implements Runnable {
    * Read already registered data.
    */
   private void readRegisteredData() {
+    log(INFO);
     this.sendEmptyMessage(READ_DATA);
     registeredVector = manageData.readRegisteredData(authentication, userName);
 
@@ -179,7 +178,7 @@ class Result extends Handler implements Runnable {
     if ("".equals(registeredAmplify)) throw new RuntimeException();
     amp = Double.valueOf(registeredAmplify);
 
-    CipherCrypt cipherCrypt = new CipherCrypt(context);
+    CipherCrypt cipherCrypt = new CipherCrypt(authentication);
     learnResult = cipherCrypt.decrypt(preferences.getString(userName + "learnResult", ""));
   }
 
@@ -192,6 +191,7 @@ class Result extends Handler implements Runnable {
    * @return true if authentication is succeed, otherwise false.
    */
   private boolean calculate(float[][] linearAccel, float[][] gyro) {
+    log(INFO);
     linearAccel = adjuster.adjust(linearAccel, registeredVector[0].length);
     gyro = adjuster.adjust(gyro, registeredVector[0].length);
 
@@ -216,9 +216,6 @@ class Result extends Handler implements Runnable {
 
     manageData.writeDoubleTwoArrayData(userName, "AuthAfterCalcData", "vector", vector);
 
-    manageData.writeDoubleTwoArrayData(userName, "NNTest", "RegisteredVector", registeredVector);
-    manageData.writeDoubleTwoArrayData(userName, "NNTest", "InputVector", vector);
-
     // 学習済みニューラルネットワークの出力を得る
     this.sendEmptyMessage(NN_OUT);
     double[] x = manipulateMotionDataToNeuralNetwork(vector);
@@ -226,9 +223,9 @@ class Result extends Handler implements Runnable {
     for (int i = 0; i < result.length; i++) log(DEBUG, "Neural Network Output["+i+"]: "+result[i]);
 
     // コサイン類似度を測る
-    log(INFO, "Before Cosine Similarity");
+    log(DEBUG, "Before Cosine Similarity");
     double vectorSimilarity = cosSimilarity.cosSimilarity(vector, registeredVector);
-    log(INFO, "After Cosine Similarity");
+    log(DEBUG, "After Cosine Similarity");
 
     this.sendEmptyMessage(COSINE_SIMILARITY);
     Enum.MEASURE measure = cosSimilarity.measure(vectorSimilarity);
@@ -254,6 +251,7 @@ class Result extends Handler implements Runnable {
    * @return 組み直したモーションデータ
    */
   private double[] manipulateMotionDataToNeuralNetwork(double[][] input) {
+    log(INFO);
     double[] output = new double[input[0].length * 3]; // データ長 * 軸数
 
     for (int data = 0, dataPerAxis = 0; data < input[0].length * 3; data += 3, dataPerAxis++) {

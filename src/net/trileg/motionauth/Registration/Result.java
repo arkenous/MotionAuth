@@ -2,12 +2,10 @@ package net.trileg.motionauth.Registration;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Button;
 
@@ -25,6 +23,8 @@ import net.trileg.motionauth.Utility.ManageData;
 import java.util.ArrayList;
 
 import static android.util.Log.DEBUG;
+import static android.util.Log.ERROR;
+import static android.util.Log.INFO;
 import static net.trileg.motionauth.Registration.InputName.userName;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
@@ -41,7 +41,7 @@ class Result extends Handler implements Runnable {
   private static final int DEVIATION = 5;
   private static final int COSINE_SIMILARITY = 6;
   private static final int NN_LEARNING = 7;
-  private static final int FINISH = 10;
+  private static final int FINISH = 8;
 
   private ManageData manageData = new ManageData();
   private Formatter formatter = new Formatter();
@@ -54,33 +54,32 @@ class Result extends Handler implements Runnable {
 
   private Registration registration;
   private Button getMotion;
-  private Context context;
   private ProgressDialog progressDialog;
+
   private double checkRange;
   private double amp;
   private String learnResult = "";
-
   private float[][][] linearAccel;
   private float[][][] gyro;
   private double[][] averageVector;
   private boolean result = false;
 
+  // C++で書いたMLPライブラリの呼び出しに必要
   static {
     System.loadLibrary("mlp-lib");
   }
 
 
-  Result(Registration registration, float[][][] linearAccel,
-         float[][][] gyro, Button getMotion, ProgressDialog progressDialog,
-         double checkRange, double amp, Context context) {
-    this.registration = registration;
+  Result(float[][][] linearAccel, float[][][] gyro, Button getMotion, ProgressDialog progressDialog,
+         double checkRange, double amp, Registration registration) {
+    log(INFO);
     this.linearAccel = linearAccel;
     this.gyro = gyro;
     this.getMotion = getMotion;
     this.progressDialog = progressDialog;
     this.checkRange = checkRange;
     this.amp = amp;
-    this.context = context;
+    this.registration = registration;
   }
 
 
@@ -124,7 +123,7 @@ class Result extends Handler implements Runnable {
         log(DEBUG, "ProgressDialog was dismissed now");
 
         if (!result) {
-          AlertDialog.Builder alert = new AlertDialog.Builder(context);
+          AlertDialog.Builder alert = new AlertDialog.Builder(registration);
           alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
             @Override
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
@@ -145,9 +144,9 @@ class Result extends Handler implements Runnable {
         } else {
           // モーションの平均値をファイルに書き出す
           manageData.writeDoubleTwoArrayData(userName, "RegRegistered", "vector", averageVector);
-          manageData.writeRegisterData(userName, averageVector, amp, learnResult, context);
+          manageData.writeRegisterData(userName, averageVector, amp, learnResult, registration);
 
-          AlertDialog.Builder alert = new AlertDialog.Builder(context);
+          AlertDialog.Builder alert = new AlertDialog.Builder(registration);
           alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
             @Override
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
@@ -168,13 +167,14 @@ class Result extends Handler implements Runnable {
         }
         break;
       default:
-        log(Log.ERROR, "Something went wrong");
+        log(ERROR, "Something went wrong");
         break;
     }
   }
 
 
   void setAmpAndRange(double amp, double checkRange) {
+    log(INFO);
     this.amp = amp;
     this.checkRange = checkRange;
   }
@@ -184,7 +184,7 @@ class Result extends Handler implements Runnable {
    * データ加工，計算処理を行う
    */
   private boolean calculate(float[][][] linearAccelList, float[][][] gyroList) {
-    log(Log.INFO);
+    log(INFO);
 
     // 複数回のデータ取得について，データ数を揃える
     ArrayList<float[][][]> adjusted = adjuster.adjust(linearAccelList, gyroList);
@@ -223,7 +223,7 @@ class Result extends Handler implements Runnable {
 
     log(DEBUG, "Finish fourier");
 
-    // 加速度から距離，角速度から角度へ変換（第二引数はセンサの取得間隔）
+    // 加速度から変位，角速度から角度へ変換（第二引数はセンサの取得間隔）
     this.sendEmptyMessage(CONVERT);
     double[][][] linearDistance = calc.accelToDistance(linearAcceleration, Enum.SENSOR_DELAY_TIME);
     double[][][] angle = calc.gyroToAngle(gyroscope, Enum.SENSOR_DELAY_TIME);
@@ -233,7 +233,7 @@ class Result extends Handler implements Runnable {
 
     log(DEBUG, "After write data");
 
-    // 加速度センサより得られたデータを角速度センサより得られたデータで回転させる
+    // 変位データを角度データで回転させる
     RotateVector rotateVector = new RotateVector();
     double[][][] vector = new double[linearDistance.length][linearDistance[0].length][linearDistance[0][0].length];
     for (int time = 0; time < linearDistance.length; time++) {
@@ -252,13 +252,11 @@ class Result extends Handler implements Runnable {
 
     Enum.MEASURE measure = cosSimilarity.measure(vectorCosSimilarity);
 
-    log(Log.INFO, "After measure cosine similarity");
-    log(Log.INFO, "measure = " + String.valueOf(measure));
+    log(DEBUG, "After measure cosine similarity");
+    log(DEBUG, "measure = " + String.valueOf(measure));
 
-    if (Enum.MEASURE.INCORRECT == measure) {
-      // 類似度が0.4以下
-      return false;
-    } else if (Enum.MEASURE.MAYBE == measure) {
+    if (Enum.MEASURE.INCORRECT == measure) return false; // 類似度が0.4以下
+    else if (Enum.MEASURE.MAYBE == measure) {
       log(DEBUG, "Deviation");
       // 類似度が0.4よりも高く，0.6以下の場合，ズレ修正を行う
       int count = 0;
@@ -286,28 +284,20 @@ class Result extends Handler implements Runnable {
 
         Enum.MEASURE tmp = cosSimilarity.measure(vectorCosSimilarity);
 
-        log(Log.INFO, "MEASURE: " + String.valueOf(tmp));
+        log(DEBUG, "MEASURE: " + String.valueOf(tmp));
 
         manageData.writeDoubleThreeArrayData(userName, "DeviatedData" + String.valueOf(mode), "vector", vector);
 
-        if (tmp == Enum.MEASURE.PERFECT || tmp == Enum.MEASURE.CORRECT) {
-          break;
-        }
+        if (tmp == Enum.MEASURE.PERFECT || tmp == Enum.MEASURE.CORRECT) break;
 
         vector = originalVector;
 
-        if (count == 2) {
-          // Break this loop if all pattern attempts were failed
-          break;
-        }
+        if (count == 2) break; // Break this loop if all pattern attempts were failed
 
         count++;
       }
-    } else if (measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT) {
-      log(Log.INFO, "SUCCESS");
-    } else {
-      return false;
-    }
+    } else if (measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT) log(DEBUG, "SUCCESS");
+    else return false; // 到達しないはず
     //endregion
 
     manageData.writeDoubleThreeArrayData(userName, "AfterCalcData", "vector", vector);
@@ -320,10 +310,10 @@ class Result extends Handler implements Runnable {
     vectorCosSimilarity = cosSimilarity.cosSimilarity(vector);
 
     measure = cosSimilarity.measure(vectorCosSimilarity);
-    log(Log.INFO, "measure = " + measure);
+    log(DEBUG, "measure = " + measure);
 
     this.sendEmptyMessage(NN_LEARNING);
-    // ニューラルネットワークの学習を行う
+    //region ニューラルネットワークの学習をし，期待した出力が得られれば登録完了とする
     // 取得したデータを，ニューラルネットワークの教師入力用に調整する
     double[][] x = manipulateMotionDataToNeuralNetwork(vector);
     double[][] answer = new double[x.length][1];
@@ -342,10 +332,17 @@ class Result extends Handler implements Runnable {
       if (result[0] > 0.1) return false;
     }
     return true;
+    //endregion
   }
 
 
+  /**
+   * 複数回分の入力モーションデータの平均値を計算する
+   * @param input 入力データ
+   * @return 平均値データ
+   */
   private double[][] calculateAverage(double[][][] input) {
+    log(INFO);
     double[][] output = new double[Enum.NUM_AXIS][input[0][0].length];
     for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
       for (int item = 0; item < output[axis].length; item++) {
@@ -364,6 +361,7 @@ class Result extends Handler implements Runnable {
    * @return 組み直したモーションデータ
    */
   private double[][] manipulateMotionDataToNeuralNetwork(double[][][] input) {
+    log(INFO);
     double[][] output = new double[input.length][input[0][0].length * 3]; // 入力回数 * (データ長 * 軸数）
 
     for (int time = 0; time < input.length; ++time) {

@@ -1,5 +1,6 @@
 package net.trileg.motionauth.Processing;
 
+import static android.util.Log.INFO;
 import static java.lang.Math.*;
 
 public class RotateVector {
@@ -10,6 +11,7 @@ public class RotateVector {
    * @return 軸・データ長の距離を角度を用いて回転させたベクトル配列
    */
   public double[][] rotate (double[][] distance, double[][] angle) {
+    log(INFO);
     double[][] rotated = new double[distance.length][distance[0].length];
     double[] combined;
 
@@ -43,8 +45,8 @@ public class RotateVector {
    * @param yaw ヨー
    * @return 回転させた距離データ
    */
-  private double[] combine(double distanceX, double distanceY, double distanceZ,
-                           double pitch, double roll, double yaw) {
+  private double[] combine(double distanceX, double distanceY, double distanceZ, double pitch, double roll, double yaw) {
+    log(INFO);
     double sinPitch = round(sin(pitch));
     double cosPitch = round(cos(pitch));
     double sinRoll = round(sin(roll));

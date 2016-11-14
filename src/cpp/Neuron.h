@@ -25,9 +25,10 @@ private:
   std::vector<double> inputWeights;
   double delta = 0.0; // 修正量
   double bias = 0.0; // ニューロンのバイアス // -threshold
-  double alpha = 0.3; // 学習率
+  double alpha = 0.01; // 学習率
   std::vector<double> g; // 学習率用AdaGrad，過去の勾配の二乗和を覚えておく
-  double rambda = 0.00001; // SGDの荷重減衰の定数．正の小さな定数にしておくことで勾配がゼロでも重みが減る
+  double epsilon = 0.00000001;
+  double lambda = 0.00001; // SGDの荷重減衰の定数．正の小さな定数にしておくことで勾配がゼロでも重みが減る
   double activation_identity(double x); // 0
   double activation_sigmoid(double x); // 1
   double activation_tanh(double x); // 2

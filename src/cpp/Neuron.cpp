@@ -44,11 +44,11 @@ void Neuron::learn(double delta, std::vector<double> inputValues) {
   for (int i = 0; i < this->inputNeuronNum; ++i) {
     this->g[i] += pow(this->delta * inputValues[i], 2);
 
-    this->inputWeights[i] -= (this->alpha / sqrt(this->g[i])) * (this->delta * inputValues[i]);
+    this->inputWeights[i] -= (this->alpha / (sqrt(this->g[i]) + this->epsilon)) * (this->delta * inputValues[i]);
   }
 
   // SGDでバイアスを更新
-  this->bias -= (this->alpha * this->delta) - (this->alpha * this->rambda * this->bias);
+  this->bias -= (this->alpha * this->delta) - (this->alpha * this->lambda * this->bias);
 }
 
 /**

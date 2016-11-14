@@ -255,8 +255,7 @@ class Result extends Handler implements Runnable {
     log(DEBUG, "After measure cosine similarity");
     log(DEBUG, "measure = " + String.valueOf(measure));
 
-    if (Enum.MEASURE.INCORRECT == measure) return false; // 類似度が0.4以下
-    else if (Enum.MEASURE.MAYBE == measure) {
+    if (Enum.MEASURE.MAYBE == measure) {
       log(DEBUG, "Deviation");
       // 類似度が0.4よりも高く，0.6以下の場合，ズレ修正を行う
       int count = 0;
@@ -296,8 +295,7 @@ class Result extends Handler implements Runnable {
 
         count++;
       }
-    } else if (measure == Enum.MEASURE.CORRECT || measure == Enum.MEASURE.PERFECT) log(DEBUG, "SUCCESS");
-    else return false; // 到達しないはず
+    }
     //endregion
 
     manageData.writeDoubleThreeArrayData(userName, "RegAfterCalcData", "vector", vector);
@@ -326,12 +324,12 @@ class Result extends Handler implements Runnable {
     learnResult = learn((short)x[0].length, (short)x[0].length, (short)answer[0].length, (short)1, neuronParams, x, answer);
     log(DEBUG, "learnResult: "+learnResult);
 
-    // テストデータで期待した出力が得られるか確認する．出力が0.1よりも大きければ登録失敗とする
+    // テストデータで期待した出力が得られるか確認する．出力が教師信号+許容誤差よりも大きければ登録失敗とする
     for (int set = 0; set < x.length; ++set) {
       double[] result = out((short)x[set].length, (short)x[set].length, (short)1, (short)1, learnResult, x[set]);
       manageData.writeDoubleOneArrayData(userName, "RegNNOut", "set"+set, result);
       log(DEBUG, "set["+set+"] result[0]: "+result[0]);
-      if (result[0] > 0.1) return false;
+      if (result[0] > answer[set][0] + 0.1) return false;
     }
     return true;
     //endregion

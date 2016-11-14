@@ -240,7 +240,7 @@ class Result extends Handler implements Runnable {
       vector[time] = rotateVector.rotate(linearDistance[time], angle[time]);
     }
 
-    manageData.writeDoubleThreeArrayData(userName, "Combined", "vector", vector);
+    manageData.writeDoubleThreeArrayData(userName, "RegCombined", "vector", vector);
 
     this.sendEmptyMessage(DEVIATION);
 
@@ -286,7 +286,7 @@ class Result extends Handler implements Runnable {
 
         log(DEBUG, "MEASURE: " + String.valueOf(tmp));
 
-        manageData.writeDoubleThreeArrayData(userName, "DeviatedData" + String.valueOf(mode), "vector", vector);
+        manageData.writeDoubleThreeArrayData(userName, "RegDeviatedData" + String.valueOf(mode), "vector", vector);
 
         if (tmp == Enum.MEASURE.PERFECT || tmp == Enum.MEASURE.CORRECT) break;
 
@@ -300,7 +300,7 @@ class Result extends Handler implements Runnable {
     else return false; // 到達しないはず
     //endregion
 
-    manageData.writeDoubleThreeArrayData(userName, "AfterCalcData", "vector", vector);
+    manageData.writeDoubleThreeArrayData(userName, "RegAfterCalcData", "vector", vector);
 
     this.sendEmptyMessage(COSINE_SIMILARITY);
 
@@ -308,6 +308,7 @@ class Result extends Handler implements Runnable {
     averageVector = calculateAverage(vector);
 
     vectorCosSimilarity = cosSimilarity.cosSimilarity(vector);
+    manageData.writeDoubleOneArrayData(userName, "RegCosSimilarity", "vectorCosSimilarity", vectorCosSimilarity);
 
     measure = cosSimilarity.measure(vectorCosSimilarity);
     log(DEBUG, "measure = " + measure);
@@ -328,6 +329,7 @@ class Result extends Handler implements Runnable {
     // テストデータで期待した出力が得られるか確認する．出力が0.1よりも大きければ登録失敗とする
     for (int set = 0; set < x.length; ++set) {
       double[] result = out((short)x[set].length, (short)x[set].length, (short)1, (short)1, learnResult, x[set]);
+      manageData.writeDoubleOneArrayData(userName, "RegNNOut", "set"+set, result);
       log(DEBUG, "set["+set+"] result[0]: "+result[0]);
       if (result[0] > 0.1) return false;
     }

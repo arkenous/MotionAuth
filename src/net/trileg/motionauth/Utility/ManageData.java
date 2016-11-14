@@ -28,6 +28,116 @@ public class ManageData {
 
 
   /**
+   * Write double type single data into sd card. SD_PATH/APP_NAME/userName/className/fileName.dat
+   * @param userName User name
+   * @param className Data class name
+   * @param fileName File name
+   * @param data Double type single data
+   * @return Return true when succeeded writing data, otherwise false
+   */
+  public boolean writeDoubleSingleData(String userName, String className, String fileName, double data) {
+    log(INFO);
+
+    String status = Environment.getExternalStorageState();
+    if (!status.equals(MEDIA_MOUNTED)) {
+      log(ERROR, "SDCard not mounted");
+      return false;
+    }
+
+    String SD_PATH = Environment.getExternalStorageDirectory().getPath();
+    String FOLDER_PATH = SD_PATH + separator + APP_NAME + separator + userName + separator + className;
+
+    File file = new File(FOLDER_PATH);
+
+    try {
+      if (!file.exists()) {
+        if (!file.mkdirs()) {
+          log(ERROR, "Make directory error");
+        }
+      }
+    } catch (Exception e) {
+      log(ERROR, e.getMessage(), e.getCause());
+      return false;
+    }
+
+    try {
+      String filePath = FOLDER_PATH + separator + fileName + ".dat";
+      file = new File(filePath);
+
+      fos = new FileOutputStream(file, false);
+      osw = new OutputStreamWriter(fos, "UTF-8");
+      bw = new BufferedWriter(osw);
+
+      bw.write(data + "\n");
+
+      bw.flush();
+      bw.close();
+      osw.close();
+      fos.close();
+    }catch (Exception e) {
+      log(ERROR, e.getMessage(), e.getCause());
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Write one dimension double type array data into sd card. SD_PATH/APP_NAME/userName/className/fileName.dat
+   * @param userName User name
+   * @param className Data class name
+   * @param fileName File name
+   * @param data one dimension double type array data
+   * @return Return true when succeeded writing data, otherwise false
+   */
+  public boolean writeDoubleOneArrayData(String userName, String className, String fileName, double[] data) {
+    log(INFO);
+
+    String status = Environment.getExternalStorageState();
+    if (!status.equals(MEDIA_MOUNTED)) {
+      log(ERROR, "SDCard not mounted");
+      return false;
+    }
+
+    String SD_PATH = Environment.getExternalStorageDirectory().getPath();
+    String FOLDER_PATH = SD_PATH + separator + APP_NAME + separator + userName + separator + className;
+
+    File file = new File(FOLDER_PATH);
+
+    try {
+      if (!file.exists()) {
+        if (!file.mkdirs()) {
+          log(ERROR, "Make directory error");
+        }
+      }
+    } catch (Exception e) {
+      log(ERROR, e.getMessage(), e.getCause());
+      return false;
+    }
+
+    try {
+      String filePath = FOLDER_PATH + separator + fileName + ".dat";
+      file = new File(filePath);
+
+      fos = new FileOutputStream(file, false);
+      osw = new OutputStreamWriter(fos, "UTF-8");
+      bw = new BufferedWriter(osw);
+
+      for (int item = 0; item < data.length; ++item) bw.write(data[item] + "\n");
+
+      bw.flush();
+      bw.close();
+      osw.close();
+      fos.close();
+    }catch (Exception e) {
+      log(ERROR, e.getMessage(), e.getCause());
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
    * @param userName   User name.
    * @param dataName   Data name.
    * @param sensorName Sensor name.

@@ -83,8 +83,8 @@ class Result extends Handler implements Runnable {
 
   @Override
   public void run() {
-    manageData.writeFloatData(userName, "AuthenticationRaw", "linearAcceleration", linearAccel);
-    manageData.writeFloatData(userName, "AuthenticationRaw", "gyroscope", gyro);
+    manageData.writeFloatData(userName, "AuthRaw", "linearAcceleration", linearAccel);
+    manageData.writeFloatData(userName, "AuthRaw", "gyroscope", gyro);
 
     readRegisteredData();
     manageData.writeDoubleTwoArrayData(userName, "AuthRegistered", "vector", registeredVector);
@@ -222,13 +222,17 @@ class Result extends Handler implements Runnable {
     double[] result = out((short)x.length, (short)x.length, (short)1, (short)1, learnResult, x);
     for (int i = 0; i < result.length; i++) log(DEBUG, "Neural Network Output["+i+"]: "+result[i]);
 
+    manageData.writeDoubleOneArrayData(userName, "AuthNNOut", "NNOut", result);
+
     // コサイン類似度を測る
     log(DEBUG, "Before Cosine Similarity");
-    double vectorSimilarity = cosSimilarity.cosSimilarity(vector, registeredVector);
+    double vectorCosSimilarity = cosSimilarity.cosSimilarity(vector, registeredVector);
     log(DEBUG, "After Cosine Similarity");
 
+    manageData.writeDoubleSingleData(userName, "AuthCosSimilarity", "vectorCosSimilarity", vectorCosSimilarity);
+
     this.sendEmptyMessage(COSINE_SIMILARITY);
-    Enum.MEASURE measure = cosSimilarity.measure(vectorSimilarity);
+    Enum.MEASURE measure = cosSimilarity.measure(vectorCosSimilarity);
 
     // ニューラルネットワークの結果，正規モーションでないと判定された場合
     if (result[0] > 0.1) return false;

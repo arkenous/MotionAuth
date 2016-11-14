@@ -14,8 +14,8 @@ public:
   std::string learn(std::vector<std::vector<double>> x, std::vector<std::vector<double>> answer);
   std::vector<double> out(std::vector<double> input);
 private:
-  static const unsigned int MAX_TRIAL = 100; // 学習上限回数
-  constexpr static const double MAX_GAP = 0.1; // 許容する誤差の域値
+  static const unsigned int MAX_TRIAL = 5000; // 学習上限回数
+  constexpr static const double MAX_GAP = 0.01; // 許容する誤差の域値
   int num_thread = android_getCpuCount(); // Androidデバイスのプロセッサのコア数
 
 

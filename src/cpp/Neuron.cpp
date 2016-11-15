@@ -11,7 +11,7 @@
  * @param weight 結合荷重の重み付けデータ
  * @return
  */
-Neuron::Neuron(unsigned long inputNeuronNum, std::vector<double> weight, std::vector<double> g, double bias, int activationType) {
+Neuron::Neuron(unsigned long inputNeuronNum, std::vector<double> weight, int iteration, std::vector<double> m, std::vector<double> nu, std::vector<double> m_hat, std::vector<double> nu_hat, double bias, int activationType) {
   this->inputNeuronNum = inputNeuronNum;
   this->activationType = activationType;
   std::random_device rnd; // 非決定的乱数生成器
@@ -23,12 +23,24 @@ Neuron::Neuron(unsigned long inputNeuronNum, std::vector<double> weight, std::ve
   if (bias != 0.0) this->bias = bias;
   else this->bias = real_rnd(mt); // 閾値を乱数で設定
 
-  // AdaGrad用のgが渡されていればそれをセットし，そうでなければ0.0で初期化する
-  if (g.size() > 0) for (int i = 0; i < g.size(); ++i) this->g.push_back(g[i]);
-  else this->g = std::vector<double>(inputNeuronNum, 0.0);
+  // Adamの各パラメータについて，学習済みのものが渡されていればセットし，そうでなければ0.0で初期化
+  if (iteration != 0) this->iteration = iteration;
+  else this->iteration = 0;
+
+  if (m.size() > 0) for (int i = 0; i < this->inputNeuronNum; ++i) this->m.push_back(m[i]);
+  else this->m = std::vector<double>(inputNeuronNum, 0.0);
+
+  if (nu.size() > 0) for (int i = 0; i < this->inputNeuronNum; ++i) this->nu.push_back(nu[i]);
+  else this->nu = std::vector<double>(inputNeuronNum, 0.0);
+
+  if (m_hat.size() > 0) for (int i = 0; i < this->inputNeuronNum; ++i) this->m_hat.push_back(m_hat[i]);
+  else this->m_hat = std::vector<double>(inputNeuronNum, 0.0);
+
+  if (nu_hat.size() > 0) for (int i = 0; i < this->inputNeuronNum; ++i) this->nu_hat.push_back(nu_hat[i]);
+  else this->nu_hat = std::vector<double>(inputNeuronNum, 0.0);
 
   // 結合荷重が渡されていればそれをセットし，無ければ乱数で初期化
-  if (weight.size() > 0) for (int i = 0; i < weight.size(); ++i) this->inputWeights.push_back(weight[i]);
+  if (weight.size() > 0) for (int i = 0; i < this->inputNeuronNum; ++i) this->inputWeights.push_back(weight[i]);
   else for (int i = 0; i < this->inputNeuronNum; ++i) this->inputWeights.push_back(real_rnd(mt));
 }
 
@@ -40,11 +52,14 @@ Neuron::Neuron(unsigned long inputNeuronNum, std::vector<double> weight, std::ve
 void Neuron::learn(double delta, std::vector<double> inputValues) {
   this->delta = delta;
 
-  // AdaGradによる学習率で，結合荷重を更新
-  for (int i = 0; i < this->inputNeuronNum; ++i) {
-    this->g[i] += pow(this->delta * inputValues[i], 2);
-
-    this->inputWeights[i] -= (this->alpha / (sqrt(this->g[i]) + this->epsilon)) * (this->delta * inputValues[i]);
+  // Adamを用いて，結合荷重を更新
+  this->iteration += 1;
+  for (int i = 0; i < inputNeuronNum; ++i) {
+    this->m[i] = this->beta_one * this->m[i] + (1 - this->beta_one) * (this->delta * inputValues[i]);
+    this->nu[i] = this->beta_two * this->nu[i] + (1 - this->beta_two) * pow((this->delta * inputValues[i]), 2);
+    this->m_hat[i] = this->m[i] / (1 - pow(this->beta_one, this->iteration));
+    this->nu_hat[i] = sqrt(this->nu[i] / (1 - pow(this->beta_two, this->iteration))) + this->epsilon;
+    this->inputWeights[i] -= this->alpha * (this->m_hat[i] / this->nu_hat[i]);
   }
 
   // SGDでバイアスを更新
@@ -129,6 +144,26 @@ double Neuron::getDelta() {
   return this->delta;
 }
 
-double Neuron::getGIndexOf(int i){
-  return this->g[i];
+//double Neuron::getGIndexOf(int i){
+//  return this->g[i];
+//}
+
+double Neuron::getMIndexOf(int i) {
+  return this->m[i];
+}
+
+double Neuron::getNuIndexOf(int i) {
+  return this->nu[i];
+}
+
+double Neuron::getMHatIndexOf(int i){
+  return this->m_hat[i];
+}
+
+double Neuron::getNuHatIndexOf(int i) {
+  return this->nu_hat[i];
+}
+
+int Neuron::getIteration() {
+  return this->iteration;
 }

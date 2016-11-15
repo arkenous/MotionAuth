@@ -32,7 +32,7 @@ MultiLayerPerceptron::MultiLayerPerceptron(unsigned short input, unsigned short 
     // 中間層
     for (int layer = 0; layer < middleLayerNumber; ++layer) {
       for (int neuron = 0; neuron < middleNumber; ++neuron) {
-        neuronPerLayer.push_back(Neuron(inputNumber, emptyVector, emptyVector, 0.0, middleLayerType));
+        neuronPerLayer.push_back(Neuron(inputNumber, emptyVector, 0, emptyVector, emptyVector, emptyVector, emptyVector,  0.0, middleLayerType));
       }
       this->middleNeurons.push_back(neuronPerLayer);
       neuronPerLayer.clear();
@@ -40,7 +40,7 @@ MultiLayerPerceptron::MultiLayerPerceptron(unsigned short input, unsigned short 
 
     // 出力層
     for (int neuron = 0; neuron < output; ++neuron) {
-      this->outputNeurons.push_back(Neuron(inputNumber, emptyVector, emptyVector, 0.0, 1));
+      this->outputNeurons.push_back(Neuron(inputNumber, emptyVector, 0, emptyVector, emptyVector, emptyVector, emptyVector, 0.0, 1));
     }
   } else {
     // ニューロン単位でデータを分割する
@@ -59,7 +59,7 @@ MultiLayerPerceptron::MultiLayerPerceptron(unsigned short input, unsigned short 
     for (int layer = 0; layer < middleLayerNumber; ++layer) {
       for (int neuron = 0; neuron < middleNumber; ++neuron) {
         // 中間層
-        // 重みづけ，AdaGradのg，バイアスの三つに分割する
+        // 重みづけ，Adamのm，nu，m_hat，nu_hat，iteration，バイアスの七つに分割する
         std::vector<std::string> elems;
         std::stringstream ss(splitByNeuron[(layer * middleNumber) + neuron]);
         std::string item;
@@ -74,6 +74,10 @@ MultiLayerPerceptron::MultiLayerPerceptron(unsigned short input, unsigned short 
         double bias = std::stod(elems.back());
         elems.pop_back();
 
+        // iterationを取り出す
+        int iteration = std::stoi(elems.back());
+        elems.pop_back();
+
         // 重みを取り出す
         std::vector<double> weight;
         ss = std::stringstream(elems[0]);
@@ -84,17 +88,47 @@ MultiLayerPerceptron::MultiLayerPerceptron(unsigned short input, unsigned short 
         ss.str("");
         ss.clear(stringstream::goodbit);
 
-        // AdaGradのgを取り出す
-        std::vector<double> g;
+        // Adamのmを取り出す
+        std::vector<double> m;
         ss = std::stringstream(elems[1]);
         while (std::getline(ss, item, ',')) {
-          if (!item.empty()) g.push_back(std::stod(item));
+          if (!item.empty()) m.push_back(std::stod(item));
         }
         item = "";
-        ss.str(""); // バッファをクリアする
-        ss.clear(stringstream::goodbit); // ストリームの状態をクリアする
+        ss.str("");
+        ss.clear(stringstream::goodbit);
 
-        neuronPerLayer.push_back(Neuron(inputNumber, weight, g, bias, middleLayerType));
+        // Adamのnuを取り出す
+        std::vector<double> nu;
+        ss = std::stringstream(elems[2]);
+        while (std::getline(ss, item, ',')) {
+          if (!item.empty()) nu.push_back(std::stod(item));
+        }
+        item = "";
+        ss.str("");
+        ss.clear(stringstream::goodbit);
+
+        // Adamのm_hatを取り出す
+        std::vector<double> m_hat;
+        ss = std::stringstream(elems[3]);
+        while (std::getline(ss, item, ',')) {
+          if (!item.empty()) m_hat.push_back(std::stod(item));
+        }
+        item = "";
+        ss.str("");
+        ss.clear(stringstream::goodbit);
+
+        // Adamのnu_hatを取り出す
+        std::vector<double> nu_hat;
+        ss = std::stringstream(elems[4]);
+        while (std::getline(ss, item, ',')) {
+          if (!item.empty()) nu_hat.push_back(std::stod(item));
+        }
+        item = "";
+        ss.str("");
+        ss.clear(stringstream::goodbit);
+
+        neuronPerLayer.push_back(Neuron(inputNumber, weight, iteration, m, nu, m_hat, nu_hat, bias, middleLayerType));
 
         elems.clear();
       }
@@ -104,7 +138,7 @@ MultiLayerPerceptron::MultiLayerPerceptron(unsigned short input, unsigned short 
 
     for (int neuron = 0; neuron < output; ++neuron) {
       // 出力層
-      // 重みづけ，AdaGradのg，バイアスの三つに分割する
+      // 重みづけ，Adamのm，nu，m_hat，nu_hat，iteration，バイアスの七つに分割する
       std::vector<std::string> elems;
       std::stringstream ss(splitByNeuron[(middleLayerNumber * middleNumber) + neuron]);
       std::string item;
@@ -119,6 +153,10 @@ MultiLayerPerceptron::MultiLayerPerceptron(unsigned short input, unsigned short 
       double bias = std::stod(elems.back());
       elems.pop_back();
 
+      // iterationを取り出す
+      int iteration = std::stoi(elems.back());
+      elems.pop_back();
+
       // 重みを取り出す
       std::vector<double> weight;
       ss = std::stringstream(elems[0]);
@@ -129,17 +167,47 @@ MultiLayerPerceptron::MultiLayerPerceptron(unsigned short input, unsigned short 
       ss.str("");
       ss.clear(stringstream::goodbit);
 
-      // AdaGradのgを取り出す
-      std::vector<double> g;
+      // Adamのmを取り出す
+      std::vector<double> m;
       ss = std::stringstream(elems[1]);
       while (std::getline(ss, item, ',')) {
-        if (!item.empty()) g.push_back(std::stod(item));
+        if (!item.empty()) m.push_back(std::stod(item));
       }
       item = "";
-      ss.str(""); // バッファをクリアする
-      ss.clear(stringstream::goodbit); // ストリームの状態をクリアする
+      ss.str("");
+      ss.clear(stringstream::goodbit);
 
-      this->outputNeurons.push_back(Neuron(inputNumber, weight, g, bias, 1));
+      // Adamのnuを取り出す
+      std::vector<double> nu;
+      ss = std::stringstream(elems[2]);
+      while (std::getline(ss, item, ',')) {
+        if (!item.empty()) nu.push_back(std::stod(item));
+      }
+      item = "";
+      ss.str("");
+      ss.clear(stringstream::goodbit);
+
+      // Adamのm_hatを取り出す
+      std::vector<double> m_hat;
+      ss = std::stringstream(elems[3]);
+      while (std::getline(ss, item, ',')) {
+        if (!item.empty()) m_hat.push_back(std::stod(item));
+      }
+      item = "";
+      ss.str("");
+      ss.clear(stringstream::goodbit);
+
+      // Adamのnu_hatを取り出す
+      std::vector<double> nu_hat;
+      ss = std::stringstream(elems[4]);
+      while (std::getline(ss, item, ',')) {
+        if (!item.empty()) nu_hat.push_back(std::stod(item));
+      }
+      item = "";
+      ss.str("");
+      ss.clear(stringstream::goodbit);
+
+      this->outputNeurons.push_back(Neuron(inputNumber, weight, iteration, m, nu, m_hat, nu_hat, bias, 1));
 
       elems.clear();
     }
@@ -267,11 +335,33 @@ std::string MultiLayerPerceptron::learn(std::vector<std::vector<double>> x, std:
         ss << middleNeurons[layer][neuron].getInputWeightIndexOf(weightNum) << ',';
       }
       ss << '|';
-      // AdaGradのgを詰める
-      for (int gNum = 0; gNum < inputNumber; ++gNum) {
-        ss << middleNeurons[layer][neuron].getGIndexOf(gNum) << ',';
+
+      // Adamのmを詰める
+      for (int mNum = 0; mNum < inputNumber; ++mNum) {
+        ss << middleNeurons[layer][neuron].getMIndexOf(mNum) << ',';
       }
       ss << '|';
+
+      // Adamのnuを詰める
+      for (int nuNum = 0; nuNum < inputNumber; ++nuNum) {
+        ss << middleNeurons[layer][neuron].getNuIndexOf(nuNum) << ',';
+      }
+      ss << '|';
+
+      // Adamのm_hatを詰める
+      for (int mHatNum = 0; mHatNum < inputNumber; ++mHatNum) {
+        ss << middleNeurons[layer][neuron].getMHatIndexOf(mHatNum) << ',';
+      }
+      ss << '|';
+
+      // Adamのnu_hatを詰める
+      for (int nuHatNum = 0; nuHatNum < inputNumber; ++nuHatNum) {
+        ss << middleNeurons[layer][neuron].getNuHatIndexOf(nuHatNum) << ',';
+      }
+      ss << '|';
+
+      // Adamのiterationを詰める
+      ss << middleNeurons[layer][neuron].getIteration() << '|';
 
       // バイアスを入れ，最後に ' を入れる
       ss << middleNeurons[layer][neuron].getBias() << '\'';
@@ -283,11 +373,33 @@ std::string MultiLayerPerceptron::learn(std::vector<std::vector<double>> x, std:
       ss << outputNeurons[neuron].getInputWeightIndexOf(weightNum) << ",";
     }
     ss << '|';
-    // AdaGradのgを詰める
-    for (int gNum = 0; gNum < inputNumber; ++gNum) {
-      ss << outputNeurons[neuron].getGIndexOf(gNum) << ',';
+
+    //Adamのmを詰める
+    for (int mNum = 0; mNum < inputNumber; ++mNum) {
+      ss << outputNeurons[neuron].getMIndexOf(mNum) << ',';
     }
     ss << '|';
+
+    // Adamのnuを詰める
+    for (int nuNum = 0; nuNum < inputNumber; ++nuNum) {
+      ss << outputNeurons[neuron].getNuIndexOf(nuNum) << ',';
+    }
+    ss << '|';
+
+    // Adamのm_hatを詰める
+    for (int mHatNum = 0; mHatNum < inputNumber; ++mHatNum) {
+      ss << outputNeurons[neuron].getMHatIndexOf(mHatNum) << ',';
+    }
+    ss << '|';
+
+    // Adamのnu_hatを詰める
+    for (int nuHatNum = 0; nuHatNum < inputNumber; ++nuHatNum) {
+      ss << outputNeurons[neuron].getNuHatIndexOf(nuHatNum) << ',';
+    }
+    ss << '|';
+
+    // Adamのiterationを詰める
+    ss << outputNeurons[neuron].getIteration() << '|';
 
     // バイアスを入れ，最後に ' を入れる
     ss << outputNeurons[neuron].getBias() << '\'';

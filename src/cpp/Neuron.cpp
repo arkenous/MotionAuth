@@ -7,13 +7,13 @@
 
 /**
  * Neuronのコンストラクタ
- * @param inputNeuronNum 入力ニューロン数（入力データ数）
+ * @param input_num 入力ニューロン数（入力データ数）
  * @param weight 結合荷重の重み付けデータ
  * @return
  */
-Neuron::Neuron(unsigned long inputNeuronNum, std::vector<double> weight, int iteration, std::vector<double> m, std::vector<double> nu, std::vector<double> m_hat, std::vector<double> nu_hat, double bias, int activationType) {
-  this->inputNeuronNum = inputNeuronNum;
-  this->activationType = activationType;
+Neuron::Neuron(unsigned long input_num, std::vector<double> weight, int iteration, std::vector<double> m, std::vector<double> nu, std::vector<double> m_hat, std::vector<double> nu_hat, double bias, int activation_type) {
+  this->input_num = input_num;
+  this->activation_type = activation_type;
   std::random_device rnd; // 非決定的乱数生成器
   std::mt19937 mt; // メルセンヌ・ツイスタ
   mt.seed(rnd());
@@ -27,21 +27,21 @@ Neuron::Neuron(unsigned long inputNeuronNum, std::vector<double> weight, int ite
   if (iteration != 0) this->iteration = iteration;
   else this->iteration = 0;
 
-  if (m.size() > 0) for (int i = 0; i < this->inputNeuronNum; ++i) this->m.push_back(m[i]);
-  else this->m = std::vector<double>(inputNeuronNum, 0.0);
+  if (m.size() > 0) for (int i = 0; i < this->input_num; ++i) this->m.push_back(m[i]);
+  else this->m = std::vector<double>(input_num, 0.0);
 
-  if (nu.size() > 0) for (int i = 0; i < this->inputNeuronNum; ++i) this->nu.push_back(nu[i]);
-  else this->nu = std::vector<double>(inputNeuronNum, 0.0);
+  if (nu.size() > 0) for (int i = 0; i < this->input_num; ++i) this->nu.push_back(nu[i]);
+  else this->nu = std::vector<double>(input_num, 0.0);
 
-  if (m_hat.size() > 0) for (int i = 0; i < this->inputNeuronNum; ++i) this->m_hat.push_back(m_hat[i]);
-  else this->m_hat = std::vector<double>(inputNeuronNum, 0.0);
+  if (m_hat.size() > 0) for (int i = 0; i < this->input_num; ++i) this->m_hat.push_back(m_hat[i]);
+  else this->m_hat = std::vector<double>(input_num, 0.0);
 
-  if (nu_hat.size() > 0) for (int i = 0; i < this->inputNeuronNum; ++i) this->nu_hat.push_back(nu_hat[i]);
-  else this->nu_hat = std::vector<double>(inputNeuronNum, 0.0);
+  if (nu_hat.size() > 0) for (int i = 0; i < this->input_num; ++i) this->nu_hat.push_back(nu_hat[i]);
+  else this->nu_hat = std::vector<double>(input_num, 0.0);
 
   // 結合荷重が渡されていればそれをセットし，無ければ乱数で初期化
-  if (weight.size() > 0) for (int i = 0; i < this->inputNeuronNum; ++i) this->inputWeights.push_back(weight[i]);
-  else for (int i = 0; i < this->inputNeuronNum; ++i) this->inputWeights.push_back(real_rnd(mt));
+  if (weight.size() > 0) for (int i = 0; i < this->input_num; ++i) this->inputWeights.push_back(weight[i]);
+  else for (int i = 0; i < this->input_num; ++i) this->inputWeights.push_back(real_rnd(mt));
 }
 
 /**
@@ -54,7 +54,7 @@ void Neuron::learn(double delta, std::vector<double> inputValues) {
 
   // Adamを用いて，結合荷重を更新
   this->iteration += 1;
-  for (int i = 0; i < inputNeuronNum; ++i) {
+  for (int i = 0; i < input_num; ++i) {
     this->m[i] = this->beta_one * this->m[i] + (1 - this->beta_one) * (this->delta * inputValues[i]);
     this->nu[i] = this->beta_two * this->nu[i] + (1 - this->beta_two) * pow((this->delta * inputValues[i]), 2);
     this->m_hat[i] = this->m[i] / (1 - pow(this->beta_one, this->iteration));
@@ -73,14 +73,14 @@ void Neuron::learn(double delta, std::vector<double> inputValues) {
  */
 double Neuron::output(std::vector<double> inputValues){
   double sum = this->bias;
-  for (int i = 0; i < this->inputNeuronNum; ++i) {
+  for (int i = 0; i < this->input_num; ++i) {
     sum += inputValues[i] * this->inputWeights[i];
   }
 
   // 得られた重み付き和を活性化関数に入れて出力を得る
-  if (activationType == 0) return activation_identity(sum);
-  else if (activationType == 1) return activation_sigmoid(sum);
-  else if (activationType == 2) return activation_tanh(sum);
+  if (activation_type == 0) return activation_identity(sum);
+  else if (activation_type == 1) return activation_sigmoid(sum);
+  else if (activation_type == 2) return activation_tanh(sum);
   else return activation_relu(sum);
 }
 

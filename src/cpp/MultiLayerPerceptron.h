@@ -10,7 +10,7 @@
 #include "Neuron.h"
 class MultiLayerPerceptron {
 public:
-  MultiLayerPerceptron(unsigned short input, unsigned short middle, unsigned short output, unsigned short middleLayer, std::string neuronParams, int middleLayerType);
+  MultiLayerPerceptron(unsigned short input, unsigned short middle, unsigned short output, unsigned short middle_layer, std::string neuron_params, int middle_layer_type);
   std::string learn(std::vector<std::vector<double>> x, std::vector<std::vector<double>> answer);
   std::vector<double> out(std::vector<double> input);
 private:
@@ -20,13 +20,13 @@ private:
 
 
   // ニューロン数
-  unsigned short inputNumber = 0;
-  unsigned short middleNumber = 0;
-  unsigned short outputNumber = 0;
+  unsigned short input_neuron_num = 0;
+  unsigned short middle_neuron_num = 0;
+  unsigned short output_neuron_num = 0;
 
-  unsigned short middleLayerNumber = 0; // 中間層の層数
+  unsigned short middle_layer_number = 0; // 中間層の層数
 
-  int middleLayerType = 0; // 中間層の活性化関数の種類指定．0: identity 1: sigmoid 2: tanh 3: ReLU
+  int middle_layer_type = 0; // 中間層の活性化関数の種類指定．0: identity 1: sigmoid 2: tanh 3: ReLU
 
   bool successFlg = true;
 
@@ -39,5 +39,7 @@ private:
   void middleLastLayerLearnThread(const std::vector<std::vector<double>> h, const int begin, const int end);
   void middleMiddleLayerLearnThread(const std::vector<std::vector<double>> h, const int begin, const int end);
   void middleFirstLayerLearnThread(const std::vector<std::vector<double>> h, const std::vector<double> in, const int begin, const int end);
+  std::vector<double> separate_by_camma(std::string input);
+  std::vector<Neuron> setup_layer_by_params(std::vector<std::string> params, int previous_neurons_num, int layer_neuron_num, unsigned long input_number, int activation_type);
 };
 #endif //MOTIONAUTH_MULTILAYERPERCEPTRON_H

@@ -11,9 +11,9 @@
 
 class Neuron {
 public:
-  Neuron(unsigned long inputNeuronNum, std::vector<double> weight, int iteration, std::vector<double> m, std::vector<double> nu, std::vector<double> m_hat, std::vector<double> nu_hat, double bias, int activationType);
-  void learn(double delta, std::vector<double> inputValues);
-  double output(std::vector<double> inputValues);
+  Neuron(unsigned long input_num, std::vector<double> weight, int iteration, std::vector<double> m, std::vector<double> nu, std::vector<double> m_hat, std::vector<double> nu_hat, double bias, int activation_type);
+  void learn(double delta, std::vector<double> inputValues); // 誤差逆伝播学習
+  double output(std::vector<double> inputValues); // 学習済みNNの順伝播出力
   double getInputWeightIndexOf(int i);
   double getBias();
   double getDelta();
@@ -22,10 +22,10 @@ public:
   double getMHatIndexOf(int i);
   double getNuHatIndexOf(int i);
   int getIteration();
-private:
 
-  unsigned long inputNeuronNum = 0;
-  int activationType = 0;
+private:
+  unsigned long input_num = 0;
+  int activation_type = 0;
   std::vector<double> inputWeights;
   double delta = 0.0; // 修正量
   double bias = 0.0; // ニューロンのバイアス // -threshold

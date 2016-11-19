@@ -11,9 +11,11 @@
 
 class Neuron {
 public:
-  Neuron(unsigned long input_num, std::vector<double> weight, int iteration, std::vector<double> m, std::vector<double> nu, std::vector<double> m_hat, std::vector<double> nu_hat, double bias, int activation_type);
+  Neuron(unsigned long input_num, std::vector<double> weight, int iteration, std::vector<double> m, std::vector<double> nu, std::vector<double> m_hat, std::vector<double> nu_hat, double bias, int activation_type, double dropout_ratio);
+  void dropout(double random_value);
   void learn(double delta, std::vector<double> inputValues); // 誤差逆伝播学習
-  double output(std::vector<double> inputValues); // 学習済みNNの順伝播出力
+  double learn_output(std::vector<double> inputValues); // 学習時のDropoutを用いた順伝播出力
+  double output(std::vector<double> inputValues); // Dropoutを用いて学習したNNの順伝播出力
   double getInputWeightIndexOf(int i);
   double getBias();
   double getDelta();
@@ -43,6 +45,9 @@ private:
   double activation_sigmoid(double x); // 1
   double activation_tanh(double x); // 2
   double activation_relu(double x); // 3
+
+  double dropout_ratio; // どれくらいの割合で中間層ニューロンをDropoutさせるか
+  double dropout_mask; // Dropoutのマスク率，0.0で殺して1.0で生かす
 };
 
 #endif //MOTIONAUTH_NEURON_H

@@ -317,19 +317,19 @@ class Result extends Handler implements Runnable {
     double[][] x = manipulateMotionDataToNeuralNetwork(vector);
     double[][] answer = new double[x.length][1];
     for (int time = 0; time < x.length; time++) {
-      answer[time][0] = 0.1;
+      answer[time][0] = 0.0;
     }
     String neuronParams = "";
 
     learnResult = learn((short)x[0].length, (short)x[0].length, (short)answer[0].length, (short)1, neuronParams, x, answer);
     log(DEBUG, "learnResult: "+learnResult);
 
-    // テストデータで期待した出力が得られるか確認する．出力が教師信号+許容誤差よりも大きければ登録失敗とする
+    // テストデータで期待した出力が得られるか確認する．出力が0.5よりも大きければ登録失敗とする
     for (int set = 0; set < x.length; ++set) {
       double[] result = out((short)x[set].length, (short)x[set].length, (short)1, (short)1, learnResult, x[set]);
       manageData.writeDoubleOneArrayData(userName, "RegNNOut", "set"+set, result);
       log(DEBUG, "set["+set+"] result[0]: "+result[0]);
-      if (result[0] > answer[set][0] + 0.1) return false;
+      if (result[0] > 0.5) return false;
     }
     return true;
     //endregion

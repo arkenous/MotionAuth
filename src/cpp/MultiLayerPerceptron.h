@@ -10,11 +10,11 @@
 #include "Neuron.h"
 class MultiLayerPerceptron {
 public:
-  MultiLayerPerceptron(unsigned short input, unsigned short middle, unsigned short output, unsigned short middle_layer, std::string neuron_params, int middle_layer_type);
+  MultiLayerPerceptron(unsigned short input, unsigned short middle, unsigned short output, unsigned short middle_layer, std::string neuron_params, int middle_layer_type, double dropout_ratio);
   std::string learn(std::vector<std::vector<double>> x, std::vector<std::vector<double>> answer);
   std::vector<double> out(std::vector<double> input);
 private:
-  static const unsigned int MAX_TRIAL = 10000; // 学習上限回数
+  static const unsigned int MAX_TRIAL = 1000; // 学習上限回数
   constexpr static const double MAX_GAP = 0.1; // 許容する誤差の域値
   int num_thread = android_getCpuCount(); // Androidデバイスのプロセッサのコア数
 
@@ -34,12 +34,12 @@ private:
   std::vector<Neuron> outputNeurons;
 
 
-  void outLearnThread(const std::vector<double> ans, const std::vector<double> o,
+  void outLearnThread(const std::vector<double> in, const std::vector<double> ans, const std::vector<double> o,
                       const std::vector<std::vector<double>> h, const int begin, const int end);
   void middleLastLayerLearnThread(const std::vector<std::vector<double>> h, const int begin, const int end);
   void middleMiddleLayerLearnThread(const std::vector<std::vector<double>> h, const int begin, const int end);
   void middleFirstLayerLearnThread(const std::vector<std::vector<double>> h, const std::vector<double> in, const int begin, const int end);
   std::vector<double> separate_by_camma(std::string input);
-  std::vector<Neuron> setup_layer_by_params(std::vector<std::string> params, int previous_neurons_num, int layer_neuron_num, unsigned long input_number, int activation_type);
+  std::vector<Neuron> setup_layer_by_params(std::vector<std::string> params, int previous_neurons_num, int layer_neuron_num, unsigned long input_number, int activation_type, double dropout_ratio);
 };
 #endif //MOTIONAUTH_MULTILAYERPERCEPTRON_H

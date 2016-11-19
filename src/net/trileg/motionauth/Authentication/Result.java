@@ -232,7 +232,7 @@ class Result extends Handler implements Runnable {
     Enum.MEASURE measure = cosSimilarity.measure(vectorCosSimilarity);
 
     // ニューラルネットワークの結果，正規モーションでないと判定された場合
-    if (result[0] == 1.0) return false;
+    if (result[0] > 0.3) return false;
 
     // コサイン類似度が低い場合
     if (measure == INCORRECT) return false;

@@ -14,7 +14,6 @@ import net.trileg.motionauth.Lowpass.Fourier;
 import net.trileg.motionauth.Processing.Adjuster;
 import net.trileg.motionauth.Processing.Amplifier;
 import net.trileg.motionauth.Processing.Calc;
-import net.trileg.motionauth.Processing.CipherCrypt;
 import net.trileg.motionauth.Processing.CosSimilarity;
 import net.trileg.motionauth.Processing.Formatter;
 import net.trileg.motionauth.Processing.RotateVector;
@@ -177,9 +176,7 @@ class Result extends Handler implements Runnable {
     String registeredAmplify = preferences.getString(userName + "amplify", "");
     if ("".equals(registeredAmplify)) throw new RuntimeException();
     amp = Double.valueOf(registeredAmplify);
-
-    CipherCrypt cipherCrypt = new CipherCrypt(authentication);
-    learnResult = cipherCrypt.decrypt(preferences.getString(userName + "learnResult", ""));
+    learnResult = manageData.readLearnResult(authentication, userName);
   }
 
 

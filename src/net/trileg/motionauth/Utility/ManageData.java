@@ -286,8 +286,20 @@ public class ManageData {
 
     editor.putString(userName+"vector", registerVectorData);
     editor.putString(userName+"amplify", String.valueOf(ampValue));
-    editor.putString(userName+"learnResult", encryptedLearnResult);
     editor.apply();
+
+    try {
+      OutputStream os = context.openFileOutput(userName + "_learnResult.dat", MODE_PRIVATE);
+      osw = new OutputStreamWriter(os, "UTF-8");
+      PrintWriter writer = new PrintWriter(osw);
+      writer.write(encryptedLearnResult);
+      writer.flush();
+      writer.close();
+      osw.close();
+      os.close();
+    } catch (Exception e) {
+      log(ERROR, e.getMessage(), e.getCause());
+    }
   }
 
 
@@ -322,6 +334,38 @@ public class ManageData {
     }
 
     return vector;
+  }
+
+
+  /**
+   * Read NN parameters from App local file
+   * @param context Activity or Application context
+   * @param userName User name
+   * @return NN parameters
+   */
+  public String readLearnResult(Context context, String userName) {
+    log(INFO);
+
+    String learnResult = "";
+    try {
+      InputStream is = context.openFileInput(userName + "_learnResult.dat");
+      InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+      BufferedReader br = new BufferedReader(isr);
+
+      String encryptedLearnResult = br.readLine();
+
+      br.close();
+      isr.close();
+      is.close();
+
+      CipherCrypt cipherCrypt = new CipherCrypt(context);
+      learnResult = cipherCrypt.decrypt(encryptedLearnResult);
+
+    } catch (Exception e) {
+      log(ERROR, e.getMessage(), e.getCause());
+    }
+
+    return learnResult;
   }
 
 

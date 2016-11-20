@@ -34,6 +34,8 @@ private:
   std::vector<Neuron> outputNeurons;
   std::vector<std::vector<double>> h;
   std::vector<double> o;
+  std::vector<std::vector<double>> learned_h;
+  std::vector<double> learned_o;
 
   void middleFirstLayerForwardThread(const std::vector<double> in, const int begin, const int end);
   void middleLayerForwardThread(const int layer, const int begin, const int end);
@@ -43,6 +45,9 @@ private:
   void middleLastLayerLearnThread(const std::vector<std::vector<double>> h, const int begin, const int end);
   void middleMiddleLayerLearnThread(const std::vector<std::vector<double>> h, const int layer, const int begin, const int end);
   void middleFirstLayerLearnThread(const std::vector<std::vector<double>> h, const std::vector<double> in, const int begin, const int end);
+  void middleFirstLayerOutThread(const std::vector<double> in, const int begin, const int end);
+  void middleLayerOutThread(const int layer, const int begin, const int end);
+  void outOutThread(const int begin, const int end);
   std::vector<double> separate_by_camma(std::string input);
   std::vector<Neuron> setup_layer_by_params(std::vector<std::string> params, int previous_neurons_num, int layer_neuron_num, unsigned long input_number, int activation_type, double dropout_ratio);
 };

@@ -49,6 +49,6 @@ private:
   void middleLayerOutThread(const int layer, const int begin, const int end);
   void outOutThread(const int begin, const int end);
   std::vector<double> separate_by_camma(std::string input);
-  std::vector<Neuron> setup_layer_by_params(std::vector<std::string> params, int previous_neurons_num, int layer_neuron_num, unsigned long input_number, int activation_type, double dropout_ratio);
+  std::vector<Neuron> setup_layer_by_params(std::vector<std::string> params, int previous_neurons_num, unsigned short layer_neuron_num, unsigned short input_number, int activation_type, double dropout_ratio);
 };
 #endif //MOTIONAUTH_MULTILAYERPERCEPTRON_H

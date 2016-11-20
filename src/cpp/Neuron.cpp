@@ -4,15 +4,20 @@
 
 #include "Neuron.h"
 
+/**
+ * vectorのサイズ確保のためだけに用いるNeuronのデフォルトコンストラクタ
+ * @return Neuronのインスタンス
+ */
+Neuron::Neuron() { }
 
 /**
  * Neuronのコンストラクタ
  * @param input_num 入力ニューロン数（入力データ数）
  * @param weight 結合荷重の重み付けデータ
  * @param dropout_ratio Dropout率
- * @return ニューロンのインスタンス
+ * @return Neuronのインスタンス
  */
-Neuron::Neuron(unsigned long input_num, std::vector<double> weight, int iteration, std::vector<double> m, std::vector<double> nu, std::vector<double> m_hat, std::vector<double> nu_hat, double bias, int activation_type, double dropout_ratio) {
+Neuron::Neuron(unsigned short input_num, std::vector<double> weight, int iteration, std::vector<double> m, std::vector<double> nu, std::vector<double> m_hat, std::vector<double> nu_hat, double bias, int activation_type, double dropout_ratio) {
   this->input_num = input_num;
   this->activation_type = activation_type;
   std::random_device rnd; // 非決定的乱数生成器
@@ -28,21 +33,32 @@ Neuron::Neuron(unsigned long input_num, std::vector<double> weight, int iteratio
   if (iteration != 0) this->iteration = iteration;
   else this->iteration = 0;
 
-  if (m.size() > 0) for (int i = 0; i < this->input_num; ++i) this->m.push_back(m[i]);
-  else this->m = std::vector<double>(input_num, 0.0);
 
-  if (nu.size() > 0) for (int i = 0; i < this->input_num; ++i) this->nu.push_back(nu[i]);
-  else this->nu = std::vector<double>(input_num, 0.0);
+  if (m.size() > 0) {
+    this->m.resize(m.size());
+    std::copy(m.begin(), m.end(), std::back_inserter(this->m));
+  } else this->m = std::vector<double>(input_num, 0.0);
 
-  if (m_hat.size() > 0) for (int i = 0; i < this->input_num; ++i) this->m_hat.push_back(m_hat[i]);
-  else this->m_hat = std::vector<double>(input_num, 0.0);
+  if (nu.size() > 0){
+    this->nu.resize(nu.size());
+    std::copy(nu.begin(), nu.end(), std::back_inserter(this->nu));
+  } else this->nu = std::vector<double>(input_num, 0.0);
 
-  if (nu_hat.size() > 0) for (int i = 0; i < this->input_num; ++i) this->nu_hat.push_back(nu_hat[i]);
-  else this->nu_hat = std::vector<double>(input_num, 0.0);
+  if (m_hat.size() > 0) {
+    this->m_hat.resize(m_hat.size());
+    std::copy(m_hat.begin(), m_hat.end(), std::back_inserter(this->m_hat));
+  } else this->m_hat = std::vector<double>(input_num, 0.0);
+
+  if (nu_hat.size() > 0) {
+    this->nu_hat.resize(nu_hat.size());
+    std::copy(nu_hat.begin(), nu_hat.end(), std::back_inserter(this->nu_hat));
+  } else this->nu_hat = std::vector<double>(input_num, 0.0);
 
   // 結合荷重が渡されていればそれをセットし，無ければ乱数で初期化
-  if (weight.size() > 0) for (int i = 0; i < this->input_num; ++i) this->inputWeights.push_back(weight[i]);
-  else for (int i = 0; i < this->input_num; ++i) this->inputWeights.push_back(real_rnd(mt));
+  this->inputWeights.resize(input_num);
+  if (weight.size() > 0) {
+    std::copy(weight.begin(), weight.end(), std::back_inserter(this->inputWeights));
+  } else for (int i = 0; i < this->input_num; ++i) this->inputWeights[i] = real_rnd(mt);
 
   this->dropout_ratio = dropout_ratio;
 }

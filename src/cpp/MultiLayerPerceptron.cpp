@@ -218,39 +218,6 @@ std::string MultiLayerPerceptron::learn(std::vector<std::vector<double>> x, std:
     //endregion
 
     //endregion
-
-    // 再度出力
-    // 出力値を推定：1層目の中間層の出力計算
-    threads.clear();
-    if (middle_neuron_num <= num_thread) charge = 1;
-    else charge = middle_neuron_num / num_thread;
-    for (int i = 0; i < middle_neuron_num; i += charge) {
-      if (i != 0 && middle_neuron_num / i == 1) threads.push_back(std::thread(&MultiLayerPerceptron::middleFirstLayerForwardThread, this, std::ref(in), i, middle_neuron_num));
-      else threads.push_back(std::thread(&MultiLayerPerceptron::middleFirstLayerForwardThread, this, std::ref(in), i, i + charge));
-    }
-    for (std::thread &th : threads) th.join();
-
-    // 一つ前の中間層より得られた出力を用いて，以降の中間層を順に計算
-    if (middle_neuron_num <= num_thread) charge = 1;
-    else charge = middle_neuron_num / num_thread;
-    for (int layer = 1; layer <= (int)middle_layer_number - 1; ++layer) {
-      threads.clear();
-      for (int i = 0; i < middle_neuron_num; i += charge) {
-        if (i != 0 && middle_neuron_num / i == 1) threads.push_back(std::thread(&MultiLayerPerceptron::middleLayerForwardThread, this, layer, i, middle_neuron_num));
-        else threads.push_back(std::thread(&MultiLayerPerceptron::middleLayerForwardThread, this, layer, i, i + charge));
-      }
-      for (std::thread &th : threads) th.join();
-    }
-
-    // 出力値を推定：中間層の最終層の出力を用いて，出力層の出力計算
-    threads.clear();
-    if (output_neuron_num <= num_thread) charge = 1;
-    else charge = output_neuron_num / num_thread;
-    for (int i = 0; i < output_neuron_num; i += charge) {
-      if (i != 0 && output_neuron_num / i == 1) threads.push_back(std::thread(&MultiLayerPerceptron::outForwardThread, this, i, output_neuron_num));
-      else threads.push_back(std::thread(&MultiLayerPerceptron::outForwardThread, this, i, i + charge));
-    }
-    for (std::thread &th : threads) th.join();
   }
 
   // 全ての教師データで正解を出すか，収束限度回数を超えた場合に終了

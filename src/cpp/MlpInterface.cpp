@@ -20,7 +20,7 @@ JNIEXPORT jstring JNICALL Java_net_trileg_motionauth_Registration_Result_learn(J
   std::string neuronParamsString = jstringToString(env, neuronParams);
 
   // MultiLayerPerceptronインスタンスを用意する
-  MultiLayerPerceptron mlp((unsigned short)input, (unsigned short)middle * 2, (unsigned short)output, (unsigned short)middleLayer, neuronParamsString, 1, 0.0);
+  MultiLayerPerceptron mlp((unsigned short)input, (unsigned short)middle, (unsigned short)output, (unsigned short)middleLayer, neuronParamsString, 1, 0.0);
 
   std::vector<std::vector<double>> xVector = jobjectArrayToTwoDimenDoubleVector(env, x);
   std::vector<std::vector<double>> answerVector = jobjectArrayToTwoDimenDoubleVector(env, answer);
@@ -33,7 +33,7 @@ JNIEXPORT jstring JNICALL Java_net_trileg_motionauth_Registration_Result_learn(J
   std::string resultString = mlp.learn(xVector, answerVector);
 
   while (isnan(mlp.out(xVector[0])[0])) {
-    mlp = MultiLayerPerceptron((unsigned short)input, (unsigned short)middle * 2, (unsigned short)output, (unsigned short)middleLayer, neuronParamsString, 1, 0.0);
+    mlp = MultiLayerPerceptron((unsigned short)input, (unsigned short)middle, (unsigned short)output, (unsigned short)middleLayer, neuronParamsString, 1, 0.0);
     resultString = mlp.learn(xVector, answerVector);
   }
 
@@ -47,7 +47,7 @@ JNIEXPORT jdoubleArray JNICALL Java_net_trileg_motionauth_Registration_Result_ou
   std::string neuronParamsString = jstringToString(env, neuronParams);
 
   // MultiLayerPerceptronインスタンスを用意する
-  MultiLayerPerceptron mlp((unsigned short)input, (unsigned short)middle * 2, (unsigned short) output, (unsigned short)middleLayer, neuronParamsString, 1, 0.0);
+  MultiLayerPerceptron mlp((unsigned short)input, (unsigned short)middle, (unsigned short) output, (unsigned short)middleLayer, neuronParamsString, 1, 0.0);
 
   std::vector<double> xVector = jdoubleArrayToOneDimenDoubleVector(env, x);
 
@@ -67,7 +67,7 @@ JNIEXPORT jdoubleArray JNICALL Java_net_trileg_motionauth_Authentication_Result_
   std::string neuronParamsString = jstringToString(env, neuronParams);
 
   // MultiLayerPerceptronインスタンスを用意する
-  MultiLayerPerceptron mlp((unsigned short)input, (unsigned short)middle * 2, (unsigned short) output, (unsigned short)middleLayer, neuronParamsString, 1, 0.0);
+  MultiLayerPerceptron mlp((unsigned short)input, (unsigned short)middle, (unsigned short) output, (unsigned short)middleLayer, neuronParamsString, 1, 0.0);
 
   std::vector<double> xVector = jdoubleArrayToOneDimenDoubleVector(env, x);
 

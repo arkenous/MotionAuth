@@ -34,31 +34,24 @@ Neuron::Neuron(unsigned short input_num, std::vector<double> weight, int iterati
   else this->iteration = 0;
 
 
-  if (m.size() > 0) {
-    this->m.resize(m.size());
-    std::copy(m.begin(), m.end(), std::back_inserter(this->m));
-  } else this->m = std::vector<double>(input_num, 0.0);
+  if (m.size() > 0) this->m = std::vector<double>(m);
+  else this->m = std::vector<double>(input_num, 0.0);
 
-  if (nu.size() > 0){
-    this->nu.resize(nu.size());
-    std::copy(nu.begin(), nu.end(), std::back_inserter(this->nu));
-  } else this->nu = std::vector<double>(input_num, 0.0);
+  if (nu.size() > 0) this->nu = std::vector<double>(nu);
+  else this->nu = std::vector<double>(input_num, 0.0);
 
-  if (m_hat.size() > 0) {
-    this->m_hat.resize(m_hat.size());
-    std::copy(m_hat.begin(), m_hat.end(), std::back_inserter(this->m_hat));
-  } else this->m_hat = std::vector<double>(input_num, 0.0);
+  if (m_hat.size() > 0) this->m_hat = std::vector<double>(m_hat);
+  else this->m_hat = std::vector<double>(input_num, 0.0);
 
-  if (nu_hat.size() > 0) {
-    this->nu_hat.resize(nu_hat.size());
-    std::copy(nu_hat.begin(), nu_hat.end(), std::back_inserter(this->nu_hat));
-  } else this->nu_hat = std::vector<double>(input_num, 0.0);
+  if (nu_hat.size() > 0) this->nu_hat = std::vector<double>(nu_hat);
+  else this->nu_hat = std::vector<double>(input_num, 0.0);
 
   // 結合荷重が渡されていればそれをセットし，無ければ乱数で初期化
-  this->inputWeights.resize(input_num);
-  if (weight.size() > 0) {
-    std::copy(weight.begin(), weight.end(), std::back_inserter(this->inputWeights));
-  } else for (int i = 0; i < this->input_num; ++i) this->inputWeights[i] = real_rnd(mt);
+  if (weight.size() > 0) this->inputWeights = std::vector<double>(weight);
+  else {
+    this->inputWeights.resize(input_num);
+    for (int i = 0; i < this->input_num; ++i) this->inputWeights[i] = real_rnd(mt);
+  }
 
   this->dropout_ratio = dropout_ratio;
 }

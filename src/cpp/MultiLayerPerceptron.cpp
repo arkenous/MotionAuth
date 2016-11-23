@@ -6,6 +6,7 @@
 
 #include <thread>
 #include <sstream>
+#include <android/log.h>
 using namespace std;
 
 /**
@@ -415,6 +416,7 @@ void MultiLayerPerceptron::outLearnThread(const std::vector<double> in, const st
     // 出力層ニューロンのdeltaの計算
     double delta = o[neuron] - ans[neuron];
 
+    __android_log_print(ANDROID_LOG_DEBUG, "MLP", "delta: %f", delta);
     // 教師データとの誤差が十分小さい場合は学習しない．そうでなければ正解フラグをfalseに
     if (std::abs(ans[neuron] - output[neuron]) < MAX_GAP) continue;
     else successFlg = false;

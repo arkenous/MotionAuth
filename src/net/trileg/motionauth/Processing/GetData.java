@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
 
 import static android.hardware.Sensor.TYPE_GYROSCOPE;
 import static android.hardware.Sensor.TYPE_LINEAR_ACCELERATION;
-import static android.hardware.SensorManager.SENSOR_DELAY_GAME;
+import static android.hardware.SensorManager.SENSOR_DELAY_FASTEST;
 import static android.util.Log.DEBUG;
 import static android.util.Log.INFO;
 import static android.util.Log.VERBOSE;
@@ -99,8 +99,8 @@ public class GetData extends Handler implements Callable<ArrayList<ArrayList<Flo
    */
   private void registerSensor() {
     log(INFO);
-    if (this.isAcceleration) sensorManager.registerListener(this, linearAcceleration, SENSOR_DELAY_GAME);
-    else sensorManager.registerListener(this, gyroscope, SENSOR_DELAY_GAME);
+    if (this.isAcceleration) sensorManager.registerListener(this, linearAcceleration, SENSOR_DELAY_FASTEST);
+    else sensorManager.registerListener(this, gyroscope, SENSOR_DELAY_FASTEST);
     isActive = true;
   }
 

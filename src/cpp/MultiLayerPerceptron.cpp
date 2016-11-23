@@ -17,77 +17,217 @@ using namespace std;
  * @param middleLayer 中間層の層数
  * @param neuronParams 全ニューロンの重みづけ，AdaGradのg，バイアスデータ
  * @param middle_layer_type 中間層の活性化関数の種類指定．0: identity 1: sigmoid 2: tanh 3: ReLU
- * @param dropout_ratio ドロップアウト率
+ * @param dropout_rate ドロップアウト率
+ * @param is_learned
  * @return MLPインスタンス
  */
-MultiLayerPerceptron::MultiLayerPerceptron(unsigned short input, unsigned short middle, unsigned short output, unsigned short middle_layer, std::string neuron_params, int middle_layer_type, double dropout_ratio) {
-  this->input_neuron_num = input;
-  this->middle_neuron_num = middle;
+MultiLayerPerceptron::MultiLayerPerceptron(unsigned long input, unsigned long middle, unsigned long output, unsigned long middle_layer, std::vector<std::string> neuron_params, int middle_layer_type, double dropout_rate) {
+  sda_params = neuron_params[0];
+  mlp_params = neuron_params[1];
+
+  setupSdA(sda_params);
+
+  this->input_neuron_num = sda_neurons[sda_neurons.size() - 1].size(); // SdA末尾レイヤの出力数がMLPの入力数となる
+  this->middle_neuron_num = sda_neurons[sda_neurons.size() - 1].size();
   this->output_neuron_num = output;
   this->middle_layer_number = middle_layer;
   this->middle_layer_type = middle_layer_type;
 
-  this->middleNeurons.resize(middle_layer_number);
-  for (std::vector<Neuron> n : this->middleNeurons) n.resize(middle_neuron_num);
-  this->outputNeurons.resize(output_neuron_num);
+  setupMLP(mlp_params, dropout_rate);
+}
 
-  // ニューロンごとのパラメータを取得する
-  std::vector<Neuron> neuronPerLayer(middle_neuron_num);
+void MultiLayerPerceptron::setupSdA(std::string sda_params) {
+  std::stringstream ss(sda_params);
+  std::string item;
+  std::vector<std::string> elems_per_dA;
+  std::vector<std::string> elems_per_neuron;
+  std::vector<std::string> elems_per_param;
 
-  if (neuron_params.length() <= 0) {
+  // : でdA単位で分割する（= dA層のレイヤ数）
+  while (std::getline(ss, item, ':')) if (!item.empty()) elems_per_dA.push_back(item);
+  sda_neurons.resize(elems_per_dA.size());
+  sda_out.resize(elems_per_dA.size());
+  item = "";
+  ss.str("");
+  ss.clear(stringstream::goodbit);
+
+  for (int dA = 0; dA < elems_per_dA.size(); ++dA) {
+    // ' でニューロン単位で分割する
+    ss = std::stringstream(elems_per_dA[dA]);
+    while (std::getline(ss, item, '\'')) if (!item.empty()) elems_per_neuron.push_back(item);
+    sda_neurons[dA].resize(elems_per_neuron.size());
+    sda_out[dA].resize(elems_per_neuron.size());
+    item = "";
+    ss.str("");
+    ss.clear(stringstream::goodbit);
+
+    for (int neuron = 0; neuron < elems_per_neuron.size(); ++neuron) {
+      // パラメータごとに分割する
+      ss = std::stringstream(elems_per_neuron[neuron]);
+      while (std::getline(ss, item, '|')) if (!item.empty()) elems_per_param.push_back(item);
+      item = "";
+      ss.str("");
+      ss.clear(stringstream::goodbit);
+
+      double bias = std::stod(elems_per_param.back());
+      elems_per_param.pop_back();
+
+      int iteration = std::stoi(elems_per_param.back());
+      elems_per_param.pop_back();
+
+      std::vector<double> weight = separate_by_camma(elems_per_param[0]);
+      std::vector<double> m = separate_by_camma(elems_per_param[1]);
+      std::vector<double> nu = separate_by_camma(elems_per_param[2]);
+      std::vector<double> m_hat = separate_by_camma(elems_per_param[3]);
+      std::vector<double> nu_hat = separate_by_camma(elems_per_param[4]);
+
+      sda_neurons[dA][neuron] = Neuron(weight.size(), weight, m, nu, m_hat, nu_hat, iteration, bias, 1, 0.0);
+
+      elems_per_param.clear();
+    }
+    elems_per_neuron.clear();
+  }
+  elems_per_dA.clear();
+}
+
+void MultiLayerPerceptron::setupMLP(std::string mlp_params, double dropout_rate) {
+  if (mlp_params.length() <= 0) {
+    middleNeurons.resize(middle_layer_number);
+    h.resize(middle_layer_number);
+    learned_h.resize(middle_layer_number);
+
+    std::vector<Neuron> neuron_per_layer(middle_neuron_num);
     std::vector<double> emptyVector;
-    // 中間層
+    //region 中間層を構築する
     for (int layer = 0; layer < middle_layer_number; ++layer) {
       if (layer == 0) {
         for (int neuron = 0; neuron < middle_neuron_num; ++neuron) {
           // 中間層の最初の層については，入力層のニューロン数がニューロンへの入力数になる
-          neuronPerLayer[neuron] = Neuron(input_neuron_num, emptyVector, 0, emptyVector, emptyVector, emptyVector, emptyVector, 0.0, middle_layer_type, dropout_ratio);
+          neuron_per_layer[neuron] = Neuron(input_neuron_num, emptyVector, emptyVector, emptyVector, emptyVector, emptyVector, 0, 0.0, middle_layer_type, dropout_rate);
         }
       } else {
         for (int neuron = 0; neuron < middle_neuron_num; ++neuron) {
           // それ以降の層については，中間層の各層のニューロン数がニューロンへの入力数になる
-          neuronPerLayer[neuron] = Neuron(middle_neuron_num, emptyVector, 0, emptyVector, emptyVector, emptyVector, emptyVector, 0.0, middle_layer_type, dropout_ratio);
+          neuron_per_layer[neuron] = Neuron(middle_neuron_num, emptyVector, emptyVector, emptyVector, emptyVector, emptyVector, 0, 0.0, middle_layer_type, dropout_rate);
         }
       }
-      this->middleNeurons[layer] = neuronPerLayer;
+      middleNeurons[layer] = std::vector<Neuron>(neuron_per_layer);
+      h[layer].resize(middle_neuron_num);
+      learned_h[layer].resize(middle_neuron_num);
     }
+    //endregion
 
-    // 出力層
+    //region 出力層を構築する
+    outputNeurons.resize(output_neuron_num);
+    o.resize(output_neuron_num);
+    learned_o.resize(output_neuron_num);
     for (int neuron = 0; neuron < output_neuron_num; ++neuron) {
-      this->outputNeurons[neuron] = Neuron(middle_neuron_num, emptyVector, 0, emptyVector, emptyVector, emptyVector, emptyVector, 0.0, 1, dropout_ratio);
+      this->outputNeurons[neuron] = Neuron(middle_neuron_num, emptyVector, emptyVector, emptyVector, emptyVector, emptyVector, 0, 0.0, 1, dropout_rate);
     }
+    //endregion
   } else {
-    // ニューロン単位でデータを分割する
-    std::vector<std::string> splitByNeuron;
-    std::stringstream ssByNeuron(neuron_params);
-    std::string itemPerNeuron;
-    while (std::getline(ssByNeuron, itemPerNeuron, '\'')) {
-      if (!itemPerNeuron.empty()) {
-        splitByNeuron.push_back(itemPerNeuron);
+    //region 中間層を構築する
+    std::stringstream ss = std::stringstream(mlp_params);
+    std::string item;
+    std::vector<std::string> elems_per_layer;
+    std::vector<std::string> elems_per_neuron;
+    std::vector<std::string> elems_per_param;
+
+    // : でレイヤ単位で分割する
+    while (std::getline(ss, item, ':')) if (!item.empty()) elems_per_layer.push_back(item);
+
+    // 最終層は出力層のため，これを取り出す
+    std::string out_layer_params = elems_per_layer.back();
+    elems_per_layer.pop_back();
+
+    middleNeurons.resize(elems_per_layer.size());
+    h.resize(elems_per_layer.size());
+    learned_h.resize(elems_per_layer.size());
+
+    item = "";
+    ss.str("");
+    ss.clear(stringstream::goodbit);
+
+    for (int layer = 0; layer < elems_per_layer.size(); ++layer) {
+      // ' でニューロン単位で分割する
+      ss = std::stringstream(elems_per_layer[layer]);
+      while (std::getline(ss, item, '\'')) if (!item.empty()) elems_per_neuron.push_back(item);
+      middleNeurons[layer].resize(elems_per_neuron.size());
+      h[layer].resize(elems_per_neuron.size());
+      learned_h[layer].resize(elems_per_neuron.size());
+
+      item = "";
+      ss.str("");
+      ss.clear(stringstream::goodbit);
+
+      for (int neuron = 0; neuron < elems_per_neuron.size(); ++neuron) {
+        // パラメータごとに分割する
+        ss = std::stringstream(elems_per_neuron[neuron]);
+        while (std::getline(ss, item, '|')) if (!item.empty()) elems_per_param.push_back(item);
+        item = "";
+        ss.str("");
+        ss.clear(stringstream::goodbit);
+
+        double bias = std::stod(elems_per_param.back());
+        elems_per_param.pop_back();
+
+        int iteration = std::stoi(elems_per_param.back());
+        elems_per_param.pop_back();
+
+        std::vector<double> weight = separate_by_camma(elems_per_param[0]);
+        std::vector<double> m = separate_by_camma(elems_per_param[1]);
+        std::vector<double> nu = separate_by_camma(elems_per_param[2]);
+        std::vector<double> m_hat = separate_by_camma(elems_per_param[3]);
+        std::vector<double> nu_hat = separate_by_camma(elems_per_param[4]);
+
+        middleNeurons[layer][neuron] = Neuron(weight.size(), weight, m, nu, m_hat, nu_hat, iteration, bias, middle_layer_type, dropout_rate);
+
+        elems_per_param.clear();
       }
+      elems_per_neuron.clear();
     }
-    itemPerNeuron = "";
-    ssByNeuron.str("");
-    ssByNeuron.clear(stringstream::goodbit);
+    elems_per_layer.clear();
+    //endregion
 
-    for (int layer = 0; layer < middle_layer_number; ++layer) {
-      if (layer == 0) {
-        // 中間層一層目については，入力層のニューロン数がニューロンへの入力数となる
-        neuronPerLayer = setup_layer_by_params(splitByNeuron, layer * middle_neuron_num, middle_neuron_num, input_neuron_num, middle_layer_type, dropout_ratio);
-      } else {
-        // それ以降の層については，中間層の各層のニューロン数がニューロンへの入力数となる
-        neuronPerLayer = setup_layer_by_params(splitByNeuron, layer * middle_neuron_num, middle_neuron_num, middle_neuron_num, middle_layer_type, dropout_ratio);
-      }
-      this->middleNeurons[layer] = neuronPerLayer;
+    //region 出力層を構築する
+    ss = std::stringstream(out_layer_params);
+
+    // ' でニューロン単位で分割する
+    while (std::getline(ss, item, '\'')) if (!item.empty()) elems_per_neuron.push_back(item);
+    outputNeurons.resize(elems_per_neuron.size());
+    o.resize(elems_per_neuron.size());
+    learned_o.resize(elems_per_neuron.size());
+
+    item = "";
+    ss.str("");
+    ss.clear(stringstream::goodbit);
+
+    for (int neuron = 0; neuron < elems_per_neuron.size(); ++neuron) {
+      // パラメータごとに分割する
+      ss = std::stringstream(elems_per_neuron[neuron]);
+      while (std::getline(ss, item, '|')) if (!item.empty()) elems_per_param.push_back(item);
+      item = "";
+      ss.str("");
+      ss.clear(stringstream::goodbit);
+
+      double bias = std::stod(elems_per_param.back());
+      elems_per_param.pop_back();
+
+      int iteration = std::stoi(elems_per_param.back());
+      elems_per_param.pop_back();
+
+      std::vector<double> weight = separate_by_camma(elems_per_param[0]);
+      std::vector<double> m = separate_by_camma(elems_per_param[1]);
+      std::vector<double> nu = separate_by_camma(elems_per_param[2]);
+      std::vector<double> m_hat = separate_by_camma(elems_per_param[3]);
+      std::vector<double> nu_hat = separate_by_camma(elems_per_param[4]);
+
+      outputNeurons[neuron] = Neuron(weight.size(), weight, m, nu, m_hat, nu_hat, iteration, bias, 1, dropout_rate);
+
+      elems_per_param.clear();
     }
-
-    neuronPerLayer = setup_layer_by_params(splitByNeuron, middle_layer_number * middle_neuron_num, output_neuron_num, middle_neuron_num, 1, dropout_ratio);
-    this->outputNeurons = neuronPerLayer;
-
-    splitByNeuron.clear();
-    ssByNeuron.str("");
-    ssByNeuron.clear(stringstream::goodbit);
-    itemPerNeuron = "";
+    elems_per_neuron.clear();
+    //endregion
   }
 }
 
@@ -97,10 +237,7 @@ MultiLayerPerceptron::MultiLayerPerceptron(unsigned short input, unsigned short 
  * @param answer 教師入力データに対応した二次元の教師出力データ，データセット * データ
  * @return ニューロンごとの学習後の重み付けが入ったdouble型二次元ベクトル
  */
-std::string MultiLayerPerceptron::learn(std::vector<std::vector<double>> x, std::vector<std::vector<double>> answer) {
-  h = std::vector<std::vector<double>>(middle_layer_number, std::vector<double>(middle_neuron_num, 0.0));
-  o = std::vector<double>(output_neuron_num, 0.0);
-
+std::vector<std::string> MultiLayerPerceptron::learn(std::vector<std::vector<double>> x, std::vector<std::vector<double>> answer) {
   int succeed = 0; //  連続正解回数のカウンタを初期化
 
   std::random_device rnd; // 非決定的乱数生成器
@@ -125,26 +262,66 @@ std::string MultiLayerPerceptron::learn(std::vector<std::vector<double>> x, std:
     std::vector<double> in = x[trial % answer.size()]; // 利用する教師入力データ
     std::vector<double> ans = answer[trial % answer.size()]; // 教師出力データ
 
-    // 出力値を推定：1層目の中間層の出力計算
+    //region Feed Forward
+
+    // SdA First Layer
     std::vector<std::thread> threads(num_thread);
     int charge = 1;
+    threads.clear();
+    if (sda_neurons[0].size() <= num_thread) charge = 1;
+    else charge = sda_neurons[0].size() / num_thread;
+    for (int i = 0; i < sda_neurons[0].size(); i += charge) {
+      if (i != 0 && sda_neurons[0].size() / i == 1) {
+        threads.push_back(std::thread(&MultiLayerPerceptron::sdaFirstLayerOutThread, this,
+                                      std::ref(in), i, sda_neurons[0].size()));
+      } else {
+        threads.push_back(std::thread(&MultiLayerPerceptron::sdaFirstLayerOutThread, this,
+                                      std::ref(in), i, i + charge));
+      }
+    }
+    for (std::thread &th : threads) th.join();
+
+    // SdA Other Layer
+    for (int layer = 1; layer <= (int) sda_neurons.size() - 1; ++layer) {
+      threads.clear();
+      if (sda_neurons[layer].size() <= num_thread) charge = 1;
+      else charge = sda_neurons[layer].size() / num_thread;
+      for (int i = 0; i < sda_neurons[layer].size(); i += charge) {
+        if (i != 0 && sda_neurons[layer].size() / i == 1) {
+          threads.push_back(std::thread(&MultiLayerPerceptron::sdaOtherLayerOutThread, this,
+                                        layer, i, sda_neurons[layer].size()));
+        } else {
+          threads.push_back(std::thread(&MultiLayerPerceptron::sdaOtherLayerOutThread, this,
+                                        layer, i, i + charge));
+        }
+      }
+      for (std::thread &th : threads) th.join();
+    }
+
+    // 1層目の中間層の出力計算
     threads.clear();
     if (middle_neuron_num <= num_thread) charge = 1;
     else charge = middle_neuron_num / num_thread;
     for (int i = 0; i < middle_neuron_num; i += charge) {
-      if (i != 0 && middle_neuron_num / i == 1) threads.push_back(std::thread(&MultiLayerPerceptron::middleFirstLayerForwardThread, this, std::ref(in), i, middle_neuron_num));
-      else threads.push_back(std::thread(&MultiLayerPerceptron::middleFirstLayerForwardThread, this, std::ref(in), i, i + charge));
+      if (i != 0 && middle_neuron_num / i == 1) {
+        threads.push_back(std::thread(&MultiLayerPerceptron::middleFirstLayerForwardThread, this, i, middle_neuron_num));
+      } else {
+        threads.push_back(std::thread(&MultiLayerPerceptron::middleFirstLayerForwardThread, this, i, i + charge));
+      }
     }
     for (std::thread &th : threads) th.join();
 
     // 一つ前の中間層より得られた出力を用いて，以降の中間層を順に計算
     if (middle_neuron_num <= num_thread) charge = 1;
     else charge = middle_neuron_num / num_thread;
-    for (int layer = 1; layer <= (int)middle_layer_number - 1; ++layer) {
+    for (int layer = 1; layer <= (int) middle_layer_number - 1; ++layer) {
       threads.clear();
       for (int i = 0; i < middle_neuron_num; i += charge) {
-        if (i != 0 && middle_neuron_num / i == 1) threads.push_back(std::thread(&MultiLayerPerceptron::middleLayerForwardThread, this, layer, i, middle_neuron_num));
-        else threads.push_back(std::thread(&MultiLayerPerceptron::middleLayerForwardThread, this, layer, i, i + charge));
+        if (i != 0 && middle_neuron_num / i == 1) {
+          threads.push_back(std::thread(&MultiLayerPerceptron::middleLayerForwardThread, this, layer, i, middle_neuron_num));
+        } else {
+          threads.push_back(std::thread(&MultiLayerPerceptron::middleLayerForwardThread, this, layer, i, i + charge));
+        }
       }
       for (std::thread &th : threads) th.join();
     }
@@ -154,20 +331,32 @@ std::string MultiLayerPerceptron::learn(std::vector<std::vector<double>> x, std:
     if (output_neuron_num <= num_thread) charge = 1;
     else charge = output_neuron_num / num_thread;
     for (int i = 0; i < output_neuron_num; i += charge) {
-      if (i != 0 && output_neuron_num / i == 1) threads.push_back(std::thread(&MultiLayerPerceptron::outForwardThread, this, i, output_neuron_num));
-      else threads.push_back(std::thread(&MultiLayerPerceptron::outForwardThread, this, i, i + charge));
+      if (i != 0 && output_neuron_num / i == 1) {
+        threads.push_back(std::thread(&MultiLayerPerceptron::outForwardThread, this, i, output_neuron_num));
+      } else {
+        threads.push_back(std::thread(&MultiLayerPerceptron::outForwardThread, this, i, i + charge));
+      }
     }
     for (std::thread &th : threads) th.join();
 
+    //endregion
+
     successFlg = true;
+
+    //region Back Propagation (learn phase)
 
     //region 出力層を学習する
     threads.clear();
     if (output_neuron_num <= num_thread) charge = 1;
     else charge = output_neuron_num / num_thread;
     for (int i = 0; i < output_neuron_num; i += charge) {
-      if (i != 0 && output_neuron_num / i == 1) threads.push_back(std::thread(&MultiLayerPerceptron::outLearnThread, this, std::ref(in), std::ref(ans), std::ref(o), std::ref(h), i, output_neuron_num));
-      else threads.push_back(std::thread(&MultiLayerPerceptron::outLearnThread, this, std::ref(in), std::ref(ans), std::ref(o), std::ref(h), i, i + charge));
+      if (i != 0 && output_neuron_num / i == 1) {
+        threads.push_back(
+            std::thread(&MultiLayerPerceptron::outLearnThread, this, std::ref(in), std::ref(ans), i, output_neuron_num));
+      } else {
+        threads.push_back(
+            std::thread(&MultiLayerPerceptron::outLearnThread, this, std::ref(in), std::ref(ans), i, i + charge));
+      }
     }
     for (std::thread &th : threads) th.join();
     //endregion
@@ -187,8 +376,11 @@ std::string MultiLayerPerceptron::learn(std::vector<std::vector<double>> x, std:
       if (middle_neuron_num <= num_thread) charge = 1;
       else charge = middle_neuron_num / num_thread;
       for (int i = 0; i < middle_neuron_num; i += charge) {
-        if (i != 0 && middle_neuron_num / i == 1) threads.push_back(std::thread(&MultiLayerPerceptron::middleLastLayerLearnThread, this, std::ref(h), i, middle_neuron_num));
-        else threads.push_back(std::thread(&MultiLayerPerceptron::middleLastLayerLearnThread, this, std::ref(h), i, i + charge));
+        if (i != 0 && middle_neuron_num / i == 1) {
+          threads.push_back(std::thread(&MultiLayerPerceptron::middleLastLayerLearnThread, this, i, middle_neuron_num));
+        } else {
+          threads.push_back(std::thread(&MultiLayerPerceptron::middleLastLayerLearnThread, this, i, i + charge));
+        }
       }
       for (std::thread &th : threads) th.join();
     }
@@ -197,11 +389,16 @@ std::string MultiLayerPerceptron::learn(std::vector<std::vector<double>> x, std:
     //region 出力層と入力層に最も近い層一つずつを除いた残りの中間層を入力層に向けて学習する
     if (middle_neuron_num <= num_thread) charge = 1;
     else charge = middle_neuron_num / num_thread;
-    for (int layer = (int)middle_layer_number - 2; layer >= 1; --layer) {
+    for (int layer = (int) middle_layer_number - 2; layer >= 1; --layer) {
       threads.clear();
       for (int i = 0; i < middle_neuron_num; i += charge) {
-        if (i != 0 && middle_neuron_num / i == 1) threads.push_back(std::thread(&MultiLayerPerceptron::middleMiddleLayerLearnThread, this, std::ref(h), layer, i, middle_neuron_num));
-        else threads.push_back( std::thread(&MultiLayerPerceptron::middleMiddleLayerLearnThread, this, std::ref(h), layer, i, i + charge));
+        if (i != 0 && middle_neuron_num / i == 1) {
+          threads.push_back(
+              std::thread(&MultiLayerPerceptron::middleMiddleLayerLearnThread, this, layer, i, middle_neuron_num));
+        } else {
+          threads.push_back(
+              std::thread(&MultiLayerPerceptron::middleMiddleLayerLearnThread, this, layer, i, i + charge));
+        }
       }
       for (std::thread &th : threads) th.join();
     }
@@ -212,155 +409,174 @@ std::string MultiLayerPerceptron::learn(std::vector<std::vector<double>> x, std:
     if (middle_neuron_num <= num_thread) charge = 1;
     else charge = middle_neuron_num / num_thread;
     for (int i = 0; i < middle_neuron_num; i += charge) {
-      if (i != 0 && middle_neuron_num / i == 1) threads.push_back(std::thread(&MultiLayerPerceptron::middleFirstLayerLearnThread, this, std::ref(h), std::ref(in), i, middle_neuron_num));
-      else threads.push_back(std::thread(&MultiLayerPerceptron::middleFirstLayerLearnThread, this, std::ref(h), std::ref(in), i, i + charge));
+      if (i != 0 && middle_neuron_num / i == 1) {
+        threads.push_back(std::thread(&MultiLayerPerceptron::middleFirstLayerLearnThread, this, i, middle_neuron_num));
+      } else {
+        threads.push_back(std::thread(&MultiLayerPerceptron::middleFirstLayerLearnThread, this, i, i + charge));
+      }
     }
     for (std::thread &th : threads) th.join();
+    //endregion
+
+    if (sda_neurons.size() > 1) {
+      threads.clear();
+      if (sda_neurons[sda_neurons.size() - 1].size() <= num_thread) charge = 1;
+      else charge = sda_neurons[sda_neurons.size() - 1].size() / num_thread;
+      for (int i = 0; i < sda_neurons[sda_neurons.size() - 1].size(); i += charge) {
+        if (i != 0 && sda_neurons[sda_neurons.size() - 1].size() / i == 1) {
+          threads.push_back(std::thread(&MultiLayerPerceptron::sdaLastLayerLearnThread, this,
+                                        i, sda_neurons[sda_neurons.size() - 1].size()));
+        } else {
+          threads.push_back(std::thread(&MultiLayerPerceptron::sdaLastLayerLearnThread, this,
+                                        i, i + charge));
+        }
+      }
+      for (std::thread &th : threads) th.join();
+    }
+
+    for (int layer = sda_neurons.size() - 2; layer >= 1; --layer) {
+      if (sda_neurons[layer].size() <= num_thread) charge = 1;
+      else charge = sda_neurons[layer].size() / num_thread;
+      threads.clear();
+      for (int i = 0; i < sda_neurons[layer].size(); i += charge) {
+        if (i != 0 && sda_neurons[layer].size() / i == 1) {
+          threads.push_back(std::thread(&MultiLayerPerceptron::sdaMiddleLayerLearnThread, this,
+                                        layer, i, sda_neurons[layer].size()));
+        } else {
+          threads.push_back(std::thread(&MultiLayerPerceptron::sdaMiddleLayerLearnThread, this,
+                                        layer, i, i + charge));
+        }
+      }
+      for (std::thread &th : threads) th.join();
+    }
+
+    threads.clear();
+    if (sda_neurons[0].size() <= num_thread) charge = 1;
+    else charge = sda_neurons[0].size() / num_thread;
+    for (int i = 0; i < sda_neurons[0].size(); i += charge) {
+      if (i != 0 && sda_neurons[0].size() / i == 1) {
+        threads.push_back(std::thread(&MultiLayerPerceptron::sdaFirstLayerLearnThread, this,
+                                      std::ref(in), i, sda_neurons[0].size()));
+      } else {
+        threads.push_back(std::thread(&MultiLayerPerceptron::sdaFirstLayerLearnThread, this,
+                                      std::ref(in), i, i + charge));
+      }
+    }
+    for (std::thread &th : threads) th.join();
+
     //endregion
 
     //endregion
   }
 
   // 全ての教師データで正解を出すか，収束限度回数を超えた場合に終了
-  std::stringstream ss;
+//  std::stringstream ss;
+  std::vector<std::string> neuron_params(2);
+
+  //まずはSdAのパラメータを詰める
+  neuron_params[0] = sda_params;
+
+  std::string mlp_params = "";
+
   for (int layer = 0; layer < middle_layer_number; ++layer) {
     for (int neuron = 0; neuron < middle_neuron_num; ++neuron) {
       // 重みを詰める
       for (int weightNum = 0; weightNum < input_neuron_num; ++weightNum) {
-        ss << middleNeurons[layer][neuron].getInputWeightIndexOf(weightNum) << ',';
+        mlp_params += std::to_string(middleNeurons[layer][neuron].getInputWeightIndexOf(weightNum)) + ',';
       }
-      ss << '|';
+      mlp_params.pop_back();
+      mlp_params += '|';
 
       // Adamのmを詰める
       for (int mNum = 0; mNum < input_neuron_num; ++mNum) {
-        ss << middleNeurons[layer][neuron].getMIndexOf(mNum) << ',';
+        mlp_params += std::to_string(middleNeurons[layer][neuron].getMIndexOf(mNum)) + ',';
       }
-      ss << '|';
+      mlp_params.pop_back();
+      mlp_params += '|';
 
       // Adamのnuを詰める
       for (int nuNum = 0; nuNum < input_neuron_num; ++nuNum) {
-        ss << middleNeurons[layer][neuron].getNuIndexOf(nuNum) << ',';
+        mlp_params += std::to_string(middleNeurons[layer][neuron].getNuIndexOf(nuNum)) + ',';
       }
-      ss << '|';
+      mlp_params.pop_back();
+      mlp_params += '|';
 
       // Adamのm_hatを詰める
       for (int mHatNum = 0; mHatNum < input_neuron_num; ++mHatNum) {
-        ss << middleNeurons[layer][neuron].getMHatIndexOf(mHatNum) << ',';
+        mlp_params += std::to_string(middleNeurons[layer][neuron].getMHatIndexOf(mHatNum)) + ',';
       }
-      ss << '|';
+      mlp_params.pop_back();
+      mlp_params += '|';
 
       // Adamのnu_hatを詰める
       for (int nuHatNum = 0; nuHatNum < input_neuron_num; ++nuHatNum) {
-        ss << middleNeurons[layer][neuron].getNuHatIndexOf(nuHatNum) << ',';
+        mlp_params += std::to_string(middleNeurons[layer][neuron].getNuHatIndexOf(nuHatNum)) + ',';
       }
-      ss << '|';
+      mlp_params.pop_back();
+      mlp_params += '|';
 
       // Adamのiterationを詰める
-      ss << middleNeurons[layer][neuron].getIteration() << '|';
+      mlp_params += std::to_string(middleNeurons[layer][neuron].getIteration()) + '|';
 
       // バイアスを入れ，最後に ' を入れる
-      ss << middleNeurons[layer][neuron].getBias() << '\'';
+      mlp_params += std::to_string(middleNeurons[layer][neuron].getBias()) + '\'';
     }
+
+    // 末尾の余計な ' を削除する
+    mlp_params.pop_back();
+
+    // レイヤごとの終わりに ':' を入れる
+    mlp_params += ':';
   }
+
   for (int neuron = 0; neuron < output_neuron_num; ++neuron) {
     // 重みを詰める
     for (int weightNum = 0; weightNum < input_neuron_num; ++weightNum) {
-      ss << outputNeurons[neuron].getInputWeightIndexOf(weightNum) << ",";
+      mlp_params += std::to_string(outputNeurons[neuron].getInputWeightIndexOf(weightNum)) + ',';
     }
-    ss << '|';
+    mlp_params.pop_back();
+    mlp_params += '|';
 
     //Adamのmを詰める
     for (int mNum = 0; mNum < input_neuron_num; ++mNum) {
-      ss << outputNeurons[neuron].getMIndexOf(mNum) << ',';
+      mlp_params += std::to_string(outputNeurons[neuron].getMIndexOf(mNum)) + ',';
     }
-    ss << '|';
+    mlp_params.pop_back();
+    mlp_params += '|';
 
     // Adamのnuを詰める
     for (int nuNum = 0; nuNum < input_neuron_num; ++nuNum) {
-      ss << outputNeurons[neuron].getNuIndexOf(nuNum) << ',';
+      mlp_params += std::to_string(outputNeurons[neuron].getNuIndexOf(nuNum)) + ',';
     }
-    ss << '|';
+    mlp_params.pop_back();
+    mlp_params += '|';
 
     // Adamのm_hatを詰める
     for (int mHatNum = 0; mHatNum < input_neuron_num; ++mHatNum) {
-      ss << outputNeurons[neuron].getMHatIndexOf(mHatNum) << ',';
+      mlp_params += std::to_string(outputNeurons[neuron].getMHatIndexOf(mHatNum)) + ',';
     }
-    ss << '|';
+    mlp_params.pop_back();
+    mlp_params += '|';
 
     // Adamのnu_hatを詰める
     for (int nuHatNum = 0; nuHatNum < input_neuron_num; ++nuHatNum) {
-      ss << outputNeurons[neuron].getNuHatIndexOf(nuHatNum) << ',';
+      mlp_params += std::to_string(outputNeurons[neuron].getNuHatIndexOf(nuHatNum)) + ',';
     }
-    ss << '|';
+    mlp_params.pop_back();
+    mlp_params += '|';
 
     // Adamのiterationを詰める
-    ss << outputNeurons[neuron].getIteration() << '|';
+    mlp_params += std::to_string(outputNeurons[neuron].getIteration()) + '|';
 
     // バイアスを入れ，最後に ' を入れる
-    ss << outputNeurons[neuron].getBias() << '\'';
+    mlp_params += std::to_string(outputNeurons[neuron].getBias()) + '\'';
   }
 
-  std::string neuronParams = ss.str();
-  // 末尾の ' を削除する
-  neuronParams.pop_back();
-  ss.str(""); // バッファをクリアする
-  ss.clear(stringstream::goodbit); // ストリームの状態をクリアする
+  // 末尾の余計な ' を削除する
+  mlp_params.pop_back();
 
-  return neuronParams;
-}
-
-/**
- * 受け取ったパラメータ情報を分割し，層ごとのニューロンを構築していく
- * @param params パラメータ情報
- * @param previous_neurons_num 設定している層以前の入力層を除く全てのニューロン個数
- * @param layer_neuron_num 設定している層のニューロン数
- * @param input_number ニューロンの入力数
- * @param activation_type ニューロンの活性化関数
- * @param dropout_ratio ドロップアウト率
- * @return 構築が完了したニューロン層
- */
-std::vector<Neuron> MultiLayerPerceptron::setup_layer_by_params(std::vector<std::string> params, int previous_neurons_num, unsigned short layer_neuron_num, unsigned short input_number, int activation_type, double dropout_ratio) {
-  std::vector<Neuron> neuronPerLayer(layer_neuron_num);
-  std::stringstream ss;
-  std::string item;
-  std::vector<std::string> elems;
-
-  for (int neuron = 0; neuron < layer_neuron_num; ++neuron) {
-    // 重みづけ，Adamのm，nu，m_hat，nu_hat，iteration，バイアスの七つに分割する
-    ss = std::stringstream(params[previous_neurons_num + neuron]);
-
-    while (std::getline(ss, item, '|')) {
-      if (!item.empty()) elems.push_back(item);
-    }
-    item = "";
-    ss.str("");
-    ss.clear(stringstream::goodbit);
-
-    // まずはバイアスを取り出す
-    double bias = std::stod(elems.back());
-    elems.pop_back();
-
-    // iterationを取り出す
-    int iteration = std::stoi(elems.back());
-    elems.pop_back();
-
-    // 重みを取り出す
-    std::vector<double> weight = separate_by_camma(elems[0]);
-    // Adamのmを取り出す
-    std::vector<double> m = separate_by_camma(elems[1]);
-    // Adamのnuを取り出す
-    std::vector<double> nu = separate_by_camma(elems[2]);
-    // Adamのm_hatを取り出す
-    std::vector<double> m_hat = separate_by_camma(elems[3]);
-    // Adamのnu_hatを取り出す
-    std::vector<double> nu_hat = separate_by_camma(elems[4]);
-
-    neuronPerLayer[neuron] = Neuron(input_number, weight, iteration, m, nu, m_hat, nu_hat, bias, activation_type, dropout_ratio);
-
-    elems.clear();
-  }
-
-  return neuronPerLayer;
+  neuron_params[1] = mlp_params;
+  return neuron_params;
 }
 
 std::vector<double> MultiLayerPerceptron::separate_by_camma(std::string input) {
@@ -377,15 +593,24 @@ std::vector<double> MultiLayerPerceptron::separate_by_camma(std::string input) {
   return result;
 }
 
-void MultiLayerPerceptron::middleFirstLayerForwardThread(const std::vector<double> in, const int begin,
-                                                         const int end) {
+void MultiLayerPerceptron::sdaFirstLayerOutThread(const std::vector<double> in, const int begin, const int end) {
+  for (int neuron = begin; neuron < end; ++neuron) sda_out[0][neuron] = sda_neurons[0][neuron].output(in);
+}
+
+void MultiLayerPerceptron::sdaOtherLayerOutThread(const int layer, const int begin, const int end) {
   for (int neuron = begin; neuron < end; ++neuron) {
-    h[0][neuron] = middleNeurons[0][neuron].learn_output(in);
+    sda_out[layer][neuron] = sda_neurons[layer][neuron].output(sda_out[layer - 1]);
   }
 }
 
-void MultiLayerPerceptron::middleLayerForwardThread(const int layer,
-                                                    const int begin, const int end) {
+void MultiLayerPerceptron::middleFirstLayerForwardThread(const int begin, const int end) {
+  for (int neuron = begin; neuron < end; ++neuron) {
+    // SdAの最終層の出力を入れる
+    h[0][neuron] = middleNeurons[0][neuron].learn_output(sda_out[sda_out.size() - 1]);
+  }
+}
+
+void MultiLayerPerceptron::middleLayerForwardThread(const int layer, const int begin, const int end) {
   for (int neuron = begin; neuron < end; ++neuron) {
     h[layer][neuron] = middleNeurons[layer][neuron].learn_output(h[layer - 1]);
   }
@@ -407,18 +632,19 @@ void MultiLayerPerceptron::outForwardThread(const int begin, const int end) {
  * @param begin 学習するニューロンセットの開始点
  * @param end 学習するニューロンセットの終了点
  */
-void MultiLayerPerceptron::outLearnThread(const std::vector<double> in, const std::vector<double> ans, const std::vector<double> o,
-                                          const std::vector<std::vector<double>> h, const int begin, const int end){
-  // Dropout学習済みNNの出力を得る
+void MultiLayerPerceptron::outLearnThread(const std::vector<double> in, const std::vector<double> ans,
+                                          const int begin, const int end) {
+  // Dropoutを用いた学習済みNNの出力を得るようにする
   std::vector<double> output = this->out(in);
-
   for (int neuron = begin; neuron < end; ++neuron) {
     // 出力層ニューロンのdeltaの計算
     double delta = o[neuron] - ans[neuron];
 
     __android_log_print(ANDROID_LOG_DEBUG, "MLP", "delta: %f", delta);
-    // 教師データとの誤差が十分小さい場合は学習しない．そうでなければ正解フラグをfalseに
-    if (std::abs(ans[neuron] - output[neuron]) < MAX_GAP) continue;
+    __android_log_print(ANDROID_LOG_DEBUG, "MLP", "ce: %f", cross_entropy(o[neuron], ans[neuron]));
+
+    // 損失関数の出力が十分小さい場合は学習しない．そうでなければ正解フラグをfalseに
+    if (cross_entropy(o[neuron], ans[neuron]) < MAX_GAP) continue;
     else successFlg = false;
 
     // 出力層の学習
@@ -433,8 +659,7 @@ void MultiLayerPerceptron::outLearnThread(const std::vector<double> in, const st
  * @param begin 学習するニューロンセットの開始点
  * @param end 学習するニューロンセットの終了点
  */
-void MultiLayerPerceptron::middleLastLayerLearnThread(const std::vector<std::vector<double>> h, const int begin,
-                                                      const int end){
+void MultiLayerPerceptron::middleLastLayerLearnThread(const int begin, const int end) {
   for (int neuron = begin; neuron < end; ++neuron) {
     // 中間層ニューロンのdeltaを計算
     double sumDelta = 0.0;
@@ -445,10 +670,13 @@ void MultiLayerPerceptron::middleLastLayerLearnThread(const std::vector<std::vec
 
     // どの活性化関数を用いるかで，deltaの計算方法が変わる
     double delta;
-    if (middle_layer_type == 0) delta = 1.0 * sumDelta;
-    else if (middle_layer_type == 1) delta = (h[middle_layer_number - 1][neuron] * (1.0 - h[middle_layer_number - 1][neuron])) * sumDelta;
-    else if (middle_layer_type == 2) delta = (1.0 - pow(h[middle_layer_number - 1][neuron], 2)) * sumDelta;
-    else {
+    if (middle_layer_type == 0) {
+      delta = 1.0 * sumDelta;
+    } else if (middle_layer_type == 1) {
+      delta = (h[middle_layer_number - 1][neuron] * (1.0 - h[middle_layer_number - 1][neuron])) * sumDelta;
+    } else if (middle_layer_type == 2) {
+      delta = (1.0 - pow(h[middle_layer_number - 1][neuron], 2)) * sumDelta;
+    } else {
       // ReLU
       if (h[middle_layer_number - 1][neuron] > 0) delta = 1.0 * sumDelta;
       else delta = 0 * sumDelta;
@@ -465,8 +693,7 @@ void MultiLayerPerceptron::middleLastLayerLearnThread(const std::vector<std::vec
  * @param begin 学習するニューロンセットの開始点
  * @param end 学習するニューロンセットの終了点
  */
-void MultiLayerPerceptron::middleMiddleLayerLearnThread(const std::vector<std::vector<double>> h, const int layer, const int begin,
-                                                        const int end) {
+void MultiLayerPerceptron::middleMiddleLayerLearnThread(const int layer, const int begin, const int end) {
   for (int neuron = begin; neuron < end; ++neuron) {
     // 中間層ニューロンのdeltaを計算
     double sumDelta = 0.0;
@@ -476,10 +703,13 @@ void MultiLayerPerceptron::middleMiddleLayerLearnThread(const std::vector<std::v
     }
 
     double delta;
-    if (middle_layer_type == 0) delta = 1.0 * sumDelta;
-    else if (middle_layer_type == 1) delta = (h[layer][neuron] * (1.0 - h[layer][neuron])) * sumDelta;
-    else if (middle_layer_type == 2) delta = (1.0 - pow(h[layer][neuron], 2)) * sumDelta;
-    else {
+    if (middle_layer_type == 0) {
+      delta = 1.0 * sumDelta;
+    } else if (middle_layer_type == 1) {
+      delta = (h[layer][neuron] * (1.0 - h[layer][neuron])) * sumDelta;
+    } else if (middle_layer_type == 2) {
+      delta = (1.0 - pow(h[layer][neuron], 2)) * sumDelta;
+    } else {
       // ReLU
       if (h[layer][neuron] > 0) delta = 1.0 * sumDelta;
       else delta = 0 * sumDelta;
@@ -497,8 +727,7 @@ void MultiLayerPerceptron::middleMiddleLayerLearnThread(const std::vector<std::v
  * @param begin 学習するニューロンセットの開始点
  * @param end 学習するニューロンセットの終了点
  */
-void MultiLayerPerceptron::middleFirstLayerLearnThread(const std::vector<std::vector<double>> h,
-                                                       const std::vector<double> in, const int begin, const int end) {
+void MultiLayerPerceptron::middleFirstLayerLearnThread(const int begin, const int end) {
   for (int neuron = begin; neuron < end; ++neuron) {
     // 中間層ニューロンのdeltaを計算
     double sumDelta = 0.0;
@@ -516,46 +745,134 @@ void MultiLayerPerceptron::middleFirstLayerLearnThread(const std::vector<std::ve
     }
 
     double delta;
-    if (middle_layer_type == 0) delta = 1.0 * sumDelta;
-    else if (middle_layer_type == 1) delta = (h[0][neuron] * (1.0 - h[0][neuron])) * sumDelta;
-    else if (middle_layer_type == 2) delta = (1.0 - pow(h[0][neuron], 2)) * sumDelta;
-    else {
+    if (middle_layer_type == 0) {
+      delta = 1.0 * sumDelta;
+    } else if (middle_layer_type == 1) {
+      delta = (h[0][neuron] * (1.0 - h[0][neuron])) * sumDelta;
+    } else if (middle_layer_type == 2) {
+      delta = (1.0 - pow(h[0][neuron], 2)) * sumDelta;
+    } else {
       // ReLU
       if (h[0][neuron] > 0) delta = 1.0 * sumDelta;
       else delta = 0 * sumDelta;
     }
 
     // 学習
-    middleNeurons[0][neuron].learn(delta, in);
+    middleNeurons[0][neuron].learn(delta, sda_out[sda_out.size() - 1]);
+  }
+}
+
+void MultiLayerPerceptron::sdaLastLayerLearnThread(const int begin, const int end) {
+  for (int neuron = begin; neuron < end; ++neuron) {
+    double sumDelta = 0.0;
+    for (int k = 0; k < middleNeurons[0].size(); ++k) {
+      Neuron n = middleNeurons[0][k];
+      sumDelta += n.getInputWeightIndexOf(neuron) * n.getDelta();
+    }
+
+    double delta;
+    // sigmoid
+    delta = (sda_out[sda_out.size() - 1][neuron] * (1.0 - sda_out[sda_out.size() - 1][neuron])) * sumDelta;
+
+    sda_neurons[sda_neurons.size() - 1][neuron].learn(delta, sda_out[sda_out.size() - 2]);
+  }
+}
+
+void MultiLayerPerceptron::sdaMiddleLayerLearnThread(const int layer, const int begin, const int end) {
+  for (int neuron = begin; neuron < end; ++neuron) {
+    double sumDelta = 0.0;
+    for (int k = 0; k < sda_neurons[layer + 1].size(); ++k) {
+      Neuron n = sda_neurons[layer + 1][k];
+      sumDelta += n.getInputWeightIndexOf(neuron) * n.getDelta();
+    }
+
+    double delta;
+    // sigmoid
+    delta = (sda_out[layer][neuron] * (1.0 - sda_out[layer][neuron])) * sumDelta;
+
+    sda_neurons[layer][neuron].learn(delta, sda_out[layer - 1]);
+  }
+}
+
+void MultiLayerPerceptron::sdaFirstLayerLearnThread(const std::vector<double> in, const int begin, const int end) {
+  for (int neuron = begin; neuron < end; ++neuron) {
+    double sumDelta = 0.0;
+
+    if (sda_neurons.size() > 1) {
+      for (int k = 0; k < sda_neurons[1].size(); ++k) {
+        Neuron n = sda_neurons[1][k];
+        sumDelta += n.getInputWeightIndexOf(neuron) * n.getDelta();
+      }
+    } else {
+      for (int k = 0; k < middleNeurons[0].size(); ++k) {
+        Neuron n = middleNeurons[0][k];
+        sumDelta += n.getInputWeightIndexOf(neuron) * n.getDelta();
+      }
+    }
+
+    double delta;
+    // sigmoid
+    delta = (sda_out[0][neuron] * (1.0 - sda_out[0][neuron])) * sumDelta;
+
+    sda_neurons[0][neuron].learn(delta, in);
   }
 }
 
 /**
- * 与えられたデータをニューラルネットワークに入力し，出力をコンソールに書き出す
+ * 与えられたデータをニューラルネットワークに入力し，出力を返す
  * @param input ニューラルネットワークに入力するデータ
- * @return ニューラルネットワークの計算結果
  */
-std::vector<double> MultiLayerPerceptron::out(std::vector<double> input){
-  learned_h = std::vector<std::vector<double>>(middle_layer_number, std::vector<double>(middle_neuron_num, 0));
-  learned_o = std::vector<double>(output_neuron_num, 0);
-
+std::vector<double> MultiLayerPerceptron::out(std::vector<double> input) {
+  // Feed Forward
+  // SdA First Layer
   std::vector<std::thread> threads(num_thread);
   int charge = 1;
   threads.clear();
+  if (sda_neurons[0].size() <= num_thread) charge = 1;
+  else charge = sda_neurons[0].size() / num_thread;
+  for (int i = 0; i < sda_neurons[0].size(); i += charge) {
+    if (i != 0 && sda_neurons[0].size() / i == 1) {
+      threads.push_back(std::thread(&MultiLayerPerceptron::sdaFirstLayerOutThread, this,
+                                    std::ref(input), i, sda_neurons[0].size()));
+    } else {
+      threads.push_back(std::thread(&MultiLayerPerceptron::sdaFirstLayerOutThread, this,
+                                    std::ref(input), i, i + charge));
+    }
+  }
+  for (std::thread &th : threads) th.join();
+
+  // SdA Other Layer
+  for (int layer = 1; layer <= (int) sda_neurons.size() - 1; ++layer) {
+    threads.clear();
+    if (sda_neurons[layer].size() <= num_thread) charge = 1;
+    else charge = sda_neurons[layer].size() / num_thread;
+    for (int i = 0; i < sda_neurons[layer].size(); i += charge) {
+      if (i != 0 && sda_neurons[layer].size() / i == 1) {
+        threads.push_back(std::thread(&MultiLayerPerceptron::sdaOtherLayerOutThread, this,
+                                      layer, i, sda_neurons[layer].size()));
+      } else {
+        threads.push_back(std::thread(&MultiLayerPerceptron::sdaOtherLayerOutThread, this,
+                                      layer, i, i + charge));
+      }
+    }
+    for (std::thread &th : threads) th.join();
+  }
+
+  threads.clear();
   if (middle_neuron_num <= num_thread) charge = 1;
   else charge = middle_neuron_num / num_thread;
-  for (int i = 0; i < middle_neuron_num;  i += charge) {
+  for (int i = 0; i < middle_neuron_num; i += charge) {
     if (i != 0 && middle_neuron_num / i == 1) {
-      threads.push_back(std::thread(&MultiLayerPerceptron::middleFirstLayerOutThread, this, std::ref(input), i, middle_neuron_num));
+      threads.push_back(std::thread(&MultiLayerPerceptron::middleFirstLayerOutThread, this, i, middle_neuron_num));
     } else {
-      threads.push_back(std::thread(&MultiLayerPerceptron::middleFirstLayerOutThread, this, std::ref(input), i, i + charge));
+      threads.push_back(std::thread(&MultiLayerPerceptron::middleFirstLayerOutThread, this, i, i + charge));
     }
   }
   for (std::thread &th : threads) th.join();
 
   if (middle_neuron_num <= num_thread) charge = 1;
   else charge = middle_neuron_num / num_thread;
-  for (int layer = 1; layer <= (int)middle_layer_number - 1; ++layer) {
+  for (int layer = 1; layer <= (int) middle_layer_number - 1; ++layer) {
     threads.clear();
     for (int i = 0; i < middle_neuron_num; i += charge) {
       if (i != 0 && middle_neuron_num / i == 1) {
@@ -582,9 +899,9 @@ std::vector<double> MultiLayerPerceptron::out(std::vector<double> input){
   return learned_o;
 }
 
-void MultiLayerPerceptron::middleFirstLayerOutThread(const std::vector<double> in, const int begin, const int end) {
+void MultiLayerPerceptron::middleFirstLayerOutThread(const int begin, const int end) {
   for (int neuron = begin; neuron < end; ++neuron) {
-    learned_h[0][neuron] = middleNeurons[0][neuron].output(in);
+    learned_h[0][neuron] = middleNeurons[0][neuron].output(sda_out[sda_out.size() - 1]);
   }
 }
 
@@ -599,3 +916,8 @@ void MultiLayerPerceptron::outOutThread(const int begin, const int end) {
     learned_o[neuron] = outputNeurons[neuron].output(learned_h[middle_layer_number - 1]);
   }
 }
+
+double MultiLayerPerceptron::cross_entropy(double output, double answer){
+  return -answer * std::log(output) - (1.0 - answer) * std::log(1.0 - output);
+}
+

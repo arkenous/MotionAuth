@@ -14,10 +14,12 @@ Neuron::Neuron() { }
  * Neuronのコンストラクタ
  * @param input_num 入力ニューロン数（入力データ数）
  * @param weight 結合荷重の重み付けデータ
- * @param dropout_ratio Dropout率
+ * @param dropout_rate Dropout率
  * @return Neuronのインスタンス
  */
-Neuron::Neuron(unsigned short input_num, std::vector<double> weight, int iteration, std::vector<double> m, std::vector<double> nu, std::vector<double> m_hat, std::vector<double> nu_hat, double bias, int activation_type, double dropout_ratio) {
+Neuron::Neuron(unsigned long input_num, std::vector<double> weight, std::vector<double> m, std::vector<double> nu,
+               std::vector<double> m_hat, std::vector<double> nu_hat, int iteration, double bias, int activation_type,
+               double dropout_rate) {
   this->input_num = input_num;
   this->activation_type = activation_type;
   std::random_device rnd; // 非決定的乱数生成器
@@ -53,7 +55,7 @@ Neuron::Neuron(unsigned short input_num, std::vector<double> weight, int iterati
     for (int i = 0; i < this->input_num; ++i) this->inputWeights[i] = real_rnd(mt);
   }
 
-  this->dropout_ratio = dropout_ratio;
+  this->dropout_rate = dropout_rate;
 }
 
 /**
@@ -61,7 +63,7 @@ Neuron::Neuron(unsigned short input_num, std::vector<double> weight, int iterati
  * @param random_value 0.0以上1.0未満の乱数値
  */
 void Neuron::dropout(double random_value) {
-  if (random_value < dropout_ratio) this->dropout_mask = 0.0;
+  if (random_value < dropout_rate) this->dropout_mask = 0.0;
   else this->dropout_mask = 1.0;
 }
 
@@ -115,9 +117,9 @@ double Neuron::learn_output(std::vector<double> inputValues) {
  * @return ニューロンの出力
  */
 double Neuron::output(std::vector<double> inputValues){
-  double sum = this->bias * (1.0 - this->dropout_ratio);
+  double sum = this->bias * (1.0 - this->dropout_rate);
   for (int i = 0; i < this->input_num; ++i) {
-    sum += inputValues[i] * (this->inputWeights[i] * (1.0 - this->dropout_ratio));
+    sum += inputValues[i] * (this->inputWeights[i] * (1.0 - this->dropout_rate));
   }
 
   double activated;

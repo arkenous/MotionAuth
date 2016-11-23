@@ -62,7 +62,7 @@ class Result extends Handler implements Runnable {
   private float[][] gyro;
   private double[][] registeredVector;
   private boolean result = false;
-  private String learnResult;
+  private String[] learnResult;
 
   // C++で書いたMLPライブラリの呼び出しに必要
   static {
@@ -216,7 +216,7 @@ class Result extends Handler implements Runnable {
     // 学習済みニューラルネットワークの出力を得る
     this.sendEmptyMessage(NN_OUT);
     double[] x = manipulateMotionDataToNeuralNetwork(vector);
-    double[] result = out((short)x.length, (short)x.length, (short)1, (short)1, learnResult, x);
+    double[] result = out(1, learnResult, x);
     for (int i = 0; i < result.length; i++) log(DEBUG, "Neural Network Output["+i+"]: "+result[i]);
 
     manageData.writeDoubleOneArrayData(userName, "AuthNNOut", "NNOut", result);
@@ -232,7 +232,7 @@ class Result extends Handler implements Runnable {
     Enum.MEASURE measure = cosSimilarity.measure(vectorCosSimilarity);
 
     // ニューラルネットワークの結果，正規モーションでないと判定された場合
-    if (result[0] == 1.0) return false;
+    if (result[0] > 0.1) return false;
 
     // コサイン類似度が低い場合
     if (measure == INCORRECT) return false;
@@ -266,13 +266,10 @@ class Result extends Handler implements Runnable {
 
   /**
    * C++ネイティブのニューラルネットワーク出力メソッド
-   * @param input 入力層のニューロン数
-   * @param middle 中間層一層あたりのニューロン数
-   * @param output 出力層のニューロン数
    * @param middleLayer 中間層の層数
-   * @param weightAndThreshold ニューロンの結合荷重の重みと閾値をカンマで連結し，それらニューロンごとのデータをシングルクオートで連結した文字列データ
+   * @param neuronParams SdAとMLPのニューロンパラメータ
    * @param x 入力データ
    * @return 出力データ
    */
-  public native double[] out(short input, short middle, short output, short middleLayer, String weightAndThreshold, double[] x);
+  public native double[] out(long middleLayer, String[] neuronParams, double[] x);
 }

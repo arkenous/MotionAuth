@@ -58,7 +58,7 @@ class Result extends Handler implements Runnable {
 
   private double checkRange;
   private double amp;
-  private String learnResult = "";
+  private String[] learnResult;
   private float[][][] linearAccel;
   private float[][][] gyro;
   private double[][] averageVector;
@@ -321,15 +321,15 @@ class Result extends Handler implements Runnable {
     }
     String neuronParams = "";
 
-    learnResult = learn((short)x[0].length, (short)x[0].length, (short)answer[0].length, (short)1, neuronParams, x, answer);
+    learnResult = learn(1, neuronParams, x, answer);
     log(DEBUG, "learnResult: "+learnResult);
 
-    // テストデータで期待した出力が得られるか確認する．出力が0.5よりも大きければ登録失敗とする
+    // テストデータで期待した出力が得られるか確認する
     for (int set = 0; set < x.length; ++set) {
-      double[] result = out((short)x[set].length, (short)x[set].length, (short)1, (short)1, learnResult, x[set]);
+      double[] result = out(1, learnResult, x[set]);
       manageData.writeDoubleOneArrayData(userName, "RegNNOut", "set"+set, result);
       log(DEBUG, "set["+set+"] result[0]: "+result[0]);
-      if (result[0] > 0.5) return false;
+      if (result[0] > 0.1) return false;
     }
     return true;
     //endregion
@@ -378,26 +378,20 @@ class Result extends Handler implements Runnable {
 
   /**
    * C++ネイティブのニューラルネットワーク学習メソッド
-   * @param input 入力層のニューロン数
-   * @param middle 中間層一層あたりのニューロン数
-   * @param output 出力層のニューロン数
    * @param middleLayer 中間層の層数
-   * @param neuronParams ニューロンの結合荷重の重みとAdaGradのgとバイアスをパイプで連結し，それらニューロンごとのデータをシングルクオートで連結した文字列データ
+   * @param neuronParams ニューロンパラメータ（ただしここでは初めての学習となるので空文字を渡す）
    * @param x 教師入力データ
    * @param answer 教師出力データ
-   * @return 学習後のニューロンの結合荷重の重みと閾値をカンマで連結し，それらニューロンごとのデータをシングルクオートで連結した文字列データ
+   * @return SdAとMLPの学習済みニューロンパラメータ
    */
-  public native String learn(short input, short middle, short output, short middleLayer, String neuronParams, double[][] x, double[][] answer);
+  public native String[] learn(long middleLayer, String neuronParams, double[][] x, double[][] answer);
 
   /**
    * C++ネイティブのニューラルネットワーク出力メソッド
-   * @param input 入力層のニューロン数
-   * @param middle 中間層一層あたりのニューロン数
-   * @param output 出力層のニューロン数
    * @param middleLayer 中間層の層数
-   * @param neuronParams ニューロンの結合荷重の重みとAdaGradのgとバイアスをパイプで連結し，それらニューロンごとのデータをシングルクオートで連結した文字列データ
+   * @param neuronParams SdAとMLPの学習済みニューロンパラメータ
    * @param x 入力データ
    * @return ニューラルネットワークの出力
    */
-  public native double[] out(short input, short middle, short output, short middleLayer, String neuronParams, double[] x);
+  public native double[] out(long middleLayer, String[] neuronParams, double[] x);
 }

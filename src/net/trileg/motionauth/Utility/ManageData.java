@@ -251,10 +251,10 @@ public class ManageData {
    * @param userName User name.
    * @param averageVector Vector data.
    * @param ampValue Amplifier value.
-   * @param learnResult Weights and thresholds after learn neural network
+   * @param learnResult Neuron parameters of SdA and MLP
    * @param context Caller context.
    */
-  public void writeRegisterData(String userName, double[][] averageVector, double ampValue, String learnResult, Context context) {
+  public void writeRegisterData(String userName, double[][] averageVector, double ampValue, String[] learnResult, Context context) {
     log(INFO);
 
     CipherCrypt mCipherCrypt = new CipherCrypt(context);
@@ -269,7 +269,8 @@ public class ManageData {
 
     // 暗号化
     String[][] encryptedAverageVectorStr = mCipherCrypt.encrypt(averageVectorStr);
-    String encryptedLearnResult = mCipherCrypt.encrypt(learnResult);
+    String encryptedSdALearnResult = mCipherCrypt.encrypt(learnResult[0]);
+    String encryptedMLPLearnResult = mCipherCrypt.encrypt(learnResult[1]);
 
     // 配列データを特定文字列を挟んで連結する
     ConvertArrayAndString mConvertArrayAndString = new ConvertArrayAndString();
@@ -289,10 +290,10 @@ public class ManageData {
     editor.apply();
 
     try {
-      OutputStream os = context.openFileOutput(userName + "_learnResult.dat", MODE_PRIVATE);
+      OutputStream os = context.openFileOutput(userName + "_learnResult_SdA.dat", MODE_PRIVATE);
       osw = new OutputStreamWriter(os, "UTF-8");
       PrintWriter writer = new PrintWriter(osw);
-      writer.write(encryptedLearnResult);
+      writer.write(encryptedSdALearnResult);
       writer.flush();
       writer.close();
       osw.close();
@@ -300,6 +301,20 @@ public class ManageData {
     } catch (Exception e) {
       log(ERROR, e.getMessage(), e.getCause());
     }
+
+    try {
+      OutputStream os = context.openFileOutput(userName + "_learnResult_MLP.dat", MODE_PRIVATE);
+      osw = new OutputStreamWriter(os, "UTF-8");
+      PrintWriter writer = new PrintWriter(osw);
+      writer.write(encryptedMLPLearnResult);
+      writer.flush();
+      writer.close();
+      osw.close();
+      os.close();
+    } catch (Exception e) {
+      log(ERROR, e.getMessage(), e.getCause());
+    }
+
   }
 
 
@@ -343,12 +358,12 @@ public class ManageData {
    * @param userName User name
    * @return NN parameters
    */
-  public String readLearnResult(Context context, String userName) {
+  public String[] readLearnResult(Context context, String userName) {
     log(INFO);
 
-    String learnResult = "";
+    String[] learnResult = new String[2];// 損失関数の出力がこの値以下になれば学習をスキップする
     try {
-      InputStream is = context.openFileInput(userName + "_learnResult.dat");
+      InputStream is = context.openFileInput(userName + "_learnResult_SdA.dat");
       InputStreamReader isr = new InputStreamReader(is, "UTF-8");
       BufferedReader br = new BufferedReader(isr);
 
@@ -359,11 +374,30 @@ public class ManageData {
       is.close();
 
       CipherCrypt cipherCrypt = new CipherCrypt(context);
-      learnResult = cipherCrypt.decrypt(encryptedLearnResult);
+      learnResult[0] = cipherCrypt.decrypt(encryptedLearnResult);
 
     } catch (Exception e) {
       log(ERROR, e.getMessage(), e.getCause());
     }
+
+    try {
+      InputStream is = context.openFileInput(userName + "_learnResult_MLP.dat");
+      InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+      BufferedReader br = new BufferedReader(isr);
+
+      String encryptedLearnResult = br.readLine();
+
+      br.close();
+      isr.close();
+      is.close();
+
+      CipherCrypt cipherCrypt = new CipherCrypt(context);
+      learnResult[1] = cipherCrypt.decrypt(encryptedLearnResult);
+
+    } catch (Exception e) {
+      log(ERROR, e.getMessage(), e.getCause());
+    }
+
 
     return learnResult;
   }

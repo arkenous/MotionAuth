@@ -12,7 +12,9 @@
 class Neuron {
 public:
   Neuron();
-  Neuron(unsigned short input_num, std::vector<double> weight, int iteration, std::vector<double> m, std::vector<double> nu, std::vector<double> m_hat, std::vector<double> nu_hat, double bias, int activation_type, double dropout_ratio);
+  Neuron(unsigned long input_num, std::vector<double> weight, std::vector<double> m, std::vector<double> nu,
+         std::vector<double> m_hat, std::vector<double> nu_hat, int iteration, double bias, int activation_type,
+         double dropout_rate);
   void dropout(double random_value);
   void learn(double delta, std::vector<double> inputValues); // 誤差逆伝播学習
   double learn_output(std::vector<double> inputValues); // 学習時のDropoutを用いた順伝播出力
@@ -27,12 +29,12 @@ public:
   int getIteration();
 
 private:
-  unsigned short input_num = 0;
+  unsigned long input_num = 0;
   int activation_type = 0;
   std::vector<double> inputWeights;
   double delta = 0.0; // 修正量
   double bias = 0.0; // ニューロンのバイアス // -threshold
-  double alpha = 0.001; // 学習率
+  double alpha = 0.01; // 学習率
   double beta_one = 0.9;
   double beta_two = 0.999;
   double epsilon = 0.00000001;
@@ -47,7 +49,7 @@ private:
   double activation_tanh(double x); // 2
   double activation_relu(double x); // 3
 
-  double dropout_ratio; // どれくらいの割合で中間層ニューロンをDropoutさせるか
+  double dropout_rate; // どれくらいの割合で中間層ニューロンをDropoutさせるか
   double dropout_mask; // Dropoutのマスク率，0.0で殺して1.0で生かす
 };
 

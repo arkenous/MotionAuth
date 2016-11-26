@@ -153,9 +153,11 @@ public class Authentication extends Activity {
    * @param gyroscope gyroscope data
    * @return return true if data length >= LEAST_MOTION_LENGTH
    */
-  private boolean checkDataLength(ArrayList<ArrayList<Float>> linearAcceleration, ArrayList<ArrayList<Float>> gyroscope) {
+  private boolean checkDataLength(ArrayList<ArrayList<Float>> linearAcceleration,
+                                  ArrayList<ArrayList<Float>> gyroscope) {
     log(INFO);
-    return (linearAcceleration.get(0).size() >= LEAST_MOTION_LENGTH || gyroscope.get(0).size() >= LEAST_MOTION_LENGTH);
+    return (linearAcceleration.get(0).size() >= LEAST_MOTION_LENGTH
+            || gyroscope.get(0).size() >= LEAST_MOTION_LENGTH);
   }
 
 
@@ -190,7 +192,8 @@ public class Authentication extends Activity {
    * @param linearAccel Original linear acceleration data collecting from GetData.
    * @param gyro        Original gyroscope data collecting from GetData.
    */
-  private void finishGetMotion(ArrayList<ArrayList<Float>> linearAccel, ArrayList<ArrayList<Float>> gyro) {
+  private void finishGetMotion(ArrayList<ArrayList<Float>> linearAccel,
+                               ArrayList<ArrayList<Float>> gyro) {
     log(INFO);
     if (getMotion.isClickable()) getMotion.setClickable(false);
     second.setText("0");
@@ -210,7 +213,8 @@ public class Authentication extends Activity {
     progressDialog.show();
     
     Result result = new Result(listToArray.listTo2DArray(linearAccel),
-        listToArray.listTo2DArray(gyro), getMotion, progressDialog, Authentication.this);
+                               listToArray.listTo2DArray(gyro), getMotion,
+                               progressDialog, Authentication.this);
     ExecutorService executorService = newSingleThreadExecutor();
     executorService.execute(result);
     executorService.shutdown();

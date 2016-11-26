@@ -73,7 +73,8 @@ public class InputName extends Activity {
       public boolean onKey(View v, int keyCode, KeyEvent event) {
         if (event.getAction() == ACTION_DOWN && keyCode == KEYCODE_ENTER) {
           log(DEBUG, "Push enter key");
-          InputMethodManager inputMethodManager = (InputMethodManager) InputName.this.getSystemService(INPUT_METHOD_SERVICE);
+          InputMethodManager inputMethodManager
+              = (InputMethodManager) InputName.this.getSystemService(INPUT_METHOD_SERVICE);
           inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
           return true;
@@ -90,8 +91,10 @@ public class InputName extends Activity {
       public void onClick(View v) {
         log(DEBUG, "Click ok button");
         // Check user inputted name is correctly.
-        if (userName.length() == 0) Toast.makeText(InputName.this, "名前が入力されていません", Toast.LENGTH_SHORT).show();
-        else InputName.this.moveActivity(getPackageName(), getPackageName() + ".Registration.Registration", true);
+        if (userName.length() == 0)
+          Toast.makeText(InputName.this, "名前が入力されていません", Toast.LENGTH_SHORT).show();
+        else
+          moveActivity(getPackageName(), getPackageName() + ".Registration.Registration", true);
       }
     });
   }

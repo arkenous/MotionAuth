@@ -35,54 +35,35 @@ public class LogUtil {
   }
 
   private static void outputLog(int type, String message, Throwable throwable) {
-    if (!mIsShowLog) {
+    if (!mIsShowLog)
       // ログ出力フラグが立っていない場合は何もしない．
       return;
-    }
 
     // ログのメッセージ部分にスタックトレース情報を付加する．
-    if (message == null) {
-      message = getStackTraceInfo();
-    } else {
-      message = getStackTraceInfo() + message;
-    }
+    if (message == null) message = getStackTraceInfo();
+    else message = getStackTraceInfo() + message;
 
     // ログを出力
     switch (type) {
       case DEBUG:
-        if (throwable == null) {
-          Log.d(TAG, message);
-        } else {
-          Log.d(TAG, message, throwable);
-        }
+        if (throwable == null) Log.d(TAG, message);
+        else Log.d(TAG, message, throwable);
         break;
       case ERROR:
-        if (throwable == null) {
-          Log.e(TAG, message);
-        } else {
-          Log.e(TAG, message, throwable);
-        }
+        if (throwable == null) Log.e(TAG, message);
+        else Log.e(TAG, message, throwable);
         break;
       case INFO:
-        if (throwable == null) {
-          Log.i(TAG, message);
-        } else {
-          Log.i(TAG, message, throwable);
-        }
+        if (throwable == null) Log.i(TAG, message);
+        else Log.i(TAG, message, throwable);
         break;
       case VERBOSE:
-        if (throwable == null) {
-          Log.v(TAG, message);
-        } else {
-          Log.v(TAG, message, throwable);
-        }
+        if (throwable == null) Log.v(TAG, message);
+        else Log.v(TAG, message, throwable);
         break;
       case WARN:
-        if (throwable == null) {
-          Log.w(TAG, message);
-        } else {
-          Log.w(TAG, message, throwable);
-        }
+        if (throwable == null) Log.w(TAG, message);
+        else Log.w(TAG, message, throwable);
         break;
     }
   }

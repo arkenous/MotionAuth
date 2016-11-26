@@ -34,11 +34,9 @@ public class CorrectDeviation {
     double[][] representativeValue = new double[vector.length][NUM_AXIS];
     int[][] representativeTime = new int[vector.length][NUM_AXIS];
 
-    for (int time = 0; time < vector.length; time++) {
-      for (int axis = 0; axis < NUM_AXIS; axis++) {
+    for (int time = 0; time < vector.length; time++)
+      for (int axis = 0; axis < NUM_AXIS; axis++)
         representativeValue[time][axis] = vector[time][axis][0];
-      }
-    }
 
     switch (mode) {
       case MAX:
@@ -74,15 +72,13 @@ public class CorrectDeviation {
           for (int axis = 0; axis < NUM_AXIS; axis++) {
             TreeMap<Double, Integer> treeMap = new TreeMap<>();
 
-            for (int item = 0; item < vector[time][axis].length; item++) {
+            for (int item = 0; item < vector[time][axis].length; item++)
               treeMap.put(vector[time][axis][item], item);
-            }
 
             int loopCount = 0;
             for (Integer initCount : treeMap.values()) {
-              if (loopCount == vector[time][axis].length / 2) {
+              if (loopCount == vector[time][axis].length / 2)
                 representativeTime[time][axis] = initCount;
-              }
               loopCount++;
             }
           }
@@ -103,22 +99,19 @@ public class CorrectDeviation {
     }
 
     // 1回目のデータに関しては基準となるデータなのでそのまま入れる
-    for (int axis = 0; axis < NUM_AXIS; axis++) {
+    for (int axis = 0; axis < NUM_AXIS; axis++)
       System.arraycopy(vector[0][axis], 0, corrected[0][axis], 0, vector[0][axis].length);
-    }
 
     // 実際にデータをずらしていく（ずらすのは，1回目を除くデータ）
     for (int time = 1; time < vector.length; time++) {
       for (int axis = 0; axis < NUM_AXIS; axis++) {
         ArrayList<Double> vectorTmp = new ArrayList<>();
 
-        for (int item = 0; item < vector[time][axis].length; item++) {
+        for (int item = 0; item < vector[time][axis].length; item++)
           vectorTmp.add(vector[time][axis][item]);
-        }
         Collections.rotate(vectorTmp, lagData[time - 1][axis]);
-        for (int item = 0; item < vector[time][axis].length; item++) {
+        for (int item = 0; item < vector[time][axis].length; item++)
           corrected[time][axis][item] = vectorTmp.get(item);
-        }
       }
     }
     //endregion

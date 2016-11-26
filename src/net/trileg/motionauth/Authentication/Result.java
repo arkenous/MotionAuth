@@ -70,7 +70,8 @@ class Result extends Handler implements Runnable {
   }
 
 
-  Result(float[][] linearAccel, float[][] gyro, Button getMotion, ProgressDialog progressDialog, Authentication authentication) {
+  Result(float[][] linearAccel, float[][] gyro, Button getMotion,
+         ProgressDialog progressDialog, Authentication authentication) {
     log(INFO);
     this.linearAccel = linearAccel;
     this.gyro = gyro;
@@ -172,7 +173,8 @@ class Result extends Handler implements Runnable {
     this.sendEmptyMessage(READ_DATA);
     registeredVector = manageData.readRegisteredData(authentication, userName);
 
-    SharedPreferences preferences = authentication.getApplicationContext().getSharedPreferences("MotionAuth", MODE_PRIVATE);
+    SharedPreferences preferences
+        = authentication.getApplicationContext().getSharedPreferences("MotionAuth", MODE_PRIVATE);
     String registeredAmplify = preferences.getString(userName + "amplify", "");
     if ("".equals(registeredAmplify)) throw new RuntimeException();
     amp = Double.valueOf(registeredAmplify);
@@ -226,13 +228,14 @@ class Result extends Handler implements Runnable {
     double vectorCosSimilarity = cosSimilarity.cosSimilarity(vector, registeredVector);
     log(DEBUG, "After Cosine Similarity");
 
-    manageData.writeDoubleSingleData(userName, "AuthCosSimilarity", "vectorCosSimilarity", vectorCosSimilarity);
+    manageData.writeDoubleSingleData(userName, "AuthCosSimilarity",
+                                     "vectorCosSimilarity", vectorCosSimilarity);
 
     this.sendEmptyMessage(COSINE_SIMILARITY);
     Enum.MEASURE measure = cosSimilarity.measure(vectorCosSimilarity);
 
     // ニューラルネットワークの結果，正規モーションでないと判定された場合
-    if (result[0] > 0.1) return false;
+    if (result[0] > 0.001) return false;
 
     // コサイン類似度が低い場合
     if (measure == INCORRECT) return false;

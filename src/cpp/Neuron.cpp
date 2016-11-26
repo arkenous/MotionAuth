@@ -1,8 +1,7 @@
-//
-// Created by Kensuke Kosaka on 2016/10/31.
-//
 
 #include "Neuron.h"
+
+using namespace std;
 
 /**
  * vectorのサイズ確保のためだけに用いるNeuronのデフォルトコンストラクタ
@@ -17,15 +16,17 @@ Neuron::Neuron() { }
  * @param dropout_rate Dropout率
  * @return Neuronのインスタンス
  */
-Neuron::Neuron(unsigned long input_num, std::vector<double> weight, std::vector<double> m, std::vector<double> nu,
-               std::vector<double> m_hat, std::vector<double> nu_hat, int iteration, double bias, int activation_type,
+Neuron::Neuron(unsigned long input_num, vector<double> weight,
+               vector<double> m, vector<double> nu,
+               vector<double> m_hat, vector<double> nu_hat,
+               int iteration, double bias, int activation_type,
                double dropout_rate) {
   this->input_num = input_num;
   this->activation_type = activation_type;
-  std::random_device rnd; // 非決定的乱数生成器
-  std::mt19937 mt; // メルセンヌ・ツイスタ
+  random_device rnd; // 非決定的乱数生成器
+  mt19937 mt; // メルセンヌ・ツイスタ
   mt.seed(rnd());
-  std::uniform_real_distribution<double> real_rnd(0.0, 1.0);
+  uniform_real_distribution<double> real_rnd(0.0, 1.0);
 
   // 0.0以外のバイアスが渡されて入ればそれをセットし，そうでなければ乱数で初期化
   if (bias != 0.0) this->bias = bias;
@@ -35,21 +36,20 @@ Neuron::Neuron(unsigned long input_num, std::vector<double> weight, std::vector<
   if (iteration != 0) this->iteration = iteration;
   else this->iteration = 0;
 
+  if (m.size() > 0) this->m = vector<double>(m);
+  else this->m = vector<double>(input_num, 0.0);
 
-  if (m.size() > 0) this->m = std::vector<double>(m);
-  else this->m = std::vector<double>(input_num, 0.0);
+  if (nu.size() > 0) this->nu = vector<double>(nu);
+  else this->nu = vector<double>(input_num, 0.0);
 
-  if (nu.size() > 0) this->nu = std::vector<double>(nu);
-  else this->nu = std::vector<double>(input_num, 0.0);
+  if (m_hat.size() > 0) this->m_hat = vector<double>(m_hat);
+  else this->m_hat = vector<double>(input_num, 0.0);
 
-  if (m_hat.size() > 0) this->m_hat = std::vector<double>(m_hat);
-  else this->m_hat = std::vector<double>(input_num, 0.0);
-
-  if (nu_hat.size() > 0) this->nu_hat = std::vector<double>(nu_hat);
-  else this->nu_hat = std::vector<double>(input_num, 0.0);
+  if (nu_hat.size() > 0) this->nu_hat = vector<double>(nu_hat);
+  else this->nu_hat = vector<double>(input_num, 0.0);
 
   // 結合荷重が渡されていればそれをセットし，無ければ乱数で初期化
-  if (weight.size() > 0) this->inputWeights = std::vector<double>(weight);
+  if (weight.size() > 0) this->inputWeights = vector<double>(weight);
   else {
     this->inputWeights.resize(input_num);
     for (int i = 0; i < this->input_num; ++i) this->inputWeights[i] = real_rnd(mt);
@@ -72,17 +72,20 @@ void Neuron::dropout(double random_value) {
  * @param delta 修正量
  * @param inputValues 一つ前の層の出力データ
  */
-void Neuron::learn(double delta, std::vector<double> inputValues) {
+void Neuron::learn(double delta, vector<double> inputValues) {
   this->delta = delta;
 
   if (this->dropout_mask == 1.0) {
     // Adamを用いて，結合荷重を更新
     this->iteration += 1;
     for (int i = 0; i < input_num; ++i) {
-      this->m[i] = this->beta_one * this->m[i] + (1 - this->beta_one) * (this->delta * inputValues[i]);
-      this->nu[i] = this->beta_two * this->nu[i] + (1 - this->beta_two) * pow((this->delta * inputValues[i]), 2);
+      this->m[i] = this->beta_one * this->m[i]
+          + (1 - this->beta_one) * (this->delta * inputValues[i]);
+      this->nu[i] = this->beta_two * this->nu[i]
+          + (1 - this->beta_two) * pow((this->delta * inputValues[i]), 2);
       this->m_hat[i] = this->m[i] / (1 - pow(this->beta_one, this->iteration));
-      this->nu_hat[i] = sqrt(this->nu[i] / (1 - pow(this->beta_two, this->iteration))) + this->epsilon;
+      this->nu_hat[i] = sqrt(this->nu[i] / (1 - pow(this->beta_two, this->iteration)))
+          + this->epsilon;
       this->inputWeights[i] -= this->alpha * (this->m_hat[i] / this->nu_hat[i]);
     }
 
@@ -96,11 +99,9 @@ void Neuron::learn(double delta, std::vector<double> inputValues) {
  * @param inputValues ニューロンの入力データ
  * @return ニューロンの出力
  */
-double Neuron::learn_output(std::vector<double> inputValues) {
+double Neuron::learn_output(vector<double> inputValues) {
   double sum = this->bias;
-  for (int i = 0; i < this->input_num; ++i) {
-    sum += inputValues[i] * this->inputWeights[i];
-  }
+  for (int i = 0; i < this->input_num; ++i) sum += inputValues[i] * this->inputWeights[i];
 
   double activated;
   if (activation_type == 0) activated = activation_identity(sum);
@@ -116,11 +117,10 @@ double Neuron::learn_output(std::vector<double> inputValues) {
  * @param inputValues ニューロンの入力データ
  * @return ニューロンの出力
  */
-double Neuron::output(std::vector<double> inputValues){
+double Neuron::output(vector<double> inputValues) {
   double sum = this->bias * (1.0 - this->dropout_rate);
-  for (int i = 0; i < this->input_num; ++i) {
+  for (int i = 0; i < this->input_num; ++i)
     sum += inputValues[i] * (this->inputWeights[i] * (1.0 - this->dropout_rate));
-  }
 
   double activated;
   // 得られた重み付き和を活性化関数に入れて出力を得る
@@ -146,7 +146,7 @@ double Neuron::activation_identity(double x) {
  * @param x 入力
  * @return 計算結果
  */
-double Neuron::activation_sigmoid(double x){
+double Neuron::activation_sigmoid(double x) {
   return 1.0 / (1.0 + pow(M_E, -x));
 }
 
@@ -165,7 +165,7 @@ double Neuron::activation_tanh(double x) {
  * @return 計算結果
  */
 double Neuron::activation_relu(double x) {
-  return std::max(0.0, x);
+  return max(0.0, x);
 }
 
 /**
@@ -173,7 +173,7 @@ double Neuron::activation_relu(double x) {
  * @param i 入力インデックス
  * @return 結合荷重
  */
-double Neuron::getInputWeightIndexOf(int i){
+double Neuron::getInputWeightIndexOf(int i) {
   return this->inputWeights[i];
 }
 
@@ -192,10 +192,6 @@ double Neuron::getDelta() {
   return this->delta;
 }
 
-//double Neuron::getGIndexOf(int i){
-//  return this->g[i];
-//}
-
 double Neuron::getMIndexOf(int i) {
   return this->m[i];
 }
@@ -204,7 +200,7 @@ double Neuron::getNuIndexOf(int i) {
   return this->nu[i];
 }
 
-double Neuron::getMHatIndexOf(int i){
+double Neuron::getMHatIndexOf(int i) {
   return this->m_hat[i];
 }
 

@@ -22,9 +22,7 @@ class ConvertArrayAndString {
 
     // aaa   bbb   ccc
     for (String[] i : input) {
-      for (String j : i) {
-        join += j + ",";
-      }
+      for (String j : i) join += j + ",";
       join += "'";
     }
     // a,a,a,'b,b,b,'c,c,c,'

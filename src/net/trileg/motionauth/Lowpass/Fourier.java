@@ -32,11 +32,7 @@ public class Fourier {
     DoubleFFT_1D realfft = new DoubleFFT_1D(data[0][0].length);
 
     // Execute forward fourier transform
-    for (double[][] i : data) {
-      for (double[] j : i) {
-        realfft.realForward(j);
-      }
-    }
+    for (double[][] i : data) for (double[] j : i) realfft.realForward(j);
 
     double[][][] real = new double[data.length][NUM_AXIS][data[0][0].length / 2];
     double[][][] imaginary = new double[data.length][NUM_AXIS][data[0][0].length / 2];
@@ -66,30 +62,21 @@ public class Fourier {
 
     double[][][] power = new double[data.length][NUM_AXIS][data[0][0].length / 2];
 
-    for (int time = 0; time < data.length; time++) {
-      for (int axis = 0; axis < NUM_AXIS; axis++) {
-        for (int item = 0; item < data[time][axis].length / 2; item++) {
-          power[time][axis][item] = Math.sqrt(Math.pow(real[time][axis][item], 2) + Math.pow(imaginary[time][axis][item], 2));
-        }
-      }
-    }
+    for (int time = 0; time < data.length; time++)
+      for (int axis = 0; axis < NUM_AXIS; axis++)
+        for (int item = 0; item < data[time][axis].length / 2; item++)
+          power[time][axis][item] = Math.sqrt(Math.pow(real[time][axis][item], 2)
+                                              + Math.pow(imaginary[time][axis][item], 2));
 
     manageData.writeDoubleThreeArrayData(userName, "ResultFFT", "powerFFT" + sensorName, power);
 
     // Low pass filtering
-    for (int time = 0; time < data.length; time++) {
-      for (int axis = 0; axis < NUM_AXIS; axis++) {
-        for (int item = 0; item < data[time][axis].length; item++) {
+    for (int time = 0; time < data.length; time++)
+      for (int axis = 0; axis < NUM_AXIS; axis++)
+        for (int item = 0; item < data[time][axis].length; item++)
           if (item > 30) data[time][axis][item] = 0;
-        }
-      }
-    }
 
-    for (double[][] i : data) {
-      for (double[] j : i) {
-        realfft.realInverse(j, true);
-      }
-    }
+    for (double[][] i : data) for (double[] j : i) realfft.realInverse(j, true);
 
     manageData.writeDoubleThreeArrayData(userName, "AfterFFT", sensorName, data);
 
@@ -131,7 +118,6 @@ public class Fourier {
           imaginary[axis][countImaginary] = data[axis][item];
           countImaginary++;
         }
-
       }
     }
 
@@ -139,20 +125,17 @@ public class Fourier {
     manageData.writeDoubleTwoArrayData(userName, "ResultFFT", "iFFT" + sensorName, imaginary);
 
     double[][] power = new double[NUM_AXIS][data[0].length / 2];
-    for (int axis = 0; axis < NUM_AXIS; axis++) {
-      for (int item = 0; item < data[axis].length / 2; item++) {
-        power[axis][item] = Math.sqrt(Math.pow(real[axis][item], 2) + Math.pow(imaginary[axis][item], 2));
-      }
-    }
+    for (int axis = 0; axis < NUM_AXIS; axis++)
+      for (int item = 0; item < data[axis].length / 2; item++)
+        power[axis][item] = Math.sqrt(Math.pow(real[axis][item], 2)
+                                      + Math.pow(imaginary[axis][item], 2));
 
     manageData.writeDoubleTwoArrayData(userName, "ResultFFT", "powerFFT" + sensorName, power);
 
     // Low pass filtering
-    for (int axis = 0; axis < NUM_AXIS; axis++) {
-      for (int item = 0; item < data[axis].length; item++) {
+    for (int axis = 0; axis < NUM_AXIS; axis++)
+      for (int item = 0; item < data[axis].length; item++)
         if (item > 30) data[axis][item] = 0;
-      }
-    }
 
     // Execute inverse fourier transform
     for (double[] i : data) realfft.realInverse(i, true);

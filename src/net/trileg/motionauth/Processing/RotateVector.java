@@ -45,7 +45,8 @@ public class RotateVector {
    * @param yaw ヨー
    * @return 回転させた距離データ
    */
-  private double[] combine(double distanceX, double distanceY, double distanceZ, double pitch, double roll, double yaw) {
+  private double[] combine(double distanceX, double distanceY, double distanceZ,
+                           double pitch, double roll, double yaw) {
     log(INFO);
     double sinPitch = round(sin(pitch));
     double cosPitch = round(cos(pitch));

@@ -90,7 +90,7 @@ public class RegistrantList extends Activity {
         // Get item value which selected.
         item = lv.getItemAtPosition(position).toString();
 
-        RegistrantList.this.moveActivity(getPackageName(), getPackageName() + ".ViewDataList.ViewRegisteredData", true);
+        moveActivity(getPackageName(), getPackageName() + ".ViewDataList.ViewRegisteredData", true);
       }
     });
   }
@@ -110,8 +110,7 @@ public class RegistrantList extends Activity {
     ArrayList<String> keyList = new ArrayList<>();
 
     Map<String, ?> allEntries = preferences.getAll();
-    for (Map.Entry<String, ?> entry : allEntries.entrySet())
-      keyList.add(entry.getKey());
+    for (Map.Entry<String, ?> entry : allEntries.entrySet()) keyList.add(entry.getKey());
 
     return keyList;
   }

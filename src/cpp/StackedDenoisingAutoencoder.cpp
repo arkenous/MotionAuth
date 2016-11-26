@@ -8,31 +8,32 @@
 
 using namespace std;
 
-StackedDenoisingAutoencoder::StackedDenoisingAutoencoder() {}
+StackedDenoisingAutoencoder::StackedDenoisingAutoencoder() { }
 
-std::string StackedDenoisingAutoencoder::learn(const std::vector<std::vector<double>> input,
-                                               const unsigned long result_num_dimen, const float compression_rate) {
-  std::stringstream ss;
+string StackedDenoisingAutoencoder::learn(const vector<vector<double>> input,
+                                          const unsigned long result_num_dimen,
+                                          const float compression_rate) {
+  stringstream ss;
 
-  std::vector<std::vector<double>> answer(input);
-  std::vector<std::vector<double>> noisy_input = add_noise(input, 0.1);
+  vector<vector<double>> answer(input);
+  vector<vector<double>> noisy_input = add_noise(input, 0.1);
   DenoisingAutoencoder denoisingAutoencoder(noisy_input[0].size(), compression_rate);
   ss << denoisingAutoencoder.learn(answer, noisy_input) << ':';
   num_middle_neurons = denoisingAutoencoder.getCurrentMiddleNeuronNum();
 
-  __android_log_print(ANDROID_LOG_DEBUG, "SdA", "num_middle_neurons: %lu", num_middle_neurons);
+  __android_log_print(ANDROID_LOG_INFO, "SdA", "num_middle_neurons: %lu", num_middle_neurons);
 
   while (num_middle_neurons > result_num_dimen) {
-    answer = std::vector<std::vector<double>>(noisy_input);
+    answer = vector<vector<double>>(noisy_input);
     noisy_input = add_noise(denoisingAutoencoder.getMiddleOutput(noisy_input), 0.1);
     denoisingAutoencoder = DenoisingAutoencoder(noisy_input[0].size(), compression_rate);
     ss << denoisingAutoencoder.learn(answer, noisy_input) << ':';
     num_middle_neurons = denoisingAutoencoder.getCurrentMiddleNeuronNum();
-    __android_log_print(ANDROID_LOG_DEBUG, "SdA", "num_middle_neurons: %lu", num_middle_neurons);
+    __android_log_print(ANDROID_LOG_INFO, "SdA", "num_middle_neurons: %lu", num_middle_neurons);
   }
 
   // 末尾の余計な : を削除する
-  std::string result = ss.str();
+  string result = ss.str();
   result.pop_back();
   ss.str("");
   ss.clear(stringstream::goodbit);
@@ -48,18 +49,16 @@ std::string StackedDenoisingAutoencoder::learn(const std::vector<std::vector<dou
  * @param rate ノイズをのせる確率
  * @return ノイズをのせたデータ
  */
-std::vector<std::vector<double>> StackedDenoisingAutoencoder::add_noise(std::vector<std::vector<double>> input,
-                                                                        float rate) {
-  std::random_device rnd;
-  std::mt19937 mt;
+vector<vector<double>> StackedDenoisingAutoencoder::add_noise(vector<vector<double>> input,
+                                                              float rate) {
+  random_device rnd;
+  mt19937 mt;
   mt.seed(rnd());
-  std::uniform_real_distribution<double> real_rnd(0.0, 1.0);
+  uniform_real_distribution<double> real_rnd(0.0, 1.0);
 
-  for (int i = 0; i < input.size(); ++i) {
-    for (int j = 0; j < input[i].size(); ++j) {
+  for (int i = 0; i < input.size(); ++i)
+    for (int j = 0; j < input[i].size(); ++j)
       if (real_rnd(mt) < rate) input[i][j] = 0.0;
-    }
-  }
 
   return input;
 }

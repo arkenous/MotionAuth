@@ -1,6 +1,3 @@
-//
-// Created by Kensuke Kosaka on 2016/11/03.
-//
 
 #include "JniCppUtil.h"
 
@@ -8,25 +5,28 @@
 extern "C" {
 #endif
 
+using namespace std;
+
 /**
  * double型二次元配列が入ったjobjectArrayをdouble型二次元vectorに変換する
  */
-std::vector<std::vector<double>> jobjectArrayToTwoDimenDoubleVector(JNIEnv *env, jobjectArray input) {
+vector<vector<double>> jobjectArrayToTwoDimenDoubleVector(JNIEnv *env, jobjectArray input) {
   int len1 = env->GetArrayLength(input); // 配列一次元目の長さ取得
 
-  std::vector<std::vector<double>> output;
+  vector<vector<double>> output;
   if (len1 <= 0) return output;
 
-  jdoubleArray dim = (jdoubleArray)env->GetObjectArrayElement(input, 0); // 配列0番目のオブジェクトをjdoubleArrayにキャストして取得
+  // 配列0番目のオブジェクトをjdoubleArrayにキャストして取得
+  jdoubleArray dim = (jdoubleArray) env->GetObjectArrayElement(input, 0);
+
   int len2 = env->GetArrayLength(dim); // 配列二次元目の長さ取得
 
-  std::vector<double> tmp;
+  vector<double> tmp;
   for (int i = 0; i < len1; ++i) {
-    jdoubleArray oneDim = (jdoubleArray)env->GetObjectArrayElement(input, i); // 配列i番目のオブジェクトをjdoubleArrayにキャストして取得
+    // 配列i番目のオブジェクトをjdoubleArrayにキャストして取得
+    jdoubleArray oneDim = (jdoubleArray) env->GetObjectArrayElement(input, i);
     jdouble *element = env->GetDoubleArrayElements(oneDim, 0); // jdoubleArray要素を取得する
-    for (int j = 0; j < len2; ++j) {
-      tmp.push_back(element[j]);
-    }
+    for (int j = 0; j < len2; ++j) tmp.push_back(element[j]);
     output.push_back(tmp);
     tmp.clear();
     env->ReleaseDoubleArrayElements(oneDim, element, 0);
@@ -38,16 +38,14 @@ std::vector<std::vector<double>> jobjectArrayToTwoDimenDoubleVector(JNIEnv *env,
 /**
  * double型一次元配列が入ったjdoubleArrayをdouble型一次元vectorに変換する
  */
-std::vector<double> jdoubleArrayToOneDimenDoubleVector(JNIEnv *env, jdoubleArray input) {
+vector<double> jdoubleArrayToOneDimenDoubleVector(JNIEnv *env, jdoubleArray input) {
   int len = env->GetArrayLength(input); // 配列の長さ取得
 
-  std::vector<double> output;
+  vector<double> output;
   if (len <= 0) return output;
 
   jdouble *element = env->GetDoubleArrayElements(input, 0);
-  for (int i = 0; i < len; ++i) {
-    output.push_back(element[i]);
-  }
+  for (int i = 0; i < len; ++i) output.push_back(element[i]);
   env->ReleaseDoubleArrayElements(input, element, 0);
 
   return output;
@@ -56,15 +54,15 @@ std::vector<double> jdoubleArrayToOneDimenDoubleVector(JNIEnv *env, jdoubleArray
 /**
  * String型一次元配列が入ったjobjectArrayをstring型一次元vectorに変換する
  */
-std::vector<std::string> jobjectArrayToOneDimenStringVector(JNIEnv *env, jobjectArray input) {
+vector<string> jobjectArrayToOneDimenStringVector(JNIEnv *env, jobjectArray input) {
   int len = env->GetArrayLength(input); // 配列の長さ取得
 
-  std::vector<std::string> output;
+  vector<string> output;
   if (len <= 0) return output;
 
   jstring tmp;
   for (int i = 0; i < len; ++i) {
-    tmp = (jstring)env->GetObjectArrayElement(input, i);
+    tmp = (jstring) env->GetObjectArrayElement(input, i);
     const char *c = env->GetStringUTFChars(tmp, 0);
     output.push_back(c);
     env->ReleaseStringUTFChars(tmp, c);
@@ -76,8 +74,8 @@ std::vector<std::string> jobjectArrayToOneDimenStringVector(JNIEnv *env, jobject
 /**
  * jstring型をstring型に変換する
  */
-std::string jstringToString(JNIEnv *env, jstring input) {
-  std::string output;
+string jstringToString(JNIEnv *env, jstring input) {
+  string output;
   const char *c = env->GetStringUTFChars(input, 0);
   output = c;
   env->ReleaseStringUTFChars(input, c);
@@ -87,20 +85,19 @@ std::string jstringToString(JNIEnv *env, jstring input) {
 /**
  * double型二次元vectorをdouble型二次元配列が入ったjobjectArrayに変換する
  */
-jobjectArray twoDimenDoubleVectorToJOBjectArray(JNIEnv *env, std::vector<std::vector<double>> input) {
+jobjectArray twoDimenDoubleVectorToJOBjectArray(JNIEnv *env, vector<vector<double>> input) {
   double tmp[input.size()][input[0].size()];
-  for (int i = 0; i < input.size(); ++i) {
-    for (int j = 0; j < input[i].size(); ++j) {
+  for (int i = 0; i < input.size(); ++i)
+    for (int j = 0; j < input[i].size(); ++j)
       tmp[i][j] = input[i][j];
-    }
-  }
 
   int len1 = sizeof(tmp) / sizeof(tmp[0]);
   int len2 = sizeof(tmp[0]) / sizeof(tmp[0][0]);
 
   jclass doubleArray1DClass = env->FindClass("[D");
 
-  jobjectArray array2D = env->NewObjectArray(len1, doubleArray1DClass, NULL); // 二次元配列オブジェクトの作成
+  // 二次元配列オブジェクトの作成
+  jobjectArray array2D = env->NewObjectArray(len1, doubleArray1DClass, NULL);
   for (jint i = 0; i < len1; ++i) {
     jdoubleArray array1D = env->NewDoubleArray(len2); // 一次元配列オブジェクトの作成
     env->SetDoubleArrayRegion(array1D, 0, len2, tmp[i]); // 一次元配列オブジェクトに配列をセット
@@ -113,11 +110,9 @@ jobjectArray twoDimenDoubleVectorToJOBjectArray(JNIEnv *env, std::vector<std::ve
 /**
  * double型一次元vectorをjdoubleArray型に変換する
  */
-jdoubleArray oneDimenDoubleVectorToJDoubleArray(JNIEnv *env, std::vector<double> input) {
+jdoubleArray oneDimenDoubleVectorToJDoubleArray(JNIEnv *env, vector<double> input) {
   double tmp[input.size()];
-  for (int i = 0; i < input.size(); ++i) {
-    tmp[i] = input[i];
-  }
+  for (int i = 0; i < input.size(); ++i) tmp[i] = input[i];
 
   int len = sizeof(tmp) / sizeof(tmp[0]);
 
@@ -130,8 +125,8 @@ jdoubleArray oneDimenDoubleVectorToJDoubleArray(JNIEnv *env, std::vector<double>
 /**
  * string型一次元vectorをString型一次元配列が入ったjobjectArrayに変換する
  */
-jobjectArray oneDimenStringVectorToJObjectArray(JNIEnv *env, std::vector<std::string> input) {
-  int len = (int)input.size();
+jobjectArray oneDimenStringVectorToJObjectArray(JNIEnv *env, vector<string> input) {
+  int len = (int) input.size();
   jclass stringClass = env->FindClass("java/lang/String");
   jobjectArray array1D = env->NewObjectArray(len, stringClass, NULL);
 
@@ -147,7 +142,7 @@ jobjectArray oneDimenStringVectorToJObjectArray(JNIEnv *env, std::vector<std::st
 /**
  * string型をjstring型に変換する
  */
-jstring stringToJString(JNIEnv *env, std::string input) {
+jstring stringToJString(JNIEnv *env, string input) {
   return env->NewStringUTF(input.c_str());
 }
 

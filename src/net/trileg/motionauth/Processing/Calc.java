@@ -23,13 +23,10 @@ public class Calc {
 
     double[][][] returnVal = new double[inputVal.length][NUM_AXIS][inputVal[0][0].length];
 
-    for (int time = 0; time < inputVal.length; time++) {
-      for (int axis = 0; axis < NUM_AXIS; axis++) {
-        for (int item = 0; item < inputVal[time][axis].length; item++) {
+    for (int time = 0; time < inputVal.length; time++)
+      for (int axis = 0; axis < NUM_AXIS; axis++)
+        for (int item = 0; item < inputVal[time][axis].length; item++)
           returnVal[time][axis][item] = (inputVal[time][axis][item] * t * t) / 2;
-        }
-      }
-    }
 
     return returnVal;
   }
@@ -47,13 +44,10 @@ public class Calc {
 
     double[][][] returnVal = new double[inputVal.length][NUM_AXIS][inputVal[0][0].length];
 
-    for (int time = 0; time < inputVal.length; time++) {
-      for (int axis = 0; axis < NUM_AXIS; axis++) {
-        for (int item = 0; item < inputVal[time][axis].length; item++) {
+    for (int time = 0; time < inputVal.length; time++)
+      for (int axis = 0; axis < NUM_AXIS; axis++)
+        for (int item = 0; item < inputVal[time][axis].length; item++)
           returnVal[time][axis][item] = (inputVal[time][axis][item] * t);
-        }
-      }
-    }
 
     return returnVal;
   }
@@ -71,11 +65,9 @@ public class Calc {
 
     double[][] returnVal = new double[NUM_AXIS][inputVal[0].length];
 
-    for (int axis = 0; axis < NUM_AXIS; axis++) {
-      for (int item = 0; item < inputVal[axis].length; item++) {
+    for (int axis = 0; axis < NUM_AXIS; axis++)
+      for (int item = 0; item < inputVal[axis].length; item++)
         returnVal[axis][item] = (inputVal[axis][item] * t * t) / 2;
-      }
-    }
 
     return returnVal;
   }
@@ -93,11 +85,9 @@ public class Calc {
 
     double[][] returnVal = new double[NUM_AXIS][inputVal[0].length];
 
-    for (int axis = 0; axis < NUM_AXIS; axis++) {
-      for (int item = 0; item < inputVal[axis].length; item++) {
+    for (int axis = 0; axis < NUM_AXIS; axis++)
+      for (int item = 0; item < inputVal[axis].length; item++)
         returnVal[axis][item] = (inputVal[axis][item] * t);
-      }
-    }
 
     return returnVal;
   }

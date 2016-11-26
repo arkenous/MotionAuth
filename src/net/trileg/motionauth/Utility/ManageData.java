@@ -28,14 +28,16 @@ public class ManageData {
 
 
   /**
-   * Write double type single data into sd card. SD_PATH/APP_NAME/userName/className/fileName.dat
+   * Write double type single data into sd card.
+   * SD_PATH/APP_NAME/userName/className/fileName.dat
    * @param userName User name
    * @param className Data class name
    * @param fileName File name
    * @param data Double type single data
    * @return Return true when succeeded writing data, otherwise false
    */
-  public boolean writeDoubleSingleData(String userName, String className, String fileName, double data) {
+  public boolean writeDoubleSingleData(String userName, String className,
+                                       String fileName, double data) {
     log(INFO);
 
     String status = Environment.getExternalStorageState();
@@ -45,16 +47,13 @@ public class ManageData {
     }
 
     String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-    String FOLDER_PATH = SD_PATH + separator + APP_NAME + separator + userName + separator + className;
+    String FOLDER_PATH = SD_PATH + separator + APP_NAME
+                         + separator + userName + separator + className;
 
     File file = new File(FOLDER_PATH);
 
     try {
-      if (!file.exists()) {
-        if (!file.mkdirs()) {
-          log(ERROR, "Make directory error");
-        }
-      }
+      if (!file.exists()) if (!file.mkdirs()) log(ERROR, "Make directory error");
     } catch (Exception e) {
       log(ERROR, e.getMessage(), e.getCause());
       return false;
@@ -83,14 +82,16 @@ public class ManageData {
   }
 
   /**
-   * Write one dimension double type array data into sd card. SD_PATH/APP_NAME/userName/className/fileName.dat
+   * Write one dimension double type array data into sd card.
+   * SD_PATH/APP_NAME/userName/className/fileName.dat
    * @param userName User name
    * @param className Data class name
    * @param fileName File name
    * @param data one dimension double type array data
    * @return Return true when succeeded writing data, otherwise false
    */
-  public boolean writeDoubleOneArrayData(String userName, String className, String fileName, double[] data) {
+  public boolean writeDoubleOneArrayData(String userName, String className,
+                                         String fileName, double[] data) {
     log(INFO);
 
     String status = Environment.getExternalStorageState();
@@ -100,16 +101,13 @@ public class ManageData {
     }
 
     String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-    String FOLDER_PATH = SD_PATH + separator + APP_NAME + separator + userName + separator + className;
+    String FOLDER_PATH = SD_PATH + separator + APP_NAME
+                         + separator + userName + separator + className;
 
     File file = new File(FOLDER_PATH);
 
     try {
-      if (!file.exists()) {
-        if (!file.mkdirs()) {
-          log(ERROR, "Make directory error");
-        }
-      }
+      if (!file.exists()) if (!file.mkdirs()) log(ERROR, "Make directory error");
     } catch (Exception e) {
       log(ERROR, e.getMessage(), e.getCause());
       return false;
@@ -144,7 +142,8 @@ public class ManageData {
    * @param data       Double type 2-array data to write.
    * @return Return true when write data complete, otherwise false.
    */
-  public boolean writeDoubleTwoArrayData(String userName, String dataName, String sensorName, double[][] data) {
+  public boolean writeDoubleTwoArrayData(String userName, String dataName,
+                                         String sensorName, double[][] data) {
     log(INFO);
 
     String status = Environment.getExternalStorageState();
@@ -154,16 +153,13 @@ public class ManageData {
     }
 
     String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-    String FOLDER_PATH = SD_PATH + separator + APP_NAME + separator + userName + separator + dataName;
+    String FOLDER_PATH = SD_PATH + separator + APP_NAME
+                         + separator + userName + separator + dataName;
 
     File file = new File(FOLDER_PATH);
 
     try {
-      if (!file.exists()) {
-        if (!file.mkdirs()) {
-          log(ERROR, "Make directory error");
-        }
-      }
+      if (!file.exists()) if (!file.mkdirs()) log(ERROR, "Make directory error");
     } catch (Exception e) {
       log(ERROR, e.getMessage(), e.getCause());
       return false;
@@ -177,9 +173,8 @@ public class ManageData {
       osw = new OutputStreamWriter(fos, "UTF-8");
       bw = new BufferedWriter(osw);
 
-      for (int item = 0; item < data[0].length; item++) {
+      for (int item = 0; item < data[0].length; item++)
         bw.write(data[0][item] + "," + data[1][item] + "," + data[2][item] + ",\n");
-      }
 
       bw.flush();
       bw.close();
@@ -199,25 +194,21 @@ public class ManageData {
    * @param sensorName Sensor name.
    * @param data       Double type 3-array data to write.
    */
-  public void writeDoubleThreeArrayData(String userName, String dataName, String sensorName, double[][][] data) {
+  public void writeDoubleThreeArrayData(String userName, String dataName,
+                                        String sensorName, double[][][] data) {
     log(INFO);
 
     String status = Environment.getExternalStorageState();
-    if (!status.equals(MEDIA_MOUNTED)) {
-      log(ERROR, "SDCard not mounted");
-    }
+    if (!status.equals(MEDIA_MOUNTED)) log(ERROR, "SDCard not mounted");
 
     String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-    String FOLDER_PATH = SD_PATH + separator + APP_NAME + separator + userName + separator + dataName;
+    String FOLDER_PATH = SD_PATH + separator + APP_NAME
+                         + separator + userName + separator + dataName;
 
     File file = new File(FOLDER_PATH);
 
     try {
-      if (!file.exists()) {
-        if (!file.mkdirs()) {
-          log(ERROR, "Make directory Error");
-        }
-      }
+      if (!file.exists()) if (!file.mkdirs()) log(ERROR, "Make directory Error");
     } catch (Exception e) {
       log(ERROR, e.getMessage(), e.getCause());
     }
@@ -231,9 +222,10 @@ public class ManageData {
         osw = new OutputStreamWriter(fos, "UTF-8");
         bw = new BufferedWriter(osw);
 
-        for (int item = 0; item < data[time][0].length; item++) {
-          bw.write(data[time][0][item] + "," + data[time][1][item] + "," + data[time][2][item] + ",\n");
-        }
+        for (int item = 0; item < data[time][0].length; item++)
+          bw.write(data[time][0][item] + ","
+                   + data[time][1][item] + ","
+                   + data[time][2][item] + ",\n");
 
         bw.flush();
         bw.close();
@@ -254,18 +246,17 @@ public class ManageData {
    * @param learnResult Neuron parameters of SdA and MLP
    * @param context Caller context.
    */
-  public void writeRegisterData(String userName, double[][] averageVector, double ampValue, String[] learnResult, Context context) {
+  public void writeRegisterData(String userName, double[][] averageVector, double ampValue,
+                                String[] learnResult, Context context) {
     log(INFO);
 
     CipherCrypt mCipherCrypt = new CipherCrypt(context);
 
     String[][] averageVectorStr = new String[averageVector.length][averageVector[0].length];
 
-    for (int axis = 0; axis < NUM_AXIS; axis++) {
-      for (int item = 0; item < averageVector[axis].length; item++) {
+    for (int axis = 0; axis < NUM_AXIS; axis++)
+      for (int item = 0; item < averageVector[axis].length; item++)
         averageVectorStr[axis][item] = String.valueOf(averageVector[axis][item]);
-      }
-    }
 
     // 暗号化
     String[][] encryptedAverageVectorStr = mCipherCrypt.encrypt(averageVectorStr);
@@ -276,13 +267,15 @@ public class ManageData {
     ConvertArrayAndString mConvertArrayAndString = new ConvertArrayAndString();
     String registerVectorData = mConvertArrayAndString.arrayToString(encryptedAverageVectorStr);
 
-    SharedPreferences userPref = context.getApplicationContext().getSharedPreferences("UserList", MODE_PRIVATE);
+    SharedPreferences userPref
+        = context.getApplicationContext().getSharedPreferences("UserList", MODE_PRIVATE);
     SharedPreferences.Editor userPrefEditor = userPref.edit();
 
     userPrefEditor.putString(userName, "");
     userPrefEditor.apply();
 
-    SharedPreferences preferences = context.getApplicationContext().getSharedPreferences(APP_NAME, MODE_PRIVATE);
+    SharedPreferences preferences
+        = context.getApplicationContext().getSharedPreferences(APP_NAME, MODE_PRIVATE);
     SharedPreferences.Editor editor = preferences.edit();
 
     editor.putString(userName+"vector", registerVectorData);
@@ -338,15 +331,14 @@ public class ManageData {
     ConvertArrayAndString mConvertArrayAndString = new ConvertArrayAndString();
     CipherCrypt mCipherCrypt = new CipherCrypt(context);
 
-    String[][] decryptedVector = mCipherCrypt.decrypt(mConvertArrayAndString.stringToArray(registeredVectorData));
+    String[][] decryptedVector
+        = mCipherCrypt.decrypt(mConvertArrayAndString.stringToArray(registeredVectorData));
 
     double[][] vector = new double[decryptedVector.length][decryptedVector[0].length];
 
-    for (int axis = 0; axis < NUM_AXIS; axis++) {
-      for (int item = 0; item < decryptedVector[axis].length; item++) {
+    for (int axis = 0; axis < NUM_AXIS; axis++)
+      for (int item = 0; item < decryptedVector[axis].length; item++)
         vector[axis][item] = Double.valueOf(decryptedVector[axis][item]);
-      }
-    }
 
     return vector;
   }
@@ -409,7 +401,8 @@ public class ManageData {
    * @param sensorName Sensor name.
    * @param data       Float type 3-array list data.
    */
-  public void writeFloatData(String userName, String dataName, String sensorName, float[][][] data) {
+  public void writeFloatData(String userName, String dataName,
+                             String sensorName, float[][][] data) {
     log(INFO);
 
     if (!Environment.getExternalStorageState().equals(MEDIA_MOUNTED)) {
@@ -418,15 +411,12 @@ public class ManageData {
     }
 
     String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-    String DIR_PATH = SD_PATH + separator + APP_NAME + separator + userName + separator + dataName;
+    String DIR_PATH = SD_PATH + separator + APP_NAME
+                      + separator + userName + separator + dataName;
 
     File file = new File(DIR_PATH);
     try {
-      if (!file.exists()) {
-        if (!file.mkdirs()) {
-          log(DEBUG, "Make directory Error");
-        }
-      }
+      if (!file.exists()) if (!file.mkdirs()) log(DEBUG, "Make directory Error");
     } catch (Exception e) {
       log(ERROR, e.getMessage(), e.getCause());
     }
@@ -441,7 +431,9 @@ public class ManageData {
         bw = new BufferedWriter(osw);
 
         for (int item = 0; item < data[time][0].length; item++) {
-          bw.write(data[time][0][item] + "," + data[time][1][item] + "," + data[time][2][item] + ",\n");
+          bw.write(data[time][0][item] + ","
+                   + data[time][1][item] + ","
+                   + data[time][2][item] + ",\n");
         }
 
         bw.flush();
@@ -455,7 +447,8 @@ public class ManageData {
   }
 
 
-  public void writeFloatData(String userName, String dataName, String sensorName, float[][] data) {
+  public void writeFloatData(String userName, String dataName,
+                             String sensorName, float[][] data) {
     log(INFO);
 
     if (!Environment.getExternalStorageState().equals(MEDIA_MOUNTED)) {
@@ -464,15 +457,12 @@ public class ManageData {
     }
 
     String SD_PATH = Environment.getExternalStorageDirectory().getPath();
-    String DIR_PATH = SD_PATH + separator + APP_NAME + separator + userName + separator + dataName;
+    String DIR_PATH = SD_PATH + separator + APP_NAME
+                      + separator + userName + separator + dataName;
 
     File file = new File(DIR_PATH);
     try {
-      if (!file.exists()) {
-        if (!file.mkdirs()) {
-          log(DEBUG, "Make directory Error");
-        }
-      }
+      if (!file.exists()) if (!file.mkdirs()) log(DEBUG, "Make directory Error");
     } catch (Exception e) {
       log(ERROR, e.getMessage(), e.getCause());
     }

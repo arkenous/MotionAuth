@@ -168,9 +168,11 @@ public class Registration extends Activity {
    * @param gyroscope gyroscope data
    * @return return true if data length >= LEAST_MOTION_LENGTH
    */
-  private boolean checkDataLength(ArrayList<ArrayList<Float>> linearAcceleration, ArrayList<ArrayList<Float>> gyroscope) {
+  private boolean checkDataLength(ArrayList<ArrayList<Float>> linearAcceleration,
+                                  ArrayList<ArrayList<Float>> gyroscope) {
     log(INFO);
-    return (linearAcceleration.get(0).size() >= LEAST_MOTION_LENGTH || gyroscope.get(0).size() >= LEAST_MOTION_LENGTH);
+    return (linearAcceleration.get(0).size() >= LEAST_MOTION_LENGTH
+            || gyroscope.get(0).size() >= LEAST_MOTION_LENGTH);
   }
 
 
@@ -205,7 +207,8 @@ public class Registration extends Activity {
    * @param linearAcceleration Original linear acceleration data collecting from GetData.
    * @param gyro               Original gyroscope data collecting from GetData.
    */
-  void finishGetMotion(ArrayList<ArrayList<ArrayList<Float>>> linearAcceleration, ArrayList<ArrayList<ArrayList<Float>>> gyro) {
+  void finishGetMotion(ArrayList<ArrayList<ArrayList<Float>>> linearAcceleration,
+                       ArrayList<ArrayList<ArrayList<Float>>> gyro) {
     log(INFO);
     if (getMotion.isClickable()) getMotion.setClickable(false);
     second.setText("0");
@@ -225,8 +228,8 @@ public class Registration extends Activity {
     progressDialog.show();
 
     Result result = new Result(listToArray.listTo3DArray(linearAcceleration),
-        listToArray.listTo3DArray(gyro), getMotion, progressDialog,
-        checkRangeValue, ampValue, Registration.this);
+                               listToArray.listTo3DArray(gyro), getMotion, progressDialog,
+                               checkRangeValue, ampValue, Registration.this);
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     executorService.submit(result);
     executorService.shutdown();
@@ -285,11 +288,14 @@ public class Registration extends Activity {
       case R.id.change_get_times:
         if (getMotion.isClickable() && countTime == 0) {
           LayoutInflater inflater = LayoutInflater.from(Registration.this);
-          View seekView = inflater.inflate(R.layout.change_get_times, (ViewGroup) findViewById(R.id.dialog_root));
+          View seekView = inflater.inflate(R.layout.change_get_times,
+                                           (ViewGroup) findViewById(R.id.dialog_root));
 
           //region モーション取得回数変更
-          SeekBar getTimesSeekBar = (SeekBar) seekView.findViewById(R.id.change_get_times_seekbar);
-          final TextView getTimesSeekText = (TextView) seekView.findViewById(R.id.change_get_times_text);
+          SeekBar getTimesSeekBar
+              = (SeekBar) seekView.findViewById(R.id.change_get_times_seekbar);
+          final TextView getTimesSeekText
+              = (TextView) seekView.findViewById(R.id.change_get_times_text);
           getTimesSeekText.setText("モーションの取得回数を設定します．\n" +
               "回数が少ない場合，平均化されにくくなることで認証が通りづらくなる可能性があります．\n" +
               "デフォルトは3回です．現在の値は" + getTimes + "です．");
@@ -337,15 +343,16 @@ public class Registration extends Activity {
             }
           });
           dialog.show();
-        } else {
-          Toast.makeText(Registration.this, "取得回数の変更はモーション入力後には出来ません．", Toast.LENGTH_LONG).show();
-        }
+        } else
+          Toast.makeText(Registration.this, "取得回数の変更はモーション入力後には出来ません．",
+                         Toast.LENGTH_LONG).show();
         return true;
 
       case R.id.change_range_value:
         if (getMotion.isClickable()) {
           LayoutInflater inflater = LayoutInflater.from(Registration.this);
-          View seekView = inflater.inflate(R.layout.seekdialog, (ViewGroup) findViewById(R.id.dialog_root));
+          View seekView = inflater.inflate(R.layout.seekdialog,
+                                           (ViewGroup) findViewById(R.id.dialog_root));
 
           //region 閾値調整
           SeekBar thresholdSeekBar = (SeekBar) seekView.findViewById(R.id.threshold);
@@ -366,8 +373,7 @@ public class Registration extends Activity {
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
+            public void onStartTrackingTouch(SeekBar seekBar) {}
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -440,8 +446,7 @@ public class Registration extends Activity {
           alert.setMessage("本当にデータ取得をやり直しますか？");
           alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
+            public void onClick(DialogInterface dialog, int which) {}
           });
 
           alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {

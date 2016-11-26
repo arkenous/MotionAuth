@@ -30,9 +30,8 @@ public class CosSimilarity {
 
     // 取得回数AB, AC, BCそれぞれの類似度が出るはずなので，これから判断する
     log(DEBUG, "---   CosSimilarity data begin here   ---");
-    for (double data : similarity) {
+    for (double data : similarity)
       log(DEBUG, String.valueOf("similarity: " + data));
-    }
     log(DEBUG, "---   CosSimilarity data end here   ---");
 
     return similarity;
@@ -45,8 +44,10 @@ public class CosSimilarity {
 
     for (int item = 0; item < A[0].length; item++) {
       double AB = A[0][item] * B[0][item] + A[1][item] * B[1][item] + A[2][item] * B[2][item];
-      double sizeA = Math.sqrt(Math.pow(A[0][item], 2) + Math.pow(A[1][item], 2) + Math.pow(A[2][item], 2));
-      double sizeB = Math.sqrt(Math.pow(B[0][item], 2) + Math.pow(B[1][item], 2) + Math.pow(B[2][item], 2));
+      double sizeA = Math.sqrt(Math.pow(A[0][item], 2)
+                               + Math.pow(A[1][item], 2) + Math.pow(A[2][item], 2));
+      double sizeB = Math.sqrt(Math.pow(B[0][item], 2) + Math.pow(B[1][item], 2)
+                               + Math.pow(B[2][item], 2));
 
       similarity += AB / (sizeA * sizeB);
     }

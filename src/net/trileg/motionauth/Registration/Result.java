@@ -70,8 +70,8 @@ class Result extends Handler implements Runnable {
   }
 
 
-  Result(float[][][] linearAccel, float[][][] gyro, Button getMotion, ProgressDialog progressDialog,
-         double checkRange, double amp, Registration registration) {
+  Result(float[][][] linearAccel, float[][][] gyro, Button getMotion,
+         ProgressDialog progressDialog, double checkRange, double amp, Registration registration) {
     log(INFO);
     this.linearAccel = linearAccel;
     this.gyro = gyro;
@@ -199,8 +199,10 @@ class Result extends Handler implements Runnable {
     double[][][] linearAcceleration = formatter.convertFloatToDouble(linearAccel);
     double[][][] gyroscope = formatter.convertFloatToDouble(gyro);
 
-    manageData.writeDoubleThreeArrayData(userName, "RegFormatted", "linearAcceleration", linearAcceleration);
-    manageData.writeDoubleThreeArrayData(userName, "RegFormatted", "gyroscope", gyroscope);
+    manageData.writeDoubleThreeArrayData(userName, "RegFormatted",
+                                         "linearAcceleration", linearAcceleration);
+    manageData.writeDoubleThreeArrayData(userName, "RegFormatted",
+                                         "gyroscope", gyroscope);
 
     // データの増幅処理
     if (amplifier.CheckValueRange(linearAcceleration, checkRange)
@@ -210,16 +212,20 @@ class Result extends Handler implements Runnable {
       gyroscope = amplifier.Amplify(gyroscope, amp);
     }
 
-    manageData.writeDoubleThreeArrayData(userName, "RegAmplified", "linearAcceleration", linearAcceleration);
-    manageData.writeDoubleThreeArrayData(userName, "RegAmplified", "gyroscope", gyroscope);
+    manageData.writeDoubleThreeArrayData(userName, "RegAmplified",
+                                         "linearAcceleration", linearAcceleration);
+    manageData.writeDoubleThreeArrayData(userName, "RegAmplified",
+                                         "gyroscope", gyroscope);
 
     // フーリエ変換によるローパスフィルタ
     this.sendEmptyMessage(FOURIER);
     linearAcceleration = fourier.LowpassFilter(linearAcceleration, "LinearAcceleration", userName);
     gyroscope = fourier.LowpassFilter(gyroscope, "Gyroscope", userName);
 
-    manageData.writeDoubleThreeArrayData(userName, "RegLowpassed", "linearAcceleration", linearAcceleration);
-    manageData.writeDoubleThreeArrayData(userName, "RegLowpassed", "gyroscope", gyroscope);
+    manageData.writeDoubleThreeArrayData(userName, "RegLowpassed",
+                                         "linearAcceleration", linearAcceleration);
+    manageData.writeDoubleThreeArrayData(userName, "RegLowpassed",
+                                         "gyroscope", gyroscope);
 
     log(DEBUG, "Finish fourier");
 
@@ -228,17 +234,19 @@ class Result extends Handler implements Runnable {
     double[][][] linearDistance = calc.accelToDistance(linearAcceleration, Enum.SENSOR_DELAY_TIME);
     double[][][] angle = calc.gyroToAngle(gyroscope, Enum.SENSOR_DELAY_TIME);
 
-    manageData.writeDoubleThreeArrayData(userName, "RegConverted", "linearDistance", linearDistance);
-    manageData.writeDoubleThreeArrayData(userName, "RegConverted", "angle", angle);
+    manageData.writeDoubleThreeArrayData(userName, "RegConverted",
+                                         "linearDistance", linearDistance);
+    manageData.writeDoubleThreeArrayData(userName, "RegConverted",
+                                         "angle", angle);
 
     log(DEBUG, "After write data");
 
     // 変位データを角度データで回転させる
     RotateVector rotateVector = new RotateVector();
-    double[][][] vector = new double[linearDistance.length][linearDistance[0].length][linearDistance[0][0].length];
-    for (int time = 0; time < linearDistance.length; time++) {
+    double[][][] vector
+        = new double[linearDistance.length][linearDistance[0].length][linearDistance[0][0].length];
+    for (int time = 0; time < linearDistance.length; time++)
       vector[time] = rotateVector.rotate(linearDistance[time], angle[time]);
-    }
 
     manageData.writeDoubleThreeArrayData(userName, "RegCombined", "vector", vector);
 
@@ -285,7 +293,8 @@ class Result extends Handler implements Runnable {
 
         log(DEBUG, "MEASURE: " + String.valueOf(tmp));
 
-        manageData.writeDoubleThreeArrayData(userName, "RegDeviatedData" + String.valueOf(mode), "vector", vector);
+        manageData.writeDoubleThreeArrayData(userName, "RegDeviatedData" + String.valueOf(mode),
+                                             "vector", vector);
 
         if (tmp == Enum.MEASURE.PERFECT || tmp == Enum.MEASURE.CORRECT) break;
 
@@ -306,7 +315,8 @@ class Result extends Handler implements Runnable {
     averageVector = calculateAverage(vector);
 
     vectorCosSimilarity = cosSimilarity.cosSimilarity(vector);
-    manageData.writeDoubleOneArrayData(userName, "RegCosSimilarity", "vectorCosSimilarity", vectorCosSimilarity);
+    manageData.writeDoubleOneArrayData(userName, "RegCosSimilarity",
+                                       "vectorCosSimilarity", vectorCosSimilarity);
 
     measure = cosSimilarity.measure(vectorCosSimilarity);
     log(DEBUG, "measure = " + measure);
@@ -316,20 +326,17 @@ class Result extends Handler implements Runnable {
     // 取得したデータを，ニューラルネットワークの教師入力用に調整する
     double[][] x = manipulateMotionDataToNeuralNetwork(vector);
     double[][] answer = new double[x.length][1];
-    for (int time = 0; time < x.length; time++) {
-      answer[time][0] = 0.0;
-    }
+    for (int time = 0; time < x.length; time++) answer[time][0] = 0.0;
     String neuronParams = "";
 
     learnResult = learn(1, neuronParams, x, answer);
-    log(DEBUG, "learnResult: "+learnResult);
 
     // テストデータで期待した出力が得られるか確認する
     for (int set = 0; set < x.length; ++set) {
       double[] result = out(1, learnResult, x[set]);
       manageData.writeDoubleOneArrayData(userName, "RegNNOut", "set"+set, result);
       log(DEBUG, "set["+set+"] result[0]: "+result[0]);
-      if (result[0] > 0.1) return false;
+      if (result[0] > 0.001) return false;
     }
     return true;
     //endregion
@@ -365,7 +372,9 @@ class Result extends Handler implements Runnable {
     double[][] output = new double[input.length][input[0][0].length * 3]; // 入力回数 * (データ長 * 軸数）
 
     for (int time = 0; time < input.length; ++time) {
-      for (int data = 0, dataPerAxis = 0; data < input[time][0].length * 3; data += 3, dataPerAxis++) {
+      for (int data = 0, dataPerAxis = 0;
+           data < input[time][0].length * 3;
+           data += 3, dataPerAxis++) {
         output[time][data] = input[time][0][dataPerAxis];
         output[time][data + 1] = input[time][1][dataPerAxis];
         output[time][data + 2] = input[time][2][dataPerAxis];
@@ -384,7 +393,8 @@ class Result extends Handler implements Runnable {
    * @param answer 教師出力データ
    * @return SdAとMLPの学習済みニューロンパラメータ
    */
-  public native String[] learn(long middleLayer, String neuronParams, double[][] x, double[][] answer);
+  public native String[] learn(long middleLayer, String neuronParams,
+                               double[][] x, double[][] answer);
 
   /**
    * C++ネイティブのニューラルネットワーク出力メソッド

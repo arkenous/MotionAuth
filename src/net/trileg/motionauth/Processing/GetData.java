@@ -20,7 +20,8 @@ import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
 import static net.trileg.motionauth.Utility.Enum.SENSOR_DELAY_TIME;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
-public class GetData extends Handler implements Callable<ArrayList<ArrayList<Float>>>, SensorEventListener {
+public class GetData extends Handler implements Callable<ArrayList<ArrayList<Float>>>,
+                                                SensorEventListener {
   private SensorManager sensorManager;
   private Sensor linearAcceleration;
   private Sensor gyroscope;
@@ -38,7 +39,8 @@ public class GetData extends Handler implements Callable<ArrayList<ArrayList<Flo
     firstMillis = 0;
     this.isAcceleration = isAcceleration;
     this.sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-    if (this.isAcceleration) this.linearAcceleration = sensorManager.getDefaultSensor(TYPE_LINEAR_ACCELERATION);
+    if (this.isAcceleration) this.linearAcceleration
+        = sensorManager.getDefaultSensor(TYPE_LINEAR_ACCELERATION);
     else this.gyroscope = sensorManager.getDefaultSensor(TYPE_GYROSCOPE);
 
     dataPerTime.clear();
@@ -99,8 +101,10 @@ public class GetData extends Handler implements Callable<ArrayList<ArrayList<Flo
    */
   private void registerSensor() {
     log(INFO);
-    if (this.isAcceleration) sensorManager.registerListener(this, linearAcceleration, SENSOR_DELAY_FASTEST);
-    else sensorManager.registerListener(this, gyroscope, SENSOR_DELAY_FASTEST);
+    if (this.isAcceleration)
+      sensorManager.registerListener(this, linearAcceleration, SENSOR_DELAY_FASTEST);
+    else
+      sensorManager.registerListener(this, gyroscope, SENSOR_DELAY_FASTEST);
     isActive = true;
   }
 

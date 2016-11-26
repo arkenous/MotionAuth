@@ -86,11 +86,9 @@ public class ViewRegisteredData extends Activity {
     double[][] readVector = mManageData.readRegisteredData(ViewRegisteredData.this, item);
 
     String[][] registeredVector = new String[readVector.length][readVector[0].length];
-    for (int axis = 0; axis < NUM_AXIS; axis++) {
-      for (int item = 0; item < readVector[axis].length; item++) {
+    for (int axis = 0; axis < NUM_AXIS; axis++)
+      for (int item = 0; item < readVector[axis].length; item++)
         registeredVector[axis][item] = String.valueOf(readVector[axis][item]);
-      }
-    }
 
     Context mContext = ViewRegisteredData.this.getApplicationContext();
     SharedPreferences preferences = mContext.getSharedPreferences("MotionAuth", MODE_PRIVATE);
@@ -113,9 +111,8 @@ public class ViewRegisteredData extends Activity {
           index = "VectorZ";
           break;
       }
-      for (int item = 0; item < registeredVector[axis].length; item++) {
+      for (int item = 0; item < registeredVector[axis].length; item++)
         dataList.add(index + " : " + registeredVector[axis][item] + " : " + ampValue);
-      }
     }
 
     return dataList;

@@ -76,7 +76,8 @@ public class InputName extends Activity {
       public boolean onKey(View v, int keyCode, KeyEvent event) {
         if (event.getAction() == ACTION_DOWN && keyCode == KEYCODE_ENTER) {
           log(DEBUG, "Push enter key");
-          InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+          InputMethodManager inputMethodManager
+              = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
           inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
           return true;

@@ -1,6 +1,3 @@
-//
-// Created by Kensuke Kosaka on 2016/11/03.
-//
 
 #ifndef MOTIONAUTH_JNICPPUTIL_H
 #define MOTIONAUTH_JNICPPUTIL_H
@@ -14,15 +11,16 @@ extern "C" {
 
 #include <jni.h>
 
-std::vector<std::vector<double>> jobjectArrayToTwoDimenDoubleVector(JNIEnv *env, jobjectArray input);
-std::vector<double> jdoubleArrayToOneDimenDoubleVector(JNIEnv *env, jdoubleArray input);
-std::vector<std::string> jobjectArrayToOneDimenStringVector(JNIEnv *env, jobjectArray input);
-std::string jstringToString(JNIEnv *env, jstring input);
-jobjectArray twoDimenDoubleVectorToJOBjectArray(JNIEnv *env, std::vector<std::vector<double>> input);
-jdoubleArray oneDimenDoubleVectorToJDoubleArray(JNIEnv *env, std::vector<double> input);
-jobjectArray oneDimenStringVectorToJObjectArray(JNIEnv *env, std::vector<std::string> input);
-jstring stringToJString(JNIEnv *env, std::string input);
+using namespace std;
 
+vector<vector<double>> jobjectArrayToTwoDimenDoubleVector(JNIEnv *env, jobjectArray input);
+vector<double> jdoubleArrayToOneDimenDoubleVector(JNIEnv *env, jdoubleArray input);
+vector<string> jobjectArrayToOneDimenStringVector(JNIEnv *env, jobjectArray input);
+string jstringToString(JNIEnv *env, jstring input);
+jobjectArray twoDimenDoubleVectorToJOBjectArray(JNIEnv *env, vector<vector<double>> input);
+jdoubleArray oneDimenDoubleVectorToJDoubleArray(JNIEnv *env, vector<double> input);
+jobjectArray oneDimenStringVectorToJObjectArray(JNIEnv *env, vector<string> input);
+jstring stringToJString(JNIEnv *env, string input);
 
 #ifdef __cplusplus
 }

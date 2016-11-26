@@ -1,6 +1,3 @@
-//
-// Created by Kensuke Kosaka on 2016/11/23.
-//
 
 #ifndef MOTIONAUTH_DENOISINGAUTOENCODER_H
 #define MOTIONAUTH_DENOISINGAUTOENCODER_H
@@ -10,15 +7,16 @@
 #include <vector>
 #include "Neuron.h"
 
+using namespace std;
+
 class DenoisingAutoencoder {
-public:
+ public:
   DenoisingAutoencoder(unsigned long num_input, float compression_rate);
-  std::string learn(std::vector<std::vector<double>> input, std::vector<std::vector<double>> noisy_input);
-  std::vector<double> out(std::vector<double> input, bool showResult);
-  std::vector<std::vector<double>> getMiddleOutput(std::vector<std::vector<double>> noisy_input);
+  string learn(vector<vector<double>> input, vector<vector<double>> noisy_input);
+  vector<vector<double>> getMiddleOutput(vector<vector<double>> noisy_input);
   unsigned long getCurrentMiddleNeuronNum();
 
-private:
+ private:
   static const unsigned int MAX_TRIAL = 10000; // 学習上限回数
   constexpr static const double MAX_GAP = 30.0; // 損失関数の出力がこの値以下になれば学習をスキップする
   int num_thread = android_getCpuCount(); // Androidデバイスのプロセッサのコア数
@@ -31,20 +29,20 @@ private:
 
   bool successFlg = true;
 
-  std::vector<Neuron> middle_neurons;
-  std::vector<Neuron> output_neurons;
+  vector<Neuron> middle_neurons;
+  vector<Neuron> output_neurons;
 
-  std::vector<double> h; // 中間層の出力値
-  std::vector<double> o; // 出力層の出力値
-  std::vector<double> learned_h;
-  std::vector<double> learned_o;
+  vector<double> h; // 中間層の出力値
+  vector<double> o; // 出力層の出力値
+  vector<double> learned_h;
+  vector<double> learned_o;
 
-  void middleForwardThread(const std::vector<double> in, const int begin, const int end);
+  void middleForwardThread(const vector<double> in, const int begin, const int end);
   void outForwardThread(const int begin, const int end);
-  void outLearnThread(const std::vector<double> in, const std::vector<double> ans, const int begin, const int end);
-  void middleLearnThread(const std::vector<double> in, const int begin, const int end);
-  void middleOutThread(const std::vector<double> in, const int begin, const int end);
-  void outOutThread(const int begin, const int end);
+  void outLearnThread(const vector<double> in, const vector<double> ans,
+                      const int begin, const int end);
+  void middleLearnThread(const vector<double> in, const int begin, const int end);
+  void middleOutThread(const vector<double> in, const int begin, const int end);
 
   double mean_squared_error(double output, double answer);
 };

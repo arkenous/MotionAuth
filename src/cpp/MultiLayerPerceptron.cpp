@@ -52,7 +52,7 @@ void MultiLayerPerceptron::setupSdA(string sda_params) {
   for (int dA = 0; dA < elems_per_dA.size(); ++dA) {
     // ' でニューロン単位で分割する
     ss = stringstream(elems_per_dA[dA]);
-    while (getline(ss, item, '\'')) if (!item.empty()) elems_per_neuron.push_back(item);
+    while (std::getline(ss, item, '\'')) if (!item.empty()) elems_per_neuron.push_back(item);
     sda_neurons[dA].resize(elems_per_neuron.size());
     sda_out[dA].resize(elems_per_neuron.size());
     item = "";
@@ -152,7 +152,7 @@ void MultiLayerPerceptron::setupMLP(string mlp_params, double dropout_rate) {
     for (int layer = 0; layer < elems_per_layer.size(); ++layer) {
       // ' でニューロン単位で分割する
       ss = stringstream(elems_per_layer[layer]);
-      while (getline(ss, item, '\'')) if (!item.empty()) elems_per_neuron.push_back(item);
+      while (std::getline(ss, item, '\'')) if (!item.empty()) elems_per_neuron.push_back(item);
       middleNeurons[layer].resize(elems_per_neuron.size());
       h[layer].resize(elems_per_neuron.size());
       learned_h[layer].resize(elems_per_neuron.size());
@@ -195,7 +195,7 @@ void MultiLayerPerceptron::setupMLP(string mlp_params, double dropout_rate) {
     ss = stringstream(out_layer_params);
 
     // ' でニューロン単位で分割する
-    while (getline(ss, item, '\'')) if (!item.empty()) elems_per_neuron.push_back(item);
+    while (std::getline(ss, item, '\'')) if (!item.empty()) elems_per_neuron.push_back(item);
     outputNeurons.resize(elems_per_neuron.size());
     o.resize(elems_per_neuron.size());
     learned_o.resize(elems_per_neuron.size());

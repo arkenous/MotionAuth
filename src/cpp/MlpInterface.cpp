@@ -88,6 +88,34 @@ JNIEXPORT jdoubleArray JNICALL Java_net_trileg_motionauth_Authentication_Result_
   return result;
 }
 
+JNIEXPORT jobjectArray JNICALL Java_net_trileg_motionauth_Authentication_Result_learn
+    (JNIEnv *env, jobject thiz, jlong middleLayer, jobjectArray neuronParams,
+     jobjectArray x, jobjectArray answer) {
+  // jstringをstringに変換する
+  vector<string> neuronParamsVector = jobjectArrayToOneDimenStringVector(env, neuronParams);
+  vector<vector<double>> xVector = jobjectArrayToTwoDimenDoubleVector(env, x);
+  vector<vector<double>> answerVector = jobjectArrayToTwoDimenDoubleVector(env, answer);
+
+  // 入力データを正規化する
+  for (int i = 0; i < xVector.size(); ++i) xVector[i] = normalize(xVector[i]);
+
+  // MultiLayerPerceptronインスタンスを用意する
+  MultiLayerPerceptron mlp(answerVector[0].size(), (unsigned long) middleLayer,
+                           neuronParamsVector, 1, 0.0);
+
+  vector<string> resultString = mlp.learn(xVector, answerVector);
+
+  while (isnan(mlp.out(xVector[0])[0])) {
+    mlp = MultiLayerPerceptron(answerVector[0].size(), (unsigned long) middleLayer,
+                               neuronParamsVector, 1, 0.0);
+    resultString = mlp.learn(xVector, answerVector);
+  }
+
+  jobjectArray result = oneDimenStringVectorToJObjectArray(env, resultString);
+
+  return result;
+}
+
 #ifdef __cplusplus
 }
 #endif

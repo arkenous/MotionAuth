@@ -43,7 +43,8 @@ class Result extends Handler implements Runnable {
   private static final int CONVERT = 5;
   private static final int COSINE_SIMILARITY = 6;
   private static final int NN_OUT = 7;
-  private static final int FINISH = 8;
+  private static final int RE_LEARN = 8;
+  private static final int FINISH = 9;
 
   private ManageData manageData = new ManageData();
   private Formatter formatter = new Formatter();
@@ -118,6 +119,9 @@ class Result extends Handler implements Runnable {
         break;
       case NN_OUT:
         progressDialog.setMessage("ニューラルネットワークの計算中");
+        break;
+      case RE_LEARN:
+        progressDialog.setMessage("ニューラルネットワークの追加学習中");
         break;
       case FINISH:
         progressDialog.dismiss();
@@ -224,6 +228,7 @@ class Result extends Handler implements Runnable {
     manageData.writeDoubleOneArrayData(userName, "AuthNNOut", "NNOut", result);
 
     // コサイン類似度を測る
+    this.sendEmptyMessage(COSINE_SIMILARITY);
     log(DEBUG, "Before Cosine Similarity");
     double vectorCosSimilarity = cosSimilarity.cosSimilarity(vector, registeredVector);
     log(DEBUG, "After Cosine Similarity");
@@ -231,7 +236,6 @@ class Result extends Handler implements Runnable {
     manageData.writeDoubleSingleData(userName, "AuthCosSimilarity",
                                      "vectorCosSimilarity", vectorCosSimilarity);
 
-    this.sendEmptyMessage(COSINE_SIMILARITY);
     Enum.MEASURE measure = cosSimilarity.measure(vectorCosSimilarity);
 
     // ニューラルネットワークの結果，正規モーションでないと判定された場合
@@ -242,8 +246,29 @@ class Result extends Handler implements Runnable {
     else {
       // コサイン類似度が0.4より高く，ニューラルネットワークの結果，正規モーションであると判定された場合
       if (measure == PERFECT || measure == CORRECT) {
-        //TODO コサイン類似度が0.6より高ければ，ニューラルネットワークに追加学習を行う
-        log(DEBUG, "追加学習を行う");
+        this.sendEmptyMessage(RE_LEARN);
+        // コサイン類似度が0.6より高ければ，ニューラルネットワークに追加学習を行う
+        // 登録済み平均値データと新たに入力されたデータをNNに入れて学習させる
+        double[][] trainingX = {x, manipulateMotionDataToNeuralNetwork(registeredVector)};
+        double[][] answer = new double[trainingX.length][1];
+        for (int time = 0; time < trainingX.length; time++) answer[time][0] = 0.0;
+
+        String[] trainedParams = learn(1, learnResult, trainingX, answer);
+
+        // 訓練データで期待した出力が得られるか確認する
+        for (int set = 0; set < trainingX.length; ++set) {
+          double[] trainedResult = out(1, trainedParams, trainingX[set]);
+          manageData.writeDoubleOneArrayData(userName, "AuthReTrainNNOut", "set"+set, trainedResult);
+          log(DEBUG, "set["+set+"] trainedResult[0]: "+trainedResult[0]);
+          if (trainedResult[0] > 0.001) break; // 期待した出力が得られない場合，処理を抜ける
+
+          if (set == trainingX.length - 1) {
+            // 全てのデータで期待した出力が得られた場合
+            // 新しいモーションの平均値と学習済みニューラルネットワークのパラメータを上書き保存する
+            double[][] averageVector = calculateAverage(new double[][][]{registeredVector, vector});
+            manageData.writeRegisterData(userName, averageVector, amp, trainedParams, authentication);
+          }
+        }
       }
       return true;
     }
@@ -268,6 +293,26 @@ class Result extends Handler implements Runnable {
 
 
   /**
+   * 複数回分のモーションデータの平均値を計算する
+   * @param input 入力データ
+   * @return 平均値データ
+   */
+  private double[][] calculateAverage(double[][][] input) {
+    log(INFO);
+    double[][] output = new double[Enum.NUM_AXIS][input[0][0].length];
+    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
+      for (int item = 0; item < output[axis].length; item++) {
+        for (double[][] anInput : input) output[axis][item] += anInput[axis][item];
+        output[axis][item] /= input.length;
+      }
+    }
+
+    return output;
+  }
+
+
+
+  /**
    * C++ネイティブのニューラルネットワーク出力メソッド
    * @param middleLayer 中間層の層数
    * @param neuronParams SdAとMLPのニューロンパラメータ
@@ -275,4 +320,16 @@ class Result extends Handler implements Runnable {
    * @return 出力データ
    */
   public native double[] out(long middleLayer, String[] neuronParams, double[] x);
+
+
+  /**
+   * C++ネイティブのニューラルネットワーク学習メソッド
+   * @param middleLayer 中間層の層数
+   * @param neuronParams SdAとMLPのニューロンパラメータ
+   * @param x 訓練データ
+   * @param answer 教師信号データ
+   * @return 学習済みニューラルネットワークのニューロンパラメータ
+   */
+  public native String[] learn(long middleLayer, String[] neuronParams,
+                               double[][] x, double[][] answer);
 }

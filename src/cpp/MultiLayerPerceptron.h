@@ -58,9 +58,6 @@ class MultiLayerPerceptron {
   void middleLastLayerLearnThread(const int begin, const int end);
   void middleMiddleLayerLearnThread(const int layer, const int begin, const int end);
   void middleFirstLayerLearnThread(const int begin, const int end);
-  void sdaLastLayerLearnThread(const int begin, const int end);
-  void sdaMiddleLayerLearnThread(const int layer, const int begin, const int end);
-  void sdaFirstLayerLearnThread(const vector<double> in, const int begin, const int end);
 
   void sdaFirstLayerOutThread(const vector<double> in, const int begin, const int end);
   void sdaOtherLayerOutThread(const int layer, const int begin, const int end);

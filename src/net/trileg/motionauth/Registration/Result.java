@@ -331,14 +331,8 @@ class Result extends Handler implements Runnable {
 
     learnResult = learn(1, neuronParams, x, answer);
 
-    // テストデータで期待した出力が得られるか確認する
-    for (int set = 0; set < x.length; ++set) {
-      double[] result = out(1, learnResult, x[set]);
-      manageData.writeDoubleOneArrayData(userName, "RegNNOut", "set"+set, result);
-      log(DEBUG, "set["+set+"] result[0]: "+result[0]);
-      if (result[0] > 0.001) return false;
-    }
-    return true;
+    // learnResultの一次元目に学習に要した回数が入るので，これを確認して上限回数内に収まっているか確認する
+    return Integer.valueOf(learnResult[0]) != 1000000;
     //endregion
   }
 

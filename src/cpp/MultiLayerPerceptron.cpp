@@ -243,6 +243,7 @@ void MultiLayerPerceptron::setupMLP(string mlp_params, double dropout_rate) {
 vector<string> MultiLayerPerceptron::learn(vector<vector<double>> x,
                                            vector<vector<double>> answer) {
   int succeed = 0; //  連続正解回数のカウンタを初期化
+  int loop_count = 0;
 
   random_device rnd; // 非決定的乱数生成器
   mt19937 mt; // メルセンヌ・ツイスタ
@@ -413,13 +414,18 @@ vector<string> MultiLayerPerceptron::learn(vector<vector<double>> x,
     //endregion
 
     //endregion
+
+    loop_count++; // 学習回数をカウント
   }
 
   // 全ての教師データで正解を出すか，収束限度回数を超えた場合に終了
-  vector<string> neuron_params(2);
+  vector<string> neuron_params(3);
 
-  //まずはSdAのパラメータを詰める
-  neuron_params[0] = sda_params;
+  // まずは学習回数を詰める
+  neuron_params[0] = to_string(loop_count);
+
+  //次にSdAのパラメータを詰める
+  neuron_params[1] = sda_params;
 
   //region MLP中間層ニューロンのパラメータを詰める
   string mlp_params = "";
@@ -514,7 +520,7 @@ vector<string> MultiLayerPerceptron::learn(vector<vector<double>> x,
   // 末尾の余計な ' を削除する
   mlp_params.pop_back();
 
-  neuron_params[1] = mlp_params;
+  neuron_params[2] = mlp_params;
   return neuron_params;
 }
 

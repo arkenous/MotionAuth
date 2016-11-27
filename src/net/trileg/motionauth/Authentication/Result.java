@@ -255,19 +255,11 @@ class Result extends Handler implements Runnable {
 
         String[] trainedParams = learn(1, learnResult, trainingX, answer);
 
-        // 訓練データで期待した出力が得られるか確認する
-        for (int set = 0; set < trainingX.length; ++set) {
-          double[] trainedResult = out(1, trainedParams, trainingX[set]);
-          manageData.writeDoubleOneArrayData(userName, "AuthReTrainNNOut", "set"+set, trainedResult);
-          log(DEBUG, "set["+set+"] trainedResult[0]: "+trainedResult[0]);
-          if (trainedResult[0] > 0.001) break; // 期待した出力が得られない場合，処理を抜ける
-
-          if (set == trainingX.length - 1) {
-            // 全てのデータで期待した出力が得られた場合
-            // 新しいモーションの平均値と学習済みニューラルネットワークのパラメータを上書き保存する
-            double[][] averageVector = calculateAverage(new double[][][]{registeredVector, vector});
-            manageData.writeRegisterData(userName, averageVector, amp, trainedParams, authentication);
-          }
+        // trainedParamsの1次元目に学習に要した回数が入るので，これを確認して上限回数内かどうか確認する
+        if (Integer.valueOf(trainedParams[0]) != 1000000) {
+          // 新しいモーションの平均値と学習済みニューラルネットワークのパラメータを上書き保存する
+          double[][] averageVector = calculateAverage(new double[][][]{registeredVector, vector});
+          manageData.writeRegisterData(userName, averageVector, amp, trainedParams, authentication);
         }
       }
       return true;

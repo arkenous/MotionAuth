@@ -260,8 +260,10 @@ public class ManageData {
 
     // 暗号化
     String[][] encryptedAverageVectorStr = mCipherCrypt.encrypt(averageVectorStr);
-    String encryptedSdALearnResult = mCipherCrypt.encrypt(learnResult[0]);
-    String encryptedMLPLearnResult = mCipherCrypt.encrypt(learnResult[1]);
+
+    // learnResultの1次元目には学習回数が入っているので無視する
+    String encryptedSdALearnResult = mCipherCrypt.encrypt(learnResult[1]);
+    String encryptedMLPLearnResult = mCipherCrypt.encrypt(learnResult[2]);
 
     // 配列データを特定文字列を挟んで連結する
     ConvertArrayAndString mConvertArrayAndString = new ConvertArrayAndString();

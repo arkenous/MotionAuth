@@ -18,7 +18,7 @@ class MultiLayerPerceptron {
 
  private:
   static const unsigned int MAX_TRIAL = 1000000; // 学習上限回数
-  constexpr static const double MAX_GAP = 0.001; // 損失関数の出力がこの値以下になれば学習をスキップする
+  constexpr static const double MAX_GAP = 0.1; // 損失関数の出力がこの値以下になれば学習をスキップする
   int num_thread = android_getCpuCount(); // Androidデバイスのプロセッサのコア数
 
   string mlp_params = "";

@@ -212,7 +212,7 @@ void DenoisingAutoencoder::outLearnThread(const vector<double> in, const vector<
     // 出力層ニューロンのdeltaの計算
     double delta = o[neuron] - ans[neuron];
 
-    __android_log_print(ANDROID_LOG_INFO, "dA", "mse: %f",
+    __android_log_print(ANDROID_LOG_VERBOSE, "dA", "mse: %f",
                         mean_squared_error(o[neuron], ans[neuron]));
 
     // 教師データとの誤差が十分小さい場合は学習しない．そうでなければ正解フラグをfalseに

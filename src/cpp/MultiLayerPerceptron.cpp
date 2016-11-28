@@ -572,7 +572,7 @@ void MultiLayerPerceptron::outLearnThread(const vector<double> ans,
     // 出力層ニューロンのdeltaの計算
     double delta = o[neuron] - ans[neuron];
 
-    __android_log_print(ANDROID_LOG_INFO, "MLP", "ce: %f", cross_entropy(o[neuron], ans[neuron]));
+    __android_log_print(ANDROID_LOG_VERBOSE, "MLP", "ce: %f", cross_entropy(o[neuron], ans[neuron]));
 
     // 損失関数の出力が十分小さい場合は学習しない．そうでなければ正解フラグをfalseに
     if (cross_entropy(o[neuron], ans[neuron]) < MAX_GAP) continue;

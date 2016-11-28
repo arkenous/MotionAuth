@@ -26,7 +26,12 @@ JNIEXPORT jobjectArray JNICALL Java_net_trileg_motionauth_Registration_Result_le
 
   // Pre training SdA
   StackedDenoisingAutoencoder stackedDenoisingAutoencoder;
-  string sda_params = stackedDenoisingAutoencoder.learn(xVector, xVector[0].size() / 2, 0.5);
+  string sda_params = "";
+
+  if (xVector[0].size() > 500)
+    sda_params = stackedDenoisingAutoencoder.learn(xVector, xVector[0].size() / 2, 0.5);
+  else
+    sda_params = stackedDenoisingAutoencoder.learn(xVector, xVector[0].size(), 0.0);
 
   vector<string> neuronParamsVector(2);
   neuronParamsVector[0] = sda_params;

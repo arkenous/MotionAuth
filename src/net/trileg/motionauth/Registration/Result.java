@@ -331,8 +331,8 @@ class Result extends Handler implements Runnable {
 
     learnResult = learn(1, neuronParams, x, answer);
 
-    // learnResultの一次元目に学習に要した回数が入るので，これを確認して上限回数内に収まっているか確認する
-    return Integer.valueOf(learnResult[0]) != 1000000;
+    // learnResultの一次元目に学習に成功したかが入るので，これを確認して上限回数内に収まっているか確認する
+    return Integer.valueOf(learnResult[0]) == 1;
     //endregion
   }
 

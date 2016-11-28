@@ -421,8 +421,9 @@ vector<string> MultiLayerPerceptron::learn(vector<vector<double>> x,
   // 全ての教師データで正解を出すか，収束限度回数を超えた場合に終了
   vector<string> neuron_params(3);
 
-  // まずは学習回数を詰める
-  neuron_params[0] = to_string(loop_count);
+  // まずは学習上限回数内に学習できたかを詰める（成功: 1，失敗: 0）
+  if (loop_count == MAX_TRIAL) neuron_params[0] = to_string(0);
+  else neuron_params[0] = to_string(1);
 
   //次にSdAのパラメータを詰める
   neuron_params[1] = sda_params;

@@ -24,29 +24,18 @@ JNIEXPORT jobjectArray JNICALL Java_net_trileg_motionauth_Registration_Result_le
   // 入力データを正規化する
   for (int i = 0; i < xVector.size(); ++i) xVector[i] = normalize(xVector[i]);
 
-  // Pre training SdA
-  StackedDenoisingAutoencoder stackedDenoisingAutoencoder;
-  string sda_params = "";
-
-  if (xVector[0].size() > 500)
-    sda_params = stackedDenoisingAutoencoder.learn(xVector, xVector[0].size() / 2, 0.5);
-  else
-    sda_params = stackedDenoisingAutoencoder.learn(xVector, xVector[0].size(), 0.0);
-
-  vector<string> neuronParamsVector(2);
-  neuronParamsVector[0] = sda_params;
-  neuronParamsVector[1] = neuronParamsString;
-  unsigned long mlp_input_size = stackedDenoisingAutoencoder.getNumMiddleNeuron();
+  vector<string> neuronParamsVector(1);
+  neuronParamsVector[0] = neuronParamsString;
 
   // MultiLayerPerceptronインスタンスを用意する
-  MultiLayerPerceptron mlp(answerVector[0].size(), (unsigned long) middleLayer,
-                           neuronParamsVector, 1, 0.0);
+  MultiLayerPerceptron mlp(xVector[0].size(), xVector[0].size(), answerVector[0].size(),
+                           (unsigned long) middleLayer, neuronParamsVector, 1, 0.0);
 
   vector<string> resultString = mlp.learn(xVector, answerVector);
 
   while (isnan(mlp.out(xVector[0])[0])) {
-    mlp = MultiLayerPerceptron(answerVector[0].size(), (unsigned long) middleLayer,
-                               neuronParamsVector, 1, 0.0);
+    mlp = MultiLayerPerceptron(xVector[0].size(), xVector[0].size(), answerVector[0].size(),
+                                   (unsigned long) middleLayer, neuronParamsVector, 1, 0.0);
     resultString = mlp.learn(xVector, answerVector);
   }
 
@@ -65,7 +54,8 @@ JNIEXPORT jdoubleArray JNICALL Java_net_trileg_motionauth_Registration_Result_ou
   xVector = normalize(xVector);
 
   // MultiLayerPerceptronインスタンスを用意する
-  MultiLayerPerceptron mlp(1, (unsigned long) middleLayer, neuronParamsVector, 1, 0.0);
+  MultiLayerPerceptron mlp(xVector.size(), xVector.size(), 1,
+                           (unsigned long) middleLayer, neuronParamsVector, 1, 0.0);
 
   vector<double> resultDoubleVector = mlp.out(xVector);
 
@@ -84,7 +74,8 @@ JNIEXPORT jdoubleArray JNICALL Java_net_trileg_motionauth_Authentication_Result_
   xVector = normalize(xVector);
 
   // MultiLayerPerceptronインスタンスを用意する
-  MultiLayerPerceptron mlp(1, (unsigned long) middleLayer, neuronParamsVector, 1, 0.0);
+  MultiLayerPerceptron mlp(xVector.size(), xVector.size(), 1,
+                           (unsigned long) middleLayer, neuronParamsVector, 1, 0.0);
 
   vector<double> resultDoubleVector = mlp.out(xVector);
 
@@ -105,14 +96,14 @@ JNIEXPORT jobjectArray JNICALL Java_net_trileg_motionauth_Authentication_Result_
   for (int i = 0; i < xVector.size(); ++i) xVector[i] = normalize(xVector[i]);
 
   // MultiLayerPerceptronインスタンスを用意する
-  MultiLayerPerceptron mlp(answerVector[0].size(), (unsigned long) middleLayer,
-                           neuronParamsVector, 1, 0.0);
+  MultiLayerPerceptron mlp(xVector[0].size(), xVector[0].size(), answerVector[0].size(),
+                           (unsigned long) middleLayer, neuronParamsVector, 1, 0.0);
 
   vector<string> resultString = mlp.learn(xVector, answerVector);
 
   while (isnan(mlp.out(xVector[0])[0])) {
-    mlp = MultiLayerPerceptron(answerVector[0].size(), (unsigned long) middleLayer,
-                               neuronParamsVector, 1, 0.0);
+    mlp = MultiLayerPerceptron(xVector[0].size(), xVector[0].size(), answerVector[0].size(),
+                               (unsigned long) middleLayer, neuronParamsVector, 1, 0.0);
     resultString = mlp.learn(xVector, answerVector);
   }
 

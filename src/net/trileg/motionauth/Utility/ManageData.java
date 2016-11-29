@@ -262,8 +262,7 @@ public class ManageData {
     String[][] encryptedAverageVectorStr = mCipherCrypt.encrypt(averageVectorStr);
 
     // learnResultの1次元目には学習回数が入っているので無視する
-    String encryptedSdALearnResult = mCipherCrypt.encrypt(learnResult[1]);
-    String encryptedMLPLearnResult = mCipherCrypt.encrypt(learnResult[2]);
+    String encryptedMLPLearnResult = mCipherCrypt.encrypt(learnResult[1]);
 
     // 配列データを特定文字列を挟んで連結する
     ConvertArrayAndString mConvertArrayAndString = new ConvertArrayAndString();
@@ -283,19 +282,6 @@ public class ManageData {
     editor.putString(userName+"vector", registerVectorData);
     editor.putString(userName+"amplify", String.valueOf(ampValue));
     editor.apply();
-
-    try {
-      OutputStream os = context.openFileOutput(userName + "_learnResult_SdA.dat", MODE_PRIVATE);
-      osw = new OutputStreamWriter(os, "UTF-8");
-      PrintWriter writer = new PrintWriter(osw);
-      writer.write(encryptedSdALearnResult);
-      writer.flush();
-      writer.close();
-      osw.close();
-      os.close();
-    } catch (Exception e) {
-      log(ERROR, e.getMessage(), e.getCause());
-    }
 
     try {
       OutputStream os = context.openFileOutput(userName + "_learnResult_MLP.dat", MODE_PRIVATE);
@@ -355,25 +341,7 @@ public class ManageData {
   public String[] readLearnResult(Context context, String userName) {
     log(INFO);
 
-    String[] learnResult = new String[2];// 損失関数の出力がこの値以下になれば学習をスキップする
-    try {
-      InputStream is = context.openFileInput(userName + "_learnResult_SdA.dat");
-      InputStreamReader isr = new InputStreamReader(is, "UTF-8");
-      BufferedReader br = new BufferedReader(isr);
-
-      String encryptedLearnResult = br.readLine();
-
-      br.close();
-      isr.close();
-      is.close();
-
-      CipherCrypt cipherCrypt = new CipherCrypt(context);
-      learnResult[0] = cipherCrypt.decrypt(encryptedLearnResult);
-
-    } catch (Exception e) {
-      log(ERROR, e.getMessage(), e.getCause());
-    }
-
+    String[] learnResult = new String[1];
     try {
       InputStream is = context.openFileInput(userName + "_learnResult_MLP.dat");
       InputStreamReader isr = new InputStreamReader(is, "UTF-8");
@@ -386,7 +354,7 @@ public class ManageData {
       is.close();
 
       CipherCrypt cipherCrypt = new CipherCrypt(context);
-      learnResult[1] = cipherCrypt.decrypt(encryptedLearnResult);
+      learnResult[0] = cipherCrypt.decrypt(encryptedLearnResult);
 
     } catch (Exception e) {
       log(ERROR, e.getMessage(), e.getCause());

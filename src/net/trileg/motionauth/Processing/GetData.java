@@ -65,7 +65,7 @@ public class GetData extends Handler implements Callable<ArrayList<ArrayList<Flo
     registerSensor();
 
     while(isActive){
-      log(DEBUG, "wait...");
+      log(VERBOSE, "wait...");
       try {
         Thread.sleep(100);
       } catch (InterruptedException e) {

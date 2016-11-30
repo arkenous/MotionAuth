@@ -25,7 +25,6 @@ import static android.util.Log.DEBUG;
 import static android.util.Log.INFO;
 import static net.trileg.motionauth.Authentication.InputName.userName;
 import static net.trileg.motionauth.Utility.Enum.MEASURE.CORRECT;
-import static net.trileg.motionauth.Utility.Enum.MEASURE.INCORRECT;
 import static net.trileg.motionauth.Utility.Enum.MEASURE.PERFECT;
 import static net.trileg.motionauth.Utility.Enum.SENSOR_DELAY_TIME;
 import static net.trileg.motionauth.Utility.LogUtil.log;
@@ -241,29 +240,26 @@ class Result extends Handler implements Runnable {
     // ニューラルネットワークの結果，正規モーションでないと判定された場合
     if (result[0] >= 0.1) return false;
 
-    // コサイン類似度が低い場合
-    if (measure == INCORRECT) return false;
-    else {
-      // コサイン類似度が0.4より高く，ニューラルネットワークの結果，正規モーションであると判定された場合
-      if (measure == PERFECT || measure == CORRECT) {
-        this.sendEmptyMessage(RE_LEARN);
-        // コサイン類似度が0.6より高ければ，ニューラルネットワークに追加学習を行う
-        // 登録済み平均値データと新たに入力されたデータをNNに入れて学習させる
-        double[][] trainingX = {x, manipulateMotionDataToNeuralNetwork(registeredVector)};
-        double[][] answer = new double[trainingX.length][1];
-        for (int time = 0; time < trainingX.length; time++) answer[time][0] = 0.0;
+    // ニューラルネットワークの結果，正規モーションであると判定された場合
+    if (measure == PERFECT || measure == CORRECT) {
+      this.sendEmptyMessage(RE_LEARN);
+      // コサイン類似度が0.6より高ければ，ニューラルネットワークに追加学習を行う
+      // 登録済み平均値データと新たに入力されたデータをNNに入れて学習させる
+      double[][] trainingX = {x, manipulateMotionDataToNeuralNetwork(registeredVector)};
+      double[][] answer = new double[trainingX.length][1];
+      for (int time = 0; time < trainingX.length; time++) answer[time][0] = 0.0;
 
-        String[] trainedParams = learn(1, learnResult, trainingX, answer);
+      String[] trainedParams = learn(1, learnResult, trainingX, answer);
 
-        // trainedParamsの1次元目に学習に成功したかが入るので，これを確認して上限回数内かどうか確認する
-        if (Integer.valueOf(trainedParams[0]) == 1) {
-          // 新しいモーションの平均値と学習済みニューラルネットワークのパラメータを上書き保存する
-          double[][] averageVector = calculateAverage(new double[][][]{registeredVector, vector});
-          manageData.writeRegisterData(userName, averageVector, amp, trainedParams, authentication);
-        }
+      // trainedParamsの1次元目に学習に成功したかが入るので，これを確認して上限回数内かどうか確認する
+      if (Integer.valueOf(trainedParams[0]) == 1) {
+        // 新しいモーションの平均値と学習済みニューラルネットワークのパラメータを上書き保存する
+        double[][] averageVector = calculateAverage(new double[][][]{registeredVector, vector});
+        manageData.writeRegisterData(userName, averageVector, amp, trainedParams, authentication);
       }
-      return true;
     }
+
+    return true;
   }
 
   /**

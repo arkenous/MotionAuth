@@ -109,31 +109,25 @@ void MultiLayerPerceptron::setupMLP(const string &mlp_params, const double dropo
       ss.str("");
       ss.clear(stringstream::goodbit);
 
-      for (unsigned long neuron = 0, n_n = elems_per_neuron.size(); neuron < n_n; ++neuron) {
-        // パラメータごとに分割する
-        ss = stringstream(elems_per_neuron[neuron]);
-        while (getline(ss, item, '|')) if (!item.empty()) elems_per_param.push_back(item);
-        item = "";
-        ss.str("");
-        ss.clear(stringstream::goodbit);
-
-        double bias = stod(elems_per_param.back());
-        elems_per_param.pop_back();
-
-        int iteration = stoi(elems_per_param.back());
-        elems_per_param.pop_back();
-
-        vector<double> weight = separate_by_camma(elems_per_param[0]);
-        vector<double> m = separate_by_camma(elems_per_param[1]);
-        vector<double> nu = separate_by_camma(elems_per_param[2]);
-        vector<double> m_hat = separate_by_camma(elems_per_param[3]);
-        vector<double> nu_hat = separate_by_camma(elems_per_param[4]);
-
-        middleNeurons[layer][neuron] = Neuron(weight.size(), weight, m, nu, m_hat, nu_hat,
-                                              iteration, bias, middle_layer_type, dropout_rate);
-
-        elems_per_param.clear();
+      vector<thread> threads(num_thread);
+      int charge;
+      threads.clear();
+      unsigned long elems_per_neuron_size = elems_per_neuron.size();
+      if (elems_per_neuron_size <= num_thread) charge = 1;
+      else charge = elems_per_neuron_size / num_thread;
+      for (int i = 0; i < elems_per_neuron_size; i += charge) {
+        if (i != 0 && elems_per_neuron_size / i == 1) {
+          threads.push_back(std::thread(&MultiLayerPerceptron::setupMiddleNeuron, this,
+                                        ref(elems_per_neuron), dropout_rate, layer,
+                                        i, elems_per_neuron_size));
+        } else {
+          threads.push_back(std::thread(&MultiLayerPerceptron::setupMiddleNeuron, this,
+                                        ref(elems_per_neuron), dropout_rate, layer,
+                                        i, i + charge));
+        }
       }
+      for (thread &th : threads) th.join();
+
       elems_per_neuron.clear();
     }
     elems_per_layer.clear();
@@ -152,31 +146,25 @@ void MultiLayerPerceptron::setupMLP(const string &mlp_params, const double dropo
     ss.str("");
     ss.clear(stringstream::goodbit);
 
-    for (unsigned long neuron = 0, n_n = elems_per_neuron.size(); neuron < n_n; ++neuron) {
-      // パラメータごとに分割する
-      ss = stringstream(elems_per_neuron[neuron]);
-      while (getline(ss, item, '|')) if (!item.empty()) elems_per_param.push_back(item);
-      item = "";
-      ss.str("");
-      ss.clear(stringstream::goodbit);
-
-      double bias = stod(elems_per_param.back());
-      elems_per_param.pop_back();
-
-      int iteration = stoi(elems_per_param.back());
-      elems_per_param.pop_back();
-
-      vector<double> weight = separate_by_camma(elems_per_param[0]);
-      vector<double> m = separate_by_camma(elems_per_param[1]);
-      vector<double> nu = separate_by_camma(elems_per_param[2]);
-      vector<double> m_hat = separate_by_camma(elems_per_param[3]);
-      vector<double> nu_hat = separate_by_camma(elems_per_param[4]);
-
-      outputNeurons[neuron] = Neuron(weight.size(), weight, m, nu, m_hat, nu_hat,
-                                     iteration, bias, 1, dropout_rate);
-
-      elems_per_param.clear();
+    vector<thread> threads(num_thread);
+    int charge;
+    threads.clear();
+    unsigned long elems_per_neuron_size = elems_per_neuron.size();
+    if (elems_per_neuron_size <= num_thread) charge = 1;
+    else charge = elems_per_neuron_size / num_thread;
+    for (int i = 0; i < elems_per_neuron_size; i += charge) {
+      if (i != 0 && elems_per_neuron_size / i == 1) {
+        threads.push_back(std::thread(&MultiLayerPerceptron::setupOutNeuron, this,
+                                      ref(elems_per_neuron), dropout_rate,
+                                      i, elems_per_neuron_size));
+      } else {
+        threads.push_back(std::thread(&MultiLayerPerceptron::setupOutNeuron, this,
+                                      ref(elems_per_neuron), dropout_rate,
+                                      i, i + charge));
+      }
     }
+    for (thread &th : threads) th.join();
+
     elems_per_neuron.clear();
     //endregion
   }
@@ -452,6 +440,71 @@ vector<double> MultiLayerPerceptron::separate_by_camma(const string &input) {
   ss.clear(stringstream::goodbit);
 
   return result;
+}
+
+void MultiLayerPerceptron::setupMiddleNeuron(const vector<string> &elems_per_neuron,
+                                             const double dropout_rate,
+                                             const int layer,
+                                             const int begin,
+                                             const int end){
+  for (int neuron = begin; neuron < end; ++neuron) {
+    // パラメータごとに分割する
+    stringstream ss(elems_per_neuron[neuron]);
+    string item = "";
+    vector<string> elems_per_param;
+    while (getline(ss, item, '|')) if (!item.empty()) elems_per_param.push_back(item);
+    item = "";
+    ss.str("");
+    ss.clear(stringstream::goodbit);
+
+    double bias = stod(elems_per_param.back());
+    elems_per_param.pop_back();
+
+    int iteration = stoi(elems_per_param.back());
+    elems_per_param.pop_back();
+
+    vector<double> weight = separate_by_camma(elems_per_param[0]);
+    vector<double> m = separate_by_camma(elems_per_param[1]);
+    vector<double> nu = separate_by_camma(elems_per_param[2]);
+    vector<double> m_hat = separate_by_camma(elems_per_param[3]);
+    vector<double> nu_hat = separate_by_camma(elems_per_param[4]);
+
+    middleNeurons[layer][neuron] = Neuron(weight.size(), weight, m, nu, m_hat, nu_hat,
+                                          iteration, bias, middle_layer_type, dropout_rate);
+    elems_per_param.clear();
+  }
+}
+
+void MultiLayerPerceptron::setupOutNeuron(const vector<string> &elems_per_neuron,
+                                          const double dropout_rate,
+                                          const int begin,
+                                          const int end) {
+  for (int neuron = begin ; neuron < end; ++neuron) {
+    // パラメータごとに分割する
+    stringstream ss(elems_per_neuron[neuron]);
+    string item = "";
+    vector<string> elems_per_param;
+    while (getline(ss, item, '|')) if (!item.empty()) elems_per_param.push_back(item);
+    item = "";
+    ss.str("");
+    ss.clear(stringstream::goodbit);
+
+    double bias = stod(elems_per_param.back());
+    elems_per_param.pop_back();
+
+    int iteration = stoi(elems_per_param.back());
+    elems_per_param.pop_back();
+
+    vector<double> weight = separate_by_camma(elems_per_param[0]);
+    vector<double> m = separate_by_camma(elems_per_param[1]);
+    vector<double> nu = separate_by_camma(elems_per_param[2]);
+    vector<double> m_hat = separate_by_camma(elems_per_param[3]);
+    vector<double> nu_hat = separate_by_camma(elems_per_param[4]);
+
+    outputNeurons[neuron] = Neuron(weight.size(), weight, m, nu, m_hat, nu_hat,
+                                   iteration, bias, 1, dropout_rate);
+    elems_per_param.clear();
+  }
 }
 
 void MultiLayerPerceptron::middleFirstLayerForwardThread(const vector<double> &in,

@@ -47,6 +47,11 @@ class MultiLayerPerceptron {
   void setupMLP(const string &mlp_params, const double dropout_rate);
   vector<double> separate_by_camma(const string &input);
 
+  void setupMiddleNeuron(const vector<string> &elems_per_neuron, const double dropout_rate,
+                         const int layer, const int begin, const int end);
+  void setupOutNeuron(const vector<string> &elems_per_neuron, const double dropout_rate,
+                      const int begin, const int end);
+
   void middleFirstLayerForwardThread(const vector<double> &in, const int begin, const int end);
   void middleLayerForwardThread(const int layer, const int begin, const int end);
   void outForwardThread(const int begin, const int end);

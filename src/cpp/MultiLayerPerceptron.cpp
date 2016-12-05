@@ -110,7 +110,7 @@ void MultiLayerPerceptron::setupMLP(const string &mlp_params, const double dropo
       ss.clear(stringstream::goodbit);
 
       vector<thread> threads(num_thread);
-      int charge;
+      unsigned long charge;
       threads.clear();
       unsigned long elems_per_neuron_size = elems_per_neuron.size();
       if (elems_per_neuron_size <= num_thread) charge = 1;
@@ -147,7 +147,7 @@ void MultiLayerPerceptron::setupMLP(const string &mlp_params, const double dropo
     ss.clear(stringstream::goodbit);
 
     vector<thread> threads(num_thread);
-    int charge;
+    unsigned long charge;
     threads.clear();
     unsigned long elems_per_neuron_size = elems_per_neuron.size();
     if (elems_per_neuron_size <= num_thread) charge = 1;
@@ -203,7 +203,7 @@ vector<string> MultiLayerPerceptron::learn(const vector<vector<double>> &x,
 
     // 1層目の中間層の出力計算
     vector<thread> threads(num_thread);
-    int charge;
+    unsigned long charge;
     threads.clear();
     if (middle_neuron_num <= num_thread) charge = 1;
     else charge = middle_neuron_num / num_thread;
@@ -643,7 +643,7 @@ void MultiLayerPerceptron::middleFirstLayerLearnThread(const vector<double> &in,
 vector<double> MultiLayerPerceptron::out(const vector<double> &input) {
   // MLP
   vector<thread> threads(num_thread);
-  int charge = 1;
+  unsigned long charge = 1;
   threads.clear();
   if (middle_neuron_num <= num_thread) charge = 1;
   else charge = middle_neuron_num / num_thread;

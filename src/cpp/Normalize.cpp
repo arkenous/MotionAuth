@@ -23,6 +23,4 @@ void normalize(vector<double> *input) {
   // 正規化し，得たデータで上書きする
   for (int data = 0; data < input_size; ++data)
     (*input)[data] = ((*input)[data] - avg) / standard_deviation;
-
-//  return *input;
 }

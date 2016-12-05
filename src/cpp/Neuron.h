@@ -10,13 +10,14 @@ using namespace std;
 class Neuron {
  public:
   Neuron();
-  Neuron(unsigned long input_num, vector<double> weight, vector<double> m, vector<double> nu,
-         vector<double> m_hat, vector<double> nu_hat, int iteration, double bias,
-         int activation_type, double dropout_rate);
-  void dropout(double random_value);
-  void learn(double delta, vector<double> inputValues); // 誤差逆伝播学習
-  double learn_output(vector<double> inputValues); // 学習時のDropoutを用いた順伝播出力
-  double output(vector<double> inputValues); // Dropoutを用いて学習したNNの順伝播出力
+  Neuron(const unsigned long input_num, const vector<double> &weight, const vector<double> &m,
+         const vector<double> &nu, const vector<double> &m_hat, const vector<double> &nu_hat,
+         const int iteration, const double bias, const int activation_type,
+         const double dropout_rate);
+  void dropout(const double random_value);
+  void learn(const double delta, const vector<double> &inputValues); // 誤差逆伝播学習
+  double learn_output(const vector<double> &inputValues); // 学習時のDropoutを用いた順伝播出力
+  double output(const vector<double> &inputValues); // Dropoutを用いて学習したNNの順伝播出力
   double getInputWeightIndexOf(int i);
   double getBias();
   double getDelta();

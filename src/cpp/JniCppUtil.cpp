@@ -85,7 +85,7 @@ string jstringToString(JNIEnv *env, jstring input) {
 /**
  * double型二次元vectorをdouble型二次元配列が入ったjobjectArrayに変換する
  */
-jobjectArray twoDimenDoubleVectorToJOBjectArray(JNIEnv *env, vector<vector<double>> input) {
+jobjectArray twoDimenDoubleVectorToJOBjectArray(JNIEnv *env, vector<vector<double>> &input) {
   double tmp[input.size()][input[0].size()];
   for (int i = 0; i < input.size(); ++i)
     for (int j = 0; j < input[i].size(); ++j)
@@ -110,7 +110,7 @@ jobjectArray twoDimenDoubleVectorToJOBjectArray(JNIEnv *env, vector<vector<doubl
 /**
  * double型一次元vectorをjdoubleArray型に変換する
  */
-jdoubleArray oneDimenDoubleVectorToJDoubleArray(JNIEnv *env, vector<double> input) {
+jdoubleArray oneDimenDoubleVectorToJDoubleArray(JNIEnv *env, vector<double> &input) {
   double tmp[input.size()];
   for (int i = 0; i < input.size(); ++i) tmp[i] = input[i];
 
@@ -125,7 +125,7 @@ jdoubleArray oneDimenDoubleVectorToJDoubleArray(JNIEnv *env, vector<double> inpu
 /**
  * string型一次元vectorをString型一次元配列が入ったjobjectArrayに変換する
  */
-jobjectArray oneDimenStringVectorToJObjectArray(JNIEnv *env, vector<string> input) {
+jobjectArray oneDimenStringVectorToJObjectArray(JNIEnv *env, vector<string> &input) {
   int len = (int) input.size();
   jclass stringClass = env->FindClass("java/lang/String");
   jobjectArray array1D = env->NewObjectArray(len, stringClass, NULL);
@@ -142,7 +142,7 @@ jobjectArray oneDimenStringVectorToJObjectArray(JNIEnv *env, vector<string> inpu
 /**
  * string型をjstring型に変換する
  */
-jstring stringToJString(JNIEnv *env, string input) {
+jstring stringToJString(JNIEnv *env, string &input) {
   return env->NewStringUTF(input.c_str());
 }
 

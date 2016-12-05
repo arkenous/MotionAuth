@@ -10,11 +10,13 @@ using namespace std;
 
 class MultiLayerPerceptron {
  public:
-  MultiLayerPerceptron(unsigned long input, unsigned long middle, unsigned long output,
-                       unsigned long middle_layer, vector<string> neuron_params,
-                       int middle_layer_type, double dropout_rate);
-  vector<string> learn(vector<vector<double>> x, vector<vector<double>> answer);
-  vector<double> out(vector<double> input);
+  MultiLayerPerceptron(const unsigned long input, const unsigned long middle,
+                       const unsigned long output, const unsigned long middle_layer,
+                       const vector<string> &neuron_params,
+                       const int middle_layer_type, const double dropout_rate);
+  vector<string> learn(const vector<vector<double>> &x,
+                       const vector<vector<double>> &answer);
+  vector<double> out(const vector<double> &input);
 
  private:
   static const unsigned int MAX_TRIAL = 1000; // 学習上限回数
@@ -42,19 +44,19 @@ class MultiLayerPerceptron {
   vector<vector<double>> learned_h;
   vector<double> learned_o;
 
-  void setupMLP(string mlp_params, double dropout_rate);
-  vector<double> separate_by_camma(string input);
+  void setupMLP(const string &mlp_params, const double dropout_rate);
+  vector<double> separate_by_camma(const string &input);
 
-  void middleFirstLayerForwardThread(const vector<double> in, const int begin, const int end);
+  void middleFirstLayerForwardThread(const vector<double> &in, const int begin, const int end);
   void middleLayerForwardThread(const int layer, const int begin, const int end);
   void outForwardThread(const int begin, const int end);
 
-  void outLearnThread(const vector<double> ans, const int begin, const int end);
+  void outLearnThread(const vector<double> &ans, const int begin, const int end);
   void middleLastLayerLearnThread(const int begin, const int end);
   void middleMiddleLayerLearnThread(const int layer, const int begin, const int end);
-  void middleFirstLayerLearnThread(const vector<double> in, const int begin, const int end);
+  void middleFirstLayerLearnThread(const vector<double> &in, const int begin, const int end);
 
-  void middleFirstLayerOutThread(const vector<double> in, const int begin, const int end);
+  void middleFirstLayerOutThread(const vector<double> &in, const int begin, const int end);
   void middleLayerOutThread(const int layer, const int begin, const int end);
   void outOutThread(const int begin, const int end);
 

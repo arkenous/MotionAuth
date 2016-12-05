@@ -16,11 +16,11 @@ Neuron::Neuron() { }
  * @param dropout_rate Dropout率
  * @return Neuronのインスタンス
  */
-Neuron::Neuron(unsigned long input_num, vector<double> weight,
-               vector<double> m, vector<double> nu,
-               vector<double> m_hat, vector<double> nu_hat,
-               int iteration, double bias, int activation_type,
-               double dropout_rate) {
+Neuron::Neuron(const unsigned long input_num, const vector<double> &weight,
+               const vector<double> &m, const vector<double> &nu,
+               const vector<double> &m_hat, const vector<double> &nu_hat,
+               const int iteration, const double bias, const int activation_type,
+               const double dropout_rate) {
   this->input_num = input_num;
   this->activation_type = activation_type;
   random_device rnd; // 非決定的乱数生成器
@@ -62,7 +62,7 @@ Neuron::Neuron(unsigned long input_num, vector<double> weight,
  * 受け取った0.0以上1.0未満の乱数値からdropout_maskを設定する
  * @param random_value 0.0以上1.0未満の乱数値
  */
-void Neuron::dropout(double random_value) {
+void Neuron::dropout(const double random_value) {
   if (random_value < dropout_rate) this->dropout_mask = 0.0;
   else this->dropout_mask = 1.0;
 }
@@ -72,17 +72,19 @@ void Neuron::dropout(double random_value) {
  * @param delta 修正量
  * @param inputValues 一つ前の層の出力データ
  */
-void Neuron::learn(double delta, vector<double> inputValues) {
+void Neuron::learn(const double delta, const vector<double> &inputValues) {
   this->delta = delta;
+  double gradient;
 
   if (this->dropout_mask == 1.0) {
     // Adamを用いて，結合荷重を更新
     this->iteration += 1;
     for (int i = 0; i < input_num; ++i) {
+      gradient = this->delta * inputValues[i];
       this->m[i] = this->beta_one * this->m[i]
-          + (1 - this->beta_one) * (this->delta * inputValues[i]);
+          + (1 - this->beta_one) * gradient;
       this->nu[i] = this->beta_two * this->nu[i]
-          + (1 - this->beta_two) * pow((this->delta * inputValues[i]), 2);
+          + (1 - this->beta_two) * pow(gradient, 2);
       this->m_hat[i] = this->m[i] / (1 - pow(this->beta_one, this->iteration));
       this->nu_hat[i] = sqrt(this->nu[i] / (1 - pow(this->beta_two, this->iteration)))
           + this->epsilon;
@@ -99,7 +101,7 @@ void Neuron::learn(double delta, vector<double> inputValues) {
  * @param inputValues ニューロンの入力データ
  * @return ニューロンの出力
  */
-double Neuron::learn_output(vector<double> inputValues) {
+double Neuron::learn_output(const vector<double> &inputValues) {
   double sum = this->bias;
   for (int i = 0; i < this->input_num; ++i) sum += inputValues[i] * this->inputWeights[i];
 
@@ -117,7 +119,7 @@ double Neuron::learn_output(vector<double> inputValues) {
  * @param inputValues ニューロンの入力データ
  * @return ニューロンの出力
  */
-double Neuron::output(vector<double> inputValues) {
+double Neuron::output(const vector<double> &inputValues) {
   double sum = this->bias * (1.0 - this->dropout_rate);
   for (int i = 0; i < this->input_num; ++i)
     sum += inputValues[i] * (this->inputWeights[i] * (1.0 - this->dropout_rate));

@@ -17,10 +17,10 @@ vector<vector<double>> jobjectArrayToTwoDimenDoubleVector(JNIEnv *env, jobjectAr
 vector<double> jdoubleArrayToOneDimenDoubleVector(JNIEnv *env, jdoubleArray input);
 vector<string> jobjectArrayToOneDimenStringVector(JNIEnv *env, jobjectArray input);
 string jstringToString(JNIEnv *env, jstring input);
-jobjectArray twoDimenDoubleVectorToJOBjectArray(JNIEnv *env, vector<vector<double>> input);
-jdoubleArray oneDimenDoubleVectorToJDoubleArray(JNIEnv *env, vector<double> input);
-jobjectArray oneDimenStringVectorToJObjectArray(JNIEnv *env, vector<string> input);
-jstring stringToJString(JNIEnv *env, string input);
+jobjectArray twoDimenDoubleVectorToJOBjectArray(JNIEnv *env, vector<vector<double>> &input);
+jdoubleArray oneDimenDoubleVectorToJDoubleArray(JNIEnv *env, vector<double> &input);
+jobjectArray oneDimenStringVectorToJObjectArray(JNIEnv *env, vector<string> &input);
+jstring stringToJString(JNIEnv *env, string &input);
 
 #ifdef __cplusplus
 }

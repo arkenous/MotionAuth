@@ -6,5 +6,5 @@
 
 using namespace std;
 
-vector<double> normalize(vector<double> input);
+void normalize(vector<double> *input);
 #endif //MOTIONAUTH_NORMALIZE_H

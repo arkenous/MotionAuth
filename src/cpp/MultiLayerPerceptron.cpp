@@ -97,7 +97,7 @@ void MultiLayerPerceptron::setupMLP(const string &mlp_params, const double dropo
     ss.str("");
     ss.clear(stringstream::goodbit);
 
-    for (int layer = 0; layer < elems_per_layer.size(); ++layer) {
+    for (unsigned long layer = 0, n_l = elems_per_layer.size(); layer < n_l; ++layer) {
       // ' でニューロン単位で分割する
       ss = stringstream(elems_per_layer[layer]);
       while (std::getline(ss, item, '\'')) if (!item.empty()) elems_per_neuron.push_back(item);
@@ -109,7 +109,7 @@ void MultiLayerPerceptron::setupMLP(const string &mlp_params, const double dropo
       ss.str("");
       ss.clear(stringstream::goodbit);
 
-      for (int neuron = 0; neuron < elems_per_neuron.size(); ++neuron) {
+      for (unsigned long neuron = 0, n_n = elems_per_neuron.size(); neuron < n_n; ++neuron) {
         // パラメータごとに分割する
         ss = stringstream(elems_per_neuron[neuron]);
         while (getline(ss, item, '|')) if (!item.empty()) elems_per_param.push_back(item);
@@ -152,7 +152,7 @@ void MultiLayerPerceptron::setupMLP(const string &mlp_params, const double dropo
     ss.str("");
     ss.clear(stringstream::goodbit);
 
-    for (int neuron = 0; neuron < elems_per_neuron.size(); ++neuron) {
+    for (unsigned long neuron = 0, n_n = elems_per_neuron.size(); neuron < n_n; ++neuron) {
       // パラメータごとに分割する
       ss = stringstream(elems_per_neuron[neuron]);
       while (getline(ss, item, '|')) if (!item.empty()) elems_per_param.push_back(item);
@@ -231,7 +231,7 @@ vector<string> MultiLayerPerceptron::learn(const vector<vector<double>> &x,
     // 一つ前の中間層より得られた出力を用いて，以降の中間層を順に計算
     if (middle_neuron_num <= num_thread) charge = 1;
     else charge = middle_neuron_num / num_thread;
-    for (int layer = 1; layer <= (int) middle_layer_number - 1; ++layer) {
+    for (int layer = 1, last_layer = (int)middle_layer_number - 1; layer <= last_layer; ++layer) {
       threads.clear();
       for (int i = 0; i < middle_neuron_num; i += charge)
         if (i != 0 && middle_neuron_num / i == 1)
@@ -304,7 +304,7 @@ vector<string> MultiLayerPerceptron::learn(const vector<vector<double>> &x,
     //region 出力層と入力層に最も近い層一つずつを除いた残りの中間層を入力層に向けて学習する
     if (middle_neuron_num <= num_thread) charge = 1;
     else charge = middle_neuron_num / num_thread;
-    for (int layer = (int) middle_layer_number - 2; layer >= 1; --layer) {
+    for (int layer = (int)middle_layer_number - 2; layer >= 1; --layer) {
       threads.clear();
       for (int i = 0; i < middle_neuron_num; i += charge)
         if (i != 0 && middle_neuron_num / i == 1)
@@ -605,7 +605,7 @@ vector<double> MultiLayerPerceptron::out(const vector<double> &input) {
 
   if (middle_neuron_num <= num_thread) charge = 1;
   else charge = middle_neuron_num / num_thread;
-  for (int layer = 1; layer <= (int) middle_layer_number - 1; ++layer) {
+  for (int layer = 1, last_layer = (int)middle_layer_number - 1; layer <= last_layer; ++layer) {
     threads.clear();
     for (int i = 0; i < middle_neuron_num; i += charge)
       if (i != 0 && middle_neuron_num / i == 1)

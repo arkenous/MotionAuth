@@ -87,8 +87,8 @@ string jstringToString(JNIEnv *env, jstring input) {
  */
 jobjectArray twoDimenDoubleVectorToJOBjectArray(JNIEnv *env, vector<vector<double>> &input) {
   double tmp[input.size()][input[0].size()];
-  for (int i = 0; i < input.size(); ++i)
-    for (int j = 0; j < input[i].size(); ++j)
+  for (unsigned long i = 0, m = input.size(); i < m; ++i)
+    for (unsigned long j = 0, n = input[i].size(); j < n; ++j)
       tmp[i][j] = input[i][j];
 
   int len1 = sizeof(tmp) / sizeof(tmp[0]);
@@ -112,7 +112,7 @@ jobjectArray twoDimenDoubleVectorToJOBjectArray(JNIEnv *env, vector<vector<doubl
  */
 jdoubleArray oneDimenDoubleVectorToJDoubleArray(JNIEnv *env, vector<double> &input) {
   double tmp[input.size()];
-  for (int i = 0; i < input.size(); ++i) tmp[i] = input[i];
+  for (unsigned long i = 0, n = input.size(); i < n; ++i) tmp[i] = input[i];
 
   int len = sizeof(tmp) / sizeof(tmp[0]);
 

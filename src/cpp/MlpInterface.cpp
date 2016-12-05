@@ -22,7 +22,7 @@ JNIEXPORT jobjectArray JNICALL Java_net_trileg_motionauth_Registration_Result_le
   vector<vector<double>> answerVector = jobjectArrayToTwoDimenDoubleVector(env, answer);
 
   // 入力データを正規化する
-  for (int i = 0; i < xVector.size(); ++i) xVector[i] = normalize(xVector[i]);
+  for (unsigned long i = 0, n = xVector.size(); i < n; ++i) normalize(&xVector[i]);
 
   vector<string> neuronParamsVector(1);
   neuronParamsVector[0] = neuronParamsString;
@@ -51,7 +51,7 @@ JNIEXPORT jdoubleArray JNICALL Java_net_trileg_motionauth_Registration_Result_ou
   vector<double> xVector = jdoubleArrayToOneDimenDoubleVector(env, x);
 
   // 入力データを正規化する
-  xVector = normalize(xVector);
+  normalize(&xVector);
 
   // MultiLayerPerceptronインスタンスを用意する
   MultiLayerPerceptron mlp(xVector.size(), xVector.size(), 1,
@@ -71,7 +71,7 @@ JNIEXPORT jdoubleArray JNICALL Java_net_trileg_motionauth_Authentication_Result_
   vector<double> xVector = jdoubleArrayToOneDimenDoubleVector(env, x);
 
   // 入力データを正規化する
-  xVector = normalize(xVector);
+  normalize(&xVector);
 
   // MultiLayerPerceptronインスタンスを用意する
   MultiLayerPerceptron mlp(xVector.size(), xVector.size(), 1,
@@ -93,7 +93,7 @@ JNIEXPORT jobjectArray JNICALL Java_net_trileg_motionauth_Authentication_Result_
   vector<vector<double>> answerVector = jobjectArrayToTwoDimenDoubleVector(env, answer);
 
   // 入力データを正規化する
-  for (int i = 0; i < xVector.size(); ++i) xVector[i] = normalize(xVector[i]);
+  for (unsigned long i = 0, n = xVector.size(); i < n; ++i) normalize(&xVector[i]);
 
   // MultiLayerPerceptronインスタンスを用意する
   MultiLayerPerceptron mlp(xVector[0].size(), xVector[0].size(), answerVector[0].size(),

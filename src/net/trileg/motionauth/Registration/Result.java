@@ -11,15 +11,19 @@ import android.widget.Button;
 
 import net.trileg.motionauth.Lowpass.Fourier;
 import net.trileg.motionauth.Processing.Adjuster;
-import net.trileg.motionauth.Processing.Amplifier;
 import net.trileg.motionauth.Processing.Calc;
-import net.trileg.motionauth.Processing.CorrectDeviation;
-import net.trileg.motionauth.Processing.CosSimilarity;
 import net.trileg.motionauth.Processing.Formatter;
 import net.trileg.motionauth.Processing.RotateVector;
+import net.trileg.motionauth.R;
 import net.trileg.motionauth.Utility.Enum;
 import net.trileg.motionauth.Utility.ManageData;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Socket;
 import java.util.ArrayList;
 
 import static android.util.Log.DEBUG;
@@ -35,51 +39,41 @@ import static net.trileg.motionauth.Utility.LogUtil.log;
  */
 class Result extends Handler implements Runnable {
   private static final int FORMAT = 1;
-  private static final int AMPLIFY = 2;
   private static final int FOURIER = 3;
   private static final int CONVERT = 4;
-  private static final int DEVIATION = 5;
-  private static final int COSINE_SIMILARITY = 6;
   private static final int NN_LEARNING = 7;
   private static final int FINISH = 8;
 
+  private String hostname;
+  private int port;
+
   private ManageData manageData = new ManageData();
   private Formatter formatter = new Formatter();
-  private Amplifier amplifier = new Amplifier();
   private Fourier fourier = new Fourier();
   private Calc calc = new Calc();
-  private CorrectDeviation correctDeviation = new CorrectDeviation();
   private Adjuster adjuster = new Adjuster();
-  private CosSimilarity cosSimilarity = new CosSimilarity();
 
   private Registration registration;
   private Button getMotion;
   private ProgressDialog progressDialog;
 
-  private double checkRange;
-  private double amp;
-  private String[] learnResult;
+  private String[] learnResult = {"", ""};
   private float[][][] linearAccel;
   private float[][][] gyro;
-  private double[][] averageVector;
   private boolean result = false;
-
-  // C++で書いたMLPライブラリの呼び出しに必要
-  static {
-    System.loadLibrary("mlp-lib");
-  }
+  private int num_dimension = 0;
 
 
   Result(float[][][] linearAccel, float[][][] gyro, Button getMotion,
-         ProgressDialog progressDialog, double checkRange, double amp, Registration registration) {
+         ProgressDialog progressDialog, Registration registration) {
     log(INFO);
     this.linearAccel = linearAccel;
     this.gyro = gyro;
     this.getMotion = getMotion;
     this.progressDialog = progressDialog;
-    this.checkRange = checkRange;
-    this.amp = amp;
     this.registration = registration;
+    this.hostname = registration.getResources().getString(R.string.serverHost);
+    this.port = registration.getResources().getInteger(R.integer.serverPort);
   }
 
 
@@ -100,20 +94,11 @@ class Result extends Handler implements Runnable {
       case FORMAT:
         progressDialog.setMessage("データのフォーマット中");
         break;
-      case AMPLIFY:
-        progressDialog.setMessage("データの増幅処理中");
-        break;
       case FOURIER:
         progressDialog.setMessage("フーリエ変換中");
         break;
       case CONVERT:
         progressDialog.setMessage("データの変換中");
-        break;
-      case DEVIATION:
-        progressDialog.setMessage("データのズレを修正中");
-        break;
-      case COSINE_SIMILARITY:
-        progressDialog.setMessage("コサイン類似度を算出中");
         break;
       case NN_LEARNING:
         progressDialog.setMessage("ニューラルネットワークの学習中");
@@ -142,9 +127,7 @@ class Result extends Handler implements Runnable {
 
           alert.show();
         } else {
-          // モーションの平均値をファイルに書き出す
-          manageData.writeDoubleTwoArrayData(userName, "RegRegistered", "vector", averageVector);
-          manageData.writeRegisterData(userName, averageVector, amp, learnResult, registration);
+          manageData.writeRegisterData(userName, learnResult, num_dimension, registration);
 
           AlertDialog.Builder alert = new AlertDialog.Builder(registration);
           alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
@@ -173,13 +156,6 @@ class Result extends Handler implements Runnable {
   }
 
 
-  void setAmpAndRange(double amp, double checkRange) {
-    log(INFO);
-    this.amp = amp;
-    this.checkRange = checkRange;
-  }
-
-
   /**
    * データ加工，計算処理を行う
    */
@@ -202,19 +178,6 @@ class Result extends Handler implements Runnable {
     manageData.writeDoubleThreeArrayData(userName, "RegFormatted",
                                          "linearAcceleration", linearAcceleration);
     manageData.writeDoubleThreeArrayData(userName, "RegFormatted",
-                                         "gyroscope", gyroscope);
-
-    // データの増幅処理
-    if (amplifier.CheckValueRange(linearAcceleration, checkRange)
-        || amplifier.CheckValueRange(gyroscope, checkRange)) {
-      this.sendEmptyMessage(AMPLIFY);
-      linearAcceleration = amplifier.Amplify(linearAcceleration, amp);
-      gyroscope = amplifier.Amplify(gyroscope, amp);
-    }
-
-    manageData.writeDoubleThreeArrayData(userName, "RegAmplified",
-                                         "linearAcceleration", linearAcceleration);
-    manageData.writeDoubleThreeArrayData(userName, "RegAmplified",
                                          "gyroscope", gyroscope);
 
     // フーリエ変換によるローパスフィルタ
@@ -250,109 +213,74 @@ class Result extends Handler implements Runnable {
 
     manageData.writeDoubleThreeArrayData(userName, "RegCombined", "vector", vector);
 
-    this.sendEmptyMessage(DEVIATION);
-
-    //region 同一のモーションであるかの確認をし，必要に応じてズレ修正を行う
-    log(DEBUG, "Before measure cosine similarity");
-
-    // コサイン類似度を測る
-    double[] vectorCosSimilarity = cosSimilarity.cosSimilarity(vector);
-
-    Enum.MEASURE measure = cosSimilarity.measure(vectorCosSimilarity);
-
-    log(DEBUG, "After measure cosine similarity");
-    log(DEBUG, "measure = " + String.valueOf(measure));
-
-    if (Enum.MEASURE.MAYBE == measure) {
-      log(DEBUG, "Deviation");
-      // 類似度が0.4よりも高く，0.6以下の場合，ズレ修正を行う
-      int count = 0;
-      Enum.MODE mode = Enum.MODE.MAX;
-
-      double[][][] originalVector = vector;
-
-      // ズレ修正は基準値を最大値，最小値，中央値の順に置く．
-      while (true) {
-        switch (count) {
-          case 0:
-            mode = Enum.MODE.MAX;
-            break;
-          case 1:
-            mode = Enum.MODE.MIN;
-            break;
-          case 2:
-            mode = Enum.MODE.MEDIAN;
-            break;
-        }
-
-        vector = correctDeviation.correctDeviation(vector, mode);
-
-        vectorCosSimilarity = cosSimilarity.cosSimilarity(vector);
-
-        Enum.MEASURE tmp = cosSimilarity.measure(vectorCosSimilarity);
-
-        log(DEBUG, "MEASURE: " + String.valueOf(tmp));
-
-        manageData.writeDoubleThreeArrayData(userName, "RegDeviatedData" + String.valueOf(mode),
-                                             "vector", vector);
-
-        if (tmp == Enum.MEASURE.PERFECT || tmp == Enum.MEASURE.CORRECT) break;
-
-        vector = originalVector;
-
-        if (count == 2) break; // Break this loop if all pattern attempts were failed
-
-        count++;
-      }
-    }
-    //endregion
-
     manageData.writeDoubleThreeArrayData(userName, "RegAfterCalcData", "vector", vector);
-
-    this.sendEmptyMessage(COSINE_SIMILARITY);
-
-    // Calculate average data.
-    averageVector = calculateAverage(vector);
-
-    vectorCosSimilarity = cosSimilarity.cosSimilarity(vector);
-    manageData.writeDoubleOneArrayData(userName, "RegCosSimilarity",
-                                       "vectorCosSimilarity", vectorCosSimilarity);
-
-    measure = cosSimilarity.measure(vectorCosSimilarity);
-    log(DEBUG, "measure = " + measure);
 
     this.sendEmptyMessage(NN_LEARNING);
     //region ニューラルネットワークの学習をし，期待した出力が得られれば登録完了とする
     // 取得したデータを，ニューラルネットワークの教師入力用に調整する
     double[][] x = manipulateMotionDataToNeuralNetwork(vector);
-    double[][] answer = new double[x.length][1];
-    for (int time = 0; time < x.length; time++) answer[time][0] = 0.0;
-    String neuronParams = "";
+    num_dimension = x[0].length;
 
-    learnResult = learn(1, neuronParams, x, answer);
+    manageData.writeNNInputData(userName, "NNInputData", "vector", x);
 
-    // learnResultの一次元目に学習に成功したかが入るので，これを確認して上限回数内に収まっているか確認する
-    return Integer.valueOf(learnResult[0]) == 1;
-    //endregion
-  }
+    //Socketでサーバにモード，ユーザ名，データ入力回数，データ次元数，データを渡す
+    try {
+      log(DEBUG, "Waiting for connecting to server");
+      Socket socket = new Socket(hostname, port);
+      log(DEBUG, "Socket connected");
+      log(DEBUG, "Preparing stream");
+      DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+      BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+      DataInputStream inputStream = new DataInputStream(socket.getInputStream());
+      String line;
 
+      // Send mode value
+      outputStream.writeInt(0);
+      outputStream.flush();
+      log(DEBUG, "Send mode value");
 
-  /**
-   * 複数回分の入力モーションデータの平均値を計算する
-   * @param input 入力データ
-   * @return 平均値データ
-   */
-  private double[][] calculateAverage(double[][][] input) {
-    log(INFO);
-    double[][] output = new double[Enum.NUM_AXIS][input[0][0].length];
-    for (int axis = 0; axis < Enum.NUM_AXIS; axis++) {
-      for (int item = 0; item < output[axis].length; item++) {
-        for (double[][] anInput : input) output[axis][item] += anInput[axis][item];
-        output[axis][item] /= input.length;
+      // Send user name
+      outputStream.writeBytes(userName+"\n");
+      outputStream.flush();
+      log(DEBUG, "Send user name");
+
+      // Send number of input time
+      outputStream.writeInt(x.length);
+      outputStream.flush();
+      log(DEBUG, "Send number of input time");
+
+      // Send number of data dimension
+      outputStream.writeInt(num_dimension);
+      outputStream.flush();
+      log(DEBUG, "Send number of data dimension");
+
+      // Send data
+      for (int time = 0, t_size = x.length; time < t_size; ++time) {
+        for (int dimen = 0, d_size = x[time].length; dimen < d_size; ++dimen) {
+          outputStream.writeDouble(x[time][dimen]);
+        }
       }
-    }
+      outputStream.flush();
+      log(DEBUG, "Send data");
 
-    return output;
+      // Receive neuron size
+      int neuron_size = inputStream.readInt();
+      log(DEBUG, "Receive neuron size");
+      learnResult = new String[neuron_size];
+
+      // Receive neuron parameters
+      for(int neuron = 0; neuron < neuron_size; ++neuron) {
+        if ((line = bufferedReader.readLine()) != null) learnResult[neuron] = line;
+      }
+      log(DEBUG, "Receive neuron parameters");
+
+      return true;
+    } catch (IOException e) {
+      // Make registration failure if socket connection was broken
+      e.printStackTrace();
+      return false;
+    }
+    //endregion
   }
 
 
@@ -377,25 +305,4 @@ class Result extends Handler implements Runnable {
 
     return output;
   }
-
-
-  /**
-   * C++ネイティブのニューラルネットワーク学習メソッド
-   * @param middleLayer 中間層の層数
-   * @param neuronParams ニューロンパラメータ（ただしここでは初めての学習となるので空文字を渡す）
-   * @param x 教師入力データ
-   * @param answer 教師出力データ
-   * @return SdAとMLPの学習済みニューロンパラメータ
-   */
-  public native String[] learn(long middleLayer, String neuronParams,
-                               double[][] x, double[][] answer);
-
-  /**
-   * C++ネイティブのニューラルネットワーク出力メソッド
-   * @param middleLayer 中間層の層数
-   * @param neuronParams SdAとMLPの学習済みニューロンパラメータ
-   * @param x 入力データ
-   * @return ニューラルネットワークの出力
-   */
-  public native double[] out(long middleLayer, String[] neuronParams, double[] x);
 }

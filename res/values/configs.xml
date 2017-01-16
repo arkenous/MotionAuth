@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <bool name="isShowLog">true</bool>
+    <string name="serverHost">192.0.2.1</string>
+    <integer name="serverPort">50001</integer>
 </resources>

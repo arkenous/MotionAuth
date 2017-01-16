@@ -3,15 +3,26 @@ package net.trileg.motionauth.Utility;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
+
 import net.trileg.motionauth.Processing.CipherCrypt;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.os.Environment.MEDIA_MOUNTED;
-import static android.util.Log.*;
+import static android.util.Log.DEBUG;
+import static android.util.Log.ERROR;
+import static android.util.Log.INFO;
 import static java.io.File.separator;
-import static net.trileg.motionauth.Utility.Enum.NUM_AXIS;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
 
@@ -187,6 +198,54 @@ public class ManageData {
     return true;
   }
 
+  public boolean writeNNInputData(String userName, String dataName,
+                                  String sensorName, double[][] data) {
+    log(INFO);
+
+    String status = Environment.getExternalStorageState();
+    if (!status.equals(MEDIA_MOUNTED)) {
+      log(ERROR, "SDCard not mounted");
+      return false;
+    }
+
+    String SD_PATH = Environment.getExternalStorageDirectory().getPath();
+    String FOLDER_PATH = SD_PATH + separator + APP_NAME
+                         + separator + userName + separator + dataName;
+
+    File file = new File(FOLDER_PATH);
+
+    try {
+      if (!file.exists()) if (!file.mkdirs()) log(ERROR, "Make directory error");
+    } catch (Exception e) {
+      log(ERROR, e.getMessage(), e.getCause());
+      return false;
+    }
+
+    try {
+      for (int time = 0, size = data.length; time < size; ++time) {
+        String filePath = FOLDER_PATH + separator + sensorName + time + ".dat";
+        file = new File(filePath);
+
+        fos = new FileOutputStream(file, false);
+        osw = new OutputStreamWriter(fos, "UTF-8");
+        bw = new BufferedWriter(osw);
+
+        for (int item = 0; item < data[time].length; item = item + 3)
+          bw.write(data[time][item] + "," + data[time][item + 1] + "," + data[time][item + 2] + ",\n");
+
+        bw.flush();
+        bw.close();
+        osw.close();
+        fos.close();
+      }
+    } catch (Exception e) {
+      log(ERROR, e.getMessage(), e.getCause());
+      return false;
+    }
+    return true;
+  }
+
+
 
   /**
    * @param userName   User name.
@@ -241,32 +300,12 @@ public class ManageData {
   /**
    * Save authentication key data which is collected from Registration.
    * @param userName User name.
-   * @param averageVector Vector data.
-   * @param ampValue Amplifier value.
    * @param learnResult Neuron parameters of SdA and MLP
    * @param context Caller context.
    */
-  public void writeRegisterData(String userName, double[][] averageVector, double ampValue,
-                                String[] learnResult, Context context) {
+  public void writeRegisterData(String userName, String[] learnResult, int num_dimension,
+                                Context context) {
     log(INFO);
-
-    CipherCrypt mCipherCrypt = new CipherCrypt(context);
-
-    String[][] averageVectorStr = new String[averageVector.length][averageVector[0].length];
-
-    for (int axis = 0; axis < NUM_AXIS; axis++)
-      for (int item = 0; item < averageVector[axis].length; item++)
-        averageVectorStr[axis][item] = String.valueOf(averageVector[axis][item]);
-
-    // 暗号化
-    String[][] encryptedAverageVectorStr = mCipherCrypt.encrypt(averageVectorStr);
-
-    // learnResultの1次元目には学習回数が入っているので無視する
-    String encryptedMLPLearnResult = mCipherCrypt.encrypt(learnResult[1]);
-
-    // 配列データを特定文字列を挟んで連結する
-    ConvertArrayAndString mConvertArrayAndString = new ConvertArrayAndString();
-    String registerVectorData = mConvertArrayAndString.arrayToString(encryptedAverageVectorStr);
 
     SharedPreferences userPref
         = context.getApplicationContext().getSharedPreferences("UserList", MODE_PRIVATE);
@@ -275,19 +314,28 @@ public class ManageData {
     userPrefEditor.putString(userName, "");
     userPrefEditor.apply();
 
+    CipherCrypt mCipherCrypt = new CipherCrypt(context);
+
+    String[] encryptedLearnResult = new String[learnResult.length];
+    for (int i = 0, size = learnResult.length; i < size; ++i) {
+      encryptedLearnResult[i] = mCipherCrypt.encrypt(learnResult[i]);
+    }
+
     SharedPreferences preferences
         = context.getApplicationContext().getSharedPreferences(APP_NAME, MODE_PRIVATE);
     SharedPreferences.Editor editor = preferences.edit();
 
-    editor.putString(userName+"vector", registerVectorData);
-    editor.putString(userName+"amplify", String.valueOf(ampValue));
+    editor.putInt(userName+"learnResult_length", encryptedLearnResult.length);
+    editor.putInt(userName+"num_dimension", num_dimension);
     editor.apply();
 
     try {
-      OutputStream os = context.openFileOutput(userName + "_learnResult_MLP.dat", MODE_PRIVATE);
+      OutputStream os = context.openFileOutput(userName + "_learnResult.dat", MODE_PRIVATE);
       osw = new OutputStreamWriter(os, "UTF-8");
       PrintWriter writer = new PrintWriter(osw);
-      writer.write(encryptedMLPLearnResult);
+      for (int i = 0, size = encryptedLearnResult.length; i < size; ++i) {
+        writer.println(encryptedLearnResult[i]);
+      }
       writer.flush();
       writer.close();
       osw.close();
@@ -300,39 +348,6 @@ public class ManageData {
 
 
   /**
-   * Read registered data from SharedPreferences
-   *
-   * @param context  Context use to get Application unique SharedPreferences.
-   * @param userName User name.
-   * @return Double type 2-array registered data list.
-   */
-  public double[][] readRegisteredData(Context context, String userName) {
-    log(INFO);
-    Context mContext = context.getApplicationContext();
-
-    SharedPreferences preferences = mContext.getSharedPreferences(APP_NAME, MODE_PRIVATE);
-
-    String registeredVectorData = preferences.getString(userName+"vector", "");
-
-    if ("".equals(registeredVectorData)) throw new RuntimeException();
-
-    ConvertArrayAndString mConvertArrayAndString = new ConvertArrayAndString();
-    CipherCrypt mCipherCrypt = new CipherCrypt(context);
-
-    String[][] decryptedVector
-        = mCipherCrypt.decrypt(mConvertArrayAndString.stringToArray(registeredVectorData));
-
-    double[][] vector = new double[decryptedVector.length][decryptedVector[0].length];
-
-    for (int axis = 0; axis < NUM_AXIS; axis++)
-      for (int item = 0; item < decryptedVector[axis].length; item++)
-        vector[axis][item] = Double.valueOf(decryptedVector[axis][item]);
-
-    return vector;
-  }
-
-
-  /**
    * Read NN parameters from App local file
    * @param context Activity or Application context
    * @param userName User name
@@ -341,25 +356,28 @@ public class ManageData {
   public String[] readLearnResult(Context context, String userName) {
     log(INFO);
 
-    String[] learnResult = new String[1];
+    SharedPreferences preferences = context.getApplicationContext().getSharedPreferences(APP_NAME, MODE_PRIVATE);
+    int learnResult_length = preferences.getInt(userName+"learnResult_length", -1);
+    String[] learnResult = new String[learnResult_length];
     try {
-      InputStream is = context.openFileInput(userName + "_learnResult_MLP.dat");
+      InputStream is = context.openFileInput(userName + "_learnResult.dat");
       InputStreamReader isr = new InputStreamReader(is, "UTF-8");
       BufferedReader br = new BufferedReader(isr);
+      String encryptedLearnResult;
 
-      String encryptedLearnResult = br.readLine();
+      CipherCrypt cipherCrypt = new CipherCrypt(context);
+      int counter = 0;
+      while ((encryptedLearnResult = br.readLine()) != null) {
+        learnResult[counter] = cipherCrypt.decrypt(encryptedLearnResult);
+        counter++;
+      }
 
       br.close();
       isr.close();
       is.close();
-
-      CipherCrypt cipherCrypt = new CipherCrypt(context);
-      learnResult[0] = cipherCrypt.decrypt(encryptedLearnResult);
-
     } catch (Exception e) {
       log(ERROR, e.getMessage(), e.getCause());
     }
-
 
     return learnResult;
   }

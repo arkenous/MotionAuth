@@ -53,8 +53,6 @@ public class Registration extends Activity {
   private ArrayList<ArrayList<ArrayList<Float>>> gyroscopeData = new ArrayList<>();
   private ListToArray listToArray = new ListToArray();
 
-  private double checkRangeValue = 2.0; // 増幅器にかけるかどうかを判断する，モーションの振れ幅の閾値
-  private double ampValue = 2.0; // 増幅する量（モーションデータ * ampValue）
   private int countTime = 0; // 何回入力されたかを計測する
   private int getTimes = 3; // モーションの取得回数
 
@@ -82,7 +80,11 @@ public class Registration extends Activity {
     rest = (TextView) findViewById(R.id.rest);
     getMotion = (Button) findViewById(R.id.getMotion);
 
+    // Initializing
+    reset();
+
     nameTv.setText(userName + "さん読んでね！");
+
 
     getMotion.setOnTouchListener(new View.OnTouchListener() {
       @Override
@@ -229,7 +231,7 @@ public class Registration extends Activity {
 
     Result result = new Result(listToArray.listTo3DArray(linearAcceleration),
                                listToArray.listTo3DArray(gyro), getMotion, progressDialog,
-                               checkRangeValue, ampValue, Registration.this);
+                               Registration.this);
     ExecutorService executorService = Executors.newSingleThreadExecutor();
     executorService.submit(result);
     executorService.shutdown();
@@ -270,7 +272,6 @@ public class Registration extends Activity {
   @Override
   protected void onPause() {
     super.onPause();
-    //TODO モーションセンサの停止コードを書く
     log(INFO);
   }
 
@@ -346,90 +347,6 @@ public class Registration extends Activity {
         } else
           Toast.makeText(Registration.this, "取得回数の変更はモーション入力後には出来ません．",
                          Toast.LENGTH_LONG).show();
-        return true;
-
-      case R.id.change_range_value:
-        if (getMotion.isClickable()) {
-          LayoutInflater inflater = LayoutInflater.from(Registration.this);
-          View seekView = inflater.inflate(R.layout.seekdialog,
-                                           (ViewGroup) findViewById(R.id.dialog_root));
-
-          //region 閾値調整
-          SeekBar thresholdSeekBar = (SeekBar) seekView.findViewById(R.id.threshold);
-          final TextView thresholdSeekText = (TextView) seekView.findViewById(R.id.thresholdtext);
-          thresholdSeekText.setText("増幅器にかけるかどうかを判断する閾値を調整できます．\n" +
-              "2.5を中心に，値が小さければ登録・認証が難しくなり，大きければ易しくなります．\n" +
-              "現在の値は" + checkRangeValue + "です．");
-
-          thresholdSeekBar.setMax(30);
-          thresholdSeekBar.setProgress(16);
-          thresholdSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-              checkRangeValue = (seekBar.getProgress() + 10) / 10.0;
-              thresholdSeekText.setText("増幅器にかけるかどうかを判断する閾値を調整できます．\n" +
-                  "2.5を中心に，値が小さければ登録・認証が難しくなり，大きければ易しくなります．\n" +
-                  "現在の値は" + checkRangeValue + "です．");
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-              checkRangeValue = (seekBar.getProgress() + 10) / 10.0;
-              thresholdSeekText.setText("増幅器にかけるかどうかを判断する閾値を調整できます．\n" +
-                  "2.5を中心に，値が小さければ登録・認証が難しくなり，大きければ易しくなります．\n" +
-                  "現在の値は" + checkRangeValue + "です．");
-            }
-          });
-          //endregion
-
-          //region 増幅値調整
-          SeekBar amplifierSeekBar = (SeekBar) seekView.findViewById(R.id.amplifier);
-          final TextView amplifierText = (TextView) seekView.findViewById(R.id.amplifierText);
-          amplifierText.setText("増幅器にかける場合に，何倍増幅するかを調整できます．標準は2倍です．\n" +
-              "現在の値は" + ampValue + "です．");
-
-          amplifierSeekBar.setMax(10);
-          amplifierSeekBar.setProgress(2);
-          amplifierSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-              ampValue = seekBar.getProgress() * 1.0;
-              amplifierText.setText("増幅器にかける場合に，何倍増幅するかを調整できます．標準は2倍です．\n" +
-                  "現在の値は" + ampValue + "です．");
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-              ampValue = seekBar.getProgress() * 1.0;
-              amplifierText.setText("増幅器にかける場合に，何倍増幅するかを調整できます．標準は2倍です．\n" +
-                  "現在の値は" + ampValue + "です．");
-            }
-          });
-          //endregion
-
-          AlertDialog.Builder dialog = new AlertDialog.Builder(Registration.this);
-          dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
-            @Override
-            public boolean onKey(DialogInterface dialog1, int keyCode, KeyEvent event) {
-              return keyCode == KEYCODE_BACK;
-            }
-          });
-          dialog.setTitle("増幅器設定");
-          dialog.setView(seekView);
-          dialog.setCancelable(false);
-          dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog1, int which) {}
-          });
-          dialog.show();
-        }
         return true;
 
       case R.id.reset:

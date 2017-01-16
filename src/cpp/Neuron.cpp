@@ -1,4 +1,4 @@
-
+#include <math.h>
 #include "Neuron.h"
 
 using namespace std;
@@ -18,8 +18,7 @@ Neuron::Neuron() { }
  */
 Neuron::Neuron(const unsigned long input_num, const vector<double> &weight,
                const vector<double> &m, const vector<double> &nu,
-               const vector<double> &m_hat, const vector<double> &nu_hat,
-               const int iteration, const double bias, const int activation_type,
+               const unsigned long iteration, const double bias, const int activation_type,
                const double dropout_rate) {
   this->input_num = input_num;
   this->activation_type = activation_type;
@@ -41,12 +40,6 @@ Neuron::Neuron(const unsigned long input_num, const vector<double> &weight,
 
   if (nu.size() > 0) this->nu = vector<double>(nu);
   else this->nu = vector<double>(input_num, 0.0);
-
-  if (m_hat.size() > 0) this->m_hat = vector<double>(m_hat);
-  else this->m_hat = vector<double>(input_num, 0.0);
-
-  if (nu_hat.size() > 0) this->nu_hat = vector<double>(nu_hat);
-  else this->nu_hat = vector<double>(input_num, 0.0);
 
   // 結合荷重が渡されていればそれをセットし，無ければ乱数で初期化
   if (weight.size() > 0) this->inputWeights = vector<double>(weight);
@@ -85,10 +78,9 @@ void Neuron::learn(const double delta, const vector<double> &inputValues) {
           + (1 - this->beta_one) * gradient;
       this->nu[i] = this->beta_two * this->nu[i]
           + (1 - this->beta_two) * pow(gradient, 2);
-      this->m_hat[i] = this->m[i] / (1 - pow(this->beta_one, this->iteration));
-      this->nu_hat[i] = sqrt(this->nu[i] / (1 - pow(this->beta_two, this->iteration)))
-          + this->epsilon;
-      this->inputWeights[i] -= this->alpha * (this->m_hat[i] / this->nu_hat[i]);
+      this->inputWeights[i] -= this->alpha *
+          ((this->m[i] / (1 - pow(this->beta_one, this->iteration))) /
+              (sqrt(this->nu[i] / (1 - pow(this->beta_two, this->iteration))) + this->epsilon));
     }
 
     // SGDでバイアスを更新
@@ -170,12 +162,16 @@ double Neuron::activation_relu(double x) {
   return max(0.0, x);
 }
 
+unsigned long Neuron::getInputNum(){
+  return this->input_num;
+}
+
 /**
  * このニューロンの指定された入力インデックスの結合荷重を返す
  * @param i 入力インデックス
  * @return 結合荷重
  */
-double Neuron::getInputWeightIndexOf(int i) {
+double Neuron::getInputWeightIndexOf(unsigned long i) {
   return this->inputWeights[i];
 }
 
@@ -194,22 +190,14 @@ double Neuron::getDelta() {
   return this->delta;
 }
 
-double Neuron::getMIndexOf(int i) {
+double Neuron::getMIndexOf(unsigned long i) {
   return this->m[i];
 }
 
-double Neuron::getNuIndexOf(int i) {
+double Neuron::getNuIndexOf(unsigned long i) {
   return this->nu[i];
 }
 
-double Neuron::getMHatIndexOf(int i) {
-  return this->m_hat[i];
-}
-
-double Neuron::getNuHatIndexOf(int i) {
-  return this->nu_hat[i];
-}
-
-int Neuron::getIteration() {
+unsigned long Neuron::getIteration() {
   return this->iteration;
 }

@@ -3,23 +3,28 @@
 #define MOTIONAUTH_DENOISINGAUTOENCODER_H
 
 #include <string>
-#include <cpu-features.h>
 #include <vector>
+#include <thread>
+#include <cpu-features.h>
 #include "Neuron.h"
 
-using namespace std;
+using std::vector;
+using std::string;
+using std::thread;
 
 class DenoisingAutoencoder {
  public:
-  DenoisingAutoencoder(unsigned long num_input, float compression_rate);
-  string learn(vector<vector<double>> input, vector<vector<double>> noisy_input);
-  vector<vector<double>> getMiddleOutput(vector<vector<double>> noisy_input);
+  DenoisingAutoencoder(const unsigned long num_input, const float compression_rate,
+                       const double dropout_rate);
+  vector<Neuron> learn(const vector<vector<double>> &input,
+                       const vector<vector<double>> &noisy_input);
+  vector<vector<double>> getMiddleOutput(const vector<vector<double>> &noisy_input);
   unsigned long getCurrentMiddleNeuronNum();
 
  private:
-  static const unsigned int MAX_TRIAL = 10000; // 学習上限回数
-  constexpr static const double MAX_GAP = 30.0; // 損失関数の出力がこの値以下になれば学習をスキップする
-  int num_thread = android_getCpuCount(); // Androidデバイスのプロセッサのコア数
+  static const unsigned int MAX_TRIAL = 2000; // 学習上限回数
+  constexpr static const double MAX_GAP = 0.1; // 損失関数の出力がこの値以下になれば学習をスキップする
+  unsigned long num_thread = (unsigned long) android_getCpuCount(); // Androidデバイスのプロセッサのコア数
 
   unsigned long input_neuron_num;
   unsigned long middle_neuron_num;
@@ -29,22 +34,30 @@ class DenoisingAutoencoder {
 
   bool successFlg = true;
 
+  vector<double> in;
+  vector<double> ans;
+
+  vector<thread> threads;
+
   vector<Neuron> middle_neurons;
   vector<Neuron> output_neurons;
 
   vector<double> h; // 中間層の出力値
   vector<double> o; // 出力層の出力値
-  vector<double> learned_h;
-  vector<double> learned_o;
+  vector<double> learnedH;
+  vector<double> learnedO;
 
-  void middleForwardThread(const vector<double> in, const int begin, const int end);
+
+  void middleForwardThread(const int begin, const int end);
   void outForwardThread(const int begin, const int end);
-  void outLearnThread(const vector<double> in, const vector<double> ans,
-                      const int begin, const int end);
-  void middleLearnThread(const vector<double> in, const int begin, const int end);
-  void middleOutThread(const vector<double> in, const int begin, const int end);
 
-  double mean_squared_error(double output, double answer);
+  void outLearnThread(const int begin, const int end);
+  void middleLearnThread(const int begin, const int end);
+
+  void middleOutThread(const int begin, const int end);
+  void outOutThread(const int begin, const int end);
+
+  double mean_squared_error(const double output, const double answer);
 };
 
 #endif //MOTIONAUTH_DENOISINGAUTOENCODER_H

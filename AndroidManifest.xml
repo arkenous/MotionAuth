@@ -47,13 +47,5 @@
                 android:name=".Authentication.Authentication"
             android:label="@string/title_activity_auth_motion"
             android:screenOrientation="portrait"></activity>
-        <activity
-            android:name=".ViewDataList.RegistrantList"
-            android:label="@string/title_activity_registrant_list"
-            android:screenOrientation="portrait"></activity>
-        <activity
-            android:name=".ViewDataList.ViewRegisteredData"
-            android:label="@string/title_activity_view_registered_data"
-            android:screenOrientation="portrait"></activity>
     </application>
 </manifest>

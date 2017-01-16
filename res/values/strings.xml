@@ -24,8 +24,6 @@
     <string name="getData">モーションデータ取得</string>
     <string name="title_activity_auth_name_input">InputName</string>
     <string name="title_activity_auth_motion">Authentication</string>
-    <string name="title_activity_registrant_list">RegistrantList</string>
-    <string name="title_activity_view_registered_data">ViewRegisteredData</string>
     <string name="amplifier_settings">増幅器設定</string>
     <string name="reset">リセット</string>
     <string name="text">text</string>

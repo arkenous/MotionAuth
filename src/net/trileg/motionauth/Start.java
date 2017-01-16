@@ -55,7 +55,7 @@ public class Start extends Activity {
       public void onClick(View v) {
         log(DEBUG, "Click start button.");
 
-        String[] btnMsg = {"View data", "Authentication", "Registration"};
+        String[] btnMsg = {"Authentication", "Registration"};
         AlertDialog.Builder alert = new AlertDialog.Builder(Start.this);
         alert.setOnKeyListener(new DialogInterface.OnKeyListener() {
           @Override
@@ -77,16 +77,10 @@ public class Start extends Activity {
         alert.setPositiveButton(btnMsg[0], new DialogInterface.OnClickListener() {
           @Override
           public void onClick(DialogInterface dialog, int which) {
-            moveActivity(getPackageName(), getPackageName() + ".ViewDataList.RegistrantList", true);
-          }
-        });
-        alert.setNeutralButton(btnMsg[1], new DialogInterface.OnClickListener() {
-          @Override
-          public void onClick(DialogInterface dialog, int which) {
             moveActivity(getPackageName(), getPackageName() + ".Authentication.InputName", true);
           }
         });
-        alert.setNegativeButton(btnMsg[2], new DialogInterface.OnClickListener() {
+        alert.setNegativeButton(btnMsg[1], new DialogInterface.OnClickListener() {
           @Override
           public void onClick(DialogInterface dialog, int which) {
             moveActivity(getPackageName(), getPackageName() + ".Registration.InputName", true);

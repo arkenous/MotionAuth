@@ -237,21 +237,25 @@ class Result extends Handler implements Runnable {
       // Send mode value
       outputStream.writeInt(0);
       outputStream.flush();
+      if(!inputStream.readBoolean()) return false;
       log(DEBUG, "Send mode value");
 
       // Send user name
       outputStream.writeBytes(userName+"\n");
       outputStream.flush();
+      if(!inputStream.readBoolean()) return false;
       log(DEBUG, "Send user name");
 
       // Send number of input time
       outputStream.writeInt(x.length);
       outputStream.flush();
+      if(!inputStream.readBoolean()) return false;
       log(DEBUG, "Send number of input time");
 
       // Send number of data dimension
       outputStream.writeInt(num_dimension);
       outputStream.flush();
+      if(!inputStream.readBoolean()) return false;
       log(DEBUG, "Send number of data dimension");
 
       // Send data
@@ -261,10 +265,13 @@ class Result extends Handler implements Runnable {
         }
       }
       outputStream.flush();
+      if(!inputStream.readBoolean()) return false;
       log(DEBUG, "Send data");
 
       // Receive neuron size
       int neuron_size = inputStream.readInt();
+      outputStream.writeBoolean(true);
+      outputStream.flush();
       log(DEBUG, "Receive neuron size");
       learnResult = new String[neuron_size];
 
@@ -272,6 +279,8 @@ class Result extends Handler implements Runnable {
       for(int neuron = 0; neuron < neuron_size; ++neuron) {
         if ((line = bufferedReader.readLine()) != null) learnResult[neuron] = line;
       }
+      outputStream.writeBoolean(true);
+      outputStream.flush();
       log(DEBUG, "Receive neuron parameters");
 
       return true;

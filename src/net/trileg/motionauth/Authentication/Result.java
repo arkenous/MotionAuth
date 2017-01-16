@@ -219,38 +219,47 @@ class Result extends Handler implements Runnable {
       // Send mode value
       outputStream.writeInt(1);
       outputStream.flush();
+      if(!inputStream.readBoolean()) return false;
 
       // Send user name
       outputStream.writeBytes(userName+"\n");
       outputStream.flush();
+      if(!inputStream.readBoolean()) return false;
 
       // Send number of input time
       outputStream.writeInt(1);
       outputStream.flush();
+      if(!inputStream.readBoolean()) return false;
 
       // Send number of data dimension
       outputStream.writeInt(x.length);
       outputStream.flush();
+      if(!inputStream.readBoolean()) return false;
 
       // Send data
       for (int dimen = 0, d_size = x.length; dimen < d_size; ++dimen) {
         outputStream.writeDouble(x[dimen]);
       }
       outputStream.flush();
+      if(!inputStream.readBoolean()) return false;
 
 
       // Send SdA parameter length
       outputStream.writeInt(learnResult.length);
       outputStream.flush();
+      if(!inputStream.readBoolean()) return false;
 
       // Send SdA parameter
       for (int i = 0, size = learnResult.length; i < size; ++i) {
         outputStream.writeBytes(learnResult[i]+"\n");
       }
       outputStream.flush();
+      if(!inputStream.readBoolean()) return false;
 
       // Receive result
       double result = inputStream.readDouble();
+      outputStream.writeBoolean(true);
+      outputStream.flush();
 
       log(DEBUG, "Neural Network Output: "+result);
       manageData.writeDoubleSingleData(userName, "AuthNNOut", "NNOut", result);

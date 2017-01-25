@@ -16,8 +16,6 @@ using namespace std;
 
 JNIEXPORT jdouble JNICALL Java_net_trileg_motionauth_Authentication_Result_out
     (JNIEnv *env, jobject thiz, jobjectArray neuronParams, jdoubleArray x) {
-  //TODO SdA仕様に変える
-
   vector<string> neuronParamsVector = jobjectArrayToOneDimenStringVector(env, neuronParams);
   vector<double> xVector = jdoubleArrayToOneDimenDoubleVector(env, x);
 

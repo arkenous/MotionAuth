@@ -22,8 +22,8 @@ class DenoisingAutoencoder {
   unsigned long getCurrentMiddleNeuronNum();
 
  private:
-  static const unsigned int MAX_TRIAL = 2000; // 学習上限回数
-  constexpr static const double MAX_GAP = 0.1; // 損失関数の出力がこの値以下になれば学習をスキップする
+  static const unsigned int MAX_TRIAL = 100; // 学習上限回数
+  constexpr static const double MAX_GAP = 0.0; // 損失関数の出力がこの値以下になれば学習をスキップする
   unsigned long num_thread = (unsigned long) android_getCpuCount(); // Androidデバイスのプロセッサのコア数
 
   unsigned long input_neuron_num;

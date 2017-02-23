@@ -32,7 +32,7 @@ class Neuron {
   vector<double> inputWeights;
   double delta = 0.0; // 修正量
   double bias = 0.0; // ニューロンのバイアス // -threshold
-  double alpha = 0.01; // 学習率
+  double alpha = 0.005; // 学習率
   double beta_one = 0.9;
   double beta_two = 0.999;
   double epsilon = 0.00000001;
@@ -45,8 +45,8 @@ class Neuron {
   double activation_tanh(double x); // 2
   double activation_relu(double x); // 3
 
-  double dropout_rate; // どれくらいの割合で中間層ニューロンをDropoutさせるか
-  double dropout_mask; // Dropoutのマスク率，0.0で殺して1.0で生かす
+  double dropout_rate = 0.0; // どれくらいの割合で中間層ニューロンをDropoutさせるか
+  double dropout_mask = 1.0; // Dropoutのマスク率，0.0で殺して1.0で生かす
 };
 
 #endif //MOTIONAUTH_NEURON_H

@@ -26,6 +26,7 @@ import java.net.Socket;
 import static android.content.Context.MODE_PRIVATE;
 import static android.util.Log.DEBUG;
 import static android.util.Log.INFO;
+import static android.util.Log.WARN;
 import static net.trileg.motionauth.Authentication.InputName.userName;
 import static net.trileg.motionauth.Utility.Enum.SENSOR_DELAY_TIME;
 import static net.trileg.motionauth.Utility.LogUtil.log;
@@ -118,6 +119,7 @@ class Result extends Handler implements Runnable {
         break;
       case FINISH:
         progressDialog.dismiss();
+        log(WARN, "Auth Calculation Finished!!!");
         if (!result) {
           log(INFO, "False authentication");
           AlertDialog.Builder alert = new AlertDialog.Builder(authentication);
@@ -198,7 +200,7 @@ class Result extends Handler implements Runnable {
     gyroscope = fourier.LowpassFilter(gyroscope, "gyro", userName);
 
     this.sendEmptyMessage(CONVERT);
-    double[][] linearDistance = calc.accelToDistance(linearAcceleration, SENSOR_DELAY_TIME);
+    double[][] linearDistance = calc.accelToDisplacement(linearAcceleration, SENSOR_DELAY_TIME);
     double[][] angle = calc.gyroToAngle(gyroscope, SENSOR_DELAY_TIME);
 
     RotateVector rotateVector = new RotateVector();
@@ -209,6 +211,8 @@ class Result extends Handler implements Runnable {
     // 学習済みニューラルネットワークの出力を得る
     this.sendEmptyMessage(NN_OUT);
     double[] x = manipulateMotionDataToNeuralNetwork(vector);
+
+    manageData.writeNNInputData(userName, "AuthNNInputData", "vector", x);
 
     //Socketでサーバにモード，ユーザ名，データ入力回数，データ次元数，データを渡す
     try {

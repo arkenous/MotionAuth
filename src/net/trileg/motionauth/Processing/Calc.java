@@ -18,7 +18,7 @@ public class Calc {
    * @param t        time
    * @return After converted 3-array distance data.
    */
-  public double[][][] accelToDistance(double[][][] inputVal, double t) {
+  public double[][][] accelToDisplacement(double[][][] inputVal, double t) {
     log(INFO);
 
     double[][][] returnVal = new double[inputVal.length][NUM_AXIS][inputVal[0][0].length];
@@ -60,7 +60,7 @@ public class Calc {
    * @param t        time
    * @return After converted 2-array distance data.
    */
-  public double[][] accelToDistance(double[][] inputVal, double t) {
+  public double[][] accelToDisplacement(double[][] inputVal, double t) {
     log(INFO);
 
     double[][] returnVal = new double[NUM_AXIS][inputVal[0].length];

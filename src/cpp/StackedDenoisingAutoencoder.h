@@ -26,7 +26,7 @@ class StackedDenoisingAutoencoder {
   double out(const vector<double> &input);
 
  private:
-  static const unsigned int MAX_TRIAL = 50000; // 学習上限回数
+  static const unsigned int MAX_TRIAL = 500; // 学習上限回数
   constexpr static const double MAX_GAP = 0.1; // 許容する誤差の域値
   bool successFlg = true;
   unsigned long num_thread = (unsigned long) android_getCpuCount(); // Androidデバイスのプロセッサのコア数

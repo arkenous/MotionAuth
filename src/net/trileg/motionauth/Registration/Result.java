@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import static android.util.Log.DEBUG;
 import static android.util.Log.ERROR;
 import static android.util.Log.INFO;
+import static android.util.Log.WARN;
 import static net.trileg.motionauth.Registration.InputName.userName;
 import static net.trileg.motionauth.Utility.LogUtil.log;
 
@@ -105,6 +106,7 @@ class Result extends Handler implements Runnable {
         break;
       case FINISH:
         progressDialog.dismiss();
+        log(WARN, "Reg Calculation Finished!!!");
         log(DEBUG, "ProgressDialog was dismissed now");
 
         if (!result) {
@@ -194,7 +196,7 @@ class Result extends Handler implements Runnable {
 
     // 加速度から変位，角速度から角度へ変換（第二引数はセンサの取得間隔）
     this.sendEmptyMessage(CONVERT);
-    double[][][] linearDistance = calc.accelToDistance(linearAcceleration, Enum.SENSOR_DELAY_TIME);
+    double[][][] linearDistance = calc.accelToDisplacement(linearAcceleration, Enum.SENSOR_DELAY_TIME);
     double[][][] angle = calc.gyroToAngle(gyroscope, Enum.SENSOR_DELAY_TIME);
 
     manageData.writeDoubleThreeArrayData(userName, "RegConverted",
@@ -221,7 +223,7 @@ class Result extends Handler implements Runnable {
     double[][] x = manipulateMotionDataToNeuralNetwork(vector);
     num_dimension = x[0].length;
 
-    manageData.writeNNInputData(userName, "NNInputData", "vector", x);
+    manageData.writeNNInputData(userName, "RegNNInputData", "vector", x);
 
     //Socketでサーバにモード，ユーザ名，データ入力回数，データ次元数，データを渡す
     try {
@@ -303,9 +305,7 @@ class Result extends Handler implements Runnable {
     double[][] output = new double[input.length][input[0][0].length * 3]; // 入力回数 * (データ長 * 軸数）
 
     for (int time = 0; time < input.length; ++time) {
-      for (int data = 0, dataPerAxis = 0;
-           data < input[time][0].length * 3;
-           data += 3, dataPerAxis++) {
+      for (int data = 0, dataPerAxis = 0; data < input[time][0].length * 3; data += 3, dataPerAxis++) {
         output[time][data] = input[time][0][dataPerAxis];
         output[time][data + 1] = input[time][1][dataPerAxis];
         output[time][data + 2] = input[time][2][dataPerAxis];

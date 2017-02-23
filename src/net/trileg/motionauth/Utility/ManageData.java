@@ -246,6 +246,53 @@ public class ManageData {
   }
 
 
+  public boolean writeNNInputData(String userName, String dataName,
+                                  String sensorName, double[] data) {
+    log(INFO);
+
+    String status = Environment.getExternalStorageState();
+    if (!status.equals(MEDIA_MOUNTED)) {
+      log(ERROR, "SDCard not mounted");
+      return false;
+    }
+
+    String SD_PATH = Environment.getExternalStorageDirectory().getPath();
+    String FOLDER_PATH = SD_PATH + separator + APP_NAME
+                         + separator + userName + separator + dataName;
+
+    File file = new File(FOLDER_PATH);
+
+    try {
+      if (!file.exists()) if (!file.mkdirs()) log(ERROR, "Make directory error");
+    } catch (Exception e) {
+      log(ERROR, e.getMessage(), e.getCause());
+      return false;
+    }
+
+    try {
+      String filePath = FOLDER_PATH + separator + sensorName + ".dat";
+      file = new File(filePath);
+
+      fos = new FileOutputStream(file, false);
+      osw = new OutputStreamWriter(fos, "UTF-8");
+      bw = new BufferedWriter(osw);
+
+      for (int item = 0; item < data.length; item = item + 3)
+        bw.write(data[item] + "," + data[item + 1] + "," + data[item + 2] + ",\n");
+
+      bw.flush();
+      bw.close();
+      osw.close();
+      fos.close();
+    } catch (Exception e) {
+      log(ERROR, e.getMessage(), e.getCause());
+      return false;
+    }
+    return true;
+  }
+
+
+
 
   /**
    * @param userName   User name.

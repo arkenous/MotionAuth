@@ -2,7 +2,7 @@
 #ifndef MOTIONAUTH_MLPINTERFACE_H
 #define MOTIONAUTH_MLPINTERFACE_H
 
-double dropout_rate = 0.3;
+double dropout_rate = 0.5;
 unsigned long num_sda_layer = 1;
-float sda_compression_rate = 0.6;
+float sda_compression_rate = 0.5;
 #endif //MOTIONAUTH_MLPINTERFACE_H

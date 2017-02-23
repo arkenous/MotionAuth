@@ -212,6 +212,7 @@ public class Registration extends Activity {
   void finishGetMotion(ArrayList<ArrayList<ArrayList<Float>>> linearAcceleration,
                        ArrayList<ArrayList<ArrayList<Float>>> gyro) {
     log(INFO);
+    log(WARN, "Reg Calculation Started!!!");
     if (getMotion.isClickable()) getMotion.setClickable(false);
     second.setText("0");
     getMotion.setText("データ処理中");

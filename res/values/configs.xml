@@ -2,5 +2,5 @@
 <resources>
     <bool name="isShowLog">true</bool>
     <string name="serverHost">192.0.2.1</string>
-    <integer name="serverPort">50001</integer>
+    <integer name="serverPort">50010</integer>
 </resources>

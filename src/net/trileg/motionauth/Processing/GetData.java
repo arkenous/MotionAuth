@@ -39,9 +39,14 @@ public class GetData extends Handler implements Callable<ArrayList<ArrayList<Flo
     firstMillis = 0;
     this.isAcceleration = isAcceleration;
     this.sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-    if (this.isAcceleration) this.linearAcceleration
-        = sensorManager.getDefaultSensor(TYPE_LINEAR_ACCELERATION);
-    else this.gyroscope = sensorManager.getDefaultSensor(TYPE_GYROSCOPE);
+    if (this.isAcceleration) {
+      this.linearAcceleration
+          = sensorManager.getDefaultSensor(TYPE_LINEAR_ACCELERATION);
+      log(DEBUG, "linearAcceleration Maximum Range: "+linearAcceleration.getMaximumRange());
+    } else {
+      this.gyroscope = sensorManager.getDefaultSensor(TYPE_GYROSCOPE);
+      log(DEBUG, "gyroscope Maximum Range: "+gyroscope.getMaximumRange());
+    }
 
     dataPerTime.clear();
     for (int axis = 0; axis < NUM_AXIS; axis++) dataPerTime.add(new ArrayList<Float>());
@@ -83,6 +88,7 @@ public class GetData extends Handler implements Callable<ArrayList<ArrayList<Flo
     if (time == 1){
       long secondMillis = System.currentTimeMillis();
       SENSOR_DELAY_TIME = (secondMillis - firstMillis) / 1000.0;
+      log(DEBUG, "SENSOR_DELAY_TIME: "+SENSOR_DELAY_TIME);
       time++;
     } else if (time == 0) {
       firstMillis = System.currentTimeMillis();

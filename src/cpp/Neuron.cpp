@@ -72,19 +72,21 @@ void Neuron::learn(const double delta, const vector<double> &inputValues) {
   if (this->dropout_mask == 1.0) {
     // Adamを用いて，結合荷重を更新
     this->iteration += 1;
+
     for (int i = 0; i < input_num; ++i) {
       gradient = this->delta * inputValues[i];
       this->m[i] = this->beta_one * this->m[i]
-          + (1 - this->beta_one) * gradient;
+          + (1.0 - this->beta_one) * gradient;
       this->nu[i] = this->beta_two * this->nu[i]
-          + (1 - this->beta_two) * pow(gradient, 2);
+          + (1.0 - this->beta_two) * pow(gradient, 2);
       this->inputWeights[i] -= this->alpha *
-          ((this->m[i] / (1 - pow(this->beta_one, this->iteration))) /
-              (sqrt(this->nu[i] / (1 - pow(this->beta_two, this->iteration))) + this->epsilon));
+          ((this->m[i] / (1.0 - pow(this->beta_one, this->iteration))) /
+              (sqrt(this->nu[i] / (1.0 - pow(this->beta_two, this->iteration))) + this->epsilon))
+           - (alpha * lambda * inputWeights[i]);
     }
 
     // SGDでバイアスを更新
-    this->bias -= (this->alpha * this->delta) - (this->alpha * this->lambda * this->bias);
+    this->bias -= this->alpha * this->delta;
   }
 }
 
@@ -98,10 +100,19 @@ double Neuron::learn_output(const vector<double> &inputValues) {
   for (int i = 0; i < this->input_num; ++i) sum += inputValues[i] * this->inputWeights[i];
 
   double activated;
-  if (activation_type == 0) activated = activation_identity(sum);
-  else if (activation_type == 1) activated = activation_sigmoid(sum);
-  else if (activation_type == 2) activated = activation_tanh(sum);
-  else activated = activation_relu(sum);
+  switch (activation_type) {
+    case 0:
+      activated = activation_identity(sum);
+      break;
+    case 1:
+      activated = activation_sigmoid(sum);
+      break;
+    case 2:
+      activated = activation_tanh(sum);
+      break;
+    default:
+      activated = activation_relu(sum);
+  }
 
   return activated * this->dropout_mask;
 }
@@ -112,18 +123,27 @@ double Neuron::learn_output(const vector<double> &inputValues) {
  * @return ニューロンの出力
  */
 double Neuron::output(const vector<double> &inputValues) {
-  double sum = this->bias * (1.0 - this->dropout_rate);
+  double sum = this->bias;
   for (int i = 0; i < this->input_num; ++i)
-    sum += inputValues[i] * (this->inputWeights[i] * (1.0 - this->dropout_rate));
+    sum += inputValues[i] * this->inputWeights[i];
 
   double activated;
   // 得られた重み付き和を活性化関数に入れて出力を得る
-  if (activation_type == 0) activated = activation_identity(sum);
-  else if (activation_type == 1) activated = activation_sigmoid(sum);
-  else if (activation_type == 2) activated = activation_tanh(sum);
-  else activated = activation_relu(sum);
+  switch (activation_type) {
+    case 0:
+      activated = activation_identity(sum);
+      break;
+    case 1:
+      activated = activation_sigmoid(sum);
+      break;
+    case 2:
+      activated = activation_tanh(sum);
+      break;
+    default:
+      activated = activation_relu(sum);
+  }
 
-  return activated;
+  return activated * (1.0 - this->dropout_rate);
 }
 
 /**

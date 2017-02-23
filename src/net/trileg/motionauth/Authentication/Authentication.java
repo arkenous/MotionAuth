@@ -195,6 +195,7 @@ public class Authentication extends Activity {
   private void finishGetMotion(ArrayList<ArrayList<Float>> linearAccel,
                                ArrayList<ArrayList<Float>> gyro) {
     log(INFO);
+    log(WARN, "Auth Calculation Started!!!");
     if (getMotion.isClickable()) getMotion.setClickable(false);
     second.setText("0");
     getMotion.setText("認証処理中");
